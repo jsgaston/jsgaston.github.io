@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Tu Radio en GitHub Pages</title>
+</head>
+<body>
+   <h1>Bienvenido a Tu Radio</h1>
+
+   <audio controls id="radioPlayer">
+      <!-- Agrega la ruta de tu primera canción .m4a -->
+      <source src="ruta/a/tu/primera-cancion.m4a" type="audio/mp4">
+      Tu navegador no soporta el elemento de audio.
+   </audio>
+
+   <script>
+      var playlist = [
+         "/Musica/04 Comancheria.m4a",
+         "/Musica/05 No Pasarán.m4a",
+         // Agrega más canciones según sea necesario
+      ];
+
+      var currentTrack = 0;
+      var radioPlayer = document.getElementById('radioPlayer');
+
+      radioPlayer.addEventListener('ended', function() {
+         currentTrack = (currentTrack + 1) % playlist.length;
+         radioPlayer.src = playlist[currentTrack];
+         radioPlayer.play();
+      });
+
+      radioPlayer.play();
+   </script>
+</body>
+</html>
+
