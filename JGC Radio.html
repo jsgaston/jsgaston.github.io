@@ -1,66 +1,102 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>JGC Radio</title>
-   <style>
-      body {
-         background-image: url('/images/back_radio.png');
-         background-size: cover;
-         background-repeat: no-repeat;
-         color: white; /* Cambia el color del texto según sea necesario para que sea legible en tu fondo */
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JGC Radio</title>
+    <style>
+        body {
+            background-image: url('/images/back_radio.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            color: white;
+            overflow: hidden; /* Oculta la barra de desplazamiento vertical */
+        }
 
-      h1 {
-         text-align: center;
-         padding: 50px;
-      }
+        h1 {
+            text-align: center;
+            padding: 50px;
+        }
 
-      #radioPlayer {
-         margin: 20px auto;
-         display: block;
-      }
+        #radioPlayer {
+            margin: 20px auto;
+            display: block;
+        }
 
-      /* Puedes agregar estilos adicionales para otras partes de tu página aquí */
-   </style>
+        /* Estilos para las imágenes que se mueven */
+        .moving-image-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Permite clics a través de la imagen */
+            z-index: -1; /* Coloca la imagen detrás del contenido */
+        }
+
+        .moving-image {
+            width: 100px; /* Ajusta el tamaño de la imagen según sea necesario */
+            position: absolute;
+            animation: moveImage 10s infinite linear;
+        }
+
+        @keyframes moveImage {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(50vh);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        /* Agrega estilos adicionales para otras partes de tu página aquí */
+
+    </style>
 </head>
+
 <body>
-   <h1>Bienvenido a mi Radio</h1>
+    <h1>Bienvenido a mi Radio</h1>
 
-   <audio controls id="radioPlayer">
-      <!-- Agrega la ruta de tu primera canción .m4a -->
-      <source src="/Musica/04 Comancheria.m4a" type="audio/mp4">
-      Tu navegador no soporta el elemento de audio.
-   </audio>
+    <!-- Contenedor para la imagen que se mueve -->
+    <div class="moving-image-container">
+        <img class="moving-image" src="/images/logo.png" alt="Imagen estática">
+    </div>
 
-   <script>
-      var playlist = [
-         
-         "/Musica/05 No Pasaran.m4a",
-         "/Musica/04 Comancheria.m4a",
-         "/Musica/03 Forjado a Fuego.m4a",
-         "/Musica/04 La Estanquera de Saigon.m4a",
-         "/Musica/04 Trabajadoreas.m4a",
-         "/Musica/01 Libertad.m4a",
-         "/Musica/08 Adentro.m4a",
-         "/Musica/02 Esto No para.m4a",
-         "/Musica/13 Insolacion.m4a",
-         
-         
-         // Agrega más canciones según sea necesario
-      ];
+    <audio controls id="radioPlayer">
+        <source src="/Musica/04 Comancheria.m4a" type="audio/mp4">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
 
-      var currentTrack = 0;
-      var radioPlayer = document.getElementById('radioPlayer');
+    <script>
+        var playlist = [
+            "/Musica/05 No Pasaran.m4a",
+            "/Musica/04 Comancheria.m4a",
+            "/Musica/03 Forjado a Fuego.m4a",
+            "/Musica/04 La Estanquera de Saigon.m4a",
+            "/Musica/04 Trabajadores.m4a",
+            "/Musica/01 Libertad.m4a",
+            "/Musica/08 Adentro.m4a",
+            "/Musica/02 Esto No para.m4a",
+            "/Musica/13 Insolacion.m4a",
+        ];
 
-      radioPlayer.addEventListener('ended', function() {
-         currentTrack = (currentTrack + 1) % playlist.length;
-         radioPlayer.src = playlist[currentTrack];
-         radioPlayer.play();
-      });
+        var currentTrack = 0;
+        var radioPlayer = document.getElementById('radioPlayer');
 
-      radioPlayer.play();
-   </script>
+        radioPlayer.addEventListener('ended', function () {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            radioPlayer.src = playlist[currentTrack];
+            radioPlayer.play();
+        });
+
+        radioPlayer.play();
+    </script>
 </body>
+
 </html>
