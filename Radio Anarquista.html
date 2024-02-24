@@ -136,8 +136,8 @@
                 radioPlayer.load(); // Se añadió esta línea para cargar la nueva canción
                 radioPlayer.play();
                 var songName = playlist[currentTrack].split('/').pop().split('.')[0];
-                console.log("Reproduciendo: " + songName);
-                currentSongElement.innerText = "Reproduciendo: " + songName;
+                console.log( songName);
+                currentSongElement.innerText =  songName;
                 currentTrack++;
                 changeBackgroundImage(); // Cambiar la imagen de fondo al azar
             }
@@ -149,8 +149,8 @@
             radioPlayer.load(); // Se añadió esta línea para cargar la nueva canción
             radioPlayer.play();
             var songName = playlist[currentTrack].split('/').pop().split('.')[0];
-            console.log("Reproduciendo: " + songName);
-            currentSongElement.innerText = "Reproduciendo: " + songName;
+            console.log( songName);
+            currentSongElement.innerText =  songName;
             changeBackgroundImage(); // Cambiar la imagen de fondo al azar
         }
 
