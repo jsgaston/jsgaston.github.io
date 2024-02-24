@@ -18,9 +18,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Set working directory
-        run: cd jsgaston.github.io/  # Make sure this matches the actual path
-
       - name: Install Dependencies
         run: |
           npm install -g npm@latest
