@@ -16,11 +16,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Puedes usar la versión 14 o superior
+          node-version: '18'  # Puedes usar la versión 14 o superior
 
       - name: Install Dependencies
         run: |
           npm install -g npm
+          npm install -g npm@latest
           npm install -g yarn  # Solo si necesitas Yarn
           npm install
 
