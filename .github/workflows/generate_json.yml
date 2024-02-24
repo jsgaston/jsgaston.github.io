@@ -34,4 +34,3 @@ jobs:
           git add music_list.json
           git commit -m "Update music list [skip ci]"
           git push
-
