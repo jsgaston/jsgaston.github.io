@@ -1,63 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor de Música</title>
-</head>
-<body>
-<audio id="radioPlayer" controls autoplay></audio>
-
-<script>
-    // Función para mezclar el array de manera aleatoria
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+    <title>Radio Anarquia</title>
+    <style>
+        body {
+            background-image: url('/images/GUERRERO_BANDERA_2.png'); /* Ruta de la imagen de fondo */
+            background-size: cover;
+            background-position: center;
+            color: white; /* Color del texto */
+            font-family: Arial, sans-serif;
         }
-        return array;
-    }
 
-    // Lista de canciones obtenidas de la carpeta Musica
-    var playlist = [
-        "/Musica/04 Comancheria.m4a",
-        "/Musica/05 No Pasaran.m4a",
-        "/Musica/03 Forjado a Fuego.m4a",
-        "/Musica/04 La Estanquera de Saigon.m4a",
-        "/Musica/04 Trabajadoreas.m4a",
-        "/Musica/01 Libertad.m4a",
-        "/Musica/08 Adentro.m4a",
-        "/Musica/02 Esto No para.m4a",
-        "/Musica/13 Insolacion.m4a",
-    ];
+        #playerContainer {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7); /* Color de fondo del contenedor del reproductor */
+            max-width: 400px;
+            margin: auto;
+            margin-top: 50px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
 
-    // Mezcla la lista de canciones
-    shuffle(playlist);
+<body>
+    <div id="playerContainer">
+        <h1>Radio Anarquia</h1>
+        <audio id="radioPlayer" controls autoplay></audio>
+        <p id="currentSong"></p>
+    </div>
 
-    var currentTrack = 0;
-    var radioPlayer = document.getElementById('radioPlayer');
+    <script>
+        // ... (tu código JavaScript existente)
 
-    // Función para reproducir la siguiente pista de manera aleatoria
-    function playRandomTrack() {
-        currentTrack = (currentTrack + 1) % playlist.length;
-        radioPlayer.src = playlist[currentTrack];
-        radioPlayer.play();
-        // Imprime el nombre de la canción que se está reproduciendo
-        var songName = playlist[currentTrack].split('/').pop().split('.')[0];
-        console.log("Reproduciendo: " + songName);
-    }
+        function playRandomTrack() {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            radioPlayer.src = playlist[currentTrack];
+            radioPlayer.play();
+            
+            var songName = playlist[currentTrack].split('/').pop().split('.')[0];
+            console.log("Reproduciendo: " + songName);
 
-    // Evento 'ended' para avanzar a la siguiente pista
-    radioPlayer.addEventListener('ended', playRandomTrack);
+            // Muestra el nombre de la canción en la página
+            document.getElementById('currentSong').innerText = "Reproduciendo: " + songName;
+        }
 
-    // Reproduce automáticamente la primera pista al cargar la página
-    window.addEventListener('load', function() {
-        playRandomTrack();
-    });
-</script>
-</body>
-</html>
-
+        window.addEventListener('load', function () {
+            playRandomTrack();
+        });
     </script>
 </body>
 
