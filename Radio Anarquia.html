@@ -29,7 +29,7 @@
 <body>
     <div id="playerContainer">
         <h1>Radio Anarquia</h1>
-        <audio id="radioPlayer" controls autoplay></audio>
+        <audio id="radioPlayer" controls autoplay loop></audio>
         <p id="currentSong"></p>
     </div>
 
@@ -55,6 +55,7 @@
                 });
             })
             .catch(error => console.error('Error al obtener la lista de canciones:', error));
+        console.log("Lista de canciones:", playlist);
 
         var currentTrack = 0;
         var radioPlayer = document.getElementById('radioPlayer');
@@ -62,8 +63,10 @@
 
         function playNextTrack() {
             if (currentTrack < playlist.length) {
+                console.log("Cargando canción: " + playlist[currentTrack]);
                 radioPlayer.src = playlist[currentTrack];
                 radioPlayer.play();
+                console.log("Cargando canción: " + playlist[currentTrack]);
                 var songName = playlist[currentTrack].split('/').pop().split('.')[0];
                 console.log("Reproduciendo: " + songName);
                 currentSongElement.innerText = "Reproduciendo: " + songName;
