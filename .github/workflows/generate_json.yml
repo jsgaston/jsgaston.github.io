@@ -26,16 +26,13 @@ jobs:
           npm install
 
       - name: Generate JSON
-        run: |
-          mkdir -p /github/workspace/Musica  # Asegúrate de que la carpeta Musica exista
-          python generate_json.py
-        env:
-          GITHUB_WORKSPACE: ${{ github.workspace }}
+        run: python generate_json.py
+
 
       - name: Commit and Push Changes
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          git add Musica/music_list.json
+          git add music_list.json
           git commit -m "Update music list [skip ci]"
           git push
