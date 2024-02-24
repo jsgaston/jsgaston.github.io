@@ -39,7 +39,7 @@
             padding: 10px 20px;
             font-size: 16px;
             border-radius: 5px;
-            background-color: #007bff;
+            background-color: transparent; /* Fondo de botón transparente */
             color: #fff;
             border: none;
             cursor: pointer;
@@ -54,6 +54,10 @@
 
         img:hover {
             transform: scale(1.2);
+        }
+
+        h1, #currentSong {
+            color: red; /* Cambia el color del título y del título de la canción a rojo */
         }
     </style>
 </head>
@@ -76,8 +80,6 @@
     </section>
 
     <!-- Agrega más secciones según sea necesario -->
-
-    <button onclick="scrollToSection(2)">Ir a Sección 2</button>
 
     <script>
         var playlist = [];
