@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Anarquista</title>
-    <!-- Agrega el enlace al icono/logo de la página -->
     <link rel="icon" href="/images/guerrero_bandera_004.jpg" type="image/jpg">
     <meta name="description" content="Radio Anarquista - Anti-Fascista">
     <style>
@@ -13,13 +12,14 @@
             margin: 0;
             font-family: Arial, sans-serif;
             overflow-x: hidden;
+            overflow-y: scroll; /* Agrega una barra de desplazamiento */
         }
 
         section {
             width: 100vw;
             height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: center 25%;
             justify-content: center;
             background-size: cover;
             transition: transform 0.5s ease-in-out;
@@ -31,7 +31,7 @@
             max-width: 400px;
             border-radius: 10px;
             text-align: center;
-            z-index: 1; /* Asegurar que el reproductor esté sobre las secciones */
+            z-index: 1;
         }
 
         button {
@@ -57,19 +57,20 @@
 </head>
 
 <body>
-    <section style="background-image: url('/images/section1.jpg');">
+    <section style="background-image: url('/images/guerrero_bandera_003.jpg');">
         <div id="playerContainer">
             <h1>Radio Anarquista</h1>
             <audio id="radioPlayer" controls autoplay></audio>
             <p id="currentSong"></p>
             <div id="controls">
-                <button onclick="playPreviousTrack()">Anterior</button>
-                <button onclick="playNextTrack()">Siguiente</button>
+                <!-- Cambia los botones por iconos -->
+                <button onclick="playPreviousTrack()"><img src="/images/atras.png" alt="Anterior"></button>
+                <button onclick="playNextTrack()"><img src="/images/adelante.png" alt="Siguiente"></button>
             </div>
         </div>
     </section>
 
-    <section style="background-image: url('/images/section2.jpg');">
+    <section style="background-image: url('/images/guerrero_bandera_005.jpg');">
         <!-- Contenido de la segunda sección -->
     </section>
 
@@ -78,14 +79,12 @@
     <button onclick="scrollToSection(2)">Ir a Sección 2</button>
 
     <script>
-        var playlist = []; // Lista de canciones obtenidas de la carpeta Musica
+        var playlist = [];
 
-        // Obtener la lista de canciones del archivo JSON generado por el script Python
         fetch('music_list.json')
             .then(response => response.json())
             .then(data => {
                 playlist = data;
-                // Intenta iniciar la reproducción automáticamente después de un breve retraso
                 setTimeout(playNextTrack, 500);
             })
             .catch(error => console.error('Error al obtener la lista de canciones:', error));
@@ -103,22 +102,14 @@
                 currentSongElement.innerText = "Reproduciendo: " + songName;
                 currentTrack++;
             } else {
-                currentTrack = 0; // Reiniciar la reproducción al llegar al final de la lista
+                currentTrack = 0;
             }
         }
 
         function playPreviousTrack() {
-            currentTrack = Math.max(0, currentTrack - 1); // Retroceder una pista
+            currentTrack = Math.max(0, currentTrack - 1);
             playNextTrack();
         }
-
-        function scrollToSection(sectionNumber) {
-            const section = document.getElementsByTagName('section')[sectionNumber - 1];
-            section.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Reproducir la siguiente pista cuando se termina la actual
-        radioPlayer.addEventListener('ended', playNextTrack);
     </script>
 </body>
 
