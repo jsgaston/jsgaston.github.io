@@ -53,7 +53,7 @@
 
         function playNextTrack() {
             if (currentTrack < playlist.length) {
-                radioPlayer.src = 'Musica/' + playlist[currentTrack];
+                radioPlayer.src = '/Musica/' + playlist[currentTrack];
                 radioPlayer.play();
                 var songName = playlist[currentTrack].split('/').pop().split('.')[0];
                 console.log("Reproduciendo: " + songName);
