@@ -17,7 +17,6 @@
             color: red;
             border: none;
             cursor: pointer;
-            font-weight: bold; /* Letras en negrita */
         }
         
         body {
@@ -25,7 +24,7 @@
             font-family: Arial, sans-serif;
             overflow-x: hidden;
             overflow-y: scroll;
-            background-color: black; /* Fondo del cuerpo en negro */
+            background-color: black;
         }
 
         section {
@@ -34,12 +33,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-size: contain; /* Cambiado de 'cover' a 'contain' */
-            background-position: center; /* Centra la imagen de fondo */
+            background-size: contain;
+            background-position: center;
             transition: transform 0.5s ease-in-out;
-            background-repeat: no-repeat; /* Evita que se repita la imagen de fondo */
-            background-size: cover; /* Ajusta la imagen de fondo al tamaño del elemento */
-            background-attachment: fixed; /* Fija la imagen de fondo a la ventana */
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
         }
 
         #playerContainer {
@@ -49,6 +48,17 @@
             border-radius: 10px;
             text-align: center;
             z-index: 1;
+        }
+
+        .control-button {
+            margin: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 5px;
+            background-color: transparent;
+            color: red;
+            border: none;
+            cursor: pointer;
         }
 
         img {
@@ -65,24 +75,19 @@
             <audio id="radioPlayer" controls autoplay></audio>
             <p id="currentSong"></p>
             <div id="controls">
-
+                <button class="control-button" onclick="playPreviousTrack()">Anterior</button>
+                <button class="control-button" onclick="toggleRepeat()">Repetir</button>
+                <button class="control-button" onclick="playNextTrack()">Siguiente</button>
             </div>
         </div>
     </section>
 
-    <section style="background-image: url('/images/guerrero_bandera_006.jpg');">
-        <!-- Contenido de la segunda sección -->
-    </section>
-    <section style="background-image: url('/images/guerrero_bandera_003.jpg');">
-        <!-- Contenido de la segunda sección -->
-    </section>
-    <section style="background-image: url('/images/GUERRERO_BANDERA_2.png');">
-        <!-- Contenido de la segunda sección -->
-    </section>
-    <!-- Agrega más secciones según sea necesario -->
-
     <script>
         var playlist = [];
+        var currentTrack = 0;
+        var radioPlayer = document.getElementById('radioPlayer');
+        var currentSongElement = document.getElementById('currentSong');
+        var isRepeat = false;
 
         fetch('music_list.json')
             .then(response => response.json())
@@ -92,30 +97,46 @@
             })
             .catch(error => console.error('Error al obtener la lista de canciones:', error));
 
-        var currentTrack = 0;
-        var radioPlayer = document.getElementById('radioPlayer');
-        var currentSongElement = document.getElementById('currentSong');
-
-        // **Función para mezclar un array de forma aleatoria**
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]]; // Intercambiar elementos
+                [array[i], array[j]] = [array[j], array[i]];
             }
+        }
+
+        function playPreviousTrack() {
+            if (currentTrack > 0) {
+                currentTrack--;
+            } else {
+                currentTrack = playlist.length - 1;
+            }
+            playCurrentTrack();
+        }
+
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+            radioPlayer.loop = isRepeat;
         }
 
         function playNextTrack() {
             if (currentTrack < playlist.length) {
-                // **Mezclar el array de canciones antes de obtener el siguiente archivo**
                 shuffleArray(playlist);
                 radioPlayer.src = '/Musica/' + playlist[currentTrack];
                 radioPlayer.play();
                 var songName = playlist[currentTrack].split('/').pop().split('.')[0];
                 console.log("Reproduciendo: " + songName);
-                // **Actualizar el elemento de texto con el nombre de la canción actual**
                 currentSongElement.innerText = "Reproduciendo: " + songName;
                 currentTrack++;
             }
+        }
+
+        function playCurrentTrack() {
+            shuffleArray(playlist);
+            radioPlayer.src = '/Musica/' + playlist[currentTrack];
+            radioPlayer.play();
+            var songName = playlist[currentTrack].split('/').pop().split('.')[0];
+            console.log("Reproduciendo: " + songName);
+            currentSongElement.innerText = "Reproduciendo: " + songName;
         }
 
         radioPlayer.addEventListener('ended', playNextTrack);
