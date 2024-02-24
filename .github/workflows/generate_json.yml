@@ -3,7 +3,7 @@ name: Generate Music List JSON
 on:
   push:
     branches:
-      - jsgaston.github.io  # Cambia 'main' por el nombre de tu rama principal
+      - main
 
 jobs:
   generate_json:
@@ -16,26 +16,26 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Puedes usar la versión 14 o superior 0k
+          node-version: '18'
 
       - name: Install Dependencies
         run: |
-          npm install -g npm
+          npm uninstall -g npm
           npm install -g npm@latest
-          npm install -g yarn  # Solo si necesitas Yarn
+          npm install -g yarn
           npm install
 
       - name: Generate JSON
-        run: node generate_json.js  # Ajusta el nombre del script si es necesario
-
-      - name: Generate JSON
-        run: python generate_json.py || echo "Error during script execution"
-
+        run: |
+          mkdir -p /github/workspace/Musica  # Asegúrate de que la carpeta Musica exista
+          python generate_json.py
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
 
       - name: Commit and Push Changes
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          git add music_list.json
+          git add Musica/music_list.json
           git commit -m "Update music list [skip ci]"
           git push
