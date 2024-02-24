@@ -12,16 +12,16 @@
             margin: 0;
             font-family: Arial, sans-serif;
             overflow-x: hidden;
-            overflow-y: scroll; /* Agrega una barra de desplazamiento */
+            overflow-y: scroll;
         }
 
         section {
             width: 100vw;
             height: 100vh;
             display: flex;
-            align-items: center 25%;
+            align-items: center;
             justify-content: center;
-            background-size: cover;
+            background-size: cover; /* Asegura que la imagen de fondo cubra toda la sección */
             transition: transform 0.5s ease-in-out;
         }
 
@@ -48,6 +48,8 @@
         img {
             cursor: pointer;
             transition: transform 0.5s ease-in-out;
+            width: 30px; /* Ajusta el tamaño de los iconos de los botones */
+            height: 30px; /* Ajusta el tamaño de los iconos de los botones */
         }
 
         img:hover {
@@ -57,20 +59,19 @@
 </head>
 
 <body>
-    <section style="background-image: url('/images/guerrero_bandera_003.jpg');">
+    <section style="background-image: url('/images/guerrero_bandera_005.jpg');">
         <div id="playerContainer">
             <h1>Radio Anarquista</h1>
             <audio id="radioPlayer" controls autoplay></audio>
             <p id="currentSong"></p>
             <div id="controls">
-                <!-- Cambia los botones por iconos -->
-                <button onclick="playPreviousTrack()"><img src="/images/atras.png" alt="Anterior"></button>
-                <button onclick="playNextTrack()"><img src="/images/adelante.png" alt="Siguiente"></button>
+                <button onclick="playPreviousTrack()"><img src="/images/atras001.png" alt="Anterior"></button>
+                <button onclick="playNextTrack()"><img src="/images/adelante001.png" alt="Siguiente"></button>
             </div>
         </div>
     </section>
 
-    <section style="background-image: url('/images/guerrero_bandera_005.jpg');">
+    <section style="background-image: url('/images/guerrero_bandera_006.jpg');">
         <!-- Contenido de la segunda sección -->
     </section>
 
