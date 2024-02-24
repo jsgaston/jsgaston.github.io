@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Set working directory
+        run: cd jsgaston/jsgaston.github.io/  # Make sure this matches the actual path
+
       - name: Install Dependencies
         run: |
           npm install -g npm@latest
@@ -34,3 +37,4 @@ jobs:
           git add music_list.json
           git commit -m "Update music list [skip ci]"
           git push
+
