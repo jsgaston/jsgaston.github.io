@@ -19,7 +19,7 @@ jobs:
           node-version: '20'
 
       - name: Set working directory
-        run: cd jsgaston/jsgaston.github.io/  # Make sure this matches the actual path
+        run: cd jsgaston.github.io/  # Make sure this matches the actual path
 
       - name: Install Dependencies
         run: |
