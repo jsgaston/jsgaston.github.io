@@ -5,13 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Anarquista</title>
+    <!-- Agrega el enlace al icono/logo de la página -->
     <link rel="icon" href="/images/guerrero_bandera_004.jpg" type="image/jpg">
     <meta name="description" content="Radio Anarquista - Anti-Fascista">
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         section {
@@ -68,11 +69,13 @@
         </div>
     </section>
 
-    <section style="background-image: url('/images/guerrero_bandera_003.jpg');">
+    <section style="background-image: url('/images/section2.jpg');">
         <!-- Contenido de la segunda sección -->
-    </section style="background-image: url('/images/guerrero_bandera_005.jpg');">
+    </section>
 
     <!-- Agrega más secciones según sea necesario -->
+
+    <button onclick="scrollToSection(2)">Ir a Sección 2</button>
 
     <script>
         var playlist = []; // Lista de canciones obtenidas de la carpeta Musica
@@ -107,6 +110,11 @@
         function playPreviousTrack() {
             currentTrack = Math.max(0, currentTrack - 1); // Retroceder una pista
             playNextTrack();
+        }
+
+        function scrollToSection(sectionNumber) {
+            const section = document.getElementsByTagName('section')[sectionNumber - 1];
+            section.scrollIntoView({ behavior: 'smooth' });
         }
 
         // Reproducir la siguiente pista cuando se termina la actual
