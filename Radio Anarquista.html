@@ -74,7 +74,7 @@
 </head>
 
 <body>
-    <section id="backgroundSection">
+    <section id="backgroundSection" style="background-image: url('/images/guerrero_bandera_005.jpg');">
         <div id="playerContainer">
             <h1>Radio Anarquista</h1>
             <audio id="radioPlayer" controls autoplay></audio>
@@ -133,6 +133,7 @@
             if (currentTrack < playlist.length) {
                 shuffleArray(playlist);
                 radioPlayer.src = '/Musica/' + playlist[currentTrack];
+                radioPlayer.load(); // Se añadió esta línea para cargar la nueva canción
                 radioPlayer.play();
                 var songName = playlist[currentTrack].split('/').pop().split('.')[0];
                 console.log("Reproduciendo: " + songName);
@@ -145,12 +146,21 @@
         function playCurrentTrack() {
             shuffleArray(playlist);
             radioPlayer.src = '/Musica/' + playlist[currentTrack];
+            radioPlayer.load(); // Se añadió esta línea para cargar la nueva canción
             radioPlayer.play();
             var songName = playlist[currentTrack].split('/').pop().split('.')[0];
             console.log("Reproduciendo: " + songName);
             currentSongElement.innerText = "Reproduciendo: " + songName;
             changeBackgroundImage(); // Cambiar la imagen de fondo al azar
         }
+
+        fetch('music_list.json')
+            .then(response => response.json())
+            .then(data => {
+                playlist = data;
+                setTimeout(playNextTrack, 500);
+            })
+            .catch(error => console.error('Error al obtener la lista de canciones:', error));
 
         radioPlayer.addEventListener('ended', playNextTrack);
     </script>
