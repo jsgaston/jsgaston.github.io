@@ -3,7 +3,7 @@ name: Generate Music List JSON
 on:
   push:
     branches:
-      - main  # Cambia 'main' por el nombre de tu rama principal
+      - jsgaston.github.io  # Cambia 'main' por el nombre de tu rama principal
 
 jobs:
   generate_json:
