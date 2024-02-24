@@ -112,6 +112,16 @@
     </div>
 
     <script>
+        // Función para mezclar el array de manera aleatoria
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Lista de canciones
         var playlist = [
             "/Musica/04 Comancheria.m4a",
             "/Musica/05 No Pasaran.m4a",
@@ -122,19 +132,28 @@
             "/Musica/08 Adentro.m4a",
             "/Musica/02 Esto No para.m4a",
             "/Musica/13 Insolacion.m4a",
-            
         ];
+
+        // Mezcla la lista de canciones
+        shuffle(playlist);
 
         var currentTrack = 0;
         var radioPlayer = document.getElementById('radioPlayer');
 
-        radioPlayer.addEventListener('ended', function () {
+        // Función para reproducir la siguiente pista de manera aleatoria
+        function playRandomTrack() {
             currentTrack = (currentTrack + 1) % playlist.length;
             radioPlayer.src = playlist[currentTrack];
             radioPlayer.play();
-        });
+        }
 
-        radioPlayer.play();
+        // Evento 'ended' para avanzar a la siguiente pista
+        radioPlayer.addEventListener('ended', playRandomTrack);
+
+        // Reproduce automáticamente la primera pista al cargar la página
+        window.addEventListener('load', function() {
+            playRandomTrack();
+        });
     </script>
 </body>
 
