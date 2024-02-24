@@ -7,16 +7,16 @@
     <title>Radio Anarquia</title>
     <style>
         body {
-            background-image: url('/images/GUERRERO_BANDERA_2.png'); /* Ruta de la imagen de fondo */
+            background-image: url('/images/GUERRERO_BANDERA_2.png');
             background-size: cover;
             background-position: center;
-            color: white; /* Color del texto */
+            color: white;
             font-family: Arial, sans-serif;
         }
 
         #playerContainer {
             padding: 20px;
-            background-color: rgba(0, 0, 0, 0.7); /* Color de fondo del contenedor del reproductor */
+            background-color: rgba(0, 0, 0, 0.7);
             max-width: 400px;
             margin: auto;
             margin-top: 50px;
@@ -34,23 +34,48 @@
     </div>
 
     <script>
-        // ... (tu código JavaScript existente)
-
-        function playRandomTrack() {
-            currentTrack = (currentTrack + 1) % playlist.length;
-            radioPlayer.src = playlist[currentTrack];
-            radioPlayer.play();
-            
-            var songName = playlist[currentTrack].split('/').pop().split('.')[0];
-            console.log("Reproduciendo: " + songName);
-
-            // Muestra el nombre de la canción en la página
-            document.getElementById('currentSong').innerText = "Reproduciendo: " + songName;
+        // Función para mezclar el array de manera aleatoria
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
-        window.addEventListener('load', function () {
-            playRandomTrack();
-        });
+        var playlist = []; // Lista de canciones obtenidas de la carpeta Musica
+
+        // Obtener todas las canciones de la carpeta /Music/
+        fetch('/Music/')
+            .then(response => response.json())
+            .then(data => {
+                playlist = shuffle(data); // Mezclar la lista de canciones
+                window.addEventListener('load', function () {
+                    playNextTrack();
+                });
+            })
+            .catch(error => console.error('Error al obtener la lista de canciones:', error));
+
+        var currentTrack = 0;
+        var radioPlayer = document.getElementById('radioPlayer');
+        var currentSongElement = document.getElementById('currentSong');
+
+        function playNextTrack() {
+            if (currentTrack < playlist.length) {
+                radioPlayer.src = playlist[currentTrack];
+                radioPlayer.play();
+                var songName = playlist[currentTrack].split('/').pop().split('.')[0];
+                console.log("Reproduciendo: " + songName);
+                currentSongElement.innerText = "Reproduciendo: " + songName;
+                currentTrack++;
+            } else {
+                currentTrack = 0; // Reiniciar la reproducción si se llega al final de la lista
+                playlist = shuffle(playlist); // Mezclar la lista de canciones nuevamente
+                playNextTrack();
+            }
+        }
+
+        radioPlayer.addEventListener('ended', playNextTrack);
     </script>
 </body>
 
