@@ -1,4 +1,4 @@
-name: Generate Music List JSON
+name: Your Workflow Name
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  generate_json:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,14 +20,12 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm uninstall -g npm
           npm install -g npm@latest
           npm install -g yarn
           npm install
 
       - name: Generate JSON
-        run: python generate_json.py
-
+        run: node generate_json.js
 
       - name: Commit and Push Changes
         run: |
