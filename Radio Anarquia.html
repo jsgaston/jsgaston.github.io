@@ -12,17 +12,21 @@
         body {
             background-image: url('/images/guerrero_bandera_003.jpg');
             background-size: cover;
-            background-position: center;
+            background-position: center top; /* Ajuste para que se vea solo de la mitad hacia arriba */
             color: red;
             font-family: Arial, sans-serif;
+            margin: 0; /* Eliminar el margen predeterminado del cuerpo */
+            height: 100vh; /* Establecer la altura al 100% de la ventana */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         #playerContainer {
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
             max-width: 400px;
-            margin: auto;
-            margin-top: 50px;
             border-radius: 10px;
             text-align: center;
         }
