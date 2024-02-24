@@ -41,8 +41,8 @@
             .then(response => response.json())
             .then(data => {
                 playlist = data;
-                // Iniciar la reproducción automáticamente al cargar la página
-                playNextTrack();
+                // Intenta iniciar la reproducción automáticamente después de un breve retraso
+                setTimeout(playNextTrack, 500);
             })
             .catch(error => console.error('Error al obtener la lista de canciones:', error));
 
