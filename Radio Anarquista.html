@@ -25,6 +25,8 @@
             background-size: contain; /* Cambiado de 'cover' a 'contain' */
             background-position: center; /* Centra la imagen de fondo */
             transition: transform 0.5s ease-in-out;
+            **background-repeat: no-repeat; /* Evita que se repita la imagen de fondo */**
+            **background-size: cover; /* Ajusta la imagen de fondo al tamaño del elemento */**
         }
 
         #playerContainer {
@@ -103,24 +105,28 @@
         var radioPlayer = document.getElementById('radioPlayer');
         var currentSongElement = document.getElementById('currentSong');
 
+        // **Función para mezclar un array de forma aleatoria**
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Intercambiar elementos
+            }
+        }
+
         function playNextTrack() {
             if (currentTrack < playlist.length) {
+                // **Mezclar el array de canciones antes de obtener el siguiente archivo**
+                shuffleArray(playlist);
                 radioPlayer.src = '/Musica/' + playlist[currentTrack];
                 radioPlayer.play();
                 var songName = playlist[currentTrack].split('/').pop().split('.')[0];
                 console.log("Reproduciendo: " + songName);
+                // **Actualizar el elemento de texto con el nombre de la canción actual**
                 currentSongElement.innerText = "Reproduciendo: " + songName;
                 currentTrack++;
-            } else {
-                currentTrack = 0;
             }
         }
 
-        function playPreviousTrack() {
-            currentTrack = Math.max(0, currentTrack - 1);
-            playNextTrack();
-        }
+        radioPlayer.addEventListener('ended', playNextTrack);
     </script>
-</body>
-
 </html>
