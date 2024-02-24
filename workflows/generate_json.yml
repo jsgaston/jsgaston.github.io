@@ -1,12 +1,12 @@
-name: Generate Music List JSON
+name: Your Workflow Name
 
 on:
   push:
     branches:
-      - jsgaston.github.io  # Cambia 'main' por el nombre de tu rama principal
+      - main
 
 jobs:
-  generate_json:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,21 +16,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Puedes usar la versión 14 o superior 0k
+          node-version: '20'
 
       - name: Install Dependencies
         run: |
-          npm install -g npm
           npm install -g npm@latest
-          npm install -g yarn  # Solo si necesitas Yarn
+          npm install -g yarn
           npm install
 
       - name: Generate JSON
-        run: node generate_json.js  # Ajusta el nombre del script si es necesario
-
-      - name: Generate JSON
-        run: python generate_json.py || echo "Error during script execution"
-
+        run: node generate_json.js
 
       - name: Commit and Push Changes
         run: |
