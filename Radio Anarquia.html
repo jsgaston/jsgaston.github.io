@@ -46,7 +46,7 @@
         var playlist = []; // Lista de canciones obtenidas de la carpeta Musica
 
         // Obtener todas las canciones de la carpeta /Music/
-        fetch('/Music/')
+        fetch('/Musica/')
             .then(response => response.json())
             .then(data => {
                 playlist = shuffle(data); // Mezclar la lista de canciones
