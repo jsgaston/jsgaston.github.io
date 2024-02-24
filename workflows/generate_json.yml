@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '14'  # Puedes usar la versión 14 o superior
 
       - name: Install Dependencies
         run: |
@@ -34,4 +34,3 @@ jobs:
           git add music_list.json
           git commit -m "Update music list [skip ci]"
           git push
-
