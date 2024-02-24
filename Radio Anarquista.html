@@ -5,22 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Anarquista</title>
-    <!-- Agrega el enlace al icono/logo de la página -->
     <link rel="icon" href="/images/guerrero_bandera_004.jpg" type="image/jpg">
     <meta name="description" content="Radio Anarquista - Anti-Fascista">
     <style>
         body {
-            background-image: url('/images/guerrero_bandera_003.jpg');
-            background-size: cover;
-            background-position: center 25%; /* Ajuste para que se vea un poco más baja */
-            color: red;
+            margin: 0;
             font-family: Arial, sans-serif;
-            margin: 0; /* Eliminar el margen predeterminado del cuerpo */
-            height: 100vh; /* Establecer la altura al 100% de la ventana */
+            overflow: hidden;
+        }
+
+        section {
+            width: 100vw;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            background-size: cover;
+            transition: transform 0.5s ease-in-out;
         }
 
         #playerContainer {
@@ -29,24 +30,49 @@
             max-width: 400px;
             border-radius: 10px;
             text-align: center;
+            z-index: 1; /* Asegurar que el reproductor esté sobre las secciones */
         }
 
-        #controls {
-            margin-top: 10px;
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        img {
+            cursor: pointer;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        img:hover {
+            transform: scale(1.2);
         }
     </style>
 </head>
 
 <body>
-    <div id="playerContainer">
-        <h1>Radio Anarquista</h1>
-        <audio id="radioPlayer" controls autoplay></audio>
-        <p id="currentSong"></p>
-        <div id="controls">
-            <button onclick="playPreviousTrack()">Anterior</button>
-            <button onclick="playNextTrack()">Siguiente</button>
+    <section style="background-image: url('/images/section1.jpg');">
+        <div id="playerContainer">
+            <h1>Radio Anarquista</h1>
+            <audio id="radioPlayer" controls autoplay></audio>
+            <p id="currentSong"></p>
+            <div id="controls">
+                <button onclick="playPreviousTrack()">Anterior</button>
+                <button onclick="playNextTrack()">Siguiente</button>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <section style="background-image: url('/images/guerrero_bandera_003.jpg');">
+        <!-- Contenido de la segunda sección -->
+    </section style="background-image: url('/images/guerrero_bandera_005.jpg');">
+
+    <!-- Agrega más secciones según sea necesario -->
 
     <script>
         var playlist = []; // Lista de canciones obtenidas de la carpeta Musica
@@ -79,7 +105,7 @@
         }
 
         function playPreviousTrack() {
-            currentTrack = Math.max(0, currentTrack - 2); // Retroceder dos pistas (la actual y la siguiente)
+            currentTrack = Math.max(0, currentTrack - 1); // Retroceder una pista
             playNextTrack();
         }
 
