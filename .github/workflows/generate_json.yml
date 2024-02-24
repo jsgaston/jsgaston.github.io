@@ -11,17 +11,22 @@ jobs:
 
     steps:
       - name: Checkout Repositorio
-        uses: actions/checkout@v3  # Actualizado a la versión 3
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
 
       - name: Configurar Python
-        uses: actions/setup-python@v3  # Actualizado a la versión 3
+        uses: actions/setup-python@v3
         with:
           python-version: '3.8'
 
       - name: Instalar Dependencias
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt  # Asegúrate de tener un requirements.txt si realmente necesitas instalar dependencias
+          python -m pip install -r requirements.txt
 
       - name: Generar JSON
         run: |
@@ -34,4 +39,3 @@ jobs:
           git add music_list.json
           git commit -m "Actualizar lista de canciones [skip ci]"
           git push
-
