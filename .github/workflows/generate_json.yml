@@ -37,5 +37,5 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           git add music_list.json
-          git commit -m "Actualizar lista de canciones [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Actualizar lista de canciones [skip ci]"
           git push
