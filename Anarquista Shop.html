@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anarquista Shop</title>
+    <!-- Incluye Font Awesome desde su CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
             margin: 0;
@@ -57,8 +59,8 @@
             position: fixed;
             top: 10px;
             right: 10px;
-            width: 50px;
-            height: auto;
+            font-size: 24px; /* Tamaño del icono */
+            color: #ffffff; /* Color del icono */
             cursor: pointer;
             transition: transform 0.5s ease-in-out;
         }
@@ -99,7 +101,8 @@
         <img src="images/cazlones003.jpg" alt="Sexta Imagen">
     </div>
 
-    <img class="shopping-basket" src="images/aweasumfonts_cesta.jpg" alt="Cesta de Aweasumfonts">
+    <!-- Utiliza el icono de la cesta de Font Awesome -->
+    <i class="fas fa-shopping-basket shopping-basket"></i>
 
     <!-- El iframe para embeber la página web con el reproductor de música -->
     <iframe src="https://jsgaston.github.io/Radio%20Anarquista.html" frameborder="0"></iframe>
@@ -107,3 +110,4 @@
 </body>
 
 </html>
+
