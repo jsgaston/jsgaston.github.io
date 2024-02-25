@@ -8,7 +8,7 @@
     <style>
         body {
             margin: 0;
-            overflow: hidden;
+            /* Elimina overflow: hidden; para permitir el scroll vertical */
             background-image: url('images/GUERRERO_BANDERA.jpg');
             background-size: cover;
             background-position: center;
@@ -46,12 +46,12 @@
         .photo-group img {
             width: 26%;
             height: auto;
+            cursor: pointer; /* Agrega un cursor de puntero para indicar que se puede hacer clic */
         }
 
         iframe {
-            position: center;
-            width: 40%;
-            height: 20%;
+            width: 80%; /* Ajusta el ancho del iframe según tus necesidades */
+            height: 400px; /* Ajusta la altura del iframe según tus necesidades */
             border: none;
             overflow: hidden;
             margin-top: 20px;
@@ -64,15 +64,15 @@
     <h1>Anarquista Shop</h1>
 
     <div class="photo-group">
-        <img src="images/imagen0001.jpg" alt="Primera Imagen">
-        <img src="images/imagen0002.jpg" alt="Segunda Imagen">
-        <img src="images/imagen0003.jpg" alt="Tercera Imagen">
+        <img src="images/imagen0001.jpg" alt="Primera Imagen" onclick="expandImage(this)">
+        <img src="images/imagen0002.jpg" alt="Segunda Imagen" onclick="expandImage(this)">
+        <img src="images/imagen0003.jpg" alt="Tercera Imagen" onclick="expandImage(this)">
     </div>
 
     <div class="photo-group">
-        <img src="images/imagen0004.jpg" alt="Primera Imagen">
-        <img src="images/imagen0005.jpg" alt="Segunda Imagen">
-        <img src="images/imagen0006.jpg" alt="Tercera Imagen">
+        <img src="images/imagen0004.jpg" alt="Primera Imagen" onclick="expandImage(this)">
+        <img src="images/imagen0005.jpg" alt="Segunda Imagen" onclick="expandImage(this)">
+        <img src="images/imagen0006.jpg" alt="Tercera Imagen" onclick="expandImage(this)">
     </div>
 
     <div class="photo-group">
@@ -81,6 +81,13 @@
 
     <!-- El iframe para embeber la página web con el reproductor de música -->
     <iframe src="https://jsgaston.github.io/Radio%20Anarquista.html" frameborder="0"></iframe>
+
+    <script>
+        function expandImage(element) {
+            // Cambia el tamaño de la imagen cuando se hace clic
+            element.style.width = '60%';
+        }
+    </script>
 
 </body>
 
