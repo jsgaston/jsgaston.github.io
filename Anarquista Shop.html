@@ -12,6 +12,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            background-attachment: fixed; /* Fija la imagen de fondo */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -46,7 +47,7 @@
             width: 26%;
             height: auto;
             cursor: pointer;
-            transition: transform 0.5s ease-in-out; /* Agrega una transición para un efecto suave */
+            transition: transform 0.5s ease-in-out;
         }
 
         iframe {
@@ -85,13 +86,11 @@
     <script>
         function expandImage(element) {
             setTimeout(function () {
-                // Cambia el tamaño de la imagen después de medio segundo
                 element.style.transform = 'scale(1.2)';
-            }, 500); // 500 milisegundos = medio segundo
+            }, 500);
         }
     </script>
 
 </body>
 
 </html>
-
