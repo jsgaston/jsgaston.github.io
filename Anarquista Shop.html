@@ -3,7 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
+    <title>Página Principal con iframe</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Esto oculta la barra de desplazamiento en el cuerpo de la página principal */
+        }
+
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none; /* Elimina el borde del iframe si lo hay */
+            overflow: hidden; /* Esto oculta la barra de desplazamiento en el iframe */
+        }
+    </style>
 </head>
 <body>
 
@@ -12,7 +25,7 @@
     <p></p>
 
     <!-- El iframe para embeber la página web con el reproductor de música -->
-    <iframe src="https://jsgaston.github.io/Radio%20Anarquista.html" width="450" height="300" frameborder="0"></iframe>
+    <iframe src="https://jsgaston.github.io/Radio%20Anarquista.html" width="max" height="300" frameborder="0"></iframe>
 
 </body>
 </html>
