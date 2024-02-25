@@ -50,6 +50,10 @@
             transition: transform 0.5s ease-in-out;
         }
 
+        .photo-group img:hover {
+            transform: scale(1.2);
+        }
+
         iframe {
             width: 80%;
             height: 400px;
@@ -65,15 +69,15 @@
     <h1>Anarquista Shop</h1>
 
     <div class="photo-group">
-        <img src="images/imagen0001.jpg" alt="Primera Imagen" onclick="expandImage(this)">
-        <img src="images/imagen0002.jpg" alt="Segunda Imagen" onclick="expandImage(this)">
-        <img src="images/imagen0003.jpg" alt="Tercera Imagen" onclick="expandImage(this)">
+        <img src="images/imagen0001.jpg" alt="Primera Imagen">
+        <img src="images/imagen0002.jpg" alt="Segunda Imagen">
+        <img src="images/imagen0003.jpg" alt="Tercera Imagen">
     </div>
 
     <div class="photo-group">
-        <img src="images/imagen0004.jpg" alt="Primera Imagen" onclick="expandImage(this)">
-        <img src="images/imagen0005.jpg" alt="Segunda Imagen" onclick="expandImage(this)">
-        <img src="images/imagen0006.jpg" alt="Tercera Imagen" onclick="expandImage(this)">
+        <img src="images/imagen0004.jpg" alt="Primera Imagen">
+        <img src="images/imagen0005.jpg" alt="Segunda Imagen">
+        <img src="images/imagen0006.jpg" alt="Tercera Imagen">
     </div>
 
     <div class="photo-group">
@@ -82,14 +86,6 @@
 
     <!-- El iframe para embeber la página web con el reproductor de música -->
     <iframe src="https://jsgaston.github.io/Radio%20Anarquista.html" frameborder="0"></iframe>
-
-    <script>
-        function expandImage(element) {
-            setTimeout(function () {
-                element.style.transform = 'scale(1.2)';
-            }, 500);
-        }
-    </script>
 
 </body>
 
