@@ -53,6 +53,20 @@
             transform: scale(1.2);
         }
 
+        .shopping-basket {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .shopping-basket:hover {
+            transform: scale(1.2);
+        }
+
         iframe {
             width: 80%;
             height: 400px;
@@ -80,8 +94,12 @@
     </div>
 
     <div class="photo-group">
-        <!-- Agrega las imágenes para el tercer grupo si es necesario -->
+        <img src="images/cazlones001.jpg" alt="Cuarta Imagen">
+        <img src="images/cazlones002.jpg" alt="Quinta Imagen">
+        <img src="images/cazlones003.jpg" alt="Sexta Imagen">
     </div>
+
+    <img class="shopping-basket" src="images/aweasumfonts_cesta.jpg" alt="Cesta de Aweasumfonts">
 
     <!-- El iframe para embeber la página web con el reproductor de música -->
     <iframe src="https://jsgaston.github.io/Radio%20Anarquista.html" frameborder="0"></iframe>
