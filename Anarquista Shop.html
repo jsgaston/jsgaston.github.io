@@ -8,7 +8,6 @@
     <style>
         body {
             margin: 0;
-            /* Elimina overflow: hidden; para permitir el scroll vertical */
             background-image: url('images/GUERRERO_BANDERA.jpg');
             background-size: cover;
             background-position: center;
@@ -46,12 +45,13 @@
         .photo-group img {
             width: 26%;
             height: auto;
-            cursor: pointer; /* Agrega un cursor de puntero para indicar que se puede hacer clic */
+            cursor: pointer;
+            transition: transform 0.5s ease-in-out; /* Agrega una transición para un efecto suave */
         }
 
         iframe {
-            width: 80%; /* Ajusta el ancho del iframe según tus necesidades */
-            height: 400px; /* Ajusta la altura del iframe según tus necesidades */
+            width: 80%;
+            height: 400px;
             border: none;
             overflow: hidden;
             margin-top: 20px;
@@ -84,12 +84,13 @@
 
     <script>
         function expandImage(element) {
-            // Cambia el tamaño de la imagen cuando se hace clic
-            element.style.width = '60%';
+            setTimeout(function () {
+                // Cambia el tamaño de la imagen después de medio segundo
+                element.style.transform = 'scale(1.2)';
+            }, 500); // 500 milisegundos = medio segundo
         }
     </script>
 
 </body>
 
 </html>
-
