@@ -135,17 +135,20 @@
 
         function playNextTrack() {
             if (currentTrack < playlist.length) {
-                shuffleArray(playlist);
+                if (!isRepeat) {
+                    shuffleArray(playlist);
+                }
                 radioPlayer.src = '/Musica/' + playlist[currentTrack];
-                radioPlayer.load(); // Se añadió esta línea para cargar la nueva canción
+                radioPlayer.load();
                 radioPlayer.play();
                 var songName = playlist[currentTrack].split('/').pop().split('.')[0];
-                console.log( songName);
-                currentSongElement.innerText =  songName;
+                console.log(songName);
+                currentSongElement.innerText = songName;
                 currentTrack++;
-                changeBackgroundImage(); // Cambiar la imagen de fondo al azar
+                changeBackgroundImage();
             }
         }
+
 
         function playCurrentTrack() {
             shuffleArray(playlist);
