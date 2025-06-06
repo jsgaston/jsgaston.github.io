@@ -13,6 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
+            /* Background colors from the flags */
             background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
             min-height: 100vh;
             padding: 20px;
@@ -125,7 +126,8 @@
 <body>
     <div class="container">
         <div class="tab-container">
-            <button class="tab active" onclick="openTab(event, 'diario')">Diario</button>
+            <button class="tab active" onclick="openTab(event, 'home')">Inicio</button>
+            <button class="tab" onclick="location.href='Diario.html'">Diario</button>
             <button class="tab" onclick="openTab(event, 'planes')">Planes</button>
             <button class="tab" onclick="openTab(event, 'mapas')">Mapas</button>
             <button class="tab" onclick="openTab(event, 'cosas')">Cosas</button>
@@ -140,12 +142,12 @@
             <button class="tab" onclick="openTab(event, 'link8')">Link 8</button>
         </div>
 
-        <div id="diario" class="tab-content active">
-            <div class="content-header">📝 Mi Diario Personal</div>
+        <div id="home" class="tab-content active">
+            <div class="content-header">👋 ¡Bienvenido!</div>
             <div class="content-body">
-                <p>Bienvenido a tu diario personal. Aquí puedes escribir tus pensamientos, experiencias y reflexiones del día a día.</p>
+                <p>Esta es tu página de inicio. Usa las pestañas de arriba para navegar a diferentes secciones.</p>
                 <div class="placeholder-content">
-                    <p>Contenido del diario aparecerá aquí...</p>
+                    <p>Contenido principal de la página...</p>
                 </div>
             </div>
         </div>
@@ -289,6 +291,12 @@
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
+
+        // Set 'home' tab as active by default on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.tab[onclick*="home"]').click();
+        });
+
 
         // Funcionalidad adicional: navegación con teclado
         document.addEventListener('keydown', function(e) {
