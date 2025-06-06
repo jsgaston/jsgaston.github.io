@@ -13,6 +13,7 @@
 
         body {
             font-family: 'Georgia', serif;
+            /* Using the yellow and green from the flags as background */
             background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
             min-height: 100vh;
             padding: 20px;
@@ -115,6 +116,7 @@
         .btn-secondary {
             background: linear-gradient(135deg, #ffc107, #e0a800);
             color: #333;
+            margin-left: 10px; /* Added margin for separation */
         }
 
         .btn-secondary:hover {
@@ -262,7 +264,6 @@
         </div>
 
         <div class="content">
-            <!-- Nueva Entrada -->
             <div class="new-entry-section">
                 <h2>✍️ Nueva Entrada</h2>
                 <form id="entryForm">
@@ -303,7 +304,6 @@
                 </form>
             </div>
 
-            <!-- Filtros y Búsqueda -->
             <div class="search-filter">
                 <div class="form-group">
                     <label for="searchText">Buscar:</label>
@@ -334,7 +334,6 @@
                 </div>
             </div>
 
-            <!-- Entradas del Diario -->
             <div class="entries-section">
                 <h2>📚 Mis Entradas</h2>
                 <div id="entriesContainer">
@@ -350,13 +349,13 @@
         let entries = [];
         let editingIndex = -1;
 
-        // Configurar fecha de hoy por defecto
+        // Set today's date by default
         document.getElementById('entryDate').valueAsDate = new Date();
 
-        // Cargar entradas al inicio
+        // Load entries on page load
         loadEntries();
 
-        // Manejar envío del formulario
+        // Handle form submission
         document.getElementById('entryForm').addEventListener('submit', function(e) {
             e.preventDefault();
             saveEntry();
@@ -374,45 +373,50 @@
             }
 
             const entry = {
-                id: editingIndex >= 0 ? entries[editingIndex].id : Date.now(),
+                id: editingIndex >= 0 ? entries[editingIndex].id : Date.now(), // Use existing ID or new one
                 date: date,
                 mood: mood,
                 title: title || 'Sin título',
                 content: content,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString() // For consistent sorting
             };
 
             if (editingIndex >= 0) {
+                // Update existing entry
                 entries[editingIndex] = entry;
-                editingIndex = -1;
+                editingIndex = -1; // Reset editing state
                 document.querySelector('#entryForm button[type="submit"]').textContent = '💾 Guardar Entrada';
             } else {
+                // Add new entry
                 entries.push(entry);
             }
 
-            saveEntries();
+            saveEntriesToLocalStorage(); // Persist entries
             displayEntries();
             clearForm();
         }
 
-        function editEntry(index) {
+        function editEntry(id) {
+            const index = entries.findIndex(entry => entry.id === id);
+            if (index === -1) return;
+
             const entry = entries[index];
             document.getElementById('entryDate').value = entry.date;
             document.getElementById('entryMood').value = entry.mood;
             document.getElementById('entryTitle').value = entry.title === 'Sin título' ? '' : entry.title;
             document.getElementById('entryContent').value = entry.content;
-            
-            editingIndex = index;
+
+            editingIndex = index; // Set editing state
             document.querySelector('#entryForm button[type="submit"]').textContent = '✏️ Actualizar Entrada';
             
-            // Scroll to form
+            // Scroll to form for editing
             document.querySelector('.new-entry-section').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function deleteEntry(index) {
+        function deleteEntry(id) {
             if (confirm('¿Estás seguro de que quieres eliminar esta entrada?')) {
-                entries.splice(index, 1);
-                saveEntries();
+                entries = entries.filter(entry => entry.id !== id);
+                saveEntriesToLocalStorage();
                 displayEntries();
             }
         }
@@ -420,20 +424,28 @@
         function clearForm() {
             document.getElementById('entryForm').reset();
             document.getElementById('entryDate').valueAsDate = new Date();
-            editingIndex = -1;
+            editingIndex = -1; // Reset editing state
             document.querySelector('#entryForm button[type="submit"]').textContent = '💾 Guardar Entrada';
         }
 
         function displayEntries() {
             const container = document.getElementById('entriesContainer');
-            
             if (entries.length === 0) {
                 container.innerHTML = '<div class="no-entries"><p>No hay entradas aún. ¡Escribe tu primera entrada arriba!</p></div>';
                 return;
             }
 
+            // Apply sorting before displaying
+            let sortedEntries = [...entries];
+            const sortOrder = document.getElementById('sortOrder').value;
+            if (sortOrder === 'newest') {
+                sortedEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            } else {
+                sortedEntries.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            }
+
             let html = '';
-            entries.forEach((entry, index) => {
+            sortedEntries.forEach(entry => {
                 const formattedDate = new Date(entry.date).toLocaleDateString('es-ES', {
                     weekday: 'long',
                     year: 'numeric',
@@ -442,7 +454,7 @@
                 });
 
                 html += `
-                    <div class="entry" data-mood="${entry.mood}" data-content="${entry.content.toLowerCase()}" data-title="${entry.title.toLowerCase()}">
+                    <div class="entry" data-mood="${entry.mood}" data-content="${entry.content.toLowerCase()}" data-title="${entry.title.toLowerCase()}" data-id="${entry.id}">
                         <div class="entry-header">
                             <div class="entry-date">${formattedDate}</div>
                             <div class="entry-mood">${entry.mood}</div>
@@ -450,36 +462,21 @@
                         <h3 style="color: #28a745; margin-bottom: 10px;">${entry.title}</h3>
                         <div class="entry-content">${entry.content.replace(/\n/g, '<br>')}</div>
                         <div class="entry-actions">
-                            <button class="btn btn-secondary btn-small" onclick="editEntry(${index})">✏️ Editar</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteEntry(${index})">🗑️ Eliminar</button>
+                            <button class="btn btn-secondary btn-small" onclick="editEntry(${entry.id})">✏️ Editar</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteEntry(${entry.id})">🗑️ Eliminar</button>
                         </div>
                     </div>
                 `;
             });
 
             container.innerHTML = html;
+            filterEntries(); // Apply filters after displaying all (sorted) entries
         }
 
         function filterEntries() {
             const searchText = document.getElementById('searchText').value.toLowerCase();
             const filterMood = document.getElementById('filterMood').value;
-            const sortOrder = document.getElementById('sortOrder').value;
 
-            // Ordenar entradas
-            let sortedEntries = [...entries];
-            if (sortOrder === 'newest') {
-                sortedEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
-            } else {
-                sortedEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
-            }
-
-            // Actualizar el array global temporalmente para display
-            const originalEntries = [...entries];
-            entries = sortedEntries;
-            displayEntries();
-            entries = originalEntries;
-
-            // Aplicar filtros
             const entryElements = document.querySelectorAll('.entry');
             entryElements.forEach(entry => {
                 const matchesSearch = searchText === '' || 
@@ -496,31 +493,36 @@
             });
         }
 
-        function saveEntries() {
-            // En un entorno real, aquí se guardarían en una base de datos
-            // Por ahora, mantenemos todo en memoria durante la sesión
+        function saveEntriesToLocalStorage() {
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
         }
 
         function loadEntries() {
-            // Cargar entradas de ejemplo
-            entries = [
-                {
-                    id: 1,
-                    date: '2025-06-05',
-                    mood: '😊 Feliz',
-                    title: 'Un día perfecto',
-                    content: 'Hoy ha sido un día increíble. El sol brillaba, pude completar todos mis proyectos y tuve una conversación muy interesante con un viejo amigo. Me siento lleno de energía y optimismo.',
-                    timestamp: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    date: '2025-06-04',
-                    mood: '🤔 Pensativo',
-                    title: 'Reflexiones sobre el futuro',
-                    content: 'Últimamente he estado pensando mucho sobre hacia dónde voy en la vida. Hay tantas posibilidades y caminos por explorar. A veces me siento un poco abrumado, pero también emocionado por las oportunidades que se avecinan.',
-                    timestamp: new Date().toISOString()
-                }
-            ];
+            const storedEntries = localStorage.getItem('diaryEntries');
+            if (storedEntries) {
+                entries = JSON.parse(storedEntries);
+            } else {
+                // Load example entries only if no entries are stored
+                entries = [
+                    {
+                        id: 1,
+                        date: '2025-06-05',
+                        mood: '😊 Feliz',
+                        title: 'Un día perfecto',
+                        content: 'Hoy ha sido un día increíble. El sol brillaba, pude completar todos mis proyectos y tuve una conversación muy interesante con un viejo amigo. Me siento lleno de energía y optimismo.',
+                        timestamp: '2025-06-05T10:00:00.000Z'
+                    },
+                    {
+                        id: 2,
+                        date: '2025-06-04',
+                        mood: '🤔 Pensativo',
+                        title: 'Reflexiones sobre el futuro',
+                        content: 'Últimamente he estado pensando mucho sobre hacia dónde voy en la vida. Hay tantas posibilidades y caminos por explorar. A veces me siento un poco abrumado, pero también emocionado por las oportunidades que se avecinan.',
+                        timestamp: '2025-06-04T12:30:00.000Z'
+                    }
+                ];
+                saveEntriesToLocalStorage(); // Save example entries to local storage
+            }
             displayEntries();
         }
     </script>
