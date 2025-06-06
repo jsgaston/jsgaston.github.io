@@ -1,139 +1,306 @@
 <!DOCTYPE html>
-<html lang='en'>
-
+<html lang="es">
 <head>
-  <meta charset='UTF-8'>
-  <title>Portfolio Homepage</title>
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="https://friconix.com/cdn/friconix.js"> </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Página con Pestañas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 100px;
+            padding: 15px 10px;
+            background: linear-gradient(145deg, #28a745, #20a038);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab:hover {
+            background: linear-gradient(145deg, #20a038, #1e7e34);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(145deg, #ffc107, #e0a800);
+            color: #333;
+            transform: translateY(-3px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 400px;
+            background: white;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-header {
+            color: #28a745;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .content-body {
+            color: #333;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 50px;
+        }
+
+        @media (max-width: 768px) {
+            .tab {
+                font-size: 12px;
+                padding: 12px 8px;
+                min-width: 80px;
+            }
+            
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="nav-wrapper">
-      <div class="left-side">
-        <div class="nav-link-wrapper active-nav-link">
-          <a href="index.html">Home</a>
+    <div class="container">
+        <div class="tab-container">
+            <button class="tab active" onclick="openTab(event, 'diario')">Diario</button>
+            <button class="tab" onclick="openTab(event, 'planes')">Planes</button>
+            <button class="tab" onclick="openTab(event, 'mapas')">Mapas</button>
+            <button class="tab" onclick="openTab(event, 'cosas')">Cosas</button>
+            <button class="tab" onclick="openTab(event, 'casa')">Casa</button>
+            <button class="tab" onclick="openTab(event, 'link1')">Link 1</button>
+            <button class="tab" onclick="openTab(event, 'link2')">Link 2</button>
+            <button class="tab" onclick="openTab(event, 'link3')">Link 3</button>
+            <button class="tab" onclick="openTab(event, 'link4')">Link 4</button>
+            <button class="tab" onclick="openTab(event, 'link5')">Link 5</button>
+            <button class="tab" onclick="openTab(event, 'link6')">Link 6</button>
+            <button class="tab" onclick="openTab(event, 'link7')">Link 7</button>
+            <button class="tab" onclick="openTab(event, 'link8')">Link 8</button>
         </div>
 
-        <div class="nav-link-wrapper">
-          <a href="about.html">About</a>
+        <div id="diario" class="tab-content active">
+            <div class="content-header">📝 Mi Diario Personal</div>
+            <div class="content-body">
+                <p>Bienvenido a tu diario personal. Aquí puedes escribir tus pensamientos, experiencias y reflexiones del día a día.</p>
+                <div class="placeholder-content">
+                    <p>Contenido del diario aparecerá aquí...</p>
+                </div>
+            </div>
         </div>
-        
-        <div class="nav-link-wrapper">
-          <a href="terms.html">Terms</a>
+
+        <div id="planes" class="tab-content">
+            <div class="content-header">📋 Mis Planes</div>
+            <div class="content-body">
+                <p>Organiza tus planes futuros, metas y objetivos. Mantén un seguimiento de lo que quieres lograr.</p>
+                <div class="placeholder-content">
+                    <p>Lista de planes y objetivos...</p>
+                </div>
+            </div>
         </div>
 
-
-      </div>
-
-      
-
-      <div class="right-side">
-        <div class="brand">
-          Javier Santiago Gastón de Iriarte Cabrera
+        <div id="mapas" class="tab-content">
+            <div class="content-header">🗺️ Mapas y Ubicaciones</div>
+            <div class="content-body">
+                <p>Explora diferentes lugares, guarda ubicaciones importantes y planifica tus viajes.</p>
+                <div class="placeholder-content">
+                    <p>Mapas interactivos aparecerán aquí...</p>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div id="cosas" class="tab-content">
+            <div class="content-header">📦 Mis Cosas</div>
+            <div class="content-body">
+                <p>Inventario de tus pertenencias, objetos importantes y colecciones.</p>
+                <div class="placeholder-content">
+                    <p>Lista de objetos y pertenencias...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="casa" class="tab-content">
+            <div class="content-header">🏠 Mi Casa</div>
+            <div class="content-body">
+                <p>Todo relacionado con tu hogar: tareas domésticas, decoración, mejoras y mantenimiento.</p>
+                <div class="placeholder-content">
+                    <p>Información sobre el hogar...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link1" class="tab-content">
+            <div class="content-header">🔗 Enlace 1</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el primer enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Aquí puedes agregar enlaces a páginas externas o contenido específico...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link2" class="tab-content">
+            <div class="content-header">🔗 Enlace 2</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el segundo enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Espacio reservado para contenido del enlace 2...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link3" class="tab-content">
+            <div class="content-header">🔗 Enlace 3</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el tercer enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Espacio reservado para contenido del enlace 3...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link4" class="tab-content">
+            <div class="content-header">🔗 Enlace 4</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el cuarto enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Espacio reservado para contenido del enlace 4...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link5" class="tab-content">
+            <div class="content-header">🔗 Enlace 5</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el quinto enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Espacio reservado para contenido del enlace 5...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link6" class="tab-content">
+            <div class="content-header">🔗 Enlace 6</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el sexto enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Espacio reservado para contenido del enlace 6...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link7" class="tab-content">
+            <div class="content-header">🔗 Enlace 7</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el séptimo enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Espacio reservado para contenido del enlace 7...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="link8" class="tab-content">
+            <div class="content-header">🔗 Enlace 8</div>
+            <div class="content-body">
+                <p>Contenido personalizable para el octavo enlace adicional.</p>
+                <div class="placeholder-content">
+                    <p>Espacio reservado para contenido del enlace 8...</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="content-wrapper">
-      <div class="portfolio-items-wrapper">
+    <script>
+        function openTab(evt, tabName) {
+            // Ocultar todo el contenido de las pestañas
+            var tabcontent = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
 
-        <div class="portfolio-item-wrapper">
-          <div class="portfolio-img-background" style="background-image:url(images/image.png)"></div>
+            // Remover la clase active de todas las pestañas
+            var tablinks = document.getElementsByClassName("tab");
+            for (var i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
 
-          <div class="img-text-wrapper">
-            <div class="logo-wrapper">
+            // Mostrar el contenido de la pestaña seleccionada y marcar la pestaña como activa
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
 
-          
-              <a   href="https://apps.microsoft.com/store/search?hl=es-ve&gl=ve&cid=msft_web_chart&publisher=Javier%20Santiago%20Gaston%20de%20Iriarte%20Cabrera"><img src="images/logos/logo_1.ico " alt=""></a>
-              
-            </div>
-
-            <div class="subtitle">Crypto Backtesting Bot for SuperTrend strategy</div>
-          </div>
-        </div>
-
-        <div class="portfolio-item-wrapper">
-          <div class="portfolio-img-background" style="background-image:url(images/image_csv_to_browser.png)"></div>
-
-         
-
-          <div class="img-text-wrapper">
-            <div class="logo-wrapper">
-              <a   href="https://apps.microsoft.com/store/search?hl=es-ve&gl=ve&cid=msft_web_chart&publisher=Javier%20Santiago%20Gaston%20de%20Iriarte%20Cabrera"><img src="images/logos/logo_csv_to_browser.bmp" alt=""></a>
-            </div>
-
-            <div class="subtitle">csv to json, an easy way to make json from a csv, just drag&drop and done.</div>
-          </div>
-        </div>
-
-        <div class="portfolio-item-wrapper">
-          <div class="portfolio-img-background" style="background-image:url(images/imagen3pokerutils.bmp)"></div>
-          <div class="img-text-wrapper">
-            <div class="logo-wrapper">
-              <img src="images/logos/logo_1080_1080.png" alt="">
-            </div>
-
-            <div class="subtitle">Graphs Utility, a tool to make wonderfull graphs, charts, machine learning, k-means clustering and correlated matrix solutions.</div>
-          </div>
-        </div>
-
-        <div class="portfolio-item-wrapper">
-          <div class="portfolio-img-background" style="background-image:url(images/guerrero_bandera_003.jpg)"></div>
-          <div class="img-text-wrapper">
-            <div class="logo-wrapper">
-              <a   href="https://jsgaston.github.io/Anarquista Shop.html"><img src="images/logo.png" ></a>
-            </div>
-
-            <div class="subtitle">Anarquista Shop.</div>
-          </div>
-        </div>
-
-        <div class="portfolio-item-wrapper">
-          <div class="portfolio-img-background" style="background-image:url(images/004.png)"></div>
-          <div class="img-text-wrapper">
-            <div class="logo-wrapper">
-              <a   href="https://apps.microsoft.com/store/search?hl=es-ve&gl=ve&cid=msft_web_chart&publisher=Javier%20Santiago%20Gaston%20de%20Iriarte%20Cabrera"><img src="images/logos/icono2.png" ></a>
-            </div>
-
-            <div class="subtitle">ML forexzilla is an app that helps you make better decissions when trading forex, it uses signals, oscilators and machine learning.</div>
-          </div>
-        </div>
-
-        <div class="portfolio-item-wrapper">
-          <div class="portfolio-img-background" style="background-image:url(images/GUERRERO_BANDERA_2.png)"></div>
-          <div class="img-text-wrapper">
-            <div class="logo-wrapper">
-              <a   href="https://jsgaston.github.io/Radio Anarquista.html"><img src="images/ANARQUIA_002.png" ></a>
-            </div>
-
-            <div class="subtitle">Radio Anarquista.</div>
-          </div>
-        </div>
-          
-
-
-  </div>
-
+        // Funcionalidad adicional: navegación con teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+                e.preventDefault();
+                var tabs = document.getElementsByClassName("tab");
+                var index = parseInt(e.key) - 1;
+                if (index < tabs.length) {
+                    tabs[index].click();
+                }
+            }
+        });
+    </script>
 </body>
-
-<script>
-  const portfolioItems = document.querySelectorAll('.portfolio-item-wrapper');
-
-  portfolioItems.forEach(portfolioItem => {
-    portfolioItem.addEventListener('mouseover', () => {
-      console.log(portfolioItem.childNodes[1].classList)
-      portfolioItem.childNodes[1].classList.add('image-blur');
-    });
-
-    portfolioItem.addEventListener('mouseout', () => {
-      console.log(portfolioItem.childNodes[1].classList)
-      portfolioItem.childNodes[1].classList.remove('image-blur');
-    });
-  });
-
-</script>
-
 </html>
