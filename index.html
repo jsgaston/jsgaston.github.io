@@ -105,6 +105,46 @@
             margin-top: 50px;
         }
 
+        .latest-entry-container {
+            border: 1px solid #ddd;
+            border-left: 5px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            background-color: #f9f9f9;
+        }
+
+        .latest-entry-container h3 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .latest-entry-container p {
+            margin-bottom: 5px;
+        }
+
+        .section-links {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .section-links a {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1em;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .section-links a:hover {
+            background-color: #0056b3;
+        }
+
         @media (max-width: 768px) {
             .tab {
                 font-size: 12px;
@@ -120,6 +160,11 @@
             .tab-content {
                 padding: 20px;
             }
+
+            .section-links a {
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -127,10 +172,10 @@
     <div class="container">
         <div class="tab-container">
             <button class="tab active" onclick="openTab(event, 'home')">Inicio</button>
-            <button class="tab" onclick="location.href='Diario.html'">Diario</button           
+            <button class="tab" onclick="location.href='Diario.html'">Diario</button>           
             <button class="tab" onclick="openTab(event, 'planes')">Planes</button>
             <button class="tab" onclick="openTab(event, 'mapas')">Mapas</button>
-            <button class="tab" onclick="openTab(event, 'cosas')">Cosas</button>
+            <button class="tab" onclick="location.href='calculadora.html'">Calculadora</button> <button class="tab" onclick="openTab(event, 'cosas')">Cosas</button>
             <button class="tab" onclick="openTab(event, 'casa')">Casa</button>
             <button class="tab" onclick="openTab(event, 'link1')">Link 1</button>
             <button class="tab" onclick="openTab(event, 'link2')">Link 2</button>
@@ -146,8 +191,17 @@
             <div class="content-header">👋 ¡Bienvenido!</div>
             <div class="content-body">
                 <p>Esta es tu página de inicio. Usa las pestañas de arriba para navegar a diferentes secciones.</p>
-                <div class="placeholder-content">
-                    <p>Contenido principal de la página...</p>
+                
+                <div class="latest-entry-container">
+                    <h3>Última entrada del Diario:</h3>
+                    <div id="latestDiaryEntry">
+                        <p class="placeholder-content">Cargando última entrada...</p>
+                    </div>
+                </div>
+
+                <div class="section-links">
+                    <a href="Diario.html">Ir al Diario</a>
+                    <a href="calculadora.html">Abrir Calculadora</a>
                 </div>
             </div>
         </div>
@@ -290,6 +344,11 @@
             // Mostrar el contenido de la pestaña seleccionada y marcar la pestaña como activa
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
+
+            // Special handling for the 'home' tab to load diary entry
+            if (tabName === 'home') {
+                loadLatestDiaryEntry();
+            }
         }
 
         // Set 'home' tab as active by default on load
@@ -309,6 +368,39 @@
                 }
             }
         });
+
+        function loadLatestDiaryEntry() {
+            const storedEntries = localStorage.getItem('diaryEntries');
+            const latestEntryContainer = document.getElementById('latestDiaryEntry');
+
+            if (storedEntries) {
+                let entries = JSON.parse(storedEntries);
+                if (entries.length > 0) {
+                    // Sort by timestamp to ensure the latest entry is truly the last one
+                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    const latest = entries[0];
+
+                    const formattedDate = new Date(latest.date).toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    latestEntryContainer.innerHTML = `
+                        <p><strong>Fecha:</strong> ${formattedDate}</p>
+                        <p><strong>Hora:</strong> ${latest.time}</p>
+                        <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
+                        <p><strong>Título:</strong> ${latest.title}</p>
+                        <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
+                    `;
+                } else {
+                    latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+                }
+            } else {
+                latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+            }
+        }
     </script>
 </body>
 </html>
