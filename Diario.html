@@ -33,6 +33,7 @@
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative; /* Needed for absolute positioning of back link */
         }
 
         .header h1 {
@@ -43,6 +44,24 @@
         .header p {
             font-size: 1.1em;
             opacity: 0.9;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #ffc107;
         }
 
         .content {
@@ -116,7 +135,7 @@
         .btn-secondary {
             background: linear-gradient(135deg, #ffc107, #e0a800);
             color: #333;
-            margin-left: 10px; /* Added margin for separation */
+            margin-left: 10px;
         }
 
         .btn-secondary:hover {
@@ -158,7 +177,7 @@
             border-bottom: 2px solid #f0f0f0;
         }
 
-        .entry-date {
+        .entry-date-time { /* Changed class name to include time */
             font-size: 1.2em;
             font-weight: bold;
             color: #28a745;
@@ -179,24 +198,7 @@
             font-size: 1.1em;
         }
 
-        .entry-actions {
-            margin-top: 15px;
-            text-align: right;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 14px;
-            margin-left: 5px;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-        }
-
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #c82333, #bd2130);
-        }
+        /* Removed .entry-actions and .btn-small, .btn-danger as per request */
 
         .search-filter {
             background: #f8f9fa;
@@ -253,12 +255,21 @@
             .search-filter .form-group {
                 min-width: 100%;
             }
+
+            .back-link {
+                top: 15px;
+                left: 15px;
+                font-size: 1em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <a href="index.html" class="back-link">
+                &larr; Volver a Inicio
+            </a>
             <h1>📖 Mi Diario Personal</h1>
             <p>Captura tus pensamientos, experiencias y momentos especiales</p>
         </div>
@@ -347,7 +358,7 @@
 
     <script>
         let entries = [];
-        let editingIndex = -1;
+        // No longer need editingIndex as edit functionality is removed
 
         // Set today's date by default
         document.getElementById('entryDate').valueAsDate = new Date();
@@ -366,6 +377,8 @@
             const mood = document.getElementById('entryMood').value;
             const title = document.getElementById('entryTitle').value;
             const content = document.getElementById('entryContent').value;
+            const now = new Date();
+            const time = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
             if (!date || !mood || !content) {
                 alert('Por favor, completa todos los campos obligatorios.');
@@ -373,59 +386,28 @@
             }
 
             const entry = {
-                id: editingIndex >= 0 ? entries[editingIndex].id : Date.now(), // Use existing ID or new one
+                id: Date.now(), // Always create a new ID as editing is removed
                 date: date,
+                time: time, // Store the time
                 mood: mood,
                 title: title || 'Sin título',
                 content: content,
-                timestamp: new Date().toISOString() // For consistent sorting
+                timestamp: now.toISOString() // For consistent sorting
             };
 
-            if (editingIndex >= 0) {
-                // Update existing entry
-                entries[editingIndex] = entry;
-                editingIndex = -1; // Reset editing state
-                document.querySelector('#entryForm button[type="submit"]').textContent = '💾 Guardar Entrada';
-            } else {
-                // Add new entry
-                entries.push(entry);
-            }
-
+            entries.push(entry);
             saveEntriesToLocalStorage(); // Persist entries
             displayEntries();
             clearForm();
         }
 
-        function editEntry(id) {
-            const index = entries.findIndex(entry => entry.id === id);
-            if (index === -1) return;
-
-            const entry = entries[index];
-            document.getElementById('entryDate').value = entry.date;
-            document.getElementById('entryMood').value = entry.mood;
-            document.getElementById('entryTitle').value = entry.title === 'Sin título' ? '' : entry.title;
-            document.getElementById('entryContent').value = entry.content;
-
-            editingIndex = index; // Set editing state
-            document.querySelector('#entryForm button[type="submit"]').textContent = '✏️ Actualizar Entrada';
-            
-            // Scroll to form for editing
-            document.querySelector('.new-entry-section').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function deleteEntry(id) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta entrada?')) {
-                entries = entries.filter(entry => entry.id !== id);
-                saveEntriesToLocalStorage();
-                displayEntries();
-            }
-        }
+        // Removed editEntry function
+        // Removed deleteEntry function
 
         function clearForm() {
             document.getElementById('entryForm').reset();
             document.getElementById('entryDate').valueAsDate = new Date();
-            editingIndex = -1; // Reset editing state
-            document.querySelector('#entryForm button[type="submit"]').textContent = '💾 Guardar Entrada';
+            // No longer need to reset editing state
         }
 
         function displayEntries() {
@@ -456,16 +438,12 @@
                 html += `
                     <div class="entry" data-mood="${entry.mood}" data-content="${entry.content.toLowerCase()}" data-title="${entry.title.toLowerCase()}" data-id="${entry.id}">
                         <div class="entry-header">
-                            <div class="entry-date">${formattedDate}</div>
+                            <div class="entry-date-time">${formattedDate} - ${entry.time}</div>
                             <div class="entry-mood">${entry.mood}</div>
                         </div>
                         <h3 style="color: #28a745; margin-bottom: 10px;">${entry.title}</h3>
                         <div class="entry-content">${entry.content.replace(/\n/g, '<br>')}</div>
-                        <div class="entry-actions">
-                            <button class="btn btn-secondary btn-small" onclick="editEntry(${entry.id})">✏️ Editar</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteEntry(${entry.id})">🗑️ Eliminar</button>
                         </div>
-                    </div>
                 `;
             });
 
@@ -507,6 +485,7 @@
                     {
                         id: 1,
                         date: '2025-06-05',
+                        time: '10:00 AM', // Added time
                         mood: '😊 Feliz',
                         title: 'Un día perfecto',
                         content: 'Hoy ha sido un día increíble. El sol brillaba, pude completar todos mis proyectos y tuve una conversación muy interesante con un viejo amigo. Me siento lleno de energía y optimismo.',
@@ -515,10 +494,11 @@
                     {
                         id: 2,
                         date: '2025-06-04',
+                        time: '03:30 PM', // Added time
                         mood: '🤔 Pensativo',
                         title: 'Reflexiones sobre el futuro',
                         content: 'Últimamente he estado pensando mucho sobre hacia dónde voy en la vida. Hay tantas posibilidades y caminos por explorar. A veces me siento un poco abrumado, pero también emocionado por las oportunidades que se avecinan.',
-                        timestamp: '2025-06-04T12:30:00.000Z'
+                        timestamp: '2025-06-04T15:30:00.000Z'
                     }
                 ];
                 saveEntriesToLocalStorage(); // Save example entries to local storage
