@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Diario Personal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745, #20a038);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .new-entry-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #28a745;
+        }
+
+        .new-entry-section h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #28a745;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #28a745, #20a038);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #20a038, #1e7e34);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e0a800, #d39e00);
+        }
+
+        .entries-section {
+            margin-top: 30px;
+        }
+
+        .entries-section h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .entry {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .entry:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .entry-date {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .entry-mood {
+            background: #ffc107;
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .entry-content {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .entry-actions {
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333, #bd2130);
+        }
+
+        .search-filter {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .search-filter .form-group {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .no-entries {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .entry-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .search-filter .form-group {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 Mi Diario Personal</h1>
+            <p>Captura tus pensamientos, experiencias y momentos especiales</p>
+        </div>
+
+        <div class="content">
+            <!-- Nueva Entrada -->
+            <div class="new-entry-section">
+                <h2>✍️ Nueva Entrada</h2>
+                <form id="entryForm">
+                    <div class="form-group">
+                        <label for="entryDate">Fecha:</label>
+                        <input type="date" id="entryDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="entryMood">Estado de ánimo:</label>
+                        <select id="entryMood" required>
+                            <option value="">Selecciona tu estado de ánimo</option>
+                            <option value="😊 Feliz">😊 Feliz</option>
+                            <option value="😌 Tranquilo">😌 Tranquilo</option>
+                            <option value="😔 Triste">😔 Triste</option>
+                            <option value="😤 Frustrado">😤 Frustrado</option>
+                            <option value="😴 Cansado">😴 Cansado</option>
+                            <option value="🤔 Pensativo">🤔 Pensativo</option>
+                            <option value="😍 Enamorado">😍 Enamorado</option>
+                            <option value="😨 Ansioso">😨 Ansioso</option>
+                            <option value="🎉 Emocionado">🎉 Emocionado</option>
+                            <option value="😐 Neutral">😐 Neutral</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="entryTitle">Título (opcional):</label>
+                        <input type="text" id="entryTitle" placeholder="Dale un título a tu entrada...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="entryContent">Contenido:</label>
+                        <textarea id="entryContent" placeholder="¿Qué ha pasado hoy? ¿Cómo te sientes? Escribe todo lo que quieras recordar..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">💾 Guardar Entrada</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Limpiar</button>
+                </form>
+            </div>
+
+            <!-- Filtros y Búsqueda -->
+            <div class="search-filter">
+                <div class="form-group">
+                    <label for="searchText">Buscar:</label>
+                    <input type="text" id="searchText" placeholder="Buscar en entradas..." onkeyup="filterEntries()">
+                </div>
+                <div class="form-group">
+                    <label for="filterMood">Filtrar por estado:</label>
+                    <select id="filterMood" onchange="filterEntries()">
+                        <option value="">Todos los estados</option>
+                        <option value="😊 Feliz">😊 Feliz</option>
+                        <option value="😌 Tranquilo">😌 Tranquilo</option>
+                        <option value="😔 Triste">😔 Triste</option>
+                        <option value="😤 Frustrado">😤 Frustrado</option>
+                        <option value="😴 Cansado">😴 Cansado</option>
+                        <option value="🤔 Pensativo">🤔 Pensativo</option>
+                        <option value="😍 Enamorado">😍 Enamorado</option>
+                        <option value="😨 Ansioso">😨 Ansioso</option>
+                        <option value="🎉 Emocionado">🎉 Emocionado</option>
+                        <option value="😐 Neutral">😐 Neutral</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sortOrder">Ordenar:</label>
+                    <select id="sortOrder" onchange="filterEntries()">
+                        <option value="newest">Más recientes</option>
+                        <option value="oldest">Más antiguos</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Entradas del Diario -->
+            <div class="entries-section">
+                <h2>📚 Mis Entradas</h2>
+                <div id="entriesContainer">
+                    <div class="no-entries">
+                        <p>No hay entradas aún. ¡Escribe tu primera entrada arriba!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let editingIndex = -1;
+
+        // Configurar fecha de hoy por defecto
+        document.getElementById('entryDate').valueAsDate = new Date();
+
+        // Cargar entradas al inicio
+        loadEntries();
+
+        // Manejar envío del formulario
+        document.getElementById('entryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveEntry();
+        });
+
+        function saveEntry() {
+            const date = document.getElementById('entryDate').value;
+            const mood = document.getElementById('entryMood').value;
+            const title = document.getElementById('entryTitle').value;
+            const content = document.getElementById('entryContent').value;
+
+            if (!date || !mood || !content) {
+                alert('Por favor, completa todos los campos obligatorios.');
+                return;
+            }
+
+            const entry = {
+                id: editingIndex >= 0 ? entries[editingIndex].id : Date.now(),
+                date: date,
+                mood: mood,
+                title: title || 'Sin título',
+                content: content,
+                timestamp: new Date().toISOString()
+            };
+
+            if (editingIndex >= 0) {
+                entries[editingIndex] = entry;
+                editingIndex = -1;
+                document.querySelector('#entryForm button[type="submit"]').textContent = '💾 Guardar Entrada';
+            } else {
+                entries.push(entry);
+            }
+
+            saveEntries();
+            displayEntries();
+            clearForm();
+        }
+
+        function editEntry(index) {
+            const entry = entries[index];
+            document.getElementById('entryDate').value = entry.date;
+            document.getElementById('entryMood').value = entry.mood;
+            document.getElementById('entryTitle').value = entry.title === 'Sin título' ? '' : entry.title;
+            document.getElementById('entryContent').value = entry.content;
+            
+            editingIndex = index;
+            document.querySelector('#entryForm button[type="submit"]').textContent = '✏️ Actualizar Entrada';
+            
+            // Scroll to form
+            document.querySelector('.new-entry-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteEntry(index) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta entrada?')) {
+                entries.splice(index, 1);
+                saveEntries();
+                displayEntries();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('entryForm').reset();
+            document.getElementById('entryDate').valueAsDate = new Date();
+            editingIndex = -1;
+            document.querySelector('#entryForm button[type="submit"]').textContent = '💾 Guardar Entrada';
+        }
+
+        function displayEntries() {
+            const container = document.getElementById('entriesContainer');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="no-entries"><p>No hay entradas aún. ¡Escribe tu primera entrada arriba!</p></div>';
+                return;
+            }
+
+            let html = '';
+            entries.forEach((entry, index) => {
+                const formattedDate = new Date(entry.date).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                html += `
+                    <div class="entry" data-mood="${entry.mood}" data-content="${entry.content.toLowerCase()}" data-title="${entry.title.toLowerCase()}">
+                        <div class="entry-header">
+                            <div class="entry-date">${formattedDate}</div>
+                            <div class="entry-mood">${entry.mood}</div>
+                        </div>
+                        <h3 style="color: #28a745; margin-bottom: 10px;">${entry.title}</h3>
+                        <div class="entry-content">${entry.content.replace(/\n/g, '<br>')}</div>
+                        <div class="entry-actions">
+                            <button class="btn btn-secondary btn-small" onclick="editEntry(${index})">✏️ Editar</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteEntry(${index})">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function filterEntries() {
+            const searchText = document.getElementById('searchText').value.toLowerCase();
+            const filterMood = document.getElementById('filterMood').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+
+            // Ordenar entradas
+            let sortedEntries = [...entries];
+            if (sortOrder === 'newest') {
+                sortedEntries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else {
+                sortedEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
+            }
+
+            // Actualizar el array global temporalmente para display
+            const originalEntries = [...entries];
+            entries = sortedEntries;
+            displayEntries();
+            entries = originalEntries;
+
+            // Aplicar filtros
+            const entryElements = document.querySelectorAll('.entry');
+            entryElements.forEach(entry => {
+                const matchesSearch = searchText === '' || 
+                    entry.dataset.content.includes(searchText) || 
+                    entry.dataset.title.includes(searchText);
+                
+                const matchesMood = filterMood === '' || entry.dataset.mood === filterMood;
+
+                if (matchesSearch && matchesMood) {
+                    entry.style.display = 'block';
+                } else {
+                    entry.style.display = 'none';
+                }
+            });
+        }
+
+        function saveEntries() {
+            // En un entorno real, aquí se guardarían en una base de datos
+            // Por ahora, mantenemos todo en memoria durante la sesión
+        }
+
+        function loadEntries() {
+            // Cargar entradas de ejemplo
+            entries = [
+                {
+                    id: 1,
+                    date: '2025-06-05',
+                    mood: '😊 Feliz',
+                    title: 'Un día perfecto',
+                    content: 'Hoy ha sido un día increíble. El sol brillaba, pude completar todos mis proyectos y tuve una conversación muy interesante con un viejo amigo. Me siento lleno de energía y optimismo.',
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    date: '2025-06-04',
+                    mood: '🤔 Pensativo',
+                    title: 'Reflexiones sobre el futuro',
+                    content: 'Últimamente he estado pensando mucho sobre hacia dónde voy en la vida. Hay tantas posibilidades y caminos por explorar. A veces me siento un poco abrumado, pero también emocionado por las oportunidades que se avecinan.',
+                    timestamp: new Date().toISOString()
+                }
+            ];
+            displayEntries();
+        }
+    </script>
+</body>
+</html>
