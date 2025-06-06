@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Simple</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%); /* Colores de tus banderas */
+            margin: 0;
+            padding: 20px;
+        }
+
+        .calculator {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .calculator h1 {
+            color: #28a745;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .calculator-display {
+            background-color: #e9ecef;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 2.2em;
+            text-align: right;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            overflow-x: auto; /* Para números largos */
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .btn-calc {
+            width: 100%;
+            padding: 18px 0;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+
+        .btn-number, .btn-decimal {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-operator {
+            background-color: #ffc107; /* Amarillo */
+            color: #333;
+        }
+
+        .btn-equal {
+            background-color: #28a745; /* Verde */
+            color: white;
+            grid-column: span 2; /* Ocupa dos columnas */
+        }
+
+        .btn-clear {
+            background-color: #dc3545; /* Rojo */
+            color: white;
+            grid-column: span 2; /* Ocupa dos columnas */
+        }
+
+        .btn-calc:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-operator:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-equal:hover {
+            background-color: #218838;
+        }
+
+        .btn-clear:hover {
+            background-color: #c82333;
+        }
+
+        /* Estilos para el enlace de vuelta al index */
+        .back-link-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back-link {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 400px) {
+            .calculator {
+                padding: 15px;
+                max-width: 95%;
+            }
+            .calculator-display {
+                font-size: 1.8em;
+                min-height: 50px;
+            }
+            .btn-calc {
+                padding: 15px 0;
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Calculadora</h1>
+        <div class="calculator-display" id="display">0</div>
+        <div class="calculator-buttons">
+            <button class="btn-calc btn-clear" onclick="clearDisplay()">C</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('/')">/</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('*')">x</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('7')">7</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('8')">8</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('9')">9</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('-')">-</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('4')">4</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('5')">5</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('6')">6</button>
+            <button class="btn-calc btn-operator" onclick="appendOperator('+')">+</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('1')">1</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('2')">2</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('3')">3</button>
+            <button class="btn-calc btn-equal" onclick="calculateResult()">=</button>
+            <button class="btn-calc btn-number" onclick="appendNumber('0')">0</button>
+            <button class="btn-calc btn-decimal" onclick="appendDecimal('.')">.</button>
+        </div>
+        <div class="back-link-container">
+            <a href="index.html" class="back-link">Volver a Inicio</a>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '0';
+        let operator = null;
+        let previousInput = '';
+        let resetDisplay = false;
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        function appendNumber(number) {
+            if (currentInput === '0' || resetDisplay) {
+                currentInput = number;
+                resetDisplay = false;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (resetDisplay) {
+                currentInput = '0.';
+                resetDisplay = false;
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (operator !== null && !resetDisplay) {
+                calculateResult(); // Calculate previous operation before applying new one
+            }
+            previousInput = currentInput;
+            operator = op;
+            resetDisplay = true;
+        }
+
+        function calculateResult() {
+            let result;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current) || operator === null) {
+                return; // Nothing to calculate
+            }
+
+            switch (operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        alert("¡No se puede dividir por cero!");
+                        clearDisplay();
+                        return;
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            currentInput = result.toString();
+            operator = null;
+            previousInput = '';
+            resetDisplay = true;
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            operator = null;
+            previousInput = '';
+            resetDisplay = false;
+            updateDisplay();
+        }
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
