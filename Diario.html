@@ -33,7 +33,7 @@
             color: white;
             padding: 30px;
             text-align: center;
-            position: relative; /* Needed for absolute positioning of back link */
+            position: relative;
         }
 
         .header h1 {
@@ -114,6 +114,72 @@
             line-height: 1.6;
         }
 
+        /* Image upload and preview styles */
+        .image-upload-section {
+            border: 2px dashed #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .image-upload-section:hover {
+            background-color: #f8f9fa;
+        }
+
+        .image-upload-section.drag-over {
+            background-color: #e8f5e8;
+            border-color: #20a038;
+        }
+
+        .image-upload-text {
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .image-preview {
+            position: relative;
+            display: inline-block;
+        }
+
+        .image-preview img {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .image-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-remove:hover {
+            background: #c82333;
+        }
+
         .btn {
             background: linear-gradient(135deg, #28a745, #20a038);
             color: white;
@@ -177,7 +243,7 @@
             border-bottom: 2px solid #f0f0f0;
         }
 
-        .entry-date-time { /* Changed class name to include time */
+        .entry-date-time {
             font-size: 1.2em;
             font-weight: bold;
             color: #28a745;
@@ -198,7 +264,26 @@
             font-size: 1.1em;
         }
 
-        /* Removed .entry-actions and .btn-small, .btn-danger as per request */
+        .entry-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .entry-images img {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .entry-images img:hover {
+            transform: scale(1.05);
+        }
 
         .search-filter {
             background: #f8f9fa;
@@ -222,6 +307,47 @@
             color: #666;
             font-style: italic;
             padding: 40px;
+        }
+
+        /* Modal styles for image viewing */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #ffc107;
         }
 
         @media (max-width: 768px) {
@@ -260,6 +386,16 @@
                 top: 15px;
                 left: 15px;
                 font-size: 1em;
+            }
+
+            .image-preview-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .entry-images {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
@@ -307,7 +443,18 @@
                     
                     <div class="form-group">
                         <label for="entryContent">Contenido:</label>
-                        <textarea id="entryContent" placeholder="¿Qué ha pasado hoy? ¿Cómo te sientes? Escribe todo lo que quieras recordar..." required></textarea>
+                        <textarea id="entryContent" placeholder="¿Qué ha pasado hoy? ¿Cómo te sientes? Escribe todo lo que quieras recordar... También puedes pegar imágenes usando Ctrl+V!" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Imágenes:</label>
+                        <div class="image-upload-section" id="imageUploadArea">
+                            <div class="image-upload-text">
+                                📷 Arrastra imágenes aquí, haz clic para seleccionar o pega con Ctrl+V
+                            </div>
+                            <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                        </div>
+                        <div class="image-preview-container" id="imagePreviewContainer"></div>
                     </div>
                     
                     <button type="submit" class="btn">💾 Guardar Entrada</button>
@@ -356,9 +503,17 @@
         </div>
     </div>
 
+    <!-- Modal for viewing images -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="">
+        </div>
+    </div>
+
     <script>
         let entries = [];
-        // No longer need editingIndex as edit functionality is removed
+        let currentImages = []; // Store images for current entry
 
         // Set today's date by default
         document.getElementById('entryDate').valueAsDate = new Date();
@@ -371,6 +526,96 @@
             e.preventDefault();
             saveEntry();
         });
+
+        // Image handling
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const textarea = document.getElementById('entryContent');
+
+        // Click to upload
+        imageUploadArea.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        // File input change
+        imageInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        imageUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.add('drag-over');
+        });
+
+        imageUploadArea.addEventListener('dragleave', () => {
+            imageUploadArea.classList.remove('drag-over');
+        });
+
+        imageUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.remove('drag-over');
+            handleFileSelect({ target: { files: e.dataTransfer.files } });
+        });
+
+        // Paste functionality
+        textarea.addEventListener('paste', handlePaste);
+        document.addEventListener('paste', handlePaste);
+
+        function handlePaste(e) {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    const file = item.getAsFile();
+                    addImageToPreview(file);
+                }
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    addImageToPreview(file);
+                }
+            });
+        }
+
+        function addImageToPreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageData = e.target.result;
+                currentImages.push(imageData);
+                
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'image-preview';
+                imageDiv.innerHTML = `
+                    <img src="${imageData}" alt="Preview">
+                    <button type="button" class="image-remove" onclick="removeImage(${currentImages.length - 1})">×</button>
+                `;
+                
+                imagePreviewContainer.appendChild(imageDiv);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage(index) {
+            currentImages.splice(index, 1);
+            updateImagePreview();
+        }
+
+        function updateImagePreview() {
+            imagePreviewContainer.innerHTML = '';
+            currentImages.forEach((imageData, index) => {
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'image-preview';
+                imageDiv.innerHTML = `
+                    <img src="${imageData}" alt="Preview">
+                    <button type="button" class="image-remove" onclick="removeImage(${index})">×</button>
+                `;
+                imagePreviewContainer.appendChild(imageDiv);
+            });
+        }
 
         function saveEntry() {
             const date = document.getElementById('entryDate').value;
@@ -386,28 +631,27 @@
             }
 
             const entry = {
-                id: Date.now(), // Always create a new ID as editing is removed
+                id: Date.now(),
                 date: date,
-                time: time, // Store the time
+                time: time,
                 mood: mood,
                 title: title || 'Sin título',
                 content: content,
-                timestamp: now.toISOString() // For consistent sorting
+                images: [...currentImages], // Copy current images
+                timestamp: now.toISOString()
             };
 
             entries.push(entry);
-            saveEntriesToLocalStorage(); // Persist entries
+            saveEntriesToMemory();
             displayEntries();
             clearForm();
         }
 
-        // Removed editEntry function
-        // Removed deleteEntry function
-
         function clearForm() {
             document.getElementById('entryForm').reset();
             document.getElementById('entryDate').valueAsDate = new Date();
-            // No longer need to reset editing state
+            currentImages = [];
+            imagePreviewContainer.innerHTML = '';
         }
 
         function displayEntries() {
@@ -417,7 +661,6 @@
                 return;
             }
 
-            // Apply sorting before displaying
             let sortedEntries = [...entries];
             const sortOrder = document.getElementById('sortOrder').value;
             if (sortOrder === 'newest') {
@@ -435,6 +678,15 @@
                     day: 'numeric'
                 });
 
+                let imagesHtml = '';
+                if (entry.images && entry.images.length > 0) {
+                    imagesHtml = '<div class="entry-images">';
+                    entry.images.forEach(imageData => {
+                        imagesHtml += `<img src="${imageData}" alt="Imagen de entrada" onclick="openImageModal('${imageData}')">`;
+                    });
+                    imagesHtml += '</div>';
+                }
+
                 html += `
                     <div class="entry" data-mood="${entry.mood}" data-content="${entry.content.toLowerCase()}" data-title="${entry.title.toLowerCase()}" data-id="${entry.id}">
                         <div class="entry-header">
@@ -443,13 +695,32 @@
                         </div>
                         <h3 style="color: #28a745; margin-bottom: 10px;">${entry.title}</h3>
                         <div class="entry-content">${entry.content.replace(/\n/g, '<br>')}</div>
-                        </div>
+                        ${imagesHtml}
+                    </div>
                 `;
             });
 
             container.innerHTML = html;
-            filterEntries(); // Apply filters after displaying all (sorted) entries
+            filterEntries();
         }
+
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+        }
+
+        // Close modal
+        document.querySelector('.modal-close').addEventListener('click', () => {
+            document.getElementById('imageModal').style.display = 'none';
+        });
+
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                document.getElementById('imageModal').style.display = 'none';
+            }
+        });
 
         function filterEntries() {
             const searchText = document.getElementById('searchText').value.toLowerCase();
@@ -471,38 +742,36 @@
             });
         }
 
-        function saveEntriesToLocalStorage() {
-            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+        function saveEntriesToMemory() {
+            // Note: In a real GitHub Pages deployment, you would use localStorage
+            // For this demo, data is stored in memory only
+            console.log('Entries saved:', entries.length);
         }
 
         function loadEntries() {
-            const storedEntries = localStorage.getItem('diaryEntries');
-            if (storedEntries) {
-                entries = JSON.parse(storedEntries);
-            } else {
-                // Load example entries only if no entries are stored
-                entries = [
-                    {
-                        id: 1,
-                        date: '2025-06-05',
-                        time: '10:00 AM', // Added time
-                        mood: '😊 Feliz',
-                        title: 'Un día perfecto',
-                        content: 'Hoy ha sido un día increíble. El sol brillaba, pude completar todos mis proyectos y tuve una conversación muy interesante con un viejo amigo. Me siento lleno de energía y optimismo.',
-                        timestamp: '2025-06-05T10:00:00.000Z'
-                    },
-                    {
-                        id: 2,
-                        date: '2025-06-04',
-                        time: '03:30 PM', // Added time
-                        mood: '🤔 Pensativo',
-                        title: 'Reflexiones sobre el futuro',
-                        content: 'Últimamente he estado pensando mucho sobre hacia dónde voy en la vida. Hay tantas posibilidades y caminos por explorar. A veces me siento un poco abrumado, pero también emocionado por las oportunidades que se avecinan.',
-                        timestamp: '2025-06-04T15:30:00.000Z'
-                    }
-                ];
-                saveEntriesToLocalStorage(); // Save example entries to local storage
-            }
+            // Initialize with example entries
+            entries = [
+                {
+                    id: 1,
+                    date: '2025-06-05',
+                    time: '10:00',
+                    mood: '😊 Feliz',
+                    title: 'Un día perfecto',
+                    content: '¿Por qué hacen eso?, supongo que pa ver si los siguientes son mala gente.',
+                    images: [],
+                    timestamp: '2025-06-07T02:00:00.000Z'
+                },
+                {
+                    id: 2,
+                    date: '2025-06-04',
+                    time: '15:30',
+                    mood: '🤔 Pensativo',
+                    title: 'Reflexiones sobre el futuro',
+                    content: '¿Cómo se hace edificios para que me cazen?, destruyen viviendas como la que me debería haber llegado a mí, y hacen paredes gordas.',
+                    images: [],
+                    timestamp: '2025-06-07T01:30:00.000Z'
+                }
+            ];
             displayEntries();
         }
     </script>
