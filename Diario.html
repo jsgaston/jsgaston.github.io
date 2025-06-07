@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Diario Personal</title>
+    <title>Mi Página con Pestañas</title>
     <style>
         /* Tus estilos CSS aquí (los que ya tienes) */
         * {
@@ -13,14 +13,15 @@
         }
 
         body {
-            font-family: 'Georgia', serif;
+            font-family: 'Arial', sans-serif;
+            /* Background colors from the flags */
             background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
             min-height: 100vh;
             padding: 20px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
@@ -28,191 +29,183 @@
             overflow: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, #28a745, #20a038);
-            color: white;
-            padding: 30px;
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 2px solid #ccc;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            overflow: hidden;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 20px 0;
             text-align: center;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.3s ease;
             position: relative;
+            text-decoration: none; /* Ensure it looks like a button not a link */
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .header .home-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: #ffc107;
+        .tab-button:hover {
+            background-color: #f0f0f0;
             color: #333;
-            padding: 10px 15px;
+        }
+
+        .tab-button.active {
+            color: #28a745;
+            background-color: #e9ecef;
+            border-bottom: 3px solid #28a745;
+        }
+
+        /* Indicador visual para la pestaña activa */
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #28a745;
+        }
+
+        .tab-content {
+            padding: 30px;
+            background: #fff;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: #e9f7ef;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .welcome-section h1 {
+            color: #28a745;
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .welcome-section p {
+            color: #555;
+            font-size: 1.2em;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #007bff;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .feature-card a {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #ffc107;
+            color: #333;
+            padding: 10px 20px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
-            transition: background 0.3s ease;
+            transition: background-color 0.3s ease;
         }
 
-        .header .home-button:hover {
-            background: #e0a800;
+        .feature-card a:hover {
+            background-color: #e0a800;
         }
 
-        .content {
+        .latest-entry-section {
+            background: #f0f8ff;
+            border-radius: 10px;
             padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .form-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.8em;
+        .latest-entry-section h2 {
             text-align: center;
+            color: #28a745;
+            margin-bottom: 25px;
+            font-size: 2em;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .form-group input[type="date"],
-        .form-group input[type="time"],
-        .form-group input[type="text"],
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 1em;
-            box-sizing: border-box;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-group button {
-            background: #28a745;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: background 0.3s ease;
-            display: block;
-            width: 100%;
-        }
-
-        .form-group button:hover {
-            background: #218838;
-        }
-
-        .entries-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .entries-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            text-align: center;
-        }
-
-        .search-group {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-group input[type="text"] {
-            flex-grow: 1;
-        }
-
-        .search-group button {
-            background: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s ease;
-        }
-
-        .search-group button:hover {
-            background: #0056b3;
-        }
-
-        #diaryEntriesList {
-            list-style: none;
-            padding: 0;
-        }
-
-        .diary-entry {
-            background: #fff;
+        #latestEntryContainer {
+            background: #ffffff;
             border: 1px solid #e2e6ea;
             border-radius: 8px;
             padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .diary-entry h3 {
-            color: #007bff;
+        #latestEntryContainer p {
             margin-bottom: 10px;
-            font-size: 1.4em;
-        }
-
-        .diary-entry p {
-            color: #495057;
-            line-height: 1.6;
-            margin-bottom: 8px;
-        }
-
-        .diary-entry .meta {
-            font-size: 0.9em;
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
-
-        .diary-entry .meta strong {
             color: #343a40;
+            line-height: 1.6;
         }
 
-        .diary-entry .entry-images {
+        #latestEntryContainer strong {
+            color: #007bff;
+        }
+
+        #latestEntryContainer .placeholder-content {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        #latestEntryContainer .entry-images {
             margin-top: 15px;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .diary-entry .entry-images img {
+        #latestEntryContainer .entry-images img {
             max-width: 100px;
             height: auto;
             border: 1px solid #ddd;
@@ -220,270 +213,173 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .diary-entry .delete-button {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background 0.3s ease;
-            position: absolute;
-            top: 15px;
-            right: 15px;
-        }
-
-        .diary-entry .delete-button:hover {
-            background: #c82333;
-        }
-
-        .placeholder-content {
+        .footer {
             text-align: center;
-            color: #6c757d;
             padding: 20px;
-            font-style: italic;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 0.9em;
+            border-top: 1px solid #eee;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>Mi Diario Personal</h1>
-            <p>Captura tus pensamientos y momentos</p>
-            <a href="index.html" class="home-button">Volver al Inicio</a>
-        </header>
+        <div class="tab-container">
+            <a href="#" class="tab-button active" data-tab="home">Inicio</a>
+            <a href="#" class="tab-button" data-tab="blog">Blog</a>
+            <a href="#" class="tab-button" data-tab="contact">Contacto</a>
+            <a href="Diario.html" class="tab-button">Diario Personal</a>
+        </div>
 
-        <main class="content">
-            <section class="form-section">
-                <h2>Añadir Nueva Entrada</h2>
-                <form id="diaryEntryForm">
-                    <div class="form-group">
-                        <label for="entryDate">Fecha:</label>
-                        <input type="date" id="entryDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryTime">Hora:</label>
-                        <input type="time" id="entryTime" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryMood">Estado de Ánimo:</label>
-                        <select id="entryMood" required>
-                            <option value="😊 Feliz">😊 Feliz</option>
-                            <option value="😐 Neutral">😐 Neutral</option>
-                            <option value="😔 Triste">😔 Triste</option>
-                            <option value="😠 Enfadado">😠 Enfadado</option>
-                            <option value="🤔 Pensativo">🤔 Pensativo</option>
-                            <option value="🤩 Emocionado">🤩 Emocionado</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryTitle">Título:</label>
-                        <input type="text" id="entryTitle" placeholder="Un resumen de tu día" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryContent">Contenido:</label>
-                        <textarea id="entryContent" placeholder="Escribe aquí tus pensamientos..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryImageUrls">URLs de Imágenes (Opcional):</label>
-                        <textarea id="entryImageUrls" rows="3" placeholder="Pega una URL por línea. Ej:
-https://ejemplo.com/imagen1.jpg
-https://ejemplo.com/imagen2.png"></textarea>
-                        <small>Pega aquí una URL de imagen por línea. Sube tus imágenes a un servicio como Freeimage.host, luego pega los enlaces directos aquí.</small>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit">Guardar Entrada</button>
-                    </div>
-                </form>
-            </section>
+        <div class="tab-content">
+            <div id="home" class="tab-pane active">
+                <section class="welcome-section">
+                    <h1>¡Bienvenido a Mi Sitio!</h1>
+                    <p>Explora nuestras diferentes secciones, desde un blog personal hasta un diario interactivo.</p>
+                </section>
 
-            <section class="entries-section">
-                <h2>Mis Entradas</h2>
-                <div class="search-group">
-                    <input type="text" id="searchInput" placeholder="Buscar por título o contenido...">
-                    <button onclick="filterEntries()">Buscar</button>
+                <section class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Blog</h3>
+                        <p>Lee mis pensamientos y artículos sobre diversos temas.</p>
+                        <a href="#" onclick="showTab('blog')">Ir al Blog</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Diario Personal</h3>
+                        <p>Un espacio privado para registrar tus experiencias y estados de ánimo.</p>
+                        <a href="Diario.html">Abrir Diario</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Contacto</h3>
+                        <p>Ponte en contacto conmigo para cualquier consulta o sugerencia.</p>
+                        <a href="#" onclick="showTab('contact')">Contactar</a>
+                    </div>
+                </section>
+
+                <section class="latest-entry-section">
+                    <h2>Última Entrada del Diario</h2>
+                    <div id="latestEntryContainer">
+                        <p class="placeholder-content">Cargando última entrada...</p>
+                    </div>
+                </section>
+            </div>
+
+            <div id="blog" class="tab-pane">
+                <h2>Nuestro Blog</h2>
+                <p>Aquí encontrarás las últimas publicaciones y artículos.</p>
                 </div>
-                <ul id="diaryEntriesList">
-                    <p class="placeholder-content">Cargando entradas...</p>
-                </ul>
-            </section>
-        </main>
+
+            <div id="contact" class="tab-pane">
+                <h2>Contacto</h2>
+                <p>Puedes contactarnos a través de este formulario o en nuestras redes sociales.</p>
+                </div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2025 Mi Página. Todos los derechos reservados.</p>
+        </footer>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT ---
-        // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-        const GOOGLE_APPS_SCRIPT_URL = 'TU_URL_DE_APLICACION_WEB_DE_GOOGLE_APPS_SCRIPT_AQUI'; 
-
-        let entries = []; // Array para almacenar las entradas en memoria local
+        // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT --- AKfycbzSkn5NfK6ulu9cwSi5B9ZCtE1Jkl1NI4TFyVH9_1zk3FSh1PgKx1h77ugF06cHYgf7ag
+        // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE_APPS_SCRIPT
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSkn5NfK6ulu9cwSi5B9ZCtE1Jkl1NI4TFyVH9_1zk3FSh1PgKx1h77ugF06cHYgf7ag/exec'; 
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadEntriesFromGoogleSheet(); // Cargar las entradas del Sheet al iniciar
-            document.getElementById('diaryEntryForm').addEventListener('submit', addEntry);
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    if (button.getAttribute('href') !== '#' && button.getAttribute('href') !== '') {
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    const targetTab = button.dataset.tab;
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                    button.classList.add('active');
+                    if (targetTab) {
+                        document.getElementById(targetTab).classList.add('active');
+                    }
+                });
+            });
+
+            window.showTab = function(tabId) {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                let activatedButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+                if (!activatedButton) {
+                    activatedButton = document.querySelector(`.tab-button[href="${tabId}.html"]`);
+                }
+                
+                if (activatedButton) {
+                    activatedButton.classList.add('active');
+                }
+                
+                const targetPane = document.getElementById(tabId);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                }
+            };
+
+            displayLatestDiaryEntry();
         });
 
-        // Función para leer las entradas de Google Sheet
-        async function loadEntriesFromGoogleSheet() {
-            const list = document.getElementById('diaryEntriesList');
-            list.innerHTML = '<p class="placeholder-content">Cargando entradas del diario desde Google Sheets...</p>';
+        // Función para mostrar la última entrada de Google Sheet
+        async function displayLatestDiaryEntry() {
+            const latestEntryContainer = document.getElementById('latestEntryContainer');
+            latestEntryContainer.innerHTML = '<p class="placeholder-content">Cargando última entrada del diario...</p>';
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=GET_ALL`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                entries = data.entries || []; 
-
-                if (!Array.isArray(entries)) {
-                    entries = []; 
-                    console.warn("Los datos recuperados de Google Sheets no son un array. Inicializando vacío.");
-                } else {
-                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                }
-                
-                displayEntries(); 
-            } catch (error) {
-                console.error("Error al cargar las entradas de Google Sheets:", error);
-                list.innerHTML = '<p class="placeholder-content" style="color: red;">Error al cargar las entradas. ¿Has configurado correctamente GOOGLE_APPS_SCRIPT_URL y autorizado el script?</p>';
-            }
-        }
-
-        // Función para guardar (sobrescribir) todas las entradas en Google Sheet
-        async function saveEntriesToGoogleSheet() {
-            const submitButton = document.getElementById('diaryEntryForm').querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
-            submitButton.textContent = 'Guardando...';
-            submitButton.disabled = true;
-
-            try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=POST_UPDATE`, {
-                    method: 'POST', 
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ entries: entries }) 
-                });
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
-                console.log('Datos guardados en Google Sheets:', data);
-                alert('Entrada guardada con éxito!');
-                document.getElementById('diaryEntryForm').reset(); 
-            } catch (error) {
-                console.error("Error al guardar la entrada en Google Sheets:", error);
-                alert('Error al guardar la entrada. Consulta la consola para más detalles.');
-            } finally {
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
-                loadEntriesFromGoogleSheet(); 
-            }
-        }
+                let entries = data.entries || []; 
 
-        // Añadir una nueva entrada (modificada para Google Sheets)
-        async function addEntry(event) {
-            event.preventDefault();
+                if (!Array.isArray(entries) || entries.length === 0) {
+                    latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+                    return;
+                }
 
-            const date = document.getElementById('entryDate').value;
-            const time = document.getElementById('entryTime').value;
-            const mood = document.getElementById('entryMood').value;
-            const title = document.getElementById('entryTitle').value;
-            const content = document.getElementById('entryContent').value;
-            // Captura las URLs del textarea y las divide por saltos de línea
-            const imageUrlsInput = document.getElementById('entryImageUrls').value;
-            const imageUrls = imageUrlsInput.split('\n').map(url => url.trim()).filter(url => url !== ''); // Limpiar URLs vacías
+                entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                const latest = entries[0];
 
-            const id = Date.now().toString(); 
-            const timestamp = new Date().toISOString(); 
-
-            const newEntry = {
-                id,
-                date,
-                time,
-                mood,
-                title,
-                content,
-                imageUrls: imageUrls, // Ahora es un array
-                timestamp 
-            };
-
-            entries.unshift(newEntry); 
-            await saveEntriesToGoogleSheet(); 
-        }
-
-        // Mostrar entradas (modificada para múltiples imágenes)
-        function displayEntries() {
-            const list = document.getElementById('diaryEntriesList');
-            list.innerHTML = '';
-
-            if (entries.length === 0) {
-                list.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
-                return;
-            }
-
-            entries.forEach(entry => {
-                const entryDiv = document.createElement('li');
-                entryDiv.className = 'diary-entry';
-                entryDiv.setAttribute('data-id', entry.id);
-
-                const dateObj = new Date(entry.timestamp);
+                const dateObj = new Date(latest.timestamp);
                 const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 const formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
                 // Generar HTML para múltiples imágenes
                 let imagesHtml = '';
-                // Verifica que 'imageUrls' exista y sea un array
-                if (Array.isArray(entry.imageUrls) && entry.imageUrls.length > 0) {
+                if (Array.isArray(latest.imageUrls) && latest.imageUrls.length > 0) {
                     imagesHtml = `
                         <div class="entry-images">
-                            ${entry.imageUrls.map(url => `<img src="${url}" alt="Imagen de la entrada">`).join('')}
+                            ${latest.imageUrls.map(url => `<img src="${url}" alt="Imagen de la entrada">`).join('')}
                         </div>
                     `;
                 }
 
-                entryDiv.innerHTML = `
-                    <button class="delete-button" onclick="deleteEntry('${entry.id}')">Eliminar</button>
-                    <p class="meta"><strong>Fecha:</strong> ${formattedDate} | <strong>Hora:</strong> ${formattedTime}</p>
-                    <h3>${entry.title}</h3>
-                    <p><strong>Estado de ánimo:</strong> ${entry.mood}</p>
-                    <p><strong>Contenido:</strong> ${entry.content.replace(/\n/g, '<br>')}</p>
+                latestEntryContainer.innerHTML = `
+                    <p><strong>Fecha:</strong> ${formattedDate}</p>
+                    <p><strong>Hora:</strong> ${formattedTime}</p>
+                    <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
+                    <p><strong>Título:</strong> ${latest.title}</p>
+                    <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
                     ${imagesHtml}
                 `;
-                list.appendChild(entryDiv);
-            });
-        }
-
-        // Eliminar entrada (sin cambios)
-        async function deleteEntry(id) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta entrada?')) {
-                entries = entries.filter(entry => entry.id !== id); 
-                await saveEntriesToGoogleSheet(); 
-                alert('Entrada eliminada con éxito!');
+            } catch (error) {
+                console.error("Error al cargar la última entrada de Google Sheets:", error);
+                latestEntryContainer.innerHTML = '<p class="placeholder-content" style="color: red;">Error al cargar la última entrada. Asegúrate de que la URL de tu aplicación web de Apps Script es correcta y está desplegada.</p>';
             }
-        }
-
-        // Filtrar entradas (sin cambios)
-        function filterEntries() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const allEntries = document.querySelectorAll('#diaryEntriesList .diary-entry');
-
-            allEntries.forEach(entryDiv => {
-                const title = entryDiv.querySelector('h3').textContent.toLowerCase();
-                const contentElement = entryDiv.querySelector('p:nth-of-type(3)');
-                const content = contentElement ? contentElement.textContent.toLowerCase() : '';
-
-                if (title.includes(searchTerm) || content.includes(searchTerm)) {
-                    entryDiv.style.display = 'block';
-                } else {
-                    entryDiv.style.display = 'none';
-                }
-            });
         }
     </script>
 </body>
