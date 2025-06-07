@@ -14,7 +14,6 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            /* Background colors from the flags */
             background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
             min-height: 100vh;
             padding: 20px;
@@ -268,12 +267,14 @@
             <div id="blog" class="tab-pane">
                 <h2>Nuestro Blog</h2>
                 <p>Aquí encontrarás las últimas publicaciones y artículos.</p>
-                </div>
+                <!-- Contenido del blog -->
+            </div>
 
             <div id="contact" class="tab-pane">
                 <h2>Contacto</h2>
                 <p>Puedes contactarnos a través de este formulario o en nuestras redes sociales.</p>
-                </div>
+                <!-- Formulario de contacto -->
+            </div>
         </div>
 
         <footer class="footer">
@@ -284,7 +285,7 @@
     <script>
         // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT ---
         // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE_APPS_SCRIPT
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn294Q_Hb6iLHuLz3PKdXRCqCErVfSTT3BseP_YC7C5c8hmlSail66CW9qbV81AmJ53w/exec'; 
+        const GOOGLE_APPS_SCRIPT_URL = 'TU_URL_DE_APLICACION_WEB_DE_GOOGLE_APPS_SCRIPT_AQUI'; 
 
         document.addEventListener('DOMContentLoaded', () => {
             const tabButtons = document.querySelectorAll('.tab-button');
@@ -338,47 +339,49 @@
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=GET_ALL`);
+                const data = await response.json(); // Leer siempre el JSON
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                // Ahora verificamos la propiedad 'success' en el JSON
+                if (data.success) {
+                    let entries = data.data || []; 
 
-                const data = await response.json();
-                let entries = data.entries || []; 
+                    if (!Array.isArray(entries) || entries.length === 0) {
+                        latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+                        return;
+                    }
 
-                if (!Array.isArray(entries) || entries.length === 0) {
-                    latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
-                    return;
-                }
+                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    const latest = entries[0];
 
-                entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                const latest = entries[0];
+                    const dateObj = new Date(latest.timestamp);
+                    const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    const formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-                const dateObj = new Date(latest.timestamp);
-                const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                const formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                    // Generar HTML para múltiples imágenes
+                    let imagesHtml = '';
+                    if (Array.isArray(latest.imageUrls) && latest.imageUrls.length > 0) {
+                        imagesHtml = `
+                            <div class="entry-images">
+                                ${latest.imageUrls.map(url => `<img src="${url}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/F0F0F0/ADADAD?text=Imagen+rota';" alt="Imagen de la entrada">`).join('')}
+                            </div>
+                        `;
+                    }
 
-                // Generar HTML para múltiples imágenes
-                let imagesHtml = '';
-                if (Array.isArray(latest.imageUrls) && latest.imageUrls.length > 0) {
-                    imagesHtml = `
-                        <div class="entry-images">
-                            ${latest.imageUrls.map(url => `<img src="${url}" alt="Imagen de la entrada">`).join('')}
-                        </div>
+                    latestEntryContainer.innerHTML = `
+                        <p><strong>Fecha:</strong> ${formattedDate}</p>
+                        <p><strong>Hora:</strong> ${formattedTime}</p>
+                        <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
+                        <p><strong>Título:</strong> ${latest.title}</p>
+                        <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
+                        ${imagesHtml}
                     `;
+                } else {
+                    console.error("Error al cargar la última entrada (Apps Script informó):", data.error);
+                    latestEntryContainer.innerHTML = `<p class="placeholder-content" style="color: red;">Error al cargar la última entrada: ${data.error}.</p>`;
                 }
-
-                latestEntryContainer.innerHTML = `
-                    <p><strong>Fecha:</strong> ${formattedDate}</p>
-                    <p><strong>Hora:</strong> ${formattedTime}</p>
-                    <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
-                    <p><strong>Título:</strong> ${latest.title}</p>
-                    <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
-                    ${imagesHtml}
-                `;
             } catch (error) {
-                console.error("Error al cargar la última entrada de Google Sheets:", error);
-                latestEntryContainer.innerHTML = '<p class="placeholder-content" style="color: red;">Error al cargar la última entrada. Asegúrate de que la URL de tu aplicación web de Apps Script es correcta y está desplegada.</p>';
+                console.error("Error en la comunicación con Apps Script al cargar la última entrada:", error);
+                latestEntryContainer.innerHTML = '<p class="placeholder-content" style="color: red;">Error de red o JSON inválido al cargar la última entrada. ¿La URL es correcta y el script está desplegado?</p>';
             }
         }
     </script>
