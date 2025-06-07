@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Diario Personal</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
-        /* Estilos CSS (copia y pega tus estilos originales de Diario (1).html) */
+        /* Tus estilos CSS aquí (los que ya tienes) */
         * {
             margin: 0;
             padding: 0;
@@ -112,8 +110,6 @@
             resize: vertical;
             min-height: 100px;
         }
-
-        /* Removido el padding especial para file input ya que no se usa */
 
         .form-group button {
             background: #28a745;
@@ -290,9 +286,11 @@
                         <textarea id="entryContent" placeholder="Escribe aquí tus pensamientos..." required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="entryImageUrl">URL de Imagen (Opcional):</label>
-                        <input type="url" id="entryImageUrl" placeholder="Pega aquí el enlace de tu imagen (ej. de Imgur)">
-                        <small>Sube tu imagen a un servicio como Imgur.com, luego pega el enlace directo aquí.</small>
+                        <label for="entryImageUrls">URLs de Imágenes (Opcional):</label>
+                        <textarea id="entryImageUrls" rows="3" placeholder="Pega una URL por línea. Ej:
+https://ejemplo.com/imagen1.jpg
+https://ejemplo.com/imagen2.png"></textarea>
+                        <small>Pega aquí una URL de imagen por línea. Sube tus imágenes a un servicio como Freeimage.host, luego pega los enlaces directos aquí.</small>
                     </div>
                     <div class="form-group">
                         <button type="submit">Guardar Entrada</button>
@@ -314,37 +312,81 @@
     </div>
 
     <script>
-        // TU CONFIGURACIÓN DE FIREBASE (LA MISMA QUE YA TENÍAS)
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY", // <--- REEMPLAZA ESTO
-            authDomain: "TU_AUTH_DOMAIN", // <--- REEMPLAZA ESTO
-            projectId: "TU_PROJECT_ID", // <--- REEMPLAZA ESTO
-            storageBucket: "TU_STORAGE_BUCKET", // <--- REEMPLAZA ESTO (Aunque no se use Storage, la config es completa)
-            messagingSenderId: "TU_MESSAGING_SENDER_ID", // <--- REEMPLAZA ESTO
-            appId: "TU_APP_ID" // <--- REEMPLAZA ESTO
-        };
+        // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT ---
+        // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+        const GOOGLE_APPS_SCRIPT_URL = 'TU_URL_DE_APLICACION_WEB_DE_GOOGLE_APPS_SCRIPT_AQUI'; 
 
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const entriesCollection = db.collection('diaryEntries'); // Nombre de tu colección en Firestore
+        let entries = []; // Array para almacenar las entradas en memoria local
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Escucha cambios en la colección para actualizar la lista en tiempo real
-            entriesCollection.orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-                const entries = [];
-                snapshot.forEach(doc => {
-                    entries.push({ id: doc.id, ...doc.data() });
-                });
-                displayEntries(entries); // Pasar las entradas a la función de display
-            }, error => {
-                console.error("Error al obtener las entradas en tiempo real: ", error);
-                document.getElementById('diaryEntriesList').innerHTML = '<p class="placeholder-content">Error al cargar las entradas.</p>';
-            });
-
+            loadEntriesFromGoogleSheet(); // Cargar las entradas del Sheet al iniciar
             document.getElementById('diaryEntryForm').addEventListener('submit', addEntry);
         });
 
+        // Función para leer las entradas de Google Sheet
+        async function loadEntriesFromGoogleSheet() {
+            const list = document.getElementById('diaryEntriesList');
+            list.innerHTML = '<p class="placeholder-content">Cargando entradas del diario desde Google Sheets...</p>';
+
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=GET_ALL`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                entries = data.entries || []; 
+
+                if (!Array.isArray(entries)) {
+                    entries = []; 
+                    console.warn("Los datos recuperados de Google Sheets no son un array. Inicializando vacío.");
+                } else {
+                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                }
+                
+                displayEntries(); 
+            } catch (error) {
+                console.error("Error al cargar las entradas de Google Sheets:", error);
+                list.innerHTML = '<p class="placeholder-content" style="color: red;">Error al cargar las entradas. ¿Has configurado correctamente GOOGLE_APPS_SCRIPT_URL y autorizado el script?</p>';
+            }
+        }
+
+        // Función para guardar (sobrescribir) todas las entradas en Google Sheet
+        async function saveEntriesToGoogleSheet() {
+            const submitButton = document.getElementById('diaryEntryForm').querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Guardando...';
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=POST_UPDATE`, {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ entries: entries }) 
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Datos guardados en Google Sheets:', data);
+                alert('Entrada guardada con éxito!');
+                document.getElementById('diaryEntryForm').reset(); 
+            } catch (error) {
+                console.error("Error al guardar la entrada en Google Sheets:", error);
+                alert('Error al guardar la entrada. Consulta la consola para más detalles.');
+            } finally {
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                loadEntriesFromGoogleSheet(); 
+            }
+        }
+
+        // Añadir una nueva entrada (modificada para Google Sheets)
         async function addEntry(event) {
             event.preventDefault();
 
@@ -353,44 +395,32 @@
             const mood = document.getElementById('entryMood').value;
             const title = document.getElementById('entryTitle').value;
             const content = document.getElementById('entryContent').value;
-            // Nuevo: Obtener la URL de la imagen del input
-            const imageUrl = document.getElementById('entryImageUrl').value;
+            // Captura las URLs del textarea y las divide por saltos de línea
+            const imageUrlsInput = document.getElementById('entryImageUrls').value;
+            const imageUrls = imageUrlsInput.split('\n').map(url => url.trim()).filter(url => url !== ''); // Limpiar URLs vacías
 
-            const entryData = {
+            const id = Date.now().toString(); 
+            const timestamp = new Date().toISOString(); 
+
+            const newEntry = {
+                id,
                 date,
                 time,
                 mood,
                 title,
                 content,
-                // Almacena la URL de la imagen (vacío si no se ingresó nada)
-                imageUrl: imageUrl ? imageUrl : null,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Timestamp del servidor de Firebase
+                imageUrls: imageUrls, // Ahora es un array
+                timestamp 
             };
 
-            // Mostrar un mensaje de carga
-            document.getElementById('diaryEntryForm').querySelector('button[type="submit"]').textContent = 'Guardando...';
-            document.getElementById('diaryEntryForm').querySelector('button[type="submit"]').disabled = true;
-
-            try {
-                // Guardar datos de la entrada en Firestore
-                await entriesCollection.add(entryData);
-
-                alert('Entrada guardada con éxito!');
-                document.getElementById('diaryEntryForm').reset(); // Limpiar el formulario
-
-            } catch (error) {
-                console.error("Error al guardar la entrada:", error);
-                alert('Error al guardar la entrada. Consulta la consola para más detalles.');
-            } finally {
-                document.getElementById('diaryEntryForm').querySelector('button[type="submit"]').textContent = 'Guardar Entrada';
-                document.getElementById('diaryEntryForm').querySelector('button[type="submit"]').disabled = false;
-            }
+            entries.unshift(newEntry); 
+            await saveEntriesToGoogleSheet(); 
         }
 
-        // Modificada para recibir las entradas de onSnapshot
-        function displayEntries(entries) {
+        // Mostrar entradas (modificada para múltiples imágenes)
+        function displayEntries() {
             const list = document.getElementById('diaryEntriesList');
-            list.innerHTML = ''; // Limpiar la lista existente
+            list.innerHTML = '';
 
             if (entries.length === 0) {
                 list.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
@@ -402,34 +432,17 @@
                 entryDiv.className = 'diary-entry';
                 entryDiv.setAttribute('data-id', entry.id);
 
-                // Formatear la fecha usando el timestamp de Firebase si está disponible
-                let formattedDate = 'Fecha desconocida';
-                let formattedTime = 'Hora desconocida';
-                if (entry.timestamp && entry.timestamp.toDate) { // Check if it's a Firestore Timestamp object
-                    const dateObj = entry.timestamp.toDate();
-                    formattedDate = dateObj.toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-                } else if (entry.date && entry.time) { // Fallback to manual date/time if timestamp isn't a Firestore Timestamp
-                    formattedDate = new Date(entry.date).toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    formattedTime = entry.time;
-                }
+                const dateObj = new Date(entry.timestamp);
+                const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-                // Generar HTML para la imagen solo si hay una URL
-                let imageHtml = '';
-                if (entry.imageUrl) {
-                    imageHtml = `
+                // Generar HTML para múltiples imágenes
+                let imagesHtml = '';
+                // Verifica que 'imageUrls' exista y sea un array
+                if (Array.isArray(entry.imageUrls) && entry.imageUrls.length > 0) {
+                    imagesHtml = `
                         <div class="entry-images">
-                            <img src="${entry.imageUrl}" alt="Imagen de la entrada">
+                            ${entry.imageUrls.map(url => `<img src="${url}" alt="Imagen de la entrada">`).join('')}
                         </div>
                     `;
                 }
@@ -440,41 +453,35 @@
                     <h3>${entry.title}</h3>
                     <p><strong>Estado de ánimo:</strong> ${entry.mood}</p>
                     <p><strong>Contenido:</strong> ${entry.content.replace(/\n/g, '<br>')}</p>
-                    ${imageHtml}
+                    ${imagesHtml}
                 `;
                 list.appendChild(entryDiv);
             });
         }
 
+        // Eliminar entrada (sin cambios)
         async function deleteEntry(id) {
             if (confirm('¿Estás seguro de que quieres eliminar esta entrada?')) {
-                try {
-                    // No hay que eliminar la imagen de Firebase Storage, ya que no se subió allí.
-                    // Solo eliminar el documento de Firestore
-                    await entriesCollection.doc(id).delete();
-                    alert('Entrada eliminada con éxito!');
-                    // La lista se actualizará automáticamente por onSnapshot
-                } catch (error) {
-                    console.error("Error al eliminar la entrada:", error);
-                    alert('Error al eliminar la entrada. Consulta la consola.');
-                }
+                entries = entries.filter(entry => entry.id !== id); 
+                await saveEntriesToGoogleSheet(); 
+                alert('Entrada eliminada con éxito!');
             }
         }
 
+        // Filtrar entradas (sin cambios)
         function filterEntries() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const allEntries = document.querySelectorAll('#diaryEntriesList .diary-entry');
 
-            allEntries.forEach(entry => {
-                const title = entry.querySelector('h3').textContent.toLowerCase();
-                // Ajusta el selector si la estructura HTML de las <p> cambia.
-                // Podría ser mejor buscar por una clase específica si la hubiera.
-                const content = entry.querySelector('p:nth-of-type(3)').textContent.toLowerCase();
+            allEntries.forEach(entryDiv => {
+                const title = entryDiv.querySelector('h3').textContent.toLowerCase();
+                const contentElement = entryDiv.querySelector('p:nth-of-type(3)');
+                const content = contentElement ? contentElement.textContent.toLowerCase() : '';
 
                 if (title.includes(searchTerm) || content.includes(searchTerm)) {
-                    entry.style.display = 'block';
+                    entryDiv.style.display = 'block';
                 } else {
-                    entry.style.display = 'none';
+                    entryDiv.style.display = 'none';
                 }
             });
         }
