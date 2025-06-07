@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Página con Pestañas</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
-        /* Estilos CSS (copia y pega tus estilos originales de index (1).html) */
+        /* Tus estilos CSS aquí (los que ya tienes) */
         * {
             margin: 0;
             padding: 0;
@@ -16,6 +14,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
+            /* Background colors from the flags */
             background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
             min-height: 100vh;
             padding: 20px;
@@ -283,31 +282,20 @@
     </div>
 
     <script>
-        // TU CONFIGURACIÓN DE FIREBASE (LA MISMA QUE YA TENÍAS)
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY", // <--- REEMPLAZA ESTO
-            authDomain: "TU_AUTH_DOMAIN", // <--- REEMPLAZA ESTO
-            projectId: "TU_PROJECT_ID", // <--- REEMPLAZA ESTO
-            storageBucket: "TU_STORAGE_BUCKET", // <--- REEMPLAZA ESTO (Aunque no se use Storage, la config es completa)
-            messagingSenderId: "TU_MESSAGING_SENDER_ID", // <--- REEMPLAZA ESTO
-            appId: "TU_APP_ID" // <--- REEMPLAZA ESTO
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const entriesCollection = db.collection('diaryEntries'); // Nombre de tu colección en Firestore
+        // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT ---
+        // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE_APPS_SCRIPT
+        const GOOGLE_APPS_SCRIPT_URL = 'TU_URL_DE_APLICACION_WEB_DE_GOOGLE_APPS_SCRIPT_AQUI'; 
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Manejo de pestañas (sin cambios)
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabPanes = document.querySelectorAll('.tab-pane');
 
             tabButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
-                    if (button.getAttribute('href') === 'Diario.html') {
+                    if (button.getAttribute('href') !== '#' && button.getAttribute('href') !== '') {
                         return;
                     }
+                    
                     e.preventDefault();
                     const targetTab = button.dataset.tab;
 
@@ -315,7 +303,9 @@
                     tabPanes.forEach(pane => pane.classList.remove('active'));
 
                     button.classList.add('active');
-                    document.getElementById(targetTab).classList.add('active');
+                    if (targetTab) {
+                        document.getElementById(targetTab).classList.add('active');
+                    }
                 });
             });
 
@@ -323,75 +313,72 @@
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 tabPanes.forEach(pane => pane.classList.remove('active'));
 
-                document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
-                document.getElementById(tabId).classList.add('active');
+                let activatedButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+                if (!activatedButton) {
+                    activatedButton = document.querySelector(`.tab-button[href="${tabId}.html"]`);
+                }
+                
+                if (activatedButton) {
+                    activatedButton.classList.add('active');
+                }
+                
+                const targetPane = document.getElementById(tabId);
+                if (targetPane) {
+                    targetPane.classList.add('active');
+                }
             };
 
-            // Cargar la última entrada del diario al cargar la página
             displayLatestDiaryEntry();
         });
 
+        // Función para mostrar la última entrada de Google Sheet
         async function displayLatestDiaryEntry() {
             const latestEntryContainer = document.getElementById('latestEntryContainer');
-            latestEntryContainer.innerHTML = '<p class="placeholder-content">Cargando última entrada...</p>';
+            latestEntryContainer.innerHTML = '<p class="placeholder-content">Cargando última entrada del diario...</p>';
 
             try {
-                // Consulta a Firestore para obtener la última entrada
-                const snapshot = await entriesCollection
-                    .orderBy('timestamp', 'desc') // Ordena por timestamp descendente
-                    .limit(1) // Limita a 1 resultado (la más reciente)
-                    .get();
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=GET_ALL`);
 
-                if (!snapshot.empty) {
-                    const latest = snapshot.docs[0].data(); // Obtiene los datos del primer documento
-                    const entryId = snapshot.docs[0].id; // Obtiene el ID del documento, por si acaso
-
-                    // Formatear la fecha
-                    let formattedDate = 'Fecha desconocida';
-                    let formattedTime = 'Hora desconocida';
-                    if (latest.timestamp && latest.timestamp.toDate) { // Check if it's a Firestore Timestamp object
-                        const dateObj = latest.timestamp.toDate();
-                        formattedDate = dateObj.toLocaleDateString('es-ES', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                        formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-                    } else if (latest.date && latest.time) { // Fallback to manual date/time if timestamp isn't a Firestore Timestamp
-                        formattedDate = new Date(latest.date).toLocaleDateString('es-ES', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                        formattedTime = latest.time;
-                    }
-
-                    // Generar HTML para la imagen solo si hay una URL
-                    let imageHtml = '';
-                    if (latest.imageUrl) { // Comprueba si hay una URL de imagen
-                        imageHtml = `
-                            <div class="entry-images">
-                                <img src="${latest.imageUrl}" alt="Imagen de la entrada">
-                            </div>
-                        `;
-                    }
-
-                    latestEntryContainer.innerHTML = `
-                        <p><strong>Fecha:</strong> ${formattedDate}</p>
-                        <p><strong>Hora:</strong> ${formattedTime}</p>
-                        <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
-                        <p><strong>Título:</strong> ${latest.title}</p>
-                        <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
-                        ${imageHtml}
-                    `;
-                } else {
-                    latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+
+                const data = await response.json();
+                let entries = data.entries || []; 
+
+                if (!Array.isArray(entries) || entries.length === 0) {
+                    latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+                    return;
+                }
+
+                entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                const latest = entries[0];
+
+                const dateObj = new Date(latest.timestamp);
+                const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+                // Generar HTML para múltiples imágenes
+                let imagesHtml = '';
+                if (Array.isArray(latest.imageUrls) && latest.imageUrls.length > 0) {
+                    imagesHtml = `
+                        <div class="entry-images">
+                            ${latest.imageUrls.map(url => `<img src="${url}" alt="Imagen de la entrada">`).join('')}
+                        </div>
+                    `;
+                }
+
+                latestEntryContainer.innerHTML = `
+                    <p><strong>Fecha:</strong> ${formattedDate}</p>
+                    <p><strong>Hora:</strong> ${formattedTime}</p>
+                    <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
+                    <p><strong>Título:</strong> ${latest.title}</p>
+                    <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
+                    ${imagesHtml}
+                `;
             } catch (error) {
-                console.error("Error al cargar la última entrada:", error);
-                latestEntryContainer.innerHTML = '<p class="placeholder-content">Error al cargar la última entrada.</p>';
+                console.error("Error al cargar la última entrada de Google Sheets:", error);
+                latestEntryContainer.innerHTML = '<p class="placeholder-content" style="color: red;">Error al cargar la última entrada. Asegúrate de que la URL de tu aplicación web de Apps Script es correcta y está desplegada.</p>';
             }
         }
     </script>
