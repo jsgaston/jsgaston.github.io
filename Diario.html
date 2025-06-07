@@ -396,7 +396,8 @@ https://ejemplo.com/imagen2.png"></textarea>
                     <button onclick="filterEntries()">Buscar</button>
                 </div>
                 <ul id="diaryEntriesList">
-                    <p class="placeholder-content">Cargando entradas...</p>
+                    <!-- Initial placeholder content for the list -->
+                    <li class="placeholder-content">Cargando entradas...</li>
                 </ul>
             </section>
         </main>
@@ -418,6 +419,7 @@ https://ejemplo.com/imagen2.png"></textarea>
     <script>
         // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT ---
         // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+        // Si no se reemplaza, verás un error en la consola y un mensaje en la interfaz.
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKZXzuLe_pz1IMrTHpg22eDEv0IfOzrKZu_5V5hDX3ZY5EAY46-0d14joOstivypZtjw/exec'; // <--- CAMBIA ESTO
 
         let entries = []; // Array para almacenar las entradas en memoria local
@@ -498,7 +500,16 @@ https://ejemplo.com/imagen2.png"></textarea>
         // Función para leer las entradas de Google Sheet
         async function loadEntriesFromGoogleSheet() {
             const list = document.getElementById('diaryEntriesList');
-            list.innerHTML = '<p class="placeholder-content">Cargando entradas del diario desde Google Sheets...</p>';
+            // Ensure placeholder is an <li>
+            list.innerHTML = '<li class="placeholder-content">Cargando entradas del diario desde Google Sheets...</li>';
+
+            if (GOOGLE_APPS_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+                const errorMessage = 'Error: La URL de Google Apps Script no ha sido configurada. Reemplaza "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE" con tu URL de despliegue real.';
+                console.error(errorMessage);
+                list.innerHTML = `<li class="placeholder-content" style="color: red;">${errorMessage}</li>`;
+                await showAlertModal('Error de Configuración', errorMessage);
+                return;
+            }
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=GET_ALL`);
@@ -517,12 +528,12 @@ https://ejemplo.com/imagen2.png"></textarea>
                 } else {
                     // Si 'success' es false, mostramos el error del JSON
                     console.error("Error al cargar las entradas (Apps Script informó):", data.error);
-                    list.innerHTML = `<p class="placeholder-content" style="color: red;">Error al cargar las entradas: ${data.error}.</p>`;
+                    list.innerHTML = `<li class="placeholder-content" style="color: red;">Error al cargar las entradas: ${data.error}.</li>`;
                     await showAlertModal('Error de Carga', `Error al cargar las entradas: ${data.error}. Consulta la consola para más detalles.`);
                 }
             } catch (error) {
                 console.error("Error en la comunicación con Apps Script al cargar:", error);
-                list.innerHTML = '<p class="placeholder-content" style="color: red;">Error de red o JSON inválido al cargar. ¿La URL es correcta y el script está desplegado?</p>';
+                list.innerHTML = '<li class="placeholder-content" style="color: red;">Error de red o JSON inválido al cargar. ¿La URL es correcta y el script está desplegado?</li>';
                 await showAlertModal('Error de Conexión', 'Error de red o JSON inválido al cargar. ¿La URL es correcta y el script está desplegado? Consulta la consola para más detalles.');
             }
         }
@@ -533,6 +544,15 @@ https://ejemplo.com/imagen2.png"></textarea>
             const originalButtonText = submitButton.textContent;
             submitButton.textContent = 'Guardando...';
             submitButton.disabled = true;
+
+            if (GOOGLE_APPS_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+                const errorMessage = 'Error: La URL de Google Apps Script no ha sido configurada. Reemplaza "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE" con tu URL de despliegue real.';
+                console.error(errorMessage);
+                await showAlertModal('Error de Configuración', errorMessage);
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                return;
+            }
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=POST_UPDATE`, {
@@ -601,7 +621,8 @@ https://ejemplo.com/imagen2.png"></textarea>
             list.innerHTML = '';
 
             if (entries.length === 0) {
-                list.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+                // Ensure placeholder is an <li>
+                list.innerHTML = '<li class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</li>';
                 return;
             }
 
