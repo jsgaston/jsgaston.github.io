@@ -314,7 +314,7 @@ https://ejemplo.com/imagen2.png"></textarea>
     <script>
         // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT ---
         // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn294Q_Hb6iLHuLz3PKdXRCqCErVfSTT3BseP_YC7C5c8hmlSail66CW9qbV81AmJ53w/exec'; 
+        const GOOGLE_APPS_SCRIPT_URL = 'TU_URL_DE_APLICACION_WEB_DE_GOOGLE_APPS_SCRIPT_AQUI'; 
 
         let entries = []; // Array para almacenar las entradas en memoria local
 
@@ -330,25 +330,26 @@ https://ejemplo.com/imagen2.png"></textarea>
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=GET_ALL`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                const data = await response.json(); // Leer siempre el JSON, ya que el HTTP status será 200
 
-                const data = await response.json();
-                entries = data.entries || []; 
-
-                if (!Array.isArray(entries)) {
-                    entries = []; 
-                    console.warn("Los datos recuperados de Google Sheets no son un array. Inicializando vacío.");
+                // Ahora verificamos la propiedad 'success' en el JSON
+                if (data.success) {
+                    entries = data.data || []; 
+                    if (!Array.isArray(entries)) {
+                        entries = []; 
+                        console.warn("Los datos recuperados de Google Sheets no son un array. Inicializando vacío.");
+                    } else {
+                        entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    }
+                    displayEntries(); 
                 } else {
-                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    // Si 'success' es false, mostramos el error del JSON
+                    console.error("Error al cargar las entradas (Apps Script informó):", data.error);
+                    list.innerHTML = `<p class="placeholder-content" style="color: red;">Error al cargar las entradas: ${data.error}.</p>`;
                 }
-                
-                displayEntries(); 
             } catch (error) {
-                console.error("Error al cargar las entradas de Google Sheets:", error);
-                list.innerHTML = '<p class="placeholder-content" style="color: red;">Error al cargar las entradas. ¿Has configurado correctamente GOOGLE_APPS_SCRIPT_URL y autorizado el script?</p>';
+                console.error("Error en la comunicación con Apps Script al cargar:", error);
+                list.innerHTML = '<p class="placeholder-content" style="color: red;">Error de red o JSON inválido al cargar. ¿La URL es correcta y el script está desplegado?</p>';
             }
         }
 
@@ -368,21 +369,25 @@ https://ejemplo.com/imagen2.png"></textarea>
                     body: JSON.stringify({ entries: entries }) 
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                const data = await response.json(); // Leer siempre el JSON
 
-                const data = await response.json();
-                console.log('Datos guardados en Google Sheets:', data);
-                alert('Entrada guardada con éxito!');
-                document.getElementById('diaryEntryForm').reset(); 
+                // Ahora verificamos la propiedad 'success' en el JSON
+                if (data.success) {
+                    console.log('Datos guardados en Google Sheets:', data.data);
+                    alert('Entrada guardada con éxito!');
+                    document.getElementById('diaryEntryForm').reset(); 
+                    loadEntriesFromGoogleSheet(); // Volver a cargar para reflejar los cambios
+                } else {
+                    // Si 'success' es false, mostramos el error del JSON
+                    console.error("Error al guardar la entrada (Apps Script informó):", data.error);
+                    alert(`Error al guardar la entrada: ${data.error}. Consulta la consola para más detalles.`);
+                }
             } catch (error) {
-                console.error("Error al guardar la entrada en Google Sheets:", error);
-                alert('Error al guardar la entrada. Consulta la consola para más detalles.');
+                console.error("Error en la comunicación con Apps Script al guardar:", error);
+                alert('Error de red o JSON inválido al guardar. Consulta la consola para más detalles.');
             } finally {
                 submitButton.textContent = originalButtonText;
                 submitButton.disabled = false;
-                loadEntriesFromGoogleSheet(); 
             }
         }
 
@@ -395,9 +400,8 @@ https://ejemplo.com/imagen2.png"></textarea>
             const mood = document.getElementById('entryMood').value;
             const title = document.getElementById('entryTitle').value;
             const content = document.getElementById('entryContent').value;
-            // Captura las URLs del textarea y las divide por saltos de línea
             const imageUrlsInput = document.getElementById('entryImageUrls').value;
-            const imageUrls = imageUrlsInput.split('\n').map(url => url.trim()).filter(url => url !== ''); // Limpiar URLs vacías
+            const imageUrls = imageUrlsInput.split('\n').map(url => url.trim()).filter(url => url !== '');
 
             const id = Date.now().toString(); 
             const timestamp = new Date().toISOString(); 
@@ -409,7 +413,7 @@ https://ejemplo.com/imagen2.png"></textarea>
                 mood,
                 title,
                 content,
-                imageUrls: imageUrls, // Ahora es un array
+                imageUrls: imageUrls, 
                 timestamp 
             };
 
@@ -436,13 +440,11 @@ https://ejemplo.com/imagen2.png"></textarea>
                 const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 const formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-                // Generar HTML para múltiples imágenes
                 let imagesHtml = '';
-                // Verifica que 'imageUrls' exista y sea un array
                 if (Array.isArray(entry.imageUrls) && entry.imageUrls.length > 0) {
                     imagesHtml = `
                         <div class="entry-images">
-                            ${entry.imageUrls.map(url => `<img src="${url}" alt="Imagen de la entrada">`).join('')}
+                            ${entry.imageUrls.map(url => `<img src="${url}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/F0F0F0/ADADAD?text=Imagen+rota';" alt="Imagen de la entrada">`).join('')}
                         </div>
                     `;
                 }
@@ -459,16 +461,15 @@ https://ejemplo.com/imagen2.png"></textarea>
             });
         }
 
-        // Eliminar entrada (sin cambios)
+        // Eliminar entrada (sin cambios en la lógica)
         async function deleteEntry(id) {
             if (confirm('¿Estás seguro de que quieres eliminar esta entrada?')) {
                 entries = entries.filter(entry => entry.id !== id); 
                 await saveEntriesToGoogleSheet(); 
-                alert('Entrada eliminada con éxito!');
             }
         }
 
-        // Filtrar entradas (sin cambios)
+        // Filtrar entradas (sin cambios en la lógica)
         function filterEntries() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const allEntries = document.querySelectorAll('#diaryEntriesList .diary-entry');
