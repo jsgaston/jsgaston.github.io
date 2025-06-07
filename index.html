@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Página con Pestañas</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
+        /* Estilos CSS (copia y pega tus estilos originales de index (1).html) */
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +16,6 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            /* Background colors from the flags */
             background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
             min-height: 100vh;
             padding: 20px;
@@ -31,374 +33,365 @@
         .tab-container {
             display: flex;
             flex-wrap: wrap;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 2px solid #ccc;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            overflow: hidden;
         }
 
-        .tab {
+        .tab-button {
             flex: 1;
-            min-width: 100px;
-            padding: 15px 10px;
-            background: linear-gradient(145deg, #28a745, #20a038);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
             text-align: center;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.3s ease;
+            position: relative;
+            text-decoration: none; /* Ensure it looks like a button not a link */
         }
 
-        .tab:last-child {
-            border-right: none;
-        }
-
-        .tab:hover {
-            background: linear-gradient(145deg, #20a038, #1e7e34);
-            transform: translateY(-2px);
-        }
-
-        .tab.active {
-            background: linear-gradient(145deg, #ffc107, #e0a800);
+        .tab-button:hover {
+            background-color: #f0f0f0;
             color: #333;
-            transform: translateY(-3px);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-button.active {
+            color: #28a745;
+            background-color: #e9ecef;
+            border-bottom: 3px solid #28a745;
+        }
+
+        /* Indicador visual para la pestaña activa */
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #28a745;
         }
 
         .tab-content {
-            display: none;
             padding: 30px;
-            min-height: 400px;
-            background: white;
+            background: #fff;
         }
 
-        .tab-content.active {
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
             display: block;
-            animation: fadeIn 0.5s ease-in;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .content-header {
-            color: #28a745;
-            font-size: 24px;
-            margin-bottom: 20px;
+        .welcome-section {
             text-align: center;
-            font-weight: bold;
-        }
-
-        .content-body {
-            color: #333;
-            line-height: 1.6;
-            font-size: 16px;
-        }
-
-        .placeholder-content {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-            margin-top: 50px;
-        }
-
-        .latest-entry-container {
-            border: 1px solid #ddd;
-            border-left: 5px solid #28a745;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 30px;
+            padding: 50px 20px;
+            background-color: #e9f7ef;
+            border-radius: 10px;
             margin-bottom: 30px;
-            background-color: #f9f9f9;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .latest-entry-container h3 {
+        .welcome-section h1 {
             color: #28a745;
-            margin-bottom: 10px;
+            font-size: 3em;
+            margin-bottom: 15px;
         }
 
-        .latest-entry-container p {
-            margin-bottom: 5px;
+        .welcome-section p {
+            color: #555;
+            font-size: 1.2em;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
 
-        .section-links {
-            margin-top: 40px;
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
             text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .section-links a {
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #007bff;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .feature-card a {
             display: inline-block;
-            background-color: #007bff;
-            color: white;
+            margin-top: 20px;
+            background-color: #ffc107;
+            color: #333;
             padding: 10px 20px;
             border-radius: 8px;
             text-decoration: none;
-            font-size: 1.1em;
-            margin: 0 10px;
+            font-weight: bold;
             transition: background-color 0.3s ease;
         }
 
-        .section-links a:hover {
-            background-color: #0056b3;
+        .feature-card a:hover {
+            background-color: #e0a800;
         }
 
-        @media (max-width: 768px) {
-            .tab {
-                font-size: 12px;
-                padding: 12px 8px;
-                min-width: 80px;
-            }
-            
-            .container {
-                margin: 10px;
-                border-radius: 10px;
-            }
-            
-            .tab-content {
-                padding: 20px;
-            }
+        .latest-entry-section {
+            background: #f0f8ff;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
 
-            .section-links a {
-                margin-top: 10px;
-                margin-bottom: 10px;
-            }
+        .latest-entry-section h2 {
+            text-align: center;
+            color: #28a745;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        #latestEntryContainer {
+            background: #ffffff;
+            border: 1px solid #e2e6ea;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        #latestEntryContainer p {
+            margin-bottom: 10px;
+            color: #343a40;
+            line-height: 1.6;
+        }
+
+        #latestEntryContainer strong {
+            color: #007bff;
+        }
+
+        #latestEntryContainer .placeholder-content {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        #latestEntryContainer .entry-images {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #latestEntryContainer .entry-images img {
+            max-width: 100px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 0.9em;
+            border-top: 1px solid #eee;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="tab-container">
-            <button class="tab active" onclick="openTab(event, 'home')">Inicio</button>
-            <button class="tab" onclick="location.href='Diario.html'">Diario</button>           
-            <button class="tab" onclick="openTab(event, 'planes')">Planes</button>
-            <button class="tab" onclick="openTab(event, 'mapas')">Mapas</button>
-            <button class="tab" onclick="location.href='calculadora.html'">Calculadora</button> <button class="tab" onclick="openTab(event, 'cosas')">Cosas</button>
-            <button class="tab" onclick="openTab(event, 'casa')">Casa</button>
-            <button class="tab" onclick="openTab(event, 'link1')">Link 1</button>
-            <button class="tab" onclick="openTab(event, 'link2')">Link 2</button>
-            <button class="tab" onclick="openTab(event, 'link3')">Link 3</button>
-            <button class="tab" onclick="openTab(event, 'link4')">Link 4</button>
-            <button class="tab" onclick="openTab(event, 'link5')">Link 5</button>
-            <button class="tab" onclick="openTab(event, 'link6')">Link 6</button>
-            <button class="tab" onclick="openTab(event, 'link7')">Link 7</button>
-            <button class="tab" onclick="openTab(event, 'link8')">Link 8</button>
+            <a href="#" class="tab-button active" data-tab="home">Inicio</a>
+            <a href="#" class="tab-button" data-tab="blog">Blog</a>
+            <a href="#" class="tab-button" data-tab="contact">Contacto</a>
+            <a href="Diario.html" class="tab-button">Diario Personal</a>
         </div>
 
-        <div id="home" class="tab-content active">
-            <div class="content-header">👋 ¡Bienvenido!</div>
-            <div class="content-body">
-                <p>Esta es tu página de inicio. Usa las pestañas de arriba para navegar a diferentes secciones.</p>
-                
-                <div class="latest-entry-container">
-                    <h3>Última entrada del Diario:</h3>
-                    <div id="latestDiaryEntry">
+        <div class="tab-content">
+            <div id="home" class="tab-pane active">
+                <section class="welcome-section">
+                    <h1>¡Bienvenido a Mi Sitio!</h1>
+                    <p>Explora nuestras diferentes secciones, desde un blog personal hasta un diario interactivo.</p>
+                </section>
+
+                <section class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Blog</h3>
+                        <p>Lee mis pensamientos y artículos sobre diversos temas.</p>
+                        <a href="#" onclick="showTab('blog')">Ir al Blog</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Diario Personal</h3>
+                        <p>Un espacio privado para registrar tus experiencias y estados de ánimo.</p>
+                        <a href="Diario.html">Abrir Diario</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Contacto</h3>
+                        <p>Ponte en contacto conmigo para cualquier consulta o sugerencia.</p>
+                        <a href="#" onclick="showTab('contact')">Contactar</a>
+                    </div>
+                </section>
+
+                <section class="latest-entry-section">
+                    <h2>Última Entrada del Diario</h2>
+                    <div id="latestEntryContainer">
                         <p class="placeholder-content">Cargando última entrada...</p>
                     </div>
+                </section>
+            </div>
+
+            <div id="blog" class="tab-pane">
+                <h2>Nuestro Blog</h2>
+                <p>Aquí encontrarás las últimas publicaciones y artículos.</p>
                 </div>
 
-                <div class="section-links">
-                    <a href="Diario.html">Ir al Diario</a>
-                    <a href="calculadora.html">Abrir Calculadora</a>
+            <div id="contact" class="tab-pane">
+                <h2>Contacto</h2>
+                <p>Puedes contactarnos a través de este formulario o en nuestras redes sociales.</p>
                 </div>
-            </div>
         </div>
 
-        <div id="planes" class="tab-content">
-            <div class="content-header">📋 Mis Planes</div>
-            <div class="content-body">
-                <p>Organiza tus planes futuros, metas y objetivos. Mantén un seguimiento de lo que quieres lograr.</p>
-                <div class="placeholder-content">
-                    <p>Lista de planes y objetivos...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="mapas" class="tab-content">
-            <div class="content-header">🗺️ Mapas y Ubicaciones</div>
-            <div class="content-body">
-                <p>Explora diferentes lugares, guarda ubicaciones importantes y planifica tus viajes.</p>
-                <div class="placeholder-content">
-                    <p>Mapas interactivos aparecerán aquí...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="cosas" class="tab-content">
-            <div class="content-header">📦 Mis Cosas</div>
-            <div class="content-body">
-                <p>Inventario de tus pertenencias, objetos importantes y colecciones.</p>
-                <div class="placeholder-content">
-                    <p>Lista de objetos y pertenencias...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="casa" class="tab-content">
-            <div class="content-header">🏠 Mi Casa</div>
-            <div class="content-body">
-                <p>Todo relacionado con tu hogar: tareas domésticas, decoración, mejoras y mantenimiento.</p>
-                <div class="placeholder-content">
-                    <p>Información sobre el hogar...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link1" class="tab-content">
-            <div class="content-header">🔗 Enlace 1</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el primer enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Aquí puedes agregar enlaces a páginas externas o contenido específico...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link2" class="tab-content">
-            <div class="content-header">🔗 Enlace 2</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el segundo enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Espacio reservado para contenido del enlace 2...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link3" class="tab-content">
-            <div class="content-header">🔗 Enlace 3</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el tercer enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Espacio reservado para contenido del enlace 3...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link4" class="tab-content">
-            <div class="content-header">🔗 Enlace 4</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el cuarto enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Espacio reservado para contenido del enlace 4...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link5" class="tab-content">
-            <div class="content-header">🔗 Enlace 5</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el quinto enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Espacio reservado para contenido del enlace 5...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link6" class="tab-content">
-            <div class="content-header">🔗 Enlace 6</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el sexto enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Espacio reservado para contenido del enlace 6...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link7" class="tab-content">
-            <div class="content-header">🔗 Enlace 7</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el séptimo enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Espacio reservado para contenido del enlace 7...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="link8" class="tab-content">
-            <div class="content-header">🔗 Enlace 8</div>
-            <div class="content-body">
-                <p>Contenido personalizable para el octavo enlace adicional.</p>
-                <div class="placeholder-content">
-                    <p>Espacio reservado para contenido del enlace 8...</p>
-                </div>
-            </div>
-        </div>
+        <footer class="footer">
+            <p>&copy; 2025 Mi Página. Todos los derechos reservados.</p>
+        </footer>
     </div>
 
     <script>
-        function openTab(evt, tabName) {
-            // Ocultar todo el contenido de las pestañas
-            var tabcontent = document.getElementsByClassName("tab-content");
-            for (var i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
+        // TU CONFIGURACIÓN DE FIREBASE (LA MISMA QUE YA TENÍAS)
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY", // <--- REEMPLAZA ESTO
+            authDomain: "TU_AUTH_DOMAIN", // <--- REEMPLAZA ESTO
+            projectId: "TU_PROJECT_ID", // <--- REEMPLAZA ESTO
+            storageBucket: "TU_STORAGE_BUCKET", // <--- REEMPLAZA ESTO (Aunque no se use Storage, la config es completa)
+            messagingSenderId: "TU_MESSAGING_SENDER_ID", // <--- REEMPLAZA ESTO
+            appId: "TU_APP_ID" // <--- REEMPLAZA ESTO
+        };
 
-            // Remover la clase active de todas las pestañas
-            var tablinks = document.getElementsByClassName("tab");
-            for (var i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const entriesCollection = db.collection('diaryEntries'); // Nombre de tu colección en Firestore
 
-            // Mostrar el contenido de la pestaña seleccionada y marcar la pestaña como activa
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
+        document.addEventListener('DOMContentLoaded', () => {
+            // Manejo de pestañas (sin cambios)
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
 
-            // Special handling for the 'home' tab to load diary entry
-            if (tabName === 'home') {
-                loadLatestDiaryEntry();
-            }
-        }
+            tabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    if (button.getAttribute('href') === 'Diario.html') {
+                        return;
+                    }
+                    e.preventDefault();
+                    const targetTab = button.dataset.tab;
 
-        // Set 'home' tab as active by default on load
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.tab[onclick*="home"]').click();
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                    button.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+            window.showTab = function(tabId) {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            };
+
+            // Cargar la última entrada del diario al cargar la página
+            displayLatestDiaryEntry();
         });
 
+        async function displayLatestDiaryEntry() {
+            const latestEntryContainer = document.getElementById('latestEntryContainer');
+            latestEntryContainer.innerHTML = '<p class="placeholder-content">Cargando última entrada...</p>';
 
-        // Funcionalidad adicional: navegación con teclado
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
-                e.preventDefault();
-                var tabs = document.getElementsByClassName("tab");
-                var index = parseInt(e.key) - 1;
-                if (index < tabs.length) {
-                    tabs[index].click();
-                }
-            }
-        });
+            try {
+                // Consulta a Firestore para obtener la última entrada
+                const snapshot = await entriesCollection
+                    .orderBy('timestamp', 'desc') // Ordena por timestamp descendente
+                    .limit(1) // Limita a 1 resultado (la más reciente)
+                    .get();
 
-        function loadLatestDiaryEntry() {
-            const storedEntries = localStorage.getItem('diaryEntries');
-            const latestEntryContainer = document.getElementById('latestDiaryEntry');
+                if (!snapshot.empty) {
+                    const latest = snapshot.docs[0].data(); // Obtiene los datos del primer documento
+                    const entryId = snapshot.docs[0].id; // Obtiene el ID del documento, por si acaso
 
-            if (storedEntries) {
-                let entries = JSON.parse(storedEntries);
-                if (entries.length > 0) {
-                    // Sort by timestamp to ensure the latest entry is truly the last one
-                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    const latest = entries[0];
+                    // Formatear la fecha
+                    let formattedDate = 'Fecha desconocida';
+                    let formattedTime = 'Hora desconocida';
+                    if (latest.timestamp && latest.timestamp.toDate) { // Check if it's a Firestore Timestamp object
+                        const dateObj = latest.timestamp.toDate();
+                        formattedDate = dateObj.toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                    } else if (latest.date && latest.time) { // Fallback to manual date/time if timestamp isn't a Firestore Timestamp
+                        formattedDate = new Date(latest.date).toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        formattedTime = latest.time;
+                    }
 
-                    const formattedDate = new Date(latest.date).toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
+                    // Generar HTML para la imagen solo si hay una URL
+                    let imageHtml = '';
+                    if (latest.imageUrl) { // Comprueba si hay una URL de imagen
+                        imageHtml = `
+                            <div class="entry-images">
+                                <img src="${latest.imageUrl}" alt="Imagen de la entrada">
+                            </div>
+                        `;
+                    }
 
                     latestEntryContainer.innerHTML = `
                         <p><strong>Fecha:</strong> ${formattedDate}</p>
-                        <p><strong>Hora:</strong> ${latest.time}</p>
+                        <p><strong>Hora:</strong> ${formattedTime}</p>
                         <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
                         <p><strong>Título:</strong> ${latest.title}</p>
                         <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
+                        ${imageHtml}
                     `;
                 } else {
                     latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
                 }
-            } else {
-                latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
+            } catch (error) {
+                console.error("Error al cargar la última entrada:", error);
+                latestEntryContainer.innerHTML = '<p class="placeholder-content">Error al cargar la última entrada.</p>';
             }
         }
     </script>
