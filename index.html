@@ -3,385 +3,603 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Página con Pestañas</title>
+    <title>Mi Diario Personal</title>
+    <!-- Tailwind CSS CDN para un estilo rápido y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Tus estilos CSS aquí (los que ya tienes) */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Fuente Inter para un aspecto moderno y limpio */
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #28a745 0%, #28a745 60%, #ffc107 60%, #ffc107 100%);
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Un gris claro para el fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
-
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-
-        .tab-container {
-            display: flex;
-            flex-wrap: wrap;
-            background: rgba(255, 255, 255, 0.9);
-            border-bottom: 2px solid #ccc;
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            overflow: hidden;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 20px 0;
-            text-align: center;
-            cursor: pointer;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #555;
-            transition: all 0.3s ease;
-            position: relative;
-            text-decoration: none; /* Ensure it looks like a button not a link */
-        }
-
-        .tab-button:hover {
-            background-color: #f0f0f0;
-            color: #333;
-        }
-
-        .tab-button.active {
-            color: #28a745;
-            background-color: #e9ecef;
-            border-bottom: 3px solid #28a745;
-        }
-
-        /* Indicador visual para la pestaña activa */
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
+            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
             width: 100%;
-            height: 3px;
-            background-color: #28a745;
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
         }
-
-        .tab-content {
-            padding: 30px;
-            background: #fff;
-        }
-
-        .tab-pane {
-            display: none;
-        }
-
-        .tab-pane.active {
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
             display: block;
+            color: #374151;
         }
-
-        .welcome-section {
-            text-align: center;
-            padding: 50px 20px;
-            background-color: #e9f7ef;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .welcome-section h1 {
-            color: #28a745;
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-
-        .welcome-section p {
-            color: #555;
-            font-size: 1.2em;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .feature-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-card h3 {
-            color: #007bff;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.5;
-        }
-
-        .feature-card a {
-            display: inline-block;
-            margin-top: 20px;
-            background-color: #ffc107;
-            color: #333;
-            padding: 10px 20px;
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            font-size: 1rem;
+            color: #1f2937;
+            background-color: #f9fafb;
+            transition: border-color 0.2s;
         }
-
-        .feature-card a:hover {
-            background-color: #e0a800;
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6; /* Un azul bonito al enfocar */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
-
-        .latest-entry-section {
-            background: #f0f8ff;
-            border-radius: 10px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .latest-entry-section h2 {
-            text-align: center;
-            color: #28a745;
-            margin-bottom: 25px;
-            font-size: 2em;
-        }
-
-        #latestEntryContainer {
-            background: #ffffff;
-            border: 1px solid #e2e6ea;
+        .btn {
+            background-color: #4f46e5; /* Morado intenso */
+            color: white;
+            padding: 14px 24px;
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        #latestEntryContainer p {
-            margin-bottom: 10px;
-            color: #343a40;
-            line-height: 1.6;
-        }
-
-        #latestEntryContainer strong {
-            color: #007bff;
-        }
-
-        #latestEntryContainer .placeholder-content {
-            text-align: center;
-            color: #6c757d;
-            padding: 20px;
-            font-style: italic;
-        }
-
-        #latestEntryContainer .entry-images {
-            margin-top: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #4338ca; /* Morado más oscuro al pasar el ratón */
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .message-box {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none; /* Oculto por defecto */
+        }
+        .message-box.success {
+            background-color: #d1fae5; /* Verde claro */
+            color: #065f46; /* Verde oscuro */
+            border: 1px solid #10b981;
+        }
+        .message-box.error {
+            background-color: #fee2e2; /* Rojo claro */
+            color: #991b1b; /* Rojo oscuro */
+            border: 1px solid #ef4444;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none; /* Oculto por defecto */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        #latestEntryContainer .entry-images img {
-            max-width: 100px;
-            height: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        /* Estilos para las pestañas de navegación principal */
+        .main-tab-button {
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #e5e7eb; /* Gris claro */
+            color: #4b5563;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap; /* Evita que el texto se rompa */
+        }
+        .main-tab-button.active {
+            background-color: #ffffff;
+            color: #4f46e5; /* Morado */
+            box-shadow: 0 -2px 0 0 #4f46e5 inset; /* Subrayado morado */
+        }
+        .main-tab-content {
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* Estilos para las sub-pestañas del diario */
+        .diary-sub-tab-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            transition: background-color 0.2s, color 0.2s;
+            margin-right: 8px; /* Espacio entre botones */
+        }
+        .diary-sub-tab-button.active {
+            background-color: #e0e7ff; /* Azul claro */
+            color: #4f46e5; /* Morado */
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+        .diary-sub-tab-content {
+            padding-top: 16px;
+        }
 
-        .footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
-            color: #6c757d;
-            font-size: 0.9em;
-            border-top: 1px solid #eee;
+        .hidden {
+            display: none !important;
+        }
+        .entry-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .entry-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-top: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="tab-container">
-            <a href="#" class="tab-button active" data-tab="home">Inicio</a>
-            <a href="#" class="tab-button" data-tab="blog">Blog</a>
-            <a href="#" class="tab-button" data-tab="contact">Contacto</a>
-            <a href="Diario.html" class="tab-button">Diario Personal</a>
+<body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
+    <div class="container rounded-xl shadow-xl flex flex-col">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Mi Gestor Personal</h1>
+
+        <!-- Navegación principal por pestañas -->
+        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
+            <button class="main-tab-button active" data-main-tab="home">Inicio</button>
+            <button class="main-tab-button" data-main-tab="diary">Diario</button>
+            <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
+            <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
+            <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
+            <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+        </nav>
+
+        <!-- Contenido de la Sección Principal - Inicio -->
+        <div id="mainHomeSection" class="main-tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a tu Gestor Personal</h2>
+            <p class="text-center text-gray-600 mb-8">Aquí puedes organizar tu vida digital. Explora las pestañas de arriba.</p>
+            
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Entrada del Diario:</h3>
+            <div id="latestEntryContent" class="text-gray-700">
+                <p class="text-center text-gray-500">Cargando última entrada del diario...</p>
+            </div>
+            <div class="flex justify-center mt-8">
+                <button onclick="showMainTab('diary'); showDiarySubTab('write')" class="btn py-3 px-6 rounded-lg text-lg">
+                    <span>Ir al Diario</span>
+                </button>
+            </div>
         </div>
 
-        <div class="tab-content">
-            <div id="home" class="tab-pane active">
-                <section class="welcome-section">
-                    <h1>¡Bienvenido a Mi Sitio!</h1>
-                    <p>Explora nuestras diferentes secciones, desde un blog personal hasta un diario interactivo.</p>
-                </section>
+        <!-- Contenido de la Sección Principal - Diario -->
+        <div id="mainDiarySection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Diario Digital</h2>
+            
+            <!-- Sub-navegación para el Diario -->
+            <nav class="flex border-b border-gray-200 mb-6">
+                <button class="diary-sub-tab-button active" data-diary-sub-tab="write">Escribir Entrada</button>
+                <button class="diary-sub-tab-button" data-diary-sub-tab="view">Ver/Buscar Entradas</button>
+            </nav>
 
-                <section class="feature-grid">
-                    <div class="feature-card">
-                        <h3>Blog</h3>
-                        <p>Lee mis pensamientos y artículos sobre diversos temas.</p>
-                        <a href="#" onclick="showTab('blog')">Ir al Blog</a>
+            <!-- Contenido de la sub-pestaña "Escribir Entrada" -->
+            <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
+                <form id="diaryForm" class="w-full">
+                    <div class="mb-6">
+                        <label for="diaryEntry" class="form-label mb-2">Tu Entrada de Hoy:</label>
+                        <textarea id="diaryEntry" name="diaryEntry" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
                     </div>
-                    <div class="feature-card">
-                        <h3>Diario Personal</h3>
-                        <p>Un espacio privado para registrar tus experiencias y estados de ánimo.</p>
-                        <a href="Diario.html">Abrir Diario</a>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Contacto</h3>
-                        <p>Ponte en contacto conmigo para cualquier consulta o sugerencia.</p>
-                        <a href="#" onclick="showTab('contact')">Contactar</a>
-                    </div>
-                </section>
 
-                <section class="latest-entry-section">
-                    <h2>Última Entrada del Diario</h2>
-                    <div id="latestEntryContainer">
-                        <p class="placeholder-content">Cargando última entrada...</p>
+                    <div class="mb-8">
+                        <label for="photoUpload" class="form-label mb-2">Adjuntar Foto (opcional):</label>
+                        <input type="file" id="photoUpload" name="photoUpload" accept="image/*" class="form-input rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
                     </div>
-                </section>
+
+                    <button type="submit" class="btn w-full">
+                        <span id="buttonText">Guardar Entrada</span>
+                        <div id="loadingSpinner" class="loading-spinner"></div>
+                    </button>
+                </form>
             </div>
 
-            <div id="blog" class="tab-pane">
-                <h2>Nuestro Blog</h2>
-                <p>Aquí encontrarás las últimas publicaciones y artículos.</p>
+            <!-- Contenido de la sub-pestaña "Ver/Buscar Entradas" -->
+            <div id="diaryViewSearchSection" class="diary-sub-tab-content hidden">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                    <div>
+                        <label for="startDate" class="form-label">Desde:</label>
+                        <input type="date" id="startDate" class="form-input w-auto">
+                    </div>
+                    <div>
+                        <label for="endDate" class="form-label">Hasta:</label>
+                        <input type="date" id="endDate" class="form-input w-auto">
+                    </div>
+                    <button id="searchEntriesBtn" class="btn mt-6 sm:mt-0 px-6 py-3">Buscar</button>
                 </div>
-
-            <div id="contact" class="tab-pane">
-                <h2>Contacto</h2>
-                <p>Puedes contactarnos a través de este formulario o en nuestras redes sociales.</p>
+                <div id="searchResults" class="text-gray-700">
+                    <p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>
                 </div>
+            </div>
         </div>
 
-        <footer class="footer">
-            <p>&copy; 2025 Mi Página. Todos los derechos reservados.</p>
-        </footer>
+        <!-- Contenido de la Sección Principal - Mapas de Recorridos (Placeholder) -->
+        <div id="mainMapsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
+            <p class="text-center text-gray-600">Aquí podrás integrar tus mapas de Google Maps o uMap. ¡En construcción!</p>
+            <p class="text-center text-gray-500 mt-4">Para añadir esta funcionalidad, crearías una nueva sección aquí y la conectarías a la API de mapas.</p>
+        </div>
+
+        <!-- Contenido de la Sección Principal - Organizar Viajes (Placeholder) -->
+        <div id="mainTripsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Organizar Viajes</h2>
+            <p class="text-center text-gray-600">Planifica tus viajes, rutas y presupuestos. ¡Próximamente!</p>
+            <p class="text-center text-gray-500 mt-4">Puedes añadir formularios y listas para gestionar tus planes de viaje.</p>
+        </div>
+
+        <!-- Contenido de la Sección Principal - Menús de Comida (Placeholder) -->
+        <div id="mainMenusSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Menús de Comida</h2>
+            <p class="text-center text-gray-600">Organiza tus comidas semanales y listas de la compra. ¡Paciencia, pronto estará listo!</p>
+            <p class="text-center text-gray-500 mt-4">Aquí podrías tener un calendario, recetas y opciones de filtrado.</p>
+        </div>
+
+        <!-- Contenido de la Sección Principal - Proyectos (Placeholder) -->
+        <div id="mainProjectsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gestión de Proyectos</h2>
+            <p class="text-center text-gray-600">Gestiona tus tareas, plazos y objetivos de tus proyectos personales o profesionales. ¡Trabajando en ello!</p>
+            <p class="text-center text-gray-500 mt-4">Tableros Kanban o listas de tareas serían útiles aquí.</p>
+        </div>
+
+        <div id="messageBox" class="message-box w-full mt-8"></div>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE GOOGLE APPS SCRIPT ---
-        // ¡IMPORTANTE! REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE_APPS_SCRIPT
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOgrUpDLssOAKGdTD0N-rxXeDs8P6kAkM0eZsrBOu6hRFT-lfyig3cy0Pc8LlL4wgC1A/exec'; 
+        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado.
+        // Lo obtendrás al desplegar tu script de Google Apps Script.
+        const GOOGLE_APPS_SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI'; 
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabPanes = document.querySelectorAll('.tab-pane');
+        // Elementos del DOM para la navegación principal
+        const mainTabButtons = document.querySelectorAll('.main-tab-button');
+        const mainHomeSection = document.getElementById('mainHomeSection');
+        const mainDiarySection = document.getElementById('mainDiarySection');
+        const mainMapsSection = document.getElementById('mainMapsSection');
+        const mainTripsSection = document.getElementById('mainTripsSection');
+        const mainMenusSection = document.getElementById('mainMenusSection');
+        const mainProjectsSection = document.getElementById('mainProjectsSection');
 
-            tabButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    if (button.getAttribute('href') !== '#' && button.getAttribute('href') !== '') {
-                        return;
-                    }
-                    
-                    e.preventDefault();
-                    const targetTab = button.dataset.tab;
+        // Elementos del DOM para la sub-navegación del Diario
+        const diarySubTabButtons = document.querySelectorAll('.diary-sub-tab-button');
+        const diaryWriteEntrySection = document.getElementById('diaryWriteEntrySection');
+        const diaryViewSearchSection = document.getElementById('diaryViewSearchSection');
 
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabPanes.forEach(pane => pane.classList.remove('active'));
+        // Elementos del DOM para la lógica del Diario (existentes)
+        const latestEntryContent = document.getElementById('latestEntryContent');
+        const searchEntriesBtn = document.getElementById('searchEntriesBtn');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const searchResultsDiv = document.getElementById('searchResults');
+        const diaryForm = document.getElementById('diaryForm');
+        const diaryEntry = document.getElementById('diaryEntry');
+        const photoUpload = document.getElementById('photoUpload');
+        const messageBox = document.getElementById('messageBox');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
 
-                    button.classList.add('active');
-                    if (targetTab) {
-                        document.getElementById(targetTab).classList.add('active');
-                    }
-                });
+        // --- Funciones de Utilidad ---
+
+        // Función para mostrar mensajes al usuario (éxito/error)
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box w-full ${type}`; // Añade la clase de tipo
+            messageBox.style.display = 'block'; // Muestra el cuadro de mensaje
+        }
+
+        // Función para ocultar mensajes
+        function hideMessage() {
+            messageBox.style.display = 'none';
+            messageBox.textContent = '';
+            messageBox.className = 'message-box w-full';
+        }
+
+        // Función auxiliar para leer un archivo como Base64
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
             });
+        }
 
-            window.showTab = function(tabId) {
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabPanes.forEach(pane => pane.classList.remove('active'));
+        // Función para resetear el estado del formulario (botón y spinner)
+        function resetFormState() {
+            buttonText.textContent = 'Guardar Entrada';
+            loadingSpinner.style.display = 'none';
+            diaryForm.querySelector('button[type="submit"]').disabled = false;
+        }
 
-                let activatedButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
-                if (!activatedButton) {
-                    activatedButton = document.querySelector(`.tab-button[href="${tabId}.html"]`);
-                }
-                
-                if (activatedButton) {
-                    activatedButton.classList.add('active');
-                }
-                
-                const targetPane = document.getElementById(tabId);
-                if (targetPane) {
-                    targetPane.classList.add('active');
-                }
-            };
-
-            displayLatestDiaryEntry();
-        });
-
-        // Función para mostrar la última entrada de Google Sheet
-        async function displayLatestDiaryEntry() {
-            const latestEntryContainer = document.getElementById('latestEntryContainer');
-            latestEntryContainer.innerHTML = '<p class="placeholder-content">Cargando última entrada del diario...</p>';
-
+        // Función para formatear la fecha para mostrar
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?method=GET_ALL`);
-                const data = await response.json(); // Leer siempre el JSON
-
-                // Ahora verificamos la propiedad 'success' en el JSON
-                if (data.success) {
-                    let entries = data.data || []; 
-
-                    if (!Array.isArray(entries) || entries.length === 0) {
-                        latestEntryContainer.innerHTML = '<p class="placeholder-content">Aún no hay entradas en el diario. ¡Escribe una!</p>';
-                        return;
-                    }
-
-                    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    const latest = entries[0];
-
-                    const dateObj = new Date(latest.timestamp);
-                    const formattedDate = dateObj.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    const formattedTime = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-                    // Generar HTML para múltiples imágenes
-                    let imagesHtml = '';
-                    if (Array.isArray(latest.imageUrls) && latest.imageUrls.length > 0) {
-                        imagesHtml = `
-                            <div class="entry-images">
-                                ${latest.imageUrls.map(url => `<img src="${url}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/F0F0F0/ADADAD?text=Imagen+rota';" alt="Imagen de la entrada">`).join('')}
-                            </div>
-                        `;
-                    }
-
-                    latestEntryContainer.innerHTML = `
-                        <p><strong>Fecha:</strong> ${formattedDate}</p>
-                        <p><strong>Hora:</strong> ${formattedTime}</p>
-                        <p><strong>Estado de ánimo:</strong> ${latest.mood}</p>
-                        <p><strong>Título:</strong> ${latest.title}</p>
-                        <p><strong>Contenido:</strong> ${latest.content.replace(/\n/g, '<br>')}</p>
-                        ${imagesHtml}
-                    `;
-                } else {
-                    console.error("Error al cargar la última entrada (Apps Script informó):", data.error);
-                    latestEntryContainer.innerHTML = `<p class="placeholder-content" style="color: red;">Error al cargar la última entrada: ${data.error}.</p>`;
-                }
-            } catch (error) {
-                console.error("Error en la comunicación con Apps Script al cargar la última entrada:", error);
-                latestEntryContainer.innerHTML = '<p class="placeholder-content" style="color: red;">Error de red o JSON inválido al cargar la última entrada. ¿La URL es correcta y el script está desplegado?</p>';
+                return new Date(dateString).toLocaleDateString('es-ES', options);
+            } catch (e) {
+                return dateString; // En caso de error, devuelve la cadena original
             }
         }
+
+        // Función para renderizar una entrada de diario
+        function renderEntry(entry, containerElement) {
+            const entryCard = document.createElement('div');
+            entryCard.className = 'entry-card';
+
+            const datePara = document.createElement('p');
+            datePara.className = 'text-sm text-gray-500 mb-2';
+            datePara.textContent = `Fecha: ${formatDate(entry.timestamp)}`;
+            entryCard.appendChild(datePara);
+
+            const textPara = document.createElement('p');
+            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap'; // Mantiene saltos de línea del texto
+            textPara.textContent = entry.text;
+            entryCard.appendChild(textPara);
+
+            if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
+                const img = document.createElement('img');
+                img.src = entry.photoUrl;
+                img.alt = 'Foto de la entrada del diario';
+                img.className = 'mt-4 rounded-lg shadow-md';
+                // Añadir un manejador de error para la imagen
+                img.onerror = function() {
+                    this.onerror=null; // Evita bucle infinito si la imagen sigue fallando
+                    this.src='https://placehold.co/400x300/e0e0e0/ffffff?text=Error+Carga+Imagen'; // Placeholder
+                    this.alt='Imagen no disponible';
+                    console.error('Error al cargar la imagen de la URL:', img.src);
+                };
+                entryCard.appendChild(img);
+            } else if (entry.photoUrl.startsWith('Error')) {
+                const errorPara = document.createElement('p');
+                errorPara.className = 'text-sm text-red-500 mt-2';
+                errorPara.textContent = `Error al cargar la foto: ${entry.photoUrl.substring(19)}`; // Recorta el prefijo "Error al subir la foto: "
+                entryCard.appendChild(errorPara);
+            }
+
+            containerElement.appendChild(entryCard);
+        }
+
+        // --- Funciones de Navegación Principal ---
+
+        // Función para mostrar la pestaña principal seleccionada
+        function showMainTab(tabName) {
+            // Oculta todas las secciones principales
+            mainHomeSection.classList.add('hidden');
+            mainDiarySection.classList.add('hidden');
+            mainMapsSection.classList.add('hidden');
+            mainTripsSection.classList.add('hidden');
+            mainMenusSection.classList.add('hidden');
+            mainProjectsSection.classList.add('hidden');
+
+            // Desactiva todos los botones de pestaña principal
+            mainTabButtons.forEach(button => button.classList.remove('active'));
+
+            // Muestra la sección y activa el botón de la pestaña correspondiente
+            if (tabName === 'home') {
+                mainHomeSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="home"]').classList.add('active');
+                loadLatestEntry(); // Carga la última entrada del diario al ir a Inicio
+            } else if (tabName === 'diary') {
+                mainDiarySection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="diary"]').classList.add('active');
+                showDiarySubTab('write'); // Muestra la sub-pestaña de escritura del diario por defecto
+            } else if (tabName === 'maps') {
+                mainMapsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="maps"]').classList.add('active');
+            } else if (tabName === 'trips') {
+                mainTripsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="trips"]').classList.add('active');
+            } else if (tabName === 'menus') {
+                mainMenusSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="menus"]').classList.add('active');
+            } else if (tabName === 'projects') {
+                mainProjectsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="projects"]').classList.add('active');
+            }
+            hideMessage(); // Oculta mensajes al cambiar de pestaña principal
+        }
+
+        // Event listeners para los botones de las pestañas principales
+        mainTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showMainTab(button.dataset.mainTab);
+            });
+        });
+
+        // --- Funciones de Sub-navegación del Diario ---
+
+        // Función para mostrar la sub-pestaña del diario seleccionada
+        function showDiarySubTab(subTabName) {
+            // Oculta todas las sub-secciones del diario
+            diaryWriteEntrySection.classList.add('hidden');
+            diaryViewSearchSection.classList.add('hidden');
+
+            // Desactiva todos los botones de sub-pestaña del diario
+            diarySubTabButtons.forEach(button => button.classList.remove('active'));
+
+            // Muestra la sub-sección y activa el botón de la sub-pestaña correspondiente
+            if (subTabName === 'write') {
+                diaryWriteEntrySection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
+            } else if (subTabName === 'view') {
+                diaryViewSearchSection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+                // Limpia resultados de búsqueda anteriores
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
+            }
+            hideMessage(); // Oculta mensajes al cambiar de sub-pestaña
+        }
+
+        // Event listeners para los botones de las sub-pestañas del diario
+        diarySubTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showDiarySubTab(button.dataset.diarySubTab);
+            });
+        });
+
+        // --- Lógica para la Sección de Inicio (Última Entrada) y Diario (Escritura/Búsqueda) ---
+
+        async function loadLatestEntry() {
+            latestEntryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última entrada del diario...</p>';
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getLatest`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success' && result.entry) {
+                    latestEntryContent.innerHTML = ''; // Limpia el mensaje de carga
+                    renderEntry(result.entry, latestEntryContent);
+                } else {
+                    latestEntryContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas para mostrar.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error al cargar la última entrada:', error);
+                latestEntryContent.innerHTML = '<p class="text-center text-red-500">Error al cargar la última entrada.</p>';
+            }
+        }
+
+        diaryForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Previene el envío por defecto del formulario
+
+            hideMessage(); // Oculta mensajes anteriores
+            buttonText.textContent = 'Guardando...';
+            loadingSpinner.style.display = 'block'; // Muestra el spinner de carga
+            diaryForm.querySelector('button[type="submit"]').disabled = true; // Deshabilita el botón
+
+            const entryText = diaryEntry.value;
+            let imageData = null;
+            let imageName = '';
+
+            // Validación mínima
+            if (!entryText.trim()) {
+                showMessage('Por favor, escribe algo en tu entrada del diario.', 'error');
+                resetFormState();
+                return;
+            }
+
+            // Si hay una foto seleccionada, la lee como Base64
+            if (photoUpload.files.length > 0) {
+                const file = photoUpload.files[0];
+                // Límite de tamaño de archivo (ej. 5MB)
+                const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+                if (file.size > MAX_FILE_SIZE) {
+                    showMessage('La imagen es demasiado grande (máximo 5MB).', 'error');
+                    resetFormState();
+                    return;
+                }
+                imageName = file.name;
+                try {
+                    imageData = await readFileAsBase64(file);
+                } catch (error) {
+                    showMessage('Error al leer la imagen. Inténtalo de nuevo.', 'error');
+                    resetFormState();
+                    return;
+                }
+            }
+
+            // Datos a enviar a Google Apps Script
+            const formData = new FormData();
+            formData.append('diaryEntry', entryText);
+            if (imageData) {
+                formData.append('imageData', imageData);
+                formData.append('imageName', imageName);
+            }
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData,
+                    // No es necesario establecer 'Content-Type' para FormData, el navegador lo hace automáticamente
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showMessage('¡Entrada guardada con éxito!', 'success');
+                    diaryEntry.value = ''; // Limpia el campo de texto
+                    photoUpload.value = ''; // Limpia la selección de archivo
+                } else {
+                    showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error al enviar la entrada:', error);
+                showMessage('Ha ocurrido un error al conectar con el servidor. Inténtalo de nuevo más tarde.', 'error');
+            } finally {
+                resetFormState();
+            }
+        });
+
+        searchEntriesBtn.addEventListener('click', async () => {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (!startDate || !endDate) {
+                showMessage('Por favor, selecciona tanto la fecha de inicio como la de fin para buscar.', 'error');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                showMessage('La fecha de inicio no puede ser posterior a la fecha de fin.', 'error');
+                return;
+            }
+
+            searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando entradas...</p>';
+            hideMessage();
+
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getEntriesByDate&startDate=${startDate}&endDate=${endDate}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success' && result.entries && result.entries.length > 0) {
+                    searchResultsDiv.innerHTML = ''; // Limpia el mensaje de carga
+                    result.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Ordenar por fecha descendente
+                    result.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
+                } else {
+                    searchResultsDiv.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No se encontraron entradas para el rango de fechas seleccionado.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error al buscar entradas:', error);
+                searchResultsDiv.innerHTML = '<p class="text-center text-red-500">Error al buscar entradas. Inténtalo de nuevo.</p>';
+            }
+        });
+
+        // --- Inicialización ---
+        // Muestra la pestaña de inicio al cargar la página por primera vez
+        document.addEventListener('DOMContentLoaded', () => {
+            showMainTab('home');
+        });
     </script>
 </body>
 </html>
