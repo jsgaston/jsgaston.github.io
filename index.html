@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Diario Personal</title>
-    <!-- Tailwind CSS CDN para un estilo rápido y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Fuente Inter para un aspecto moderno y limpio */
@@ -162,7 +161,6 @@
     <div class="container rounded-xl shadow-xl flex flex-col">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Mi Gestor Personal</h1>
 
-        <!-- Navegación principal por pestañas -->
         <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
             <button class="main-tab-button active" data-main-tab="home">Inicio</button>
             <button class="main-tab-button" data-main-tab="diary">Diario</button>
@@ -172,7 +170,6 @@
             <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
         </nav>
 
-        <!-- Contenido de la Sección Principal - Inicio -->
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a tu Gestor Personal</h2>
             <p class="text-center text-gray-600 mb-8">Aquí puedes organizar tu vida digital. Explora las pestañas de arriba.</p>
@@ -188,17 +185,14 @@
             </div>
         </div>
 
-        <!-- Contenido de la Sección Principal - Diario -->
         <div id="mainDiarySection" class="main-tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Diario Digital</h2>
             
-            <!-- Sub-navegación para el Diario -->
             <nav class="flex border-b border-gray-200 mb-6">
                 <button class="diary-sub-tab-button active" data-diary-sub-tab="write">Escribir Entrada</button>
                 <button class="diary-sub-tab-button" data-diary-sub-tab="view">Ver/Buscar Entradas</button>
             </nav>
 
-            <!-- Contenido de la sub-pestaña "Escribir Entrada" -->
             <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
                 <form id="diaryForm" class="w-full">
                     <div class="mb-6">
@@ -206,9 +200,16 @@
                         <textarea id="diaryEntry" name="diaryEntry" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
                     </div>
 
-                    <div class="mb-8">
-                        <label for="photoUpload" class="form-label mb-2">Adjuntar Foto (opcional):</label>
+                    <div class="mb-4">
+                        <label for="photoUpload" class="form-label mb-2">Adjuntar Foto (desde tu ordenador):</label>
                         <input type="file" id="photoUpload" name="photoUpload" accept="image/*" class="form-input rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                        <p class="text-sm text-gray-500 mt-1">Se subirá a tu Google Drive.</p>
+                    </div>
+
+                    <div class="mb-8">
+                        <label for="externalImageUrl" class="form-label mb-2">O pegar URL de imagen (desde otra web):</label>
+                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ejemplo.com/mi-foto.jpg">
+                        <p class="text-sm text-gray-500 mt-1">Se usará este enlace si se proporciona.</p>
                     </div>
 
                     <button type="submit" class="btn w-full">
@@ -218,7 +219,6 @@
                 </form>
             </div>
 
-            <!-- Contenido de la sub-pestaña "Ver/Buscar Entradas" -->
             <div id="diaryViewSearchSection" class="diary-sub-tab-content hidden">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -238,28 +238,24 @@
             </div>
         </div>
 
-        <!-- Contenido de la Sección Principal - Mapas de Recorridos (Placeholder) -->
         <div id="mainMapsSection" class="main-tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
             <p class="text-center text-gray-600">Aquí podrás integrar tus mapas de Google Maps o uMap. ¡En construcción!</p>
             <p class="text-center text-gray-500 mt-4">Para añadir esta funcionalidad, crearías una nueva sección aquí y la conectarías a la API de mapas.</p>
         </div>
 
-        <!-- Contenido de la Sección Principal - Organizar Viajes (Placeholder) -->
         <div id="mainTripsSection" class="main-tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Organizar Viajes</h2>
             <p class="text-center text-gray-600">Planifica tus viajes, rutas y presupuestos. ¡Próximamente!</p>
             <p class="text-center text-gray-500 mt-4">Puedes añadir formularios y listas para gestionar tus planes de viaje.</p>
         </div>
 
-        <!-- Contenido de la Sección Principal - Menús de Comida (Placeholder) -->
         <div id="mainMenusSection" class="main-tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Menús de Comida</h2>
             <p class="text-center text-gray-600">Organiza tus comidas semanales y listas de la compra. ¡Paciencia, pronto estará listo!</p>
             <p class="text-center text-gray-500 mt-4">Aquí podrías tener un calendario, recetas y opciones de filtrado.</p>
         </div>
 
-        <!-- Contenido de la Sección Principal - Proyectos (Placeholder) -->
         <div id="mainProjectsSection" class="main-tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gestión de Proyectos</h2>
             <p class="text-center text-gray-600">Gestiona tus tareas, plazos y objetivos de tus proyectos personales o profesionales. ¡Trabajando en ello!</p>
@@ -297,6 +293,7 @@
         const diaryForm = document.getElementById('diaryForm');
         const diaryEntry = document.getElementById('diaryEntry');
         const photoUpload = document.getElementById('photoUpload');
+        const externalImageUrlInput = document.getElementById('externalImageUrl'); // Nuevo input para URL externa
         const messageBox = document.getElementById('messageBox');
         const buttonText = document.getElementById('buttonText');
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -359,6 +356,7 @@
             textPara.textContent = entry.text;
             entryCard.appendChild(textPara);
 
+            // Verifica si la URL de la foto es válida y no es un mensaje de error
             if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
                 const img = document.createElement('img');
                 img.src = entry.photoUrl;
@@ -367,7 +365,7 @@
                 // Añadir un manejador de error para la imagen
                 img.onerror = function() {
                     this.onerror=null; // Evita bucle infinito si la imagen sigue fallando
-                    this.src='https://placehold.co/400x300/e0e0e0/ffffff?text=Error+Carga+Imagen'; // Placeholder
+                    this.src='https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible'; // Placeholder genérico
                     this.alt='Imagen no disponible';
                     console.error('Error al cargar la imagen de la URL:', img.src);
                 };
@@ -375,7 +373,7 @@
             } else if (entry.photoUrl.startsWith('Error')) {
                 const errorPara = document.createElement('p');
                 errorPara.className = 'text-sm text-red-500 mt-2';
-                errorPara.textContent = `Error al cargar la foto: ${entry.photoUrl.substring(19)}`; // Recorta el prefijo "Error al subir la foto: "
+                errorPara.textContent = `Error con la foto: ${entry.photoUrl.substring(entry.photoUrl.indexOf(':') + 1)}`; // Recorta el prefijo "Error al..."
                 entryCard.appendChild(errorPara);
             }
 
@@ -492,6 +490,7 @@
             diaryForm.querySelector('button[type="submit"]').disabled = true; // Deshabilita el botón
 
             const entryText = diaryEntry.value;
+            const externalImageUrl = externalImageUrlInput.value.trim(); // Obtener el URL externo
             let imageData = null;
             let imageName = '';
 
@@ -502,8 +501,16 @@
                 return;
             }
 
-            // Si hay una foto seleccionada, la lee como Base64
-            if (photoUpload.files.length > 0) {
+            // Validar que no se usen ambos métodos de imagen o ninguno
+            if (photoUpload.files.length > 0 && externalImageUrl !== '') {
+                showMessage('Por favor, elige SOLO UNA opción para la imagen: o subir un archivo O pegar una URL.', 'error');
+                resetFormState();
+                return;
+            }
+
+            if (photoUpload.files.length === 0 && externalImageUrl === '') {
+                 // No hay imagen seleccionada ni URL, no hay problema, se guardará sin foto.
+            } else if (photoUpload.files.length > 0) { // Se sube archivo a Drive
                 const file = photoUpload.files[0];
                 // Límite de tamaño de archivo (ej. 5MB)
                 const MAX_FILE_SIZE = 5 * 1024 * 1024; 
@@ -520,12 +527,19 @@
                     resetFormState();
                     return;
                 }
+            } else if (externalImageUrl !== '') { // Se usa URL externa
+                // No se necesita procesar la imagen aquí, solo enviar el URL
+                // Opcional: Podrías validar el formato del URL si lo deseas.
             }
+
 
             // Datos a enviar a Google Apps Script
             const formData = new FormData();
             formData.append('diaryEntry', entryText);
-            if (imageData) {
+            
+            if (externalImageUrl !== '') {
+                formData.append('externalImageUrl', externalImageUrl);
+            } else if (imageData) {
                 formData.append('imageData', imageData);
                 formData.append('imageName', imageName);
             }
@@ -547,6 +561,7 @@
                     showMessage('¡Entrada guardada con éxito!', 'success');
                     diaryEntry.value = ''; // Limpia el campo de texto
                     photoUpload.value = ''; // Limpia la selección de archivo
+                    externalImageUrlInput.value = ''; // Limpia el URL externo
                 } else {
                     showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
                 }
