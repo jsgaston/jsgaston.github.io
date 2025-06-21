@@ -196,8 +196,8 @@
             <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
                 <form id="diaryForm" class="w-full">
                     <div class="mb-6">
-                        <label for="diaryEntry" class="form-label mb-2">Tu Entrada de Hoy:</label>
-                        <textarea id="diaryEntry" name="diaryEntry" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
+                        <label for="text" class="form-label mb-2">Tu Entrada de Hoy:</label>
+                        <textarea id="text" name="text" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
                     </div>
 
                     <div class="mb-4">
@@ -291,7 +291,7 @@
         const endDateInput = document.getElementById('endDate');
         const searchResultsDiv = document.getElementById('searchResults');
         const diaryForm = document.getElementById('diaryForm');
-        const diaryEntry = document.getElementById('diaryEntry');
+        const text = document.getElementById('text');
         const photoUpload = document.getElementById('photoUpload');
         const externalImageUrlInput = document.getElementById('externalImageUrl'); // Nuevo input para URL externa
         const messageBox = document.getElementById('messageBox');
@@ -489,7 +489,7 @@
             loadingSpinner.style.display = 'block'; // Muestra el spinner de carga
             diaryForm.querySelector('button[type="submit"]').disabled = true; // Deshabilita el botón
 
-            const entryText = diaryEntry.value;
+            const entryText = text.value;
             const externalImageUrl = externalImageUrlInput.value.trim(); // Obtener el URL externo
             let imageData = null;
             let imageName = '';
@@ -535,7 +535,7 @@
 
             // Datos a enviar a Google Apps Script
             const formData = new FormData();
-            formData.append('diaryEntry', entryText);
+            formData.append('text', entryText);
             
             if (externalImageUrl !== '') {
                 formData.append('externalImageUrl', externalImageUrl);
@@ -559,7 +559,7 @@
 
                 if (result.status === 'success') {
                     showMessage('¡Entrada guardada con éxito!', 'success');
-                    diaryEntry.value = ''; // Limpia el campo de texto
+                    text.value = ''; // Limpia el campo de texto
                     photoUpload.value = ''; // Limpia la selección de archivo
                     externalImageUrlInput.value = ''; // Limpia el URL externo
                 } else {
