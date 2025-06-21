@@ -154,10 +154,71 @@
             border-radius: 6px;
             margin-top: 12px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .entry-card img:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Estilos para el modal de imagen */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+        }
+        .modal-image {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #ccc;
+        }
+        
+        /* Indicador de carga para imágenes */
+        .image-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
         }
     </style>
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
+    <!-- Modal para ver imágenes en grande -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="Imagen ampliada">
+        </div>
+    </div>
+
     <div class="container rounded-xl shadow-xl flex flex-col">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
 
@@ -208,8 +269,8 @@
 
                     <div class="mb-8">
                         <label for="externalImageUrl" class="form-label mb-2">O pegar URL de imagen (desde otra web por ejemplo: https://es.imgbb.com/):</label>
-                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ejemplo.com/mi-foto.jpg">
-                        <p class="text-sm text-gray-500 mt-1">Se usará este enlace si se proporciona.</p>
+                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ibb.co/ABC123 o https://i.imgur.com/ejemplo.jpg">
+                        <p class="text-sm text-gray-500 mt-1">Soporta ImgBB, Imgur, PostImage y URLs directas. Se procesará automáticamente.</p>
                     </div>
 
                     <button type="submit" class="btn w-full">
@@ -297,6 +358,11 @@
         const buttonText = document.getElementById('buttonText');
         const loadingSpinner = document.getElementById('loadingSpinner');
 
+        // Elementos del modal
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.querySelector('.close-modal');
+
         // --- Funciones de Utilidad ---
 
         // Función para mostrar mensajes al usuario (éxito/error)
@@ -340,7 +406,93 @@
             }
         }
 
-        // Función para renderizar una entrada de diario
+        // Función mejorada para convertir URLs de servicios de hosting a URLs directas (cliente)
+        function convertToDirectImageUrl(url) {
+            if (!url || url.trim() === '') return url;
+            
+            const cleanUrl = url.trim();
+            
+            // Si ya es una URL directa, devolverla tal como está
+            if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) || 
+                cleanUrl.includes('drive.google.com/thumbnail') ||
+                cleanUrl.includes('i.ibb.co') ||
+                cleanUrl.includes('i.imgur.com') ||
+                cleanUrl.includes('i.postimg.cc')) {
+                return cleanUrl;
+            }
+            
+            // ImgBB: https://ibb.co/gMsvhD73 -> intentar obtener la URL directa
+            if (cleanUrl.includes('ibb.co/') && !cleanUrl.includes('i.ibb.co')) {
+                const match = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+                if (match && match[1]) {
+                    // Intentar diferentes formatos de URL directa de ImgBB
+                    return `https://i.ibb.co/${match[1]}/image.jpg`;
+                }
+            }
+            
+            // Imgur: https://imgur.com/a/ABC123 -> https://i.imgur.com/ABC123.jpg
+            if (cleanUrl.includes('imgur.com') && !cleanUrl.includes('i.imgur.com')) {
+                const match = cleanUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
+                if (match && match[1]) {
+                    return `https://i.imgur.com/${match[1]}.jpg`;
+                }
+            }
+            
+            // PostImage: https://postimg.cc/ABC123 -> https://i.postimg.cc/ABC123/image.jpg
+            if (cleanUrl.includes('postimg.cc') && !cleanUrl.includes('i.postimg.cc')) {
+                const match = cleanUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
+                if (match && match[1]) {
+                    return `https://i.postimg.cc/${match[1]}/image.jpg`;
+                }
+            }
+            
+            return cleanUrl; // Devolver la URL original si no se puede convertir
+        }
+
+        // Función para intentar múltiples URLs de imagen
+        function tryMultipleImageUrls(originalUrl, imgElement, callback) {
+            const urls = [];
+            
+            // Añadir la URL original
+            urls.push(originalUrl);
+            
+            // Si es ImgBB, intentar diferentes formatos
+            if (originalUrl.includes('ibb.co/') && !originalUrl.includes('i.ibb.co')) {
+                const match = originalUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+                if (match && match[1]) {
+                    urls.push(`https://i.ibb.co/${match[1]}/image.jpg`);
+                    urls.push(`https://i.ibb.co/${match[1]}/image.png`);
+                    urls.push(`https://i.ibb.co/${match[1]}/image.webp`);
+                }
+            }
+            
+            let currentIndex = 0;
+            
+            function tryNextUrl() {
+                if (currentIndex >= urls.length) {
+                    // Si ninguna URL funciona, mostrar imagen placeholder
+                    imgElement.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
+                    imgElement.alt = 'Imagen no disponible';
+                    if (callback) callback(false);
+                    return;
+                }
+                
+                const testImg = new Image();
+                testImg.onload = function() {
+                    imgElement.src = urls[currentIndex];
+                    if (callback) callback(true);
+                };
+                testImg.onerror = function() {
+                    currentIndex++;
+                    tryNextUrl();
+                };
+                testImg.src = urls[currentIndex];
+            }
+            
+            tryNextUrl();
+        }
+
+        // Función para renderizar una entrada de diario con mejor manejo de imágenes
         function renderEntry(entry, containerElement) {
             const entryCard = document.createElement('div');
             entryCard.className = 'entry-card';
@@ -357,16 +509,40 @@
 
             // Verificar si hay una URL de foto válida
             if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'mt-4';
+                
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.innerHTML = '<span class="image-loading"></span>Cargando imagen...';
+                loadingIndicator.className = 'text-sm text-gray-500 flex items-center';
+                imageContainer.appendChild(loadingIndicator);
+                
                 const img = document.createElement('img');
-                img.src = entry.photoUrl;
+                img.className = 'mt-4 rounded-lg shadow-md hidden';
                 img.alt = 'Foto de la entrada del diario';
-                img.className = 'mt-4 rounded-lg shadow-md';
-                img.onerror = function() {
-                    this.onerror = null;
-                    this.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
-                    this.alt = 'Imagen no disponible';
-                };
-                entryCard.appendChild(img);
+                
+                // Añadir evento de clic para mostrar en modal
+                img.addEventListener('click', function() {
+                    modalImage.src = this.src;
+                    imageModal.style.display = 'block';
+                });
+                
+                imageContainer.appendChild(img);
+                entryCard.appendChild(imageContainer);
+                
+                // Intentar cargar la imagen con múltiples URLs si es necesario
+                tryMultipleImageUrls(entry.photoUrl, img, function(success) {
+                    loadingIndicator.style.display = 'none';
+                    if (success) {
+                        img.classList.remove('hidden');
+                    } else {
+                        const errorPara = document.createElement('p');
+                        errorPara.className = 'text-sm text-red-500 mt-2';
+                        errorPara.textContent = 'No se pudo cargar la imagen';
+                        imageContainer.appendChild(errorPara);
+                    }
+                });
+                
             } else if (entry.photoUrl && entry.photoUrl.startsWith('Error')) {
                 const errorPara = document.createElement('p');
                 errorPara.className = 'text-sm text-red-500 mt-2';
@@ -376,6 +552,17 @@
 
             containerElement.appendChild(entryCard);
         }
+
+        // Event listeners para el modal
+        closeModal.addEventListener('click', function() {
+            imageModal.style.display = 'none';
+        });
+
+        imageModal.addEventListener('click', function(e) {
+            if (e.target === imageModal) {
+                imageModal.style.display = 'none';
+            }
+        });
 
         // --- Funciones de Navegación Principal ---
 
@@ -420,35 +607,6 @@
         mainTabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 showMainTab(button.dataset.mainTab);
-            });
-        });
-
-        // --- Funciones de Sub-navegación del Diario ---
-
-        function showDiarySubTab(subTabName) {
-            // Ocultar todas las sub-secciones
-            diaryWriteEntrySection.classList.add('hidden');
-            diaryViewSearchSection.classList.add('hidden');
-
-            // Desactivar todos los botones de sub-pestaña
-            diarySubTabButtons.forEach(button => button.classList.remove('active'));
-
-            // Mostrar la sub-sección correspondiente
-            if (subTabName === 'write') {
-                diaryWriteEntrySection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
-            } else if (subTabName === 'view') {
-                diaryViewSearchSection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
-                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
-            }
-            hideMessage();
-        }
-
-        // Event listeners para los botones de las sub-pestañas del diario
-        diarySubTabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                showDiarySubTab(button.dataset.diarySubTab);
             });
         });
 
