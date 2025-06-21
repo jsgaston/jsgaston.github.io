@@ -341,45 +341,68 @@
             }
         }
 
-        // Función para renderizar una entrada de diario
+        // Función para convertir URL de Google Drive a formato directo
+        function convertDriveUrlToDirectUrl(driveUrl) {
+            if (!driveUrl || typeof driveUrl !== 'string') {
+                return driveUrl;
+            }
+            
+            // Buscar el patrón de URL de Google Drive
+            const fileIdMatch = driveUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
+            
+            if (fileIdMatch && fileIdMatch[1]) {
+                const fileId = fileIdMatch[1];
+                return `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
+            
+            // Si no es una URL de Drive o no se puede convertir, devolver la original
+            return driveUrl;
+        }
+        
+
+        // Modificar la función renderEntry existente
         function renderEntry(entry, containerElement) {
             const entryCard = document.createElement('div');
             entryCard.className = 'entry-card';
-
+        
             const datePara = document.createElement('p');
             datePara.className = 'text-sm text-gray-500 mb-2';
             datePara.textContent = `Fecha: ${formatDate(entry.timestamp)}`;
             entryCard.appendChild(datePara);
-
+        
             const textPara = document.createElement('p');
-            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap'; // Mantiene saltos de línea del texto
-            textPara.textContent = entry.text;
+            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap';
+            textPara.textContent = entry.diaryEntry || entry.text; // Manejar diferentes nombres de campo
             entryCard.appendChild(textPara);
-
+        
             // Verifica si la URL de la foto es válida y no es un mensaje de error
             if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
                 const img = document.createElement('img');
-                img.src = entry.photoUrl;
+                
+                // *** CAMBIO: Convertir URL de Drive si es necesario ***
+                img.src = convertDriveUrlToDirectUrl(entry.photoUrl);
+                
                 img.alt = 'Foto de la entrada del diario';
-                img.className = 'mt-4 rounded-lg shadow-md';
+                img.className = 'mt-4 rounded-lg shadow-md max-w-full h-auto';
+                
                 // Añadir un manejador de error para la imagen
                 img.onerror = function() {
-                    this.onerror=null; // Evita bucle infinito si la imagen sigue fallando
-                    this.src='https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible'; // Placeholder genérico
-                    this.alt='Imagen no disponible';
-                    console.error('Error al cargar la imagen de la URL:', img.src);
+                    this.onerror = null; // Evita bucle infinito
+                    this.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
+                    this.alt = 'Imagen no disponible';
+                    console.error('Error al cargar la imagen de la URL:', entry.photoUrl);
                 };
+                
                 entryCard.appendChild(img);
-            } else if (entry.photoUrl.startsWith('Error')) {
+            } else if (entry.photoUrl && entry.photoUrl.startsWith('Error')) {
                 const errorPara = document.createElement('p');
                 errorPara.className = 'text-sm text-red-500 mt-2';
-                errorPara.textContent = `Error con la foto: ${entry.photoUrl.substring(entry.photoUrl.indexOf(':') + 1)}`; // Recorta el prefijo "Error al..."
+                errorPara.textContent = `Error con la foto: ${entry.photoUrl.substring(entry.photoUrl.indexOf(':') + 1)}`;
                 entryCard.appendChild(errorPara);
             }
-
+        
             containerElement.appendChild(entryCard);
         }
-
         // --- Funciones de Navegación Principal ---
 
         // Función para mostrar la pestaña principal seleccionada
