@@ -267,7 +267,6 @@
 
     <script>
         // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado.
-        // Lo obtendrás al desplegar tu script de Google Apps Script.
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJa-PDkjN_a6Xaz9aVfbpQYj0kZKSgLbwfPKAz7x5m89w3IKmlYHjR9CzPPh8i5WCg/exec'; 
 
         // Elementos del DOM para la navegación principal
@@ -284,7 +283,7 @@
         const diaryWriteEntrySection = document.getElementById('diaryWriteEntrySection');
         const diaryViewSearchSection = document.getElementById('diaryViewSearchSection');
 
-        // Elementos del DOM para la lógica del Diario (existentes)
+        // Elementos del DOM para la lógica del Diario
         const latestEntryContent = document.getElementById('latestEntryContent');
         const searchEntriesBtn = document.getElementById('searchEntriesBtn');
         const startDateInput = document.getElementById('startDate');
@@ -293,7 +292,7 @@
         const diaryForm = document.getElementById('diaryForm');
         const text = document.getElementById('text');
         const photoUpload = document.getElementById('photoUpload');
-        const externalImageUrlInput = document.getElementById('externalImageUrl'); // Nuevo input para URL externa
+        const externalImageUrlInput = document.getElementById('externalImageUrl');
         const messageBox = document.getElementById('messageBox');
         const buttonText = document.getElementById('buttonText');
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -303,8 +302,8 @@
         // Función para mostrar mensajes al usuario (éxito/error)
         function showMessage(message, type) {
             messageBox.textContent = message;
-            messageBox.className = `message-box w-full ${type}`; // Añade la clase de tipo
-            messageBox.style.display = 'block'; // Muestra el cuadro de mensaje
+            messageBox.className = `message-box w-full ${type}`;
+            messageBox.style.display = 'block';
         }
 
         // Función para ocultar mensajes
@@ -324,20 +323,20 @@
             });
         }
 
-        // Función para resetear el estado del formulario (botón y spinner)
+        // Función para resetear el estado del formulario
         function resetFormState() {
             buttonText.textContent = 'Guardar Entrada';
             loadingSpinner.style.display = 'none';
             diaryForm.querySelector('button[type="submit"]').disabled = false;
         }
 
-        // Función para formatear la fecha para mostrar
+        // Función para formatear la fecha
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             try {
                 return new Date(dateString).toLocaleDateString('es-ES', options);
             } catch (e) {
-                return dateString; // En caso de error, devuelve la cadena original
+                return dateString;
             }
         }
 
@@ -352,28 +351,26 @@
             entryCard.appendChild(datePara);
 
             const textPara = document.createElement('p');
-            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap'; // Mantiene saltos de línea del texto
+            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap';
             textPara.textContent = entry.text;
             entryCard.appendChild(textPara);
 
-            // Verifica si la URL de la foto es válida y no es un mensaje de error
+            // Verificar si hay una URL de foto válida
             if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
                 const img = document.createElement('img');
                 img.src = entry.photoUrl;
                 img.alt = 'Foto de la entrada del diario';
                 img.className = 'mt-4 rounded-lg shadow-md';
-                // Añadir un manejador de error para la imagen
                 img.onerror = function() {
-                    this.onerror=null; // Evita bucle infinito si la imagen sigue fallando
-                    this.src='https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible'; // Placeholder genérico
-                    this.alt='Imagen no disponible';
-                    console.error('Error al cargar la imagen de la URL:', img.src);
+                    this.onerror = null;
+                    this.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
+                    this.alt = 'Imagen no disponible';
                 };
                 entryCard.appendChild(img);
-            } else if (entry.photoUrl.startsWith('Error')) {
+            } else if (entry.photoUrl && entry.photoUrl.startsWith('Error')) {
                 const errorPara = document.createElement('p');
                 errorPara.className = 'text-sm text-red-500 mt-2';
-                errorPara.textContent = `Error con la foto: ${entry.photoUrl.substring(entry.photoUrl.indexOf(':') + 1)}`; // Recorta el prefijo "Error al..."
+                errorPara.textContent = `Error con la foto: ${entry.photoUrl}`;
                 entryCard.appendChild(errorPara);
             }
 
@@ -382,9 +379,8 @@
 
         // --- Funciones de Navegación Principal ---
 
-        // Función para mostrar la pestaña principal seleccionada
         function showMainTab(tabName) {
-            // Oculta todas las secciones principales
+            // Ocultar todas las secciones
             mainHomeSection.classList.add('hidden');
             mainDiarySection.classList.add('hidden');
             mainMapsSection.classList.add('hidden');
@@ -392,18 +388,18 @@
             mainMenusSection.classList.add('hidden');
             mainProjectsSection.classList.add('hidden');
 
-            // Desactiva todos los botones de pestaña principal
+            // Desactivar todos los botones
             mainTabButtons.forEach(button => button.classList.remove('active'));
 
-            // Muestra la sección y activa el botón de la pestaña correspondiente
+            // Mostrar la sección correspondiente
             if (tabName === 'home') {
                 mainHomeSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="home"]').classList.add('active');
-                loadLatestEntry(); // Carga la última entrada del diario al ir a Inicio
+                loadLatestEntry();
             } else if (tabName === 'diary') {
                 mainDiarySection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="diary"]').classList.add('active');
-                showDiarySubTab('write'); // Muestra la sub-pestaña de escritura del diario por defecto
+                showDiarySubTab('write');
             } else if (tabName === 'maps') {
                 mainMapsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="maps"]').classList.add('active');
@@ -417,7 +413,7 @@
                 mainProjectsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="projects"]').classList.add('active');
             }
-            hideMessage(); // Oculta mensajes al cambiar de pestaña principal
+            hideMessage();
         }
 
         // Event listeners para los botones de las pestañas principales
@@ -429,26 +425,24 @@
 
         // --- Funciones de Sub-navegación del Diario ---
 
-        // Función para mostrar la sub-pestaña del diario seleccionada
         function showDiarySubTab(subTabName) {
-            // Oculta todas las sub-secciones del diario
+            // Ocultar todas las sub-secciones
             diaryWriteEntrySection.classList.add('hidden');
             diaryViewSearchSection.classList.add('hidden');
 
-            // Desactiva todos los botones de sub-pestaña del diario
+            // Desactivar todos los botones de sub-pestaña
             diarySubTabButtons.forEach(button => button.classList.remove('active'));
 
-            // Muestra la sub-sección y activa el botón de la sub-pestaña correspondiente
+            // Mostrar la sub-sección correspondiente
             if (subTabName === 'write') {
                 diaryWriteEntrySection.classList.remove('hidden');
                 document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
             } else if (subTabName === 'view') {
                 diaryViewSearchSection.classList.remove('hidden');
                 document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
-                // Limpia resultados de búsqueda anteriores
                 searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
             }
-            hideMessage(); // Oculta mensajes al cambiar de sub-pestaña
+            hideMessage();
         }
 
         // Event listeners para los botones de las sub-pestañas del diario
@@ -458,7 +452,7 @@
             });
         });
 
-        // --- Lógica para la Sección de Inicio (Última Entrada) y Diario (Escritura/Búsqueda) ---
+        // --- Funciones del Diario ---
 
         async function loadLatestEntry() {
             latestEntryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última entrada del diario...</p>';
@@ -470,7 +464,7 @@
                 const result = await response.json();
 
                 if (result.status === 'success' && result.entry) {
-                    latestEntryContent.innerHTML = ''; // Limpia el mensaje de carga
+                    latestEntryContent.innerHTML = '';
                     renderEntry(result.entry, latestEntryContent);
                 } else {
                     latestEntryContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas para mostrar.'}</p>`;
@@ -481,38 +475,37 @@
             }
         }
 
+        // Envío del formulario del diario
         diaryForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Previene el envío por defecto del formulario
+            e.preventDefault();
 
-            hideMessage(); // Oculta mensajes anteriores
+            hideMessage();
             buttonText.textContent = 'Guardando...';
-            loadingSpinner.style.display = 'block'; // Muestra el spinner de carga
-            diaryForm.querySelector('button[type="submit"]').disabled = true; // Deshabilita el botón
+            loadingSpinner.style.display = 'block';
+            diaryForm.querySelector('button[type="submit"]').disabled = true;
 
             const entryText = text.value;
-            const externalImageUrl = externalImageUrlInput.value.trim(); // Obtener el URL externo
+            const externalImageUrl = externalImageUrlInput.value.trim();
             let imageData = null;
             let imageName = '';
 
-            // Validación mínima
+            // Validación
             if (!entryText.trim()) {
                 showMessage('Por favor, escribe algo en tu entrada del diario.', 'error');
                 resetFormState();
                 return;
             }
 
-            // Validar que no se usen ambos métodos de imagen o ninguno
+            // Validar que no se usen ambos métodos de imagen
             if (photoUpload.files.length > 0 && externalImageUrl !== '') {
                 showMessage('Por favor, elige SOLO UNA opción para la imagen: o subir un archivo O pegar una URL.', 'error');
                 resetFormState();
                 return;
             }
 
-            if (photoUpload.files.length === 0 && externalImageUrl === '') {
-                 // No hay imagen seleccionada ni URL, no hay problema, se guardará sin foto.
-            } else if (photoUpload.files.length > 0) { // Se sube archivo a Drive
+            // Procesar imagen si existe
+            if (photoUpload.files.length > 0) {
                 const file = photoUpload.files[0];
-                // Límite de tamaño de archivo (ej. 5MB)
                 const MAX_FILE_SIZE = 5 * 1024 * 1024; 
                 if (file.size > MAX_FILE_SIZE) {
                     showMessage('La imagen es demasiado grande (máximo 5MB).', 'error');
@@ -527,15 +520,11 @@
                     resetFormState();
                     return;
                 }
-            } else if (externalImageUrl !== '') { // Se usa URL externa
-                // No se necesita procesar la imagen aquí, solo enviar el URL
-                // Opcional: Podrías validar el formato del URL si lo deseas.
             }
 
-
-            // Datos a enviar a Google Apps Script
+            // Preparar datos para enviar - CORREGIDO para coincidir con el script
             const formData = new FormData();
-            formData.append('text', entryText);
+            formData.append('diaryEntry', entryText); // Cambiado de 'text' a 'diaryEntry'
             
             if (externalImageUrl !== '') {
                 formData.append('externalImageUrl', externalImageUrl);
@@ -548,7 +537,6 @@
                 const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: formData,
-                    // No es necesario establecer 'Content-Type' para FormData, el navegador lo hace automáticamente
                 });
 
                 if (!response.ok) {
@@ -559,9 +547,9 @@
 
                 if (result.status === 'success') {
                     showMessage('¡Entrada guardada con éxito!', 'success');
-                    text.value = ''; // Limpia el campo de texto
-                    photoUpload.value = ''; // Limpia la selección de archivo
-                    externalImageUrlInput.value = ''; // Limpia el URL externo
+                    text.value = '';
+                    photoUpload.value = '';
+                    externalImageUrlInput.value = '';
                 } else {
                     showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
                 }
@@ -573,6 +561,7 @@
             }
         });
 
+        // Búsqueda de entradas por fecha
         searchEntriesBtn.addEventListener('click', async () => {
             const startDate = startDateInput.value;
             const endDate = endDateInput.value;
@@ -598,8 +587,8 @@
                 const result = await response.json();
 
                 if (result.status === 'success' && result.entries && result.entries.length > 0) {
-                    searchResultsDiv.innerHTML = ''; // Limpia el mensaje de carga
-                    result.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Ordenar por fecha descendente
+                    searchResultsDiv.innerHTML = '';
+                    result.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                     result.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
                 } else {
                     searchResultsDiv.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No se encontraron entradas para el rango de fechas seleccionado.'}</p>`;
@@ -611,7 +600,6 @@
         });
 
         // --- Inicialización ---
-        // Muestra la pestaña de inicio al cargar la página por primera vez
         document.addEventListener('DOMContentLoaded', () => {
             showMainTab('home');
         });
