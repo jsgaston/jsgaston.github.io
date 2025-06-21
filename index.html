@@ -5,82 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Diario Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Fuente Inter para un aspecto moderno y limpio */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Un gris claro para el fondo */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
         }
-        .container {
-            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
-            width: 100%;
-            background-color: #ffffff;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        .main-tab-button.active {
+            border-bottom: 2px solid #4f46e5;
+            color: #4f46e5;
         }
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: block;
-            color: #374151;
-        }
-        .form-input, .form-textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 1rem;
-            color: #1f2937;
-            background-color: #f9fafb;
-            transition: border-color 0.2s;
-        }
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #3b82f6; /* Un azul bonito al enfocar */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-        }
-        .btn {
-            background-color: #4f46e5; /* Morado intenso */
-            color: white;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn:hover {
-            background-color: #4338ca; /* Morado más oscuro al pasar el ratón */
-            transform: translateY(-1px);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-        .message-box {
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-weight: 500;
-            display: none; /* Oculto por defecto */
-        }
-        .message-box.success {
-            background-color: #d1fae5; /* Verde claro */
-            color: #065f46; /* Verde oscuro */
-            border: 1px solid #10b981;
-        }
-        .message-box.error {
-            background-color: #fee2e2; /* Rojo claro */
-            color: #991b1b; /* Rojo oscuro */
-            border: 1px solid #ef4444;
+        .diary-sub-tab-button.active {
+            background-color: #e0e7ff;
+            color: #4f46e5;
         }
         .loading-spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
@@ -89,64 +27,13 @@
             width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
-            display: none; /* Oculto por defecto */
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* Estilos para las pestañas de navegación principal */
-        .main-tab-button {
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            font-weight: 600;
-            cursor: pointer;
-            background-color: #e5e7eb; /* Gris claro */
-            color: #4b5563;
-            transition: background-color 0.2s, color 0.2s;
-            white-space: nowrap; /* Evita que el texto se rompa */
-        }
-        .main-tab-button.active {
-            background-color: #ffffff;
-            color: #4f46e5; /* Morado */
-            box-shadow: 0 -2px 0 0 #4f46e5 inset; /* Subrayado morado */
-        }
-        .main-tab-content {
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        /* Estilos para las sub-pestañas del diario */
-        .diary-sub-tab-button {
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            background-color: #f3f4f6;
-            color: #6b7280;
-            transition: background-color 0.2s, color 0.2s;
-            margin-right: 8px; /* Espacio entre botones */
-        }
-        .diary-sub-tab-button.active {
-            background-color: #e0e7ff; /* Azul claro */
-            color: #4f46e5; /* Morado */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .diary-sub-tab-content {
-            padding-top: 16px;
-        }
-
         .hidden {
-            display: none !important;
-        }
-        .entry-card {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: none;
         }
         .entry-card img {
             max-width: 100%;
@@ -158,163 +45,86 @@
     </style>
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
-    <div class="container rounded-xl shadow-xl flex flex-col">
+    <div class="container max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg flex flex-col">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Mi Gestor Personal</h1>
 
-        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
-            <button class="main-tab-button active" data-main-tab="home">Inicio</button>
-            <button class="main-tab-button" data-main-tab="diary">Diario</button>
-            <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
-            <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
-            <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
-            <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+        <nav class="flex border-b border-gray-200 mb-8 overflow-x-auto">
+            <button class="main-tab-button text-gray-500 font-semibold py-4 px-6 focus:outline-none" data-main-tab="home">Inicio</button>
+            <button class="main-tab-button text-gray-500 font-semibold py-4 px-6 focus:outline-none active" data-main-tab="diary">Diario</button>
+            <button class="main-tab-button text-gray-500 font-semibold py-4 px-6 focus:outline-none" data-main-tab="maps">Mapas</button>
+            <button class="main-tab-button text-gray-500 font-semibold py-4 px-6 focus:outline-none" data-main-tab="trips">Viajes</button>
         </nav>
 
-        <div id="mainHomeSection" class="main-tab-content">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a tu Gestor Personal</h2>
-            <p class="text-center text-gray-600 mb-8">Aquí puedes organizar tu vida digital. Explora las pestañas de arriba.</p>
-            
-            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Entrada del Diario:</h3>
+        <div id="mainHomeSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a tu Gestor</h2>
             <div id="latestEntryContent" class="text-gray-700">
                 <p class="text-center text-gray-500">Cargando última entrada del diario...</p>
             </div>
-            <div class="flex justify-center mt-8">
-                <button onclick="showMainTab('diary'); showDiarySubTab('write')" class="btn py-3 px-6 rounded-lg text-lg">
-                    <span>Ir al Diario</span>
-                </button>
-            </div>
         </div>
 
-        <div id="mainDiarySection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Diario Digital</h2>
-            
-            <nav class="flex border-b border-gray-200 mb-6">
-                <button class="diary-sub-tab-button active" data-diary-sub-tab="write">Escribir Entrada</button>
-                <button class="diary-sub-tab-button" data-diary-sub-tab="view">Ver/Buscar Entradas</button>
+        <div id="mainDiarySection" class="main-tab-content">
+            <nav class="flex mb-6">
+                <button class="diary-sub-tab-button active text-sm font-semibold py-2 px-4 rounded-lg mr-2" data-diary-sub-tab="write">Escribir Entrada</button>
+                <button class="diary-sub-tab-button text-sm font-semibold py-2 px-4 rounded-lg" data-diary-sub-tab="view">Ver Entradas</button>
             </nav>
 
             <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
-                <form id="diaryForm" class="w-full">
-                    <div class="mb-6">
-                        <label for="diaryEntry" class="form-label mb-2">Tu Entrada de Hoy:</label>
-                        <textarea id="diaryEntry" name="diaryEntry" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
+                <form id="diaryForm" class="w-full space-y-6">
+                    <div>
+                        <label for="diaryEntry" class="block text-sm font-medium text-gray-700 mb-1">Tu Entrada de Hoy:</label>
+                        <textarea id="diaryEntry" name="diaryEntry" rows="8" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="¿Qué te ha pasado hoy?"></textarea>
                     </div>
-
-                    <div class="mb-4">
-                        <label for="photoUpload" class="form-label mb-2">Adjuntar Foto (desde tu ordenador):</label>
-                        <input type="file" id="photoUpload" name="photoUpload" accept="image/*" class="form-input rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
-                        <p class="text-sm text-gray-500 mt-1">Se subirá a tu Google Drive.</p>
+                    <div>
+                        <label for="photoUpload" class="block text-sm font-medium text-gray-700 mb-1">Adjuntar Foto (desde tu ordenador):</label>
+                        <input type="file" id="photoUpload" name="photoUpload" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
                     </div>
-
-                    <div class="mb-8">
-                        <label for="externalImageUrl" class="form-label mb-2">O pegar URL de imagen (desde otra web):</label>
-                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ejemplo.com/mi-foto.jpg">
-                        <p class="text-sm text-gray-500 mt-1">Se usará este enlace si se proporciona.</p>
+                    <div>
+                        <label for="externalImageUrl" class="block text-sm font-medium text-gray-700 mb-1">O pegar URL de una imagen externa:</label>
+                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="https://ejemplo.com/foto.jpg">
                     </div>
-
-                    <button type="submit" class="btn w-full">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 flex items-center justify-center transition-colors disabled:bg-indigo-400">
                         <span id="buttonText">Guardar Entrada</span>
-                        <div id="loadingSpinner" class="loading-spinner"></div>
+                        <div id="loadingSpinner" class="loading-spinner hidden ml-3"></div>
                     </button>
                 </form>
             </div>
 
             <div id="diaryViewSearchSection" class="diary-sub-tab-content hidden">
                 <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-                    <div>
-                        <label for="startDate" class="form-label">Desde:</label>
-                        <input type="date" id="startDate" class="form-input w-auto">
-                    </div>
-                    <div>
-                        <label for="endDate" class="form-label">Hasta:</label>
-                        <input type="date" id="endDate" class="form-input w-auto">
-                    </div>
-                    <button id="searchEntriesBtn" class="btn mt-6 sm:mt-0 px-6 py-3">Buscar</button>
+                <div class="flex flex-col sm:flex-row items-center gap-4 mb-8">
+                    <input type="date" id="startDate" class="p-2 border border-gray-300 rounded-lg">
+                    <input type="date" id="endDate" class="p-2 border border-gray-300 rounded-lg">
+                    <button id="searchEntriesBtn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700">Buscar</button>
                 </div>
-                <div id="searchResults" class="text-gray-700">
-                    <p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>
-                </div>
+                <div id="searchResults" class="text-gray-700 space-y-4"></div>
             </div>
         </div>
+        
+        <div id="mainMapsSection" class="main-tab-content hidden"><p class="text-center text-gray-500">Sección de mapas en construcción.</p></div>
+        <div id="mainTripsSection" class="main-tab-content hidden"><p class="text-center text-gray-500">Sección de viajes en construcción.</p></div>
 
-        <div id="mainMapsSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
-            <p class="text-center text-gray-600">Aquí podrás integrar tus mapas de Google Maps o uMap. ¡En construcción!</p>
-            <p class="text-center text-gray-500 mt-4">Para añadir esta funcionalidad, crearías una nueva sección aquí y la conectarías a la API de mapas.</p>
-        </div>
-
-        <div id="mainTripsSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Organizar Viajes</h2>
-            <p class="text-center text-gray-600">Planifica tus viajes, rutas y presupuestos. ¡Próximamente!</p>
-            <p class="text-center text-gray-500 mt-4">Puedes añadir formularios y listas para gestionar tus planes de viaje.</p>
-        </div>
-
-        <div id="mainMenusSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Menús de Comida</h2>
-            <p class="text-center text-gray-600">Organiza tus comidas semanales y listas de la compra. ¡Paciencia, pronto estará listo!</p>
-            <p class="text-center text-gray-500 mt-4">Aquí podrías tener un calendario, recetas y opciones de filtrado.</p>
-        </div>
-
-        <div id="mainProjectsSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gestión de Proyectos</h2>
-            <p class="text-center text-gray-600">Gestiona tus tareas, plazos y objetivos de tus proyectos personales o profesionales. ¡Trabajando en ello!</p>
-            <p class="text-center text-gray-500 mt-4">Tableros Kanban o listas de tareas serían útiles aquí.</p>
-        </div>
-
-        <div id="messageBox" class="message-box w-full mt-8"></div>
+        <div id="messageBox" class="mt-6"></div>
     </div>
 
     <script>
-        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado.
-        // Lo obtendrás al desplegar tu script de Google Apps Script.
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJwZ_oEEgJr9iVKsd46DqVvICjtjp9ti1_UcOcWjMbjeQXrBACFLKYNKhFDt3NJ2kr/exec'; 
 
-        // Elementos del DOM para la navegación principal
         const mainTabButtons = document.querySelectorAll('.main-tab-button');
-        const mainHomeSection = document.getElementById('mainHomeSection');
-        const mainDiarySection = document.getElementById('mainDiarySection');
-        const mainMapsSection = document.getElementById('mainMapsSection');
-        const mainTripsSection = document.getElementById('mainTripsSection');
-        const mainMenusSection = document.getElementById('mainMenusSection');
-        const mainProjectsSection = document.getElementById('mainProjectsSection');
-
-        // Elementos del DOM para la sub-navegación del Diario
+        const mainTabContents = document.querySelectorAll('.main-tab-content');
         const diarySubTabButtons = document.querySelectorAll('.diary-sub-tab-button');
-        const diaryWriteEntrySection = document.getElementById('diaryWriteEntrySection');
-        const diaryViewSearchSection = document.getElementById('diaryViewSearchSection');
+        const diarySubTabContents = document.querySelectorAll('.diary-sub-tab-content');
 
-        // Elementos del DOM para la lógica del Diario (existentes)
-        const latestEntryContent = document.getElementById('latestEntryContent');
-        const searchEntriesBtn = document.getElementById('searchEntriesBtn');
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const searchResultsDiv = document.getElementById('searchResults');
         const diaryForm = document.getElementById('diaryForm');
-        const diaryEntry = document.getElementById('diaryEntry');
-        const photoUpload = document.getElementById('photoUpload');
-        const externalImageUrlInput = document.getElementById('externalImageUrl'); // Nuevo input para URL externa
+        const searchEntriesBtn = document.getElementById('searchEntriesBtn');
         const messageBox = document.getElementById('messageBox');
-        const buttonText = document.getElementById('buttonText');
         const loadingSpinner = document.getElementById('loadingSpinner');
+        const buttonText = document.getElementById('buttonText');
+        const submitButton = diaryForm.querySelector('button[type="submit"]');
 
-        // --- Funciones de Utilidad ---
-
-        // Función para mostrar mensajes al usuario (éxito/error)
         function showMessage(message, type) {
-            messageBox.textContent = message;
-            messageBox.className = `message-box w-full ${type}`; // Añade la clase de tipo
-            messageBox.style.display = 'block'; // Muestra el cuadro de mensaje
+            messageBox.innerHTML = `<div class="p-4 rounded-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${message}</div>`;
         }
 
-        // Función para ocultar mensajes
-        function hideMessage() {
-            messageBox.style.display = 'none';
-            messageBox.textContent = '';
-            messageBox.className = 'message-box w-full';
-        }
-
-        // Función auxiliar para leer un archivo como Base64
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -324,320 +134,149 @@
             });
         }
 
-        // Función para resetear el estado del formulario (botón y spinner)
-        function resetFormState() {
-            buttonText.textContent = 'Guardar Entrada';
-            loadingSpinner.style.display = 'none';
-            diaryForm.querySelector('button[type="submit"]').disabled = false;
-        }
-
-        // Función para formatear la fecha para mostrar
         function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            try {
-                return new Date(dateString).toLocaleDateString('es-ES', options);
-            } catch (e) {
-                return dateString; // En caso de error, devuelve la cadena original
-            }
+            return new Date(dateString).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' });
         }
 
-        // Función para convertir URL de Google Drive a formato directo
-        function convertDriveUrlToDirectUrl(driveUrl) {
-            if (!driveUrl || typeof driveUrl !== 'string') {
-                return driveUrl;
-            }
-            
-            // Buscar el patrón de URL de Google Drive
-            const fileIdMatch = driveUrl.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
-            
-            if (fileIdMatch && fileIdMatch[1]) {
-                const fileId = fileIdMatch[1];
-                return `https://drive.google.com/uc?export=view&id=${fileId}`;
-            }
-            
-            // Si no es una URL de Drive o no se puede convertir, devolver la original
-            return driveUrl;
-        }
-        
-
-        // Modificar la función renderEntry existente
         function renderEntry(entry, containerElement) {
             const entryCard = document.createElement('div');
-            entryCard.className = 'entry-card';
+            entryCard.className = 'entry-card bg-gray-50 p-4 rounded-lg border';
         
-            const datePara = document.createElement('p');
-            datePara.className = 'text-sm text-gray-500 mb-2';
-            datePara.textContent = `Fecha: ${formatDate(entry.timestamp)}`;
-            entryCard.appendChild(datePara);
+            entryCard.innerHTML = `
+                <p class="text-sm text-gray-500 mb-2">${formatDate(entry.timestamp)}</p>
+                <p class="text-base text-gray-800 whitespace-pre-wrap">${entry.diaryEntry || ''}</p>
+            `;
         
-            const textPara = document.createElement('p');
-            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap';
-            textPara.textContent = entry.diaryEntry || entry.text; // Manejar diferentes nombres de campo
-            entryCard.appendChild(textPara);
-        
-            // Verifica si la URL de la foto es válida y no es un mensaje de error
             if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
                 const img = document.createElement('img');
-                
-                // *** CAMBIO: Convertir URL de Drive si es necesario ***
-                img.src = convertDriveUrlToDirectUrl(entry.photoUrl);
-                
+                // Directamente usamos la URL que nos da el backend. ¡Sin conversiones!
+                img.src = entry.photoUrl; 
                 img.alt = 'Foto de la entrada del diario';
-                img.className = 'mt-4 rounded-lg shadow-md max-w-full h-auto';
-                
-                // Añadir un manejador de error para la imagen
                 img.onerror = function() {
-                    this.onerror = null; // Evita bucle infinito
-                    this.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
-                    this.alt = 'Imagen no disponible';
-                    console.error('Error al cargar la imagen de la URL:', entry.photoUrl);
+                    this.onerror = null; 
+                    this.src = 'https://placehold.co/600x400/e0e0e0/ffffff?text=Imagen+no+disponible';
+                    this.alt = 'La URL de la imagen no es válida o no se pudo cargar';
+                    console.error('Error al cargar la imagen desde la URL:', entry.photoUrl);
                 };
-                
                 entryCard.appendChild(img);
             } else if (entry.photoUrl && entry.photoUrl.startsWith('Error')) {
                 const errorPara = document.createElement('p');
-                errorPara.className = 'text-sm text-red-500 mt-2';
-                errorPara.textContent = `Error con la foto: ${entry.photoUrl.substring(entry.photoUrl.indexOf(':') + 1)}`;
+                errorPara.className = 'text-sm text-red-600 mt-2';
+                errorPara.textContent = `Error con la foto: ${entry.photoUrl}`;
                 entryCard.appendChild(errorPara);
             }
-        
             containerElement.appendChild(entryCard);
         }
-        // --- Funciones de Navegación Principal ---
 
-        // Función para mostrar la pestaña principal seleccionada
-        function showMainTab(tabName) {
-            // Oculta todas las secciones principales
-            mainHomeSection.classList.add('hidden');
-            mainDiarySection.classList.add('hidden');
-            mainMapsSection.classList.add('hidden');
-            mainTripsSection.classList.add('hidden');
-            mainMenusSection.classList.add('hidden');
-            mainProjectsSection.classList.add('hidden');
-
-            // Desactiva todos los botones de pestaña principal
-            mainTabButtons.forEach(button => button.classList.remove('active'));
-
-            // Muestra la sección y activa el botón de la pestaña correspondiente
-            if (tabName === 'home') {
-                mainHomeSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="home"]').classList.add('active');
-                loadLatestEntry(); // Carga la última entrada del diario al ir a Inicio
-            } else if (tabName === 'diary') {
-                mainDiarySection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="diary"]').classList.add('active');
-                showDiarySubTab('write'); // Muestra la sub-pestaña de escritura del diario por defecto
-            } else if (tabName === 'maps') {
-                mainMapsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="maps"]').classList.add('active');
-            } else if (tabName === 'trips') {
-                mainTripsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="trips"]').classList.add('active');
-            } else if (tabName === 'menus') {
-                mainMenusSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="menus"]').classList.add('active');
-            } else if (tabName === 'projects') {
-                mainProjectsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="projects"]').classList.add('active');
-            }
-            hideMessage(); // Oculta mensajes al cambiar de pestaña principal
-        }
-
-        // Event listeners para los botones de las pestañas principales
         mainTabButtons.forEach(button => {
             button.addEventListener('click', () => {
-                showMainTab(button.dataset.mainTab);
+                mainTabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                mainTabContents.forEach(content => content.classList.add('hidden'));
+                const tabId = button.dataset.mainTab;
+                document.getElementById(`main${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Section`).classList.remove('hidden');
+                if (tabId === 'home') loadLatestEntry();
             });
         });
 
-        // --- Funciones de Sub-navegación del Diario ---
-
-        // Función para mostrar la sub-pestaña del diario seleccionada
-        function showDiarySubTab(subTabName) {
-            // Oculta todas las sub-secciones del diario
-            diaryWriteEntrySection.classList.add('hidden');
-            diaryViewSearchSection.classList.add('hidden');
-
-            // Desactiva todos los botones de sub-pestaña del diario
-            diarySubTabButtons.forEach(button => button.classList.remove('active'));
-
-            // Muestra la sub-sección y activa el botón de la sub-pestaña correspondiente
-            if (subTabName === 'write') {
-                diaryWriteEntrySection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
-            } else if (subTabName === 'view') {
-                diaryViewSearchSection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
-                // Limpia resultados de búsqueda anteriores
-                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
-            }
-            hideMessage(); // Oculta mensajes al cambiar de sub-pestaña
-        }
-
-        // Event listeners para los botones de las sub-pestañas del diario
         diarySubTabButtons.forEach(button => {
             button.addEventListener('click', () => {
-                showDiarySubTab(button.dataset.diarySubTab);
+                diarySubTabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                diarySubTabContents.forEach(content => content.classList.add('hidden'));
+                const subTabId = button.dataset.diarySubTab;
+                document.getElementById(`diary${subTabId.charAt(0).toUpperCase() + subTabId.slice(1)}Section`).classList.remove('hidden');
             });
         });
-
-        // --- Lógica para la Sección de Inicio (Última Entrada) y Diario (Escritura/Búsqueda) ---
-
+        
         async function loadLatestEntry() {
-            latestEntryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última entrada del diario...</p>';
+            const container = document.getElementById('latestEntryContent');
+            container.innerHTML = `<p class="text-center text-gray-500">Cargando...</p>`;
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getLatest`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
                 const result = await response.json();
-
+                container.innerHTML = '';
                 if (result.status === 'success' && result.entry) {
-                    latestEntryContent.innerHTML = ''; // Limpia el mensaje de carga
-                    renderEntry(result.entry, latestEntryContent);
+                    renderEntry(result.entry, container);
                 } else {
-                    latestEntryContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas para mostrar.'}</p>`;
+                    container.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas.'}</p>`;
                 }
             } catch (error) {
-                console.error('Error al cargar la última entrada:', error);
-                latestEntryContent.innerHTML = '<p class="text-center text-red-500">Error al cargar la última entrada.</p>';
+                container.innerHTML = '<p class="text-center text-red-500">Error al cargar la última entrada.</p>';
             }
         }
-
+        
         diaryForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Previene el envío por defecto del formulario
-
-            hideMessage(); // Oculta mensajes anteriores
+            e.preventDefault();
+            messageBox.innerHTML = '';
+            loadingSpinner.classList.remove('hidden');
             buttonText.textContent = 'Guardando...';
-            loadingSpinner.style.display = 'block'; // Muestra el spinner de carga
-            diaryForm.querySelector('button[type="submit"]').disabled = true; // Deshabilita el botón
+            submitButton.disabled = true;
 
-            const entryText = diaryEntry.value;
-            const externalImageUrl = externalImageUrlInput.value.trim(); // Obtener el URL externo
-            let imageData = null;
-            let imageName = '';
-
-            // Validación mínima
-            if (!entryText.trim()) {
-                showMessage('Por favor, escribe algo en tu entrada del diario.', 'error');
-                resetFormState();
-                return;
-            }
-
-            // Validar que no se usen ambos métodos de imagen o ninguno
-            if (photoUpload.files.length > 0 && externalImageUrl !== '') {
-                showMessage('Por favor, elige SOLO UNA opción para la imagen: o subir un archivo O pegar una URL.', 'error');
-                resetFormState();
-                return;
-            }
-
-            if (photoUpload.files.length === 0 && externalImageUrl === '') {
-                 // No hay imagen seleccionada ni URL, no hay problema, se guardará sin foto.
-            } else if (photoUpload.files.length > 0) { // Se sube archivo a Drive
-                const file = photoUpload.files[0];
-                // Límite de tamaño de archivo (ej. 5MB)
-                const MAX_FILE_SIZE = 5 * 1024 * 1024; 
-                if (file.size > MAX_FILE_SIZE) {
-                    showMessage('La imagen es demasiado grande (máximo 5MB).', 'error');
-                    resetFormState();
-                    return;
-                }
-                imageName = file.name;
-                try {
-                    imageData = await readFileAsBase64(file);
-                } catch (error) {
-                    showMessage('Error al leer la imagen. Inténtalo de nuevo.', 'error');
-                    resetFormState();
-                    return;
-                }
-            } else if (externalImageUrl !== '') { // Se usa URL externa
-                // No se necesita procesar la imagen aquí, solo enviar el URL
-                // Opcional: Podrías validar el formato del URL si lo deseas.
-            }
-
-
-            // Datos a enviar a Google Apps Script
             const formData = new FormData();
-            formData.append('diaryEntry', entryText);
-            
-            if (externalImageUrl !== '') {
-                formData.append('externalImageUrl', externalImageUrl);
-            } else if (imageData) {
-                formData.append('imageData', imageData);
-                formData.append('imageName', imageName);
+            formData.append('diaryEntry', document.getElementById('diaryEntry').value);
+            formData.append('externalImageUrl', document.getElementById('externalImageUrl').value);
+
+            const photoFile = document.getElementById('photoUpload').files[0];
+            if (photoFile) {
+                try {
+                    const imageData = await readFileAsBase64(photoFile);
+                    formData.append('imageData', imageData);
+                    formData.append('imageName', photoFile.name);
+                } catch (error) {
+                    showMessage('Error al leer el archivo de imagen.', 'error');
+                    return;
+                }
             }
 
             try {
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData,
-                    // No es necesario establecer 'Content-Type' para FormData, el navegador lo hace automáticamente
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, { method: 'POST', body: formData });
                 const result = await response.json();
-
                 if (result.status === 'success') {
                     showMessage('¡Entrada guardada con éxito!', 'success');
-                    diaryEntry.value = ''; // Limpia el campo de texto
-                    photoUpload.value = ''; // Limpia la selección de archivo
-                    externalImageUrlInput.value = ''; // Limpia el URL externo
+                    diaryForm.reset();
                 } else {
-                    showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
+                    showMessage(`Error: ${result.message}`, 'error');
                 }
             } catch (error) {
-                console.error('Error al enviar la entrada:', error);
-                showMessage('Ha ocurrido un error al conectar con el servidor. Inténtalo de nuevo más tarde.', 'error');
+                showMessage('Error de conexión con el servidor.', 'error');
             } finally {
-                resetFormState();
+                loadingSpinner.classList.add('hidden');
+                buttonText.textContent = 'Guardar Entrada';
+                submitButton.disabled = false;
             }
         });
 
         searchEntriesBtn.addEventListener('click', async () => {
-            const startDate = startDateInput.value;
-            const endDate = endDateInput.value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const resultsDiv = document.getElementById('searchResults');
 
             if (!startDate || !endDate) {
-                showMessage('Por favor, selecciona tanto la fecha de inicio como la de fin para buscar.', 'error');
+                showMessage('Por favor, selecciona un rango de fechas.', 'error');
                 return;
             }
-
-            if (new Date(startDate) > new Date(endDate)) {
-                showMessage('La fecha de inicio no puede ser posterior a la fecha de fin.', 'error');
-                return;
-            }
-
-            searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando entradas...</p>';
-            hideMessage();
-
+            resultsDiv.innerHTML = `<p class="text-center text-gray-500">Buscando...</p>`;
+            
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getEntriesByDate&startDate=${startDate}&endDate=${endDate}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
                 const result = await response.json();
-
-                if (result.status === 'success' && result.entries && result.entries.length > 0) {
-                    searchResultsDiv.innerHTML = ''; // Limpia el mensaje de carga
-                    result.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Ordenar por fecha descendente
-                    result.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
+                resultsDiv.innerHTML = '';
+                if (result.status === 'success' && result.entries.length > 0) {
+                    result.entries
+                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                        .forEach(entry => renderEntry(entry, resultsDiv));
                 } else {
-                    searchResultsDiv.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No se encontraron entradas para el rango de fechas seleccionado.'}</p>`;
+                    resultsDiv.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No se encontraron entradas.'}</p>`;
                 }
             } catch (error) {
-                console.error('Error al buscar entradas:', error);
-                searchResultsDiv.innerHTML = '<p class="text-center text-red-500">Error al buscar entradas. Inténtalo de nuevo.</p>';
+                resultsDiv.innerHTML = '<p class="text-center text-red-500">Error al realizar la búsqueda.</p>';
             }
         });
 
-        // --- Inicialización ---
-        // Muestra la pestaña de inicio al cargar la página por primera vez
-        document.addEventListener('DOMContentLoaded', () => {
-            showMainTab('home');
-        });
+        // Init
+        document.querySelector('[data-main-tab="home"]').click();
+
     </script>
 </body>
 </html>
