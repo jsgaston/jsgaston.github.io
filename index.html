@@ -610,6 +610,36 @@
             });
         });
 
+        
+        // --- Funciones de Sub-navegación del Diario ---
+
+        function showDiarySubTab(subTabName) {
+            // Ocultar todas las sub-secciones
+            diaryWriteEntrySection.classList.add('hidden');
+            diaryViewSearchSection.classList.add('hidden');
+
+            // Desactivar todos los botones de sub-pestaña
+            diarySubTabButtons.forEach(button => button.classList.remove('active'));
+
+            // Mostrar la sub-sección correspondiente
+            if (subTabName === 'write') {
+                diaryWriteEntrySection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
+            } else if (subTabName === 'view') {
+                diaryViewSearchSection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
+            }
+            hideMessage();
+        }
+
+        // Event listeners para los botones de las sub-pestañas del diario
+        diarySubTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showDiarySubTab(button.dataset.diarySubTab);
+            });
+        });
+
         // --- Funciones del Diario ---
 
         async function loadLatestEntry() {
