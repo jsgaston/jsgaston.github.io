@@ -61,24 +61,13 @@
 const GOOGLE_APPS_SCRIPT_DIARY_URL = 'https://script.google.com/macros/s/AKfycbx9q2YQCd2gYPfwoRayeO53O7DGrsUjSoiA3STD5xUVhAbh1ioDR5W0bcoCA9KecLLc/exec';
 const GOOGLE_APPS_SCRIPT_WEB_DATA_URL = 'https://script.google.com/macros/s/AKfycbw1fN6Voc3yoCAh388Lgh-9bvmzbjTsv6c42nvZ0VNrxb3Cf5O_9v_DN61JLIoOiv-l/exec';
 
-// Navegación de pestañas
-const tabButtons = document.querySelectorAll('.main-tab-button');
-const sections = {
-  home: document.getElementById('mainHomeSection'),
-  diary: document.getElementById('mainDiarySection'),
-  maps: document.getElementById('mainMapsSection')
-};
-
 function showMainTab(tab) {
-  tabButtons.forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.main-tab-button').forEach(btn => btn.classList.remove('active'));
   document.querySelector(`[data-main-tab="${tab}"]`).classList.add('active');
-  Object.values(sections).forEach(sec => sec.classList.add('hidden'));
-  sections[tab].classList.remove('hidden');
+  document.querySelectorAll('.main-tab-content').forEach(section => section.classList.add('hidden'));
+  document.getElementById(`main${tab.charAt(0).toUpperCase() + tab.slice(1)}Section`).classList.remove('hidden');
 }
 
-tabButtons.forEach(btn => btn.addEventListener('click', () => showMainTab(btn.dataset.mainTab)));
-
-// Cargar última entrada
 async function loadLatestEntry() {
   const res = await fetch(`${GOOGLE_APPS_SCRIPT_DIARY_URL}?action=getLatest`);
   const json = await res.json();
@@ -90,7 +79,6 @@ async function loadLatestEntry() {
   }
 }
 
-// Guardar entrada
 const form = document.getElementById('diaryForm');
 form.addEventListener('submit', async e => {
   e.preventDefault();
@@ -129,7 +117,6 @@ async function sendEntry(data) {
   }
 }
 
-// Cargar mapa y datos
 let map = L.map('mapid').setView([0, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap'
@@ -155,9 +142,11 @@ async function loadBiometricData() {
   });
 }
 
-loadLatestEntry();
-loadBiometricData();
+document.addEventListener('DOMContentLoaded', () => {
+  showMainTab('home');
+  loadLatestEntry();
+  loadBiometricData();
+});
 </script>
 </body>
 </html>
-
