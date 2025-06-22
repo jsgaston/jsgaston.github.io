@@ -771,6 +771,17 @@
 
             const entryText = text.value;
             const externalImageUrl = externalImageUrlInput.value.trim();
+
+            const title = document.getElementById('title').value.trim();
+            if (!title) {
+                showMessage('Por favor, pon un título a tu entrada.', 'error');
+                resetFormState();
+                return;
+            }
+            formData.append('title', title);  // ← ¡Esto FALTABA!
+
+
+            
             let imageData = null;
             let imageName = '';
 
