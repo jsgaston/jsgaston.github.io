@@ -886,7 +886,8 @@
             Temperature < 35.0 || Temperature > 37.5 ? "⚠️" : "";
     
           const fila = `<tr>
-            <td class="px-4 py-1">${new Date(Timestamp).toLocaleString()}</td>
+            <td class="px-4 py-1">${new Date(Timestamp).toLocaleDateString()}</td>
+            <td class="px-4 py-1">${new Date(Timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</td>
             <td class="px-4 py-1">${lat.toFixed(4)}</td>
             <td class="px-4 py-1">${lon.toFixed(4)}</td>
             <td class="px-4 py-1">${Pulse}</td>
