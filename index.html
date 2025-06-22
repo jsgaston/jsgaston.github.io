@@ -315,6 +315,7 @@
               </div>
             
               <div id="mapid" style="height: 500px;" class="mb-6 rounded-xl shadow-md"></div>
+
             
               <h3 class="text-xl font-semibold text-gray-700 mb-2">Datos Recopilados</h3>
               <div class="overflow-auto max-h-[400px] border rounded-lg shadow">
@@ -623,14 +624,12 @@
             } else if (tabName === 'maps') {
                 mainMapsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="maps"]').classList.add('active');
+            
                 setTimeout(() => {
-                    if (mapa) {
-                        mapa.invalidateSize(); // Corrige tamaño del mapa si se hace visible ahora
-                    } else {
-                        iniciarMapa(); // Lo inicializa si no lo está
-                    }
-                }, 200);
+                    if (!mapa) iniciarMapa(); else mapa.invalidateSize();
+                }, 300);
             }
+
 
             } else if (tabName === 'trips') {
                 mainTripsSection.classList.remove('hidden');
@@ -921,7 +920,7 @@
           // Este ejemplo asume carga completa; luego puedes filtrar client-side
         }
         
-        document.addEventListener("DOMContentLoaded", iniciarMapa);
+  
     </script>
 
 </body>
