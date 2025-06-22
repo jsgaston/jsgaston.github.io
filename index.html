@@ -1,152 +1,609 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Diario Personal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    #mapid {
-      height: 500px;
-      width: 100%;
-    }
-    .hidden { display: none; }
-    .entry-card img:hover {
-      transform: scale(1.02);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Diario Personal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fuente Inter para un aspecto moderno y limpio */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Un gris claro para el fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
+            width: 100%;
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #374151;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #1f2937;
+            background-color: #f9fafb;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6; /* Un azul bonito al enfocar */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .btn {
+            background-color: #4f46e5; /* Morado intenso */
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #4338ca; /* Morado más oscuro al pasar el ratón */
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .message-box {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none; /* Oculto por defecto */
+        }
+        .message-box.success {
+            background-color: #d1fae5; /* Verde claro */
+            color: #065f46; /* Verde oscuro */
+            border: 1px solid #10b981;
+        }
+        .message-box.error {
+            background-color: #fee2e2; /* Rojo claro */
+            color: #991b1b; /* Rojo oscuro */
+            border: 1px solid #ef4444;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none; /* Oculto por defecto */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Estilos para las pestañas de navegación principal */
+        .main-tab-button {
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #e5e7eb; /* Gris claro */
+            color: #4b5563;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap; /* Evita que el texto se rompa */
+        }
+        .main-tab-button.active {
+            background-color: #ffffff;
+            color: #4f46e5; /* Morado */
+            box-shadow: 0 -2px 0 0 #4f46e5 inset; /* Subrayado morado */
+        }
+        .main-tab-content {
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* Estilos para las sub-pestañas del diario */
+        .diary-sub-tab-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            transition: background-color 0.2s, color 0.2s;
+            margin-right: 8px; /* Espacio entre botones */
+        }
+        .diary-sub-tab-button.active {
+            background-color: #e0e7ff; /* Azul claro */
+            color: #4f46e5; /* Morado */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .diary-sub-tab-content {
+            padding-top: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .entry-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .entry-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-top: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-5 flex justify-center items-center">
-<div class="container bg-white p-6 rounded-xl shadow-xl w-full max-w-screen-xl">
-  <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">Mi Diario Personal</h1>
+<body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
+    <div class="container rounded-xl shadow-xl flex flex-col">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
 
-  <nav class="flex border-b border-gray-300 mb-4">
-    <button class="main-tab-button active" data-main-tab="home">Inicio</button>
-    <button class="main-tab-button" data-main-tab="diary">Diario</button>
-    <button class="main-tab-button" data-main-tab="maps">Mapas</button>
-  </nav>
+        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
+            <button class="main-tab-button active" data-main-tab="home">Inicio</button>
+            <button class="main-tab-button" data-main-tab="diary">Diario</button>
+            <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
+            <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
+            <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
+            <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+        </nav>
 
-  <div id="mainHomeSection" class="main-tab-content">
-    <p class="text-center text-gray-700 mb-4">Bienvenido. Explora tus datos personales.</p>
-    <div id="latestEntryContent">Cargando...</div>
-  </div>
+        <div id="mainHomeSection" class="main-tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a tu página Personal</h2>
+            <p class="text-center text-gray-600 mb-8">Aquí puedes organizar tu vida digital. Explora las pestañas de arriba.</p>
+            
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Entrada del Diario:</h3>
+            <div id="latestEntryContent" class="text-gray-700">
+                <p class="text-center text-gray-500">Cargando última entrada del diario...</p>
+            </div>
+            <div class="flex justify-center mt-8">
+                <button onclick="showMainTab('diary'); showDiarySubTab('write')" class="btn py-3 px-6 rounded-lg text-lg">
+                    <span>Ir al Diario</span>
+                </button>
+            </div>
+        </div>
 
-  <div id="mainDiarySection" class="main-tab-content hidden">
-    <form id="diaryForm">
-      <textarea id="text" class="form-textarea w-full p-3 border rounded mb-4" placeholder="Escribe tu entrada..."></textarea>
-      <input type="file" id="photoUpload" accept="image/*" class="mb-4">
-      <input type="url" id="externalImageUrl" placeholder="URL de imagen" class="form-input w-full p-3 border rounded mb-4">
-      <button type="submit" class="btn bg-indigo-600 text-white px-4 py-2 rounded">Guardar Entrada</button>
-    </form>
-  </div>
+        <div id="mainDiarySection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Diario Digital</h2>
+            
+            <nav class="flex border-b border-gray-200 mb-6">
+                <button class="diary-sub-tab-button active" data-diary-sub-tab="write">Escribir Entrada</button>
+                <button class="diary-sub-tab-button" data-diary-sub-tab="view">Ver/Buscar Entradas</button>
+            </nav>
 
-  <div id="mainMapsSection" class="main-tab-content hidden">
-    <div id="mapid" class="rounded shadow mb-4"></div>
-    <table class="table-auto w-full text-left text-sm">
-      <thead><tr><th>Fecha</th><th>Lat</th><th>Lng</th><th>Pulso</th><th>SpO2</th><th>Pasos</th><th>Temp.</th></tr></thead>
-      <tbody id="dataMapTableBody"></tbody>
-    </table>
-  </div>
+            <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
+                <form id="diaryForm" class="w-full">
+                    <div class="mb-6">
+                        <label for="text" class="form-label mb-2">Tu Entrada de Hoy:</label>
+                        <textarea id="text" name="text" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
+                    </div>
 
-  <div id="messageBox" class="mt-6 text-center text-sm"></div>
-</div>
+                    <div class="mb-4">
+                        <label for="photoUpload" class="form-label mb-2">Adjuntar Foto (desde tu ordenador):</label>
+                        <input type="file" id="photoUpload" name="photoUpload" accept="image/*" class="form-input rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                        <p class="text-sm text-gray-500 mt-1">Se subirá a tu Google Drive.</p>
+                    </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const GOOGLE_APPS_SCRIPT_DIARY_URL = 'https://script.google.com/macros/s/AKfycbx9q2YQCd2gYPfwoRayeO53O7DGrsUjSoiA3STD5xUVhAbh1ioDR5W0bcoCA9KecLLc/exec';
-const GOOGLE_APPS_SCRIPT_WEB_DATA_URL = 'https://script.google.com/macros/s/AKfycbw1fN6Voc3yoCAh388Lgh-9bvmzbjTsv6c42nvZ0VNrxb3Cf5O_9v_DN61JLIoOiv-l/exec';
+                    <div class="mb-8">
+                        <label for="externalImageUrl" class="form-label mb-2">O pegar URL de imagen (desde otra web por ejemplo: https://es.imgbb.com/):</label>
+                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ejemplo.com/mi-foto.jpg">
+                        <p class="text-sm text-gray-500 mt-1">Se usará este enlace si se proporciona.</p>
+                    </div>
 
-function showMainTab(tab) {
-  document.querySelectorAll('.main-tab-button').forEach(btn => btn.classList.remove('active'));
-  document.querySelector(`[data-main-tab="${tab}"]`).classList.add('active');
-  document.querySelectorAll('.main-tab-content').forEach(section => section.classList.add('hidden'));
-  document.getElementById(`main${tab.charAt(0).toUpperCase() + tab.slice(1)}Section`).classList.remove('hidden');
-}
+                    <button type="submit" class="btn w-full">
+                        <span id="buttonText">Guardar Entrada</span>
+                        <div id="loadingSpinner" class="loading-spinner"></div>
+                    </button>
+                </form>
+            </div>
 
-async function loadLatestEntry() {
-  const res = await fetch(`${GOOGLE_APPS_SCRIPT_DIARY_URL}?action=getLatest`);
-  const json = await res.json();
-  const div = document.getElementById('latestEntryContent');
-  if (json.status === 'success' && json.entry) {
-    div.innerHTML = `<p><strong>${json.entry.timestamp}</strong><br>${json.entry.text}</p><img src="${json.entry.photoUrl}" class="mt-4 rounded">`;
-  } else {
-    div.textContent = json.message || 'No se pudo cargar.';
-  }
-}
+            <div id="diaryViewSearchSection" class="diary-sub-tab-content hidden">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                    <div>
+                        <label for="startDate" class="form-label">Desde:</label>
+                        <input type="date" id="startDate" class="form-input w-auto">
+                    </div>
+                    <div>
+                        <label for="endDate" class="form-label">Hasta:</label>
+                        <input type="date" id="endDate" class="form-input w-auto">
+                    </div>
+                    <button id="searchEntriesBtn" class="btn mt-6 sm:mt-0 px-6 py-3">Buscar</button>
+                </div>
+                <div id="searchResults" class="text-gray-700">
+                    <p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>
+                </div>
+            </div>
+        </div>
 
-const form = document.getElementById('diaryForm');
-form.addEventListener('submit', async e => {
-  e.preventDefault();
-  const text = document.getElementById('text').value;
-  const externalUrl = document.getElementById('externalImageUrl').value;
-  const file = document.getElementById('photoUpload').files[0];
+        <div id="mainMapsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
+            <p class="text-center text-gray-600">Aquí podrás integrar tus mapas de Google Maps o uMap. ¡En construcción!</p>
+            <p class="text-center text-gray-500 mt-4">Para añadir esta funcionalidad, crearías una nueva sección aquí y la conectarías a la API de mapas.</p>
+        </div>
 
-  const formData = new FormData();
-  formData.append('diaryEntry', text);
-  if (externalUrl) formData.append('externalImageUrl', externalUrl);
+        <div id="mainTripsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Organizar Viajes</h2>
+            <p class="text-center text-gray-600">Planifica tus viajes, rutas y presupuestos. ¡Próximamente!</p>
+            <p class="text-center text-gray-500 mt-4">Puedes añadir formularios y listas para gestionar tus planes de viaje.</p>
+        </div>
 
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = async function(evt) {
-      formData.append('imageData', evt.target.result);
-      formData.append('imageName', file.name);
-      sendEntry(formData);
-    }
-    reader.readAsDataURL(file);
-  } else {
-    sendEntry(formData);
-  }
-});
+        <div id="mainMenusSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Menús de Comida</h2>
+            <p class="text-center text-gray-600">Organiza tus comidas semanales y listas de la compra. ¡Paciencia, pronto estará listo!</p>
+            <p class="text-center text-gray-500 mt-4">Aquí podrías tener un calendario, recetas y opciones de filtrado.</p>
+        </div>
 
-async function sendEntry(data) {
-  const msg = document.getElementById('messageBox');
-  try {
-    const res = await fetch(GOOGLE_APPS_SCRIPT_DIARY_URL, { method: 'POST', body: data });
-    const json = await res.json();
-    msg.textContent = json.message;
-    msg.className = json.status === 'success' ? 'text-green-600' : 'text-red-600';
-    loadLatestEntry();
-  } catch (err) {
-    msg.textContent = 'Error al guardar entrada.';
-    msg.className = 'text-red-600';
-  }
-}
+        <div id="mainProjectsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gestión de Proyectos</h2>
+            <p class="text-center text-gray-600">Gestiona tus tareas, plazos y objetivos de tus proyectos personales o profesionales. ¡Trabajando en ello!</p>
+            <p class="text-center text-gray-500 mt-4">Tableros Kanban o listas de tareas serían útiles aquí.</p>
+        </div>
 
-let map = L.map('mapid').setView([0, 0], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap'
-}).addTo(map);
-let markerGroup = L.layerGroup().addTo(map);
+        <div id="messageBox" class="message-box w-full mt-8"></div>
+    </div>
 
-async function loadBiometricData() {
-  const res = await fetch(GOOGLE_APPS_SCRIPT_WEB_DATA_URL);
-  const data = await res.json();
+    <script>
+        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado.
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9q2YQCd2gYPfwoRayeO53O7DGrsUjSoiA3STD5xUVhAbh1ioDR5W0bcoCA9KecLLc/exec'; 
 
-  if (!Array.isArray(data)) return;
-  markerGroup.clearLayers();
-  const table = document.getElementById('dataMapTableBody');
-  table.innerHTML = '';
+        // Elementos del DOM para la navegación principal
+        const mainTabButtons = document.querySelectorAll('.main-tab-button');
+        const mainHomeSection = document.getElementById('mainHomeSection');
+        const mainDiarySection = document.getElementById('mainDiarySection');
+        const mainMapsSection = document.getElementById('mainMapsSection');
+        const mainTripsSection = document.getElementById('mainTripsSection');
+        const mainMenusSection = document.getElementById('mainMenusSection');
+        const mainProjectsSection = document.getElementById('mainProjectsSection');
 
-  data.forEach(row => {
-    const { Timestamp, Latitude, Longitude, Pulse, SpO2, Steps, Temperature } = row;
-    if (!Latitude || !Longitude) return;
-    L.marker([Latitude, Longitude]).addTo(markerGroup)
-      .bindPopup(`<b>${Timestamp}</b><br>Pulso: ${Pulse}<br>SpO2: ${SpO2}`);
-    const tr = `<tr><td>${Timestamp}</td><td>${Latitude}</td><td>${Longitude}</td><td>${Pulse}</td><td>${SpO2}</td><td>${Steps}</td><td>${Temperature}</td></tr>`;
-    table.insertAdjacentHTML('beforeend', tr);
-  });
-}
+        // Elementos del DOM para la sub-navegación del Diario
+        const diarySubTabButtons = document.querySelectorAll('.diary-sub-tab-button');
+        const diaryWriteEntrySection = document.getElementById('diaryWriteEntrySection');
+        const diaryViewSearchSection = document.getElementById('diaryViewSearchSection');
 
-document.addEventListener('DOMContentLoaded', () => {
-  showMainTab('home');
-  loadLatestEntry();
-  loadBiometricData();
-});
-</script>
+        // Elementos del DOM para la lógica del Diario
+        const latestEntryContent = document.getElementById('latestEntryContent');
+        const searchEntriesBtn = document.getElementById('searchEntriesBtn');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const searchResultsDiv = document.getElementById('searchResults');
+        const diaryForm = document.getElementById('diaryForm');
+        const text = document.getElementById('text');
+        const photoUpload = document.getElementById('photoUpload');
+        const externalImageUrlInput = document.getElementById('externalImageUrl');
+        const messageBox = document.getElementById('messageBox');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // --- Funciones de Utilidad ---
+
+        // Función para mostrar mensajes al usuario (éxito/error)
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box w-full ${type}`;
+            messageBox.style.display = 'block';
+        }
+
+        // Función para ocultar mensajes
+        function hideMessage() {
+            messageBox.style.display = 'none';
+            messageBox.textContent = '';
+            messageBox.className = 'message-box w-full';
+        }
+
+        // Función auxiliar para leer un archivo como Base64
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Función para resetear el estado del formulario
+        function resetFormState() {
+            buttonText.textContent = 'Guardar Entrada';
+            loadingSpinner.style.display = 'none';
+            diaryForm.querySelector('button[type="submit"]').disabled = false;
+        }
+
+        // Función para formatear la fecha
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            try {
+                return new Date(dateString).toLocaleDateString('es-ES', options);
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Función para renderizar una entrada de diario
+        function renderEntry(entry, containerElement) {
+            const entryCard = document.createElement('div');
+            entryCard.className = 'entry-card';
+
+            const datePara = document.createElement('p');
+            datePara.className = 'text-sm text-gray-500 mb-2';
+            datePara.textContent = `Fecha: ${formatDate(entry.timestamp)}`;
+            entryCard.appendChild(datePara);
+
+            const textPara = document.createElement('p');
+            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap';
+            textPara.textContent = entry.text;
+            entryCard.appendChild(textPara);
+
+            // Verificar si hay una URL de foto válida
+            if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
+                const img = document.createElement('img');
+                img.src = entry.photoUrl;
+                img.alt = 'Foto de la entrada del diario';
+                img.className = 'mt-4 rounded-lg shadow-md';
+                img.onerror = function() {
+                    this.onerror = null;
+                    this.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
+                    this.alt = 'Imagen no disponible';
+                };
+                entryCard.appendChild(img);
+            } else if (entry.photoUrl && entry.photoUrl.startsWith('Error')) {
+                const errorPara = document.createElement('p');
+                errorPara.className = 'text-sm text-red-500 mt-2';
+                errorPara.textContent = `Error con la foto: ${entry.photoUrl}`;
+                entryCard.appendChild(errorPara);
+            }
+
+            containerElement.appendChild(entryCard);
+        }
+
+        // --- Funciones de Navegación Principal ---
+
+        function showMainTab(tabName) {
+            // Ocultar todas las secciones
+            mainHomeSection.classList.add('hidden');
+            mainDiarySection.classList.add('hidden');
+            mainMapsSection.classList.add('hidden');
+            mainTripsSection.classList.add('hidden');
+            mainMenusSection.classList.add('hidden');
+            mainProjectsSection.classList.add('hidden');
+
+            // Desactivar todos los botones
+            mainTabButtons.forEach(button => button.classList.remove('active'));
+
+            // Mostrar la sección correspondiente
+            if (tabName === 'home') {
+                mainHomeSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="home"]').classList.add('active');
+                loadLatestEntry();
+            } else if (tabName === 'diary') {
+                mainDiarySection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="diary"]').classList.add('active');
+                showDiarySubTab('write');
+            } else if (tabName === 'maps') {
+                mainMapsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="maps"]').classList.add('active');
+            } else if (tabName === 'trips') {
+                mainTripsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="trips"]').classList.add('active');
+            } else if (tabName === 'menus') {
+                mainMenusSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="menus"]').classList.add('active');
+            } else if (tabName === 'projects') {
+                mainProjectsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="projects"]').classList.add('active');
+            }
+            hideMessage();
+        }
+
+        // Event listeners para los botones de las pestañas principales
+        mainTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showMainTab(button.dataset.mainTab);
+            });
+        });
+
+        // --- Funciones de Sub-navegación del Diario ---
+
+        function showDiarySubTab(subTabName) {
+            // Ocultar todas las sub-secciones
+            diaryWriteEntrySection.classList.add('hidden');
+            diaryViewSearchSection.classList.add('hidden');
+
+            // Desactivar todos los botones de sub-pestaña
+            diarySubTabButtons.forEach(button => button.classList.remove('active'));
+
+            // Mostrar la sub-sección correspondiente
+            if (subTabName === 'write') {
+                diaryWriteEntrySection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
+            } else if (subTabName === 'view') {
+                diaryViewSearchSection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
+            }
+            hideMessage();
+        }
+
+        // Event listeners para los botones de las sub-pestañas del diario
+        diarySubTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showDiarySubTab(button.dataset.diarySubTab);
+            });
+        });
+
+        // --- Funciones del Diario ---
+
+        async function loadLatestEntry() {
+            latestEntryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última entrada del diario...</p>';
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getLatest`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success' && result.entry) {
+                    latestEntryContent.innerHTML = '';
+                    renderEntry(result.entry, latestEntryContent);
+                } else {
+                    latestEntryContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas para mostrar.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error al cargar la última entrada:', error);
+                latestEntryContent.innerHTML = '<p class="text-center text-red-500">Error al cargar la última entrada.</p>';
+            }
+        }
+
+        // Envío del formulario del diario
+        diaryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            hideMessage();
+            buttonText.textContent = 'Guardando...';
+            loadingSpinner.style.display = 'block';
+            diaryForm.querySelector('button[type="submit"]').disabled = true;
+
+            const entryText = text.value;
+            const externalImageUrl = externalImageUrlInput.value.trim();
+            let imageData = null;
+            let imageName = '';
+
+            // Validación
+            if (!entryText.trim()) {
+                showMessage('Por favor, escribe algo en tu entrada del diario.', 'error');
+                resetFormState();
+                return;
+            }
+
+            // Validar que no se usen ambos métodos de imagen
+            if (photoUpload.files.length > 0 && externalImageUrl !== '') {
+                showMessage('Por favor, elige SOLO UNA opción para la imagen: o subir un archivo O pegar una URL.', 'error');
+                resetFormState();
+                return;
+            }
+
+            // Procesar imagen si existe
+            if (photoUpload.files.length > 0) {
+                const file = photoUpload.files[0];
+                const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+                if (file.size > MAX_FILE_SIZE) {
+                    showMessage('La imagen es demasiado grande (máximo 5MB).', 'error');
+                    resetFormState();
+                    return;
+                }
+                imageName = file.name;
+                try {
+                    imageData = await readFileAsBase64(file);
+                } catch (error) {
+                    showMessage('Error al leer la imagen. Inténtalo de nuevo.', 'error');
+                    resetFormState();
+                    return;
+                }
+            }
+
+            // Preparar datos para enviar - CORREGIDO para coincidir con el script
+            const formData = new FormData();
+            formData.append('diaryEntry', entryText); // Cambiado de 'text' a 'diaryEntry'
+            
+            if (externalImageUrl !== '') {
+                formData.append('externalImageUrl', externalImageUrl);
+            } else if (imageData) {
+                formData.append('imageData', imageData);
+                formData.append('imageName', imageName);
+            }
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showMessage('¡Entrada guardada con éxito!', 'success');
+                    text.value = '';
+                    photoUpload.value = '';
+                    externalImageUrlInput.value = '';
+                } else {
+                    showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error al enviar la entrada:', error);
+                showMessage('Ha ocurrido un error al conectar con el servidor. Inténtalo de nuevo más tarde.', 'error');
+            } finally {
+                resetFormState();
+            }
+        });
+
+        // Búsqueda de entradas por fecha
+        searchEntriesBtn.addEventListener('click', async () => {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (!startDate || !endDate) {
+                showMessage('Por favor, selecciona tanto la fecha de inicio como la de fin para buscar.', 'error');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                showMessage('La fecha de inicio no puede ser posterior a la fecha de fin.', 'error');
+                return;
+            }
+
+            searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando entradas...</p>';
+            hideMessage();
+
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getEntriesByDate&startDate=${startDate}&endDate=${endDate}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success' && result.entries && result.entries.length > 0) {
+                    searchResultsDiv.innerHTML = '';
+                    result.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    result.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
+                } else {
+                    searchResultsDiv.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No se encontraron entradas para el rango de fechas seleccionado.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error al buscar entradas:', error);
+                searchResultsDiv.innerHTML = '<p class="text-center text-red-500">Error al buscar entradas. Inténtalo de nuevo.</p>';
+            }
+        });
+
+        // --- Inicialización ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showMainTab('home');
+        });
+    </script>
 </body>
 </html>
+
