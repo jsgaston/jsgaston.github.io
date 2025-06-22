@@ -771,13 +771,14 @@
 
             const entryText = text.value;
             const externalImageUrl = externalImageUrlInput.value.trim();
-
-            const title = document.getElementById('title').value.trim();
+            const titleInput = document.getElementById('title');
+            const title = titleInput.value.trim();
             if (!title) {
                 showMessage('Por favor, pon un título a tu entrada.', 'error');
                 resetFormState();
                 return;
             }
+
             formData.append('title', title);  // ← ¡Esto FALTABA!
 
 
@@ -819,9 +820,10 @@
             }
 
             // Preparar datos para enviar - CORREGIDO para coincidir con el script
+            // Crear FormData
             const formData = new FormData();
-            formData.append('diaryEntry', entryText); // Cambiado de 'text' a 'diaryEntry'
-            
+            formData.append('title', title);                        // ✅ Añadir título
+            formData.append('diaryEntry', entryText);               // ✅ Texto
             if (externalImageUrl !== '') {
                 formData.append('externalImageUrl', externalImageUrl);
             } else if (imageData) {
