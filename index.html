@@ -496,19 +496,57 @@
         // Función para intentar múltiples URLs de imagen
         function tryMultipleImageUrls(originalUrl, imgElement, callback) {
             const urls = [];
-            
+        
             // Añadir la URL original
             urls.push(originalUrl);
-            
-            // Si es ImgBB, intentar diferentes formatos
+        
+            // ImgBB
             if (originalUrl.includes('ibb.co/') && !originalUrl.includes('i.ibb.co')) {
                 const match = originalUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
                 if (match && match[1]) {
-                    urls.push(`https://i.ibb.co/${match[1]}/image.jpg`);
-                    urls.push(`https://i.ibb.co/${match[1]}/image.png`);
-                    urls.push(`https://i.ibb.co/${match[1]}/image.webp`);
+                    const base = `https://i.ibb.co/${match[1]}`;
+                    urls.push(`${base}/image.jpg`);
+                    urls.push(`${base}/image.png`);
+                    urls.push(`${base}/image.webp`);
                 }
             }
+        
+            // pasteboard.co
+            if (originalUrl.includes('pasteboard.co/')) {
+                const match = originalUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)/);
+                if (match && match[1]) {
+                    const base = `https://pasteboard.co/${match[1]}`;
+                    urls.push(`${base}.png`);
+                    urls.push(`${base}.jpg`);
+                    urls.push(`${base}.webp`);
+                }
+            }
+        
+            let currentIndex = 0;
+        
+            function tryNextUrl() {
+                if (currentIndex >= urls.length) {
+                    imgElement.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
+                    imgElement.alt = 'Imagen no disponible';
+                    if (callback) callback(false);
+                    return;
+                }
+        
+                const testImg = new Image();
+                testImg.onload = function () {
+                    imgElement.src = urls[currentIndex];
+                    if (callback) callback(true);
+                };
+                testImg.onerror = function () {
+                    currentIndex++;
+                    tryNextUrl();
+                };
+                testImg.src = urls[currentIndex];
+            }
+        
+            tryNextUrl();
+        }
+
             
             let currentIndex = 0;
             
