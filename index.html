@@ -810,6 +810,8 @@
             }
         
             const formData = new FormData();
+            formData.append('Timestamp', Date(Timestamp).toLocaleDateString()); // este es el campo fecha
+            
             formData.append('title', title); // este es el campo del título
             formData.append('diaryEntry', entryText); // este es el texto del diario
             
