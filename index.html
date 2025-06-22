@@ -707,6 +707,8 @@
         // --- Funciones de Navegación Principal ---
 
         function showMainTab(tabName) {
+            console.log(`Cambiando a la pestaña: ${tabName}`); // Mensaje de depuración
+
             // Ocultar todas las secciones
             mainHomeSection.classList.add('hidden');
             mainDiarySection.classList.add('hidden');
@@ -1004,12 +1006,15 @@
                 // Usamos el GOOGLE_APPS_SCRIPT_WEB_DATA_URL para obtener los datos
                 const response = await fetch(GOOGLE_APPS_SCRIPT_WEB_DATA_URL);
                 if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
+                    throw new Error(`HTTP error: ${response.status}`);
                 }
                 allBiometricData = await response.json();
 
                 // Convertir Timestamps a objetos Date
                 allBiometricData.forEach(d => {
+                    // El timestamp puede ser un número (milisegundos) o una cadena de texto ISO.
+                    // Asegúrate de que Date pueda parsearlo. Si viene de ESP32, es un número.
+                    // Si viene del diario, podría ser una cadena.
                     d.Timestamp = new Date(d.Timestamp);
                 });
 
@@ -1058,47 +1063,65 @@
             }
 
             // Para calcular pasos diarios y horas de sueño
-            const dailyAggregates = {}; // { 'YYYY-MM-DD': { totalSteps: X, totalSleepTime: Y } }
+            const dailyAggregates = {}; // { 'YYYY-MM-DD': { totalSteps: X, sleepEntries: [], entryCount: 0 } }
 
             let firstValidLatLng = null; // Para centrar el mapa en la primera ubicación válida
             const latLngsForPolyline = []; // Para la línea del recorrido
 
+            // Procesar y agregar datos a dailyAggregates primero
             data.forEach(d => {
-                const timestamp = d.Timestamp;
-                const dateKey = timestamp.toISOString().split('T')[0]; // YYYY-MM-DD
-
-                // Acumular pasos diarios y datos de sueño (si se recolectan)
+                const dateKey = d.Timestamp.toISOString().split('T')[0]; // YYYY-MM-DD
                 if (!dailyAggregates[dateKey]) {
                     dailyAggregates[dateKey] = { totalSteps: 0, sleepEntries: [], entryCount: 0 };
                 }
                 if (d.Steps !== undefined && d.Steps !== null && !isNaN(d.Steps)) {
                     dailyAggregates[dateKey].totalSteps += parseInt(d.Steps);
                 }
-                // Si tienes un campo para "horas de sueño" en tus datos, agrégalo aquí para agregación
-                // Por ejemplo, si cada entrada es una "lectura" que incluye el estado de sueño,
-                // la lógica sería más compleja para calcular horas totales. Aquí se asume
-                // que 'SleepHours' podría ser un campo acumulado o una indicación.
+                // Si tienes un campo de "SleepHours" en tus datos, agrégalo aquí.
+                // Asumiendo que 'SleepHours' es un valor por entrada que representa horas de sueño para esa entrada.
+                // La lógica de agregación de sueño puede ser más compleja y depender de cómo se recolectan los datos.
                 if (d.SleepHours !== undefined && d.SleepHours !== null && !isNaN(d.SleepHours)) {
                      dailyAggregates[dateKey].sleepEntries.push(d.SleepHours);
                 }
-                 dailyAggregates[dateKey].entryCount++; // Contar entradas por día para promedio de sueño
+                dailyAggregates[dateKey].entryCount++;
+            });
 
+
+            data.forEach(d => {
+                const dateKey = d.Timestamp.toISOString().split('T')[0]; // YYYY-MM-DD
+                const dailyAggregate = dailyAggregates[dateKey];
 
                 // Detección de anomalías para esta entrada
                 const anomalies = [];
                 let isAnomaly = false;
 
-                if (d.Pulse !== undefined && d.Pulse !== null && !isNaN(d.Pulse)) {
+                if (d.Pulse !== undefined && d.Pulse !== null && !isNaN(d.Pulse) && d.Pulse !== -1) {
                     if (d.Pulse < anomalySettings.minPulse) anomalies.push('Pulso Bajo');
                     if (d.Pulse > anomalySettings.maxPulse) anomalies.push('Pulso Alto');
                 }
-                if (d.SpO2 !== undefined && d.SpO2 !== null && !isNaN(d.SpO2)) {
+                if (d.SpO2 !== undefined && d.SpO2 !== null && !isNaN(d.SpO2) && d.SpO2 !== -1) {
                     if (d.SpO2 < anomalySettings.minSpO2) anomalies.push('Oxígeno Bajo');
                     if (d.SpO2 > anomalySettings.maxSpO2) anomalies.push('Oxígeno Alto');
                 }
-                 if (d.Temperature !== undefined && d.Temperature !== null && !isNaN(d.Temperature)) {
+                 if (d.Temperature !== undefined && d.Temperature !== null && !isNaN(d.Temperature) && d.Temperature !== -1.0) {
                     if (d.Temperature < anomalySettings.minTemperature) anomalies.push('Temp. Baja');
                     if (d.Temperature > anomalySettings.maxTemperature) anomalies.push('Temp. Alta');
+                }
+                
+                // Anomalías basadas en agregados diarios (pasos, sueño)
+                if (dailyAggregate) {
+                    if (dailyAggregate.totalSteps < anomalySettings.minStepsPerDay && dailyAggregate.totalSteps > 0) { // Solo si hay pasos registrados
+                        anomalies.push('Pasos Bajos');
+                    }
+                    if (dailyAggregate.sleepEntries.length > 0) {
+                        const avgSleepHours = dailyAggregate.sleepEntries.reduce((a, b) => a + b, 0) / dailyAggregate.sleepEntries.length;
+                        if (avgSleepHours < anomalySettings.minSleepHours) {
+                            anomalies.push('Sueño Insuficiente');
+                        }
+                        if (avgSleepHours > anomalySettings.maxSleepHours) {
+                            anomalies.push('Exceso de Sueño');
+                        }
+                    }
                 }
                 
                 if (anomalies.length > 0) {
@@ -1116,11 +1139,7 @@
                 row.insertCell().textContent = d.Longitude !== undefined && d.Longitude !== 0.0 ? d.Longitude.toFixed(6) : 'N/D';
                 row.insertCell().textContent = d.Pulse !== undefined && d.Pulse !== -1 ? d.Pulse : 'N/D';
                 row.insertCell().textContent = d.SpO2 !== undefined && d.SpO2 !== -1 ? d.SpO2 : 'N/D';
-                
-                // Celda para Pasos Diarios (se actualizará después del bucle)
-                const dailyStepsCell = row.insertCell();
-                dailyStepsCell.dataset.dateKey = dateKey; // Guarda la clave de fecha para actualizar
-
+                row.insertCell().textContent = dailyAggregate ? dailyAggregate.totalSteps : 'N/D'; // Pasos diarios
                 row.insertCell().textContent = d.MovementX !== undefined ? `X:${d.MovementX.toFixed(2)}, Y:${d.MovementY.toFixed(2)}, Z:${d.MovementZ.toFixed(2)}` : 'N/D';
                 row.insertCell().textContent = d.Temperature !== undefined && d.Temperature !== -1.0 ? d.Temperature.toFixed(1) : 'N/D';
                 
@@ -1154,60 +1173,6 @@
                     markers.addLayer(marker);
                 }
             });
-
-            // Post-procesamiento para Pasos Diarios y Anomalías de Sueño
-            dataMapTableBody.querySelectorAll('td[data-date-key]').forEach(cell => {
-                const dateKey = cell.dataset.dateKey;
-                const dailyAggregate = dailyAggregates[dateKey];
-                
-                const totalStepsForDay = dailyAggregate ? dailyAggregate.totalSteps : 0;
-                cell.textContent = totalStepsForDay;
-
-                const parentRow = cell.parentElement;
-                let anomalyTextCell = parentRow.querySelector('.anomaly-text');
-                if (!anomalyTextCell) {
-                    // Si no existe, significa que no se añadió antes, lo creamos
-                    anomalyTextCell = parentRow.cells[parentRow.cells.length - 1]; // Última celda
-                    if (anomalyTextCell.textContent === 'Ninguna') anomalyTextCell.textContent = ''; // Limpiar si ya estaba "Ninguna"
-                }
-
-                // Anomalía para pasos
-                if (totalStepsForDay < anomalySettings.minStepsPerDay && totalStepsForDay > 0) { // No marcar 0 como anomalía si no hay datos significativos
-                    if (!parentRow.classList.contains('anomaly-row')) {
-                        parentRow.classList.add('anomaly-row');
-                    }
-                    if (!anomalyTextCell.textContent.includes('Pasos Bajos')) {
-                         anomalyTextCell.textContent += (anomalyTextCell.textContent ? ', ' : '') + 'Pasos Bajos';
-                         anomalyTextCell.classList.add('anomaly-text');
-                    }
-                }
-
-                // Anomalía de Sueño (si hay datos y lógica compleja para calcularlo)
-                // Esto es más complejo. Si "SleepHours" es una lectura directa de horas de sueño
-                // por cada entrada, necesitas una media o suma sensata.
-                if (dailyAggregate && dailyAggregate.sleepEntries.length > 0) {
-                    const avgSleepHours = dailyAggregate.sleepEntries.reduce((a, b) => a + b, 0) / dailyAggregate.sleepEntries.length;
-                    if (avgSleepHours < anomalySettings.minSleepHours) {
-                         if (!parentRow.classList.contains('anomaly-row')) parentRow.classList.add('anomaly-row');
-                         if (!anomalyTextCell.textContent.includes('Sueño Insuficiente')) {
-                             anomalyTextCell.textContent += (anomalyTextCell.textContent ? ', ' : '') + 'Sueño Insuficiente';
-                             anomalyTextCell.classList.add('anomaly-text');
-                         }
-                    }
-                    if (avgSleepHours > anomalySettings.maxSleepHours) {
-                         if (!parentRow.classList.contains('anomaly-row')) parentRow.classList.add('anomaly-row');
-                         if (!anomalyTextCell.textContent.includes('Exceso de Sueño')) {
-                             anomalyTextCell.textContent += (anomalyTextCell.textContent ? ', ' : '') + 'Exceso de Sueño';
-                             anomalyTextCell.classList.add('anomaly-text');
-                         }
-                    }
-                }
-                 if (anomalyTextCell.textContent === '') {
-                    anomalyTextCell.textContent = 'Ninguna';
-                    anomalyTextCell.classList.remove('anomaly-text'); // Asegurarse de que no tenga el estilo si no hay anomalías
-                }
-            });
-
 
             // Ajustar el mapa para que muestre todos los marcadores o el primer punto válido
             if (markers.getLayers().length > 0) {
