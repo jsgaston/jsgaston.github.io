@@ -444,10 +444,11 @@
 
         // Función mejorada para convertir URLs de servicios de hosting a URLs directas (cliente)
         function convertToDirectImageUrl(url) {
-            if (!url || url.trim() === '') return url;
+            if (!url || url.trim() === '') return null;
         
             const cleanUrl = url.trim();
         
+            // Si ya es directa, úsala
             if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) ||
                 cleanUrl.includes('drive.google.com/thumbnail') ||
                 cleanUrl.includes('i.ibb.co') ||
@@ -456,77 +457,71 @@
                 return cleanUrl;
             }
         
-            // Soporte para pasteboard.co
-            if (cleanUrl.includes('pasteboard.co/')) {
-                const match = cleanUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)(\.[a-z]+)?/);
-                if (match && match[1]) {
-                    // Intentar distintos formatos (jpg, png, webp)
-                    return `https://pasteboard.co/${match[1]}.png`; // Por defecto PNG
-                }
+            // pasteboard.co
+            const pasteboard = cleanUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)(\.[a-z]+)?/);
+            if (pasteboard) {
+                return `https://pasteboard.co/${pasteboard[1]}.png`;
             }
         
-            // ImgBB
-            if (cleanUrl.includes('ibb.co/') && !cleanUrl.includes('i.ibb.co')) {
-                const match = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    return `https://i.ibb.co/${match[1]}/image.jpg`;
-                }
+            // imgbb
+            const imgbb = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+            if (imgbb) {
+                return `https://i.ibb.co/${imgbb[1]}/image.png`;
             }
         
-            // Imgur
-            if (cleanUrl.includes('imgur.com') && !cleanUrl.includes('i.imgur.com')) {
-                const match = cleanUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    return `https://i.imgur.com/${match[1]}.jpg`;
-                }
+            // imgur
+            const imgur = cleanUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
+            if (imgur) {
+                return `https://i.imgur.com/${imgur[1]}.jpg`;
             }
         
-            // PostImage
-            if (cleanUrl.includes('postimg.cc') && !cleanUrl.includes('i.postimg.cc')) {
-                const match = cleanUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    return `https://i.postimg.cc/${match[1]}/image.jpg`;
-                }
+            // postimages
+            const postimg = cleanUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
+            if (postimg) {
+                return `https://i.postimg.cc/${postimg[1]}/image.jpg`;
             }
         
             return cleanUrl;
         }
+        
 
 
         // Función para intentar múltiples URLs de imagen
         function tryMultipleImageUrls(originalUrl, imgElement, callback) {
             const urls = [];
         
-            // Añadir la URL original
-            urls.push(originalUrl);
+            const directUrl = convertToDirectImageUrl(originalUrl);
+            if (directUrl) urls.push(directUrl);
         
-            // ImgBB
-            if (originalUrl.includes('ibb.co/') && !originalUrl.includes('i.ibb.co')) {
-                const match = originalUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    const base = `https://i.ibb.co/${match[1]}`;
-                    urls.push(`${base}/image.jpg`);
-                    urls.push(`${base}/image.png`);
-                    urls.push(`${base}/image.webp`);
-                }
+            // Agregar variantes por host
+            const imgbb = originalUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+            if (imgbb) {
+                const base = `https://i.ibb.co/${imgbb[1]}`;
+                urls.push(`${base}/image.png`, `${base}/image.jpg`, `${base}/image.webp`);
             }
         
-            // pasteboard.co
-            if (originalUrl.includes('pasteboard.co/')) {
-                const match = originalUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    const base = `https://pasteboard.co/${match[1]}`;
-                    urls.push(`${base}.png`);
-                    urls.push(`${base}.jpg`);
-                    urls.push(`${base}.webp`);
-                }
+            const pasteboard = originalUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)/);
+            if (pasteboard) {
+                const base = `https://pasteboard.co/${pasteboard[1]}`;
+                urls.push(`${base}.png`, `${base}.jpg`, `${base}.webp`);
+            }
+        
+            const imgur = originalUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
+            if (imgur) {
+                urls.push(`https://i.imgur.com/${imgur[1]}.jpg`);
+            }
+        
+            const postimg = originalUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
+            if (postimg) {
+                const base = `https://i.postimg.cc/${postimg[1]}`;
+                urls.push(`${base}/image.jpg`, `${base}/image.png`, `${base}/image.webp`);
             }
         
             let index = 0;
         
             function tryNextUrl() {
                 if (index >= urls.length) {
-                    callback(false); // No se pudo cargar ninguna
+                    callback(false); // ninguna funcionó
                     return;
                 }
         
@@ -534,17 +529,18 @@
                 const testImg = new Image();
                 testImg.onload = () => {
                     imgElement.src = testUrl;
-                    callback(true); // Cargó correctamente
+                    callback(true);
                 };
                 testImg.onerror = () => {
                     index++;
-                    tryNextUrl(); // Probar siguiente
+                    tryNextUrl();
                 };
                 testImg.src = testUrl;
             }
         
-            tryNextUrl(); // Iniciar
+            tryNextUrl();
         }
+
 
         
 
