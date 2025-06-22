@@ -872,7 +872,7 @@
         const coordenadasRuta = [];
     
         datos.forEach((dato) => {
-          const { Timestamp, Latitude, Longitude, Pulse, SpO2, Steps, Temperature } = dato;
+          const { Timestamp, Hour, Latitude, Longitude, Pulse, SpO2, Steps, Temperature } = dato;
     
           if (!Latitude || !Longitude) return;
           const lat = parseFloat(Latitude);
@@ -886,7 +886,7 @@
     
           const fila = `<tr>
             <td class="px-4 py-1">${new Date(Timestamp).toLocaleDateString()}</td>
-            <th class="px-4 py-2">Hora</th>
+          
 
             <td class="px-4 py-1">${new Date(Timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</td>
 
