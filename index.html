@@ -315,7 +315,6 @@
               </div>
             
               <div id="mapid" style="height: 500px;" class="mb-6 rounded-xl shadow-md"></div>
-
             
               <h3 class="text-xl font-semibold text-gray-700 mb-2">Datos Recopilados</h3>
               <div class="overflow-auto max-h-[400px] border rounded-lg shadow">
@@ -622,14 +621,12 @@
                 document.querySelector('[data-main-tab="diary"]').classList.add('active');
                 showDiarySubTab('write');
             } else if (tabName === 'maps') {
-                mainMapsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="maps"]').classList.add('active');
-            
-                setTimeout(() => {
-                    if (!mapa) iniciarMapa(); else mapa.invalidateSize();
-                }, 300);
+              mainMapsSection.classList.remove('hidden');
+              document.querySelector('[data-main-tab="maps"]').classList.add('active');
+              setTimeout(() => {
+                if (!mapa) iniciarMapa(); else mapa.invalidateSize();
+              }, 300);
             }
-
 
             } else if (tabName === 'trips') {
                 mainTripsSection.classList.remove('hidden');
@@ -835,93 +832,94 @@
     </script>
     <!-- Insertar al final del <body>, antes del cierre -->
     <script>
-        const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbw1fN6Voc3yoCAh388Lgh-9bvmzbjTsv6c42nvZ0VNrxb3Cf5O_9v_DN61JLIoOiv-l/exec"; // URL del Apps Script de servidor de datos
-        let mapa, capaMarcadores, ruta;
-        
-        function iniciarMapa() {
-          mapa = L.map("mapid").setView([40.4168, -3.7038], 5); // Por defecto: Madrid
-        
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; OpenStreetMap',
-          }).addTo(mapa);
-        
-          capaMarcadores = L.featureGroup().addTo(mapa);
-          ruta = L.polyline([], { color: 'blue' }).addTo(mapa);
-        
-          cargarDatosMapa();
-        }
-        
-        async function cargarDatosMapa() {
-          try {
-            const res = await fetch(SERVER_DATA_URL);
-            const datos = await res.json();
-        
-            procesarYMostrarDatos(datos);
-          } catch (error) {
-            console.error("Error al obtener datos:", error);
+      const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbw1fN6Voc3yoCAh388Lgh-9bvmzbjTsv6c42nvZ0VNrxb3Cf5O_9v_DN61JLIoOiv-l/exec";
+      let mapa, capaMarcadores, ruta, datosCargados = [];
+    
+      function iniciarMapa() {
+        mapa = L.map("mapid").setView([40.4168, -3.7038], 5);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; OpenStreetMap',
+        }).addTo(mapa);
+    
+        capaMarcadores = L.featureGroup().addTo(mapa);
+        ruta = L.polyline([], { color: 'blue' }).addTo(mapa);
+        cargarDatosMapa();
+      }
+    
+      async function cargarDatosMapa() {
+        try {
+          const res = await fetch(SERVER_DATA_URL);
+          const datos = await res.json();
+    
+          if (!Array.isArray(datos) || datos.length === 0) {
+            console.warn("No se recibieron datos válidos.");
+            document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="8" class="px-4 py-2 text-center text-gray-500">No hay datos disponibles</td></tr>';
+            return;
           }
+    
+          datosCargados = datos;
+          procesarYMostrarDatos(datos);
+        } catch (error) {
+          console.error("Error al obtener datos:", error);
+          document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="8" class="px-4 py-2 text-center text-red-500">Error al obtener datos</td></tr>';
         }
-        
-        function procesarYMostrarDatos(datos) {
-          const cuerpoTabla = document.getElementById("tablaDatosMapa");
-          cuerpoTabla.innerHTML = "";
-          capaMarcadores.clearLayers();
-          ruta.setLatLngs([]);
-        
-          const coordenadasRuta = [];
-        
-          datos.forEach((dato) => {
-            const {
-              Timestamp, Latitude, Longitude, Pulse, SpO2, Steps,
-              Temperature
-            } = dato;
-        
-            // Filtro: si falta lat/lon, ignora
-            if (!Latitude || !Longitude) return;
-        
-            const lat = parseFloat(Latitude);
-            const lon = parseFloat(Longitude);
-            coordenadasRuta.push([lat, lon]);
-        
-            // Anomalías básicas
-            const anomalía =
-              Pulse < 40 || Pulse > 120 ||
-              SpO2 < 90 || SpO2 > 100 ||
-              Temperature < 35.0 || Temperature > 37.5
-                ? "⚠️"
-                : "";
-        
-            // Tabla
-            const fila = `<tr>
-              <td class="px-4 py-1">${new Date(Timestamp).toLocaleString()}</td>
-              <td class="px-4 py-1">${lat.toFixed(4)}</td>
-              <td class="px-4 py-1">${lon.toFixed(4)}</td>
-              <td class="px-4 py-1">${Pulse}</td>
-              <td class="px-4 py-1">${SpO2}</td>
-              <td class="px-4 py-1">${Steps}</td>
-              <td class="px-4 py-1">${Temperature}</td>
-              <td class="px-4 py-1">${anomalía}</td>
-            </tr>`;
-            cuerpoTabla.insertAdjacentHTML("beforeend", fila);
-        
-            // Mapa
-            const marker = L.marker([lat, lon]).bindPopup(
-              `📅 ${new Date(Timestamp).toLocaleString()}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
-            );
-            capaMarcadores.addLayer(marker);
-          });
-        
-          ruta.setLatLngs(coordenadasRuta);
-          if (coordenadasRuta.length > 0) mapa.fitBounds(ruta.getBounds());
-        }
-        
-        function filtrarDatosMapa() {
-          // Puedes implementar filtros por fecha desde inputs aquí si ya están cargados los datos
-          // Este ejemplo asume carga completa; luego puedes filtrar client-side
-        }
-        
-  
+      }
+    
+      function procesarYMostrarDatos(datos) {
+        const cuerpoTabla = document.getElementById("tablaDatosMapa");
+        cuerpoTabla.innerHTML = "";
+        capaMarcadores.clearLayers();
+        ruta.setLatLngs([]);
+        const coordenadasRuta = [];
+    
+        datos.forEach((dato) => {
+          const { Timestamp, Latitude, Longitude, Pulse, SpO2, Steps, Temperature } = dato;
+    
+          if (!Latitude || !Longitude) return;
+          const lat = parseFloat(Latitude);
+          const lon = parseFloat(Longitude);
+          coordenadasRuta.push([lat, lon]);
+    
+          const anomalía =
+            Pulse < 40 || Pulse > 120 ||
+            SpO2 < 90 || SpO2 > 100 ||
+            Temperature < 35.0 || Temperature > 37.5 ? "⚠️" : "";
+    
+          const fila = `<tr>
+            <td class="px-4 py-1">${new Date(Timestamp).toLocaleString()}</td>
+            <td class="px-4 py-1">${lat.toFixed(4)}</td>
+            <td class="px-4 py-1">${lon.toFixed(4)}</td>
+            <td class="px-4 py-1">${Pulse}</td>
+            <td class="px-4 py-1">${SpO2}</td>
+            <td class="px-4 py-1">${Steps}</td>
+            <td class="px-4 py-1">${Temperature}</td>
+            <td class="px-4 py-1">${anomalía}</td>
+          </tr>`;
+          cuerpoTabla.insertAdjacentHTML("beforeend", fila);
+    
+          const marker = L.marker([lat, lon]).bindPopup(
+            `📅 ${new Date(Timestamp).toLocaleString()}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
+          );
+          capaMarcadores.addLayer(marker);
+        });
+    
+        ruta.setLatLngs(coordenadasRuta);
+        if (coordenadasRuta.length > 0) mapa.fitBounds(ruta.getBounds());
+      }
+    
+      function filtrarDatosMapa() {
+        const desde = new Date(document.getElementById("mapStartDate").value);
+        const hasta = new Date(document.getElementById("mapEndDate").value);
+        if (!datosCargados.length || isNaN(desde) || isNaN(hasta)) return;
+    
+        const filtrados = datosCargados.filter(d => {
+          const fecha = new Date(d.Timestamp);
+          return fecha >= desde && fecha <= hasta;
+        });
+        procesarYMostrarDatos(filtrados);
+      }
     </script>
+
 
 </body>
 </html>
