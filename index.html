@@ -309,8 +309,9 @@
 
             
               <div class="flex gap-4 mb-4">
-                <input type="datetime-local" id="mapStartDate" class="form-input" />
-                <input type="datetime-local" id="mapEndDate" class="form-input" />
+                <input type="datetime-local" id="mapStartDate" class="form-input" value="2025-06-21T00:00">
+                <input type="datetime-local" id="mapEndDate" class="form-input" value="2025-06-22T23:59">
+
                 <button onclick="filtrarDatosMapa()" class="btn">Aplicar Filtros</button>
               </div>
             
@@ -916,6 +917,7 @@
       function filtrarDatosMapa() {
         const desde = new Date(document.getElementById("mapStartDate").value);
         const hasta = new Date(document.getElementById("mapEndDate").value);
+
 
         if (!datosCargados.length || isNaN(desde) || isNaN(hasta)) return;
     
