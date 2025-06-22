@@ -272,9 +272,6 @@
                       <label for="title" class="form-label mb-2">Título de la Entrada:</label>
                       <input type="text" id="title" name="title" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: Paseo por el parque" />
                     </div>
-
-
-                    
                     <div class="mb-6">
                         <label for="text" class="form-label mb-2">Tu Entrada de Hoy:</label>
                         <textarea id="text" name="text" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
@@ -813,15 +810,16 @@
             }
         
             const formData = new FormData();
-            formData.append('title', title); // ✅ ESTA LÍNEA FALTABA
-            formData.append('diaryEntry', entryText);
-        
+            formData.append('title', title); // este es el campo del título
+            formData.append('diaryEntry', entryText); // este es el texto del diario
+            
             if (externalImageUrl !== '') {
                 formData.append('externalImageUrl', externalImageUrl);
             } else if (imageData) {
                 formData.append('imageData', imageData);
                 formData.append('imageName', imageName);
             }
+
         
             try {
                 const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
