@@ -898,9 +898,13 @@
           </tr>`;
           cuerpoTabla.insertAdjacentHTML("beforeend", fila);
     
-          const marker = L.marker([lat, lon]).bindPopup(
-            `📅 ${new Date(Timestamp).toLocaleString()}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
-          );
+          const fecha = new Date(Timestamp);
+            const hora = fecha.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+            
+            const marker = L.marker([lat, lon]).bindPopup(
+              `🕒 ${hora}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
+            );
+
           capaMarcadores.addLayer(marker);
         });
     
