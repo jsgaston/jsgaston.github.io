@@ -852,7 +852,7 @@
     
           if (!Array.isArray(datos) || datos.length === 0) {
             console.warn("No se recibieron datos válidos.");
-            document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="8" class="px-4 py-2 text-center text-gray-500">No hay datos disponibles</td></tr>';
+            document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="9" class="px-4 py-2 text-center text-gray-500">No hay datos disponibles</td></tr>';
             return;
           }
     
@@ -860,7 +860,7 @@
           procesarYMostrarDatos(datos);
         } catch (error) {
           console.error("Error al obtener datos:", error);
-          document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="8" class="px-4 py-2 text-center text-red-500">Error al obtener datos</td></tr>';
+          document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="9" class="px-4 py-2 text-center text-red-500">Error al obtener datos</td></tr>';
         }
       }
     
