@@ -810,17 +810,16 @@
             }
         
             const formData = new FormData();
-            formData.append('Timestamp', Date(Timestamp).toLocaleDateString()); // este es el campo fecha
-            
-            formData.append('title', title); // este es el campo del título
-            formData.append('diaryEntry', entryText); // este es el texto del diario
-            
-            if (externalImageUrl !== '') {
-                formData.append('externalImageUrl', externalImageUrl);
-            } else if (imageData) {
-                formData.append('imageData', imageData);
-                formData.append('imageName', imageName);
-            }
+                formData.append('title', title);           // Campo 1: Título
+                formData.append('diaryEntry', entryText);  // Campo 2: Texto del diario
+                
+                if (externalImageUrl !== '') {
+                  formData.append('externalImageUrl', externalImageUrl);
+                } else if (imageData) {
+                  formData.append('imageData', imageData);
+                  formData.append('imageName', imageName);
+                }
+
 
         
             try {
