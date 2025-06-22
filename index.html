@@ -289,11 +289,11 @@
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
                     <div>
                         <label for="startDate" class="form-label">Desde:</label>
-                        <input type="date" id="startDate" class="form-input w-auto">
+                        <input type="datetime-local" id="startDate" class="form-input w-auto">
                     </div>
                     <div>
                         <label for="endDate" class="form-label">Hasta:</label>
-                        <input type="date" id="endDate" class="form-input w-auto">
+                        <input type="datetime-local" id="endDate" class="form-input w-auto">
                     </div>
                     <button id="searchEntriesBtn" class="btn mt-6 sm:mt-0 px-6 py-3">Buscar</button>
                 </div>
@@ -309,8 +309,8 @@
 
             
               <div class="flex gap-4 mb-4">
-                <input type="date" id="mapStartDate" class="form-input" />
-                <input type="date" id="mapEndDate" class="form-input" />
+                <input type="datetime-local" id="mapStartDate" class="form-input" />
+                <input type="datetime-local" id="mapEndDate" class="form-input" />
                 <button onclick="filtrarDatosMapa()" class="btn">Aplicar Filtros</button>
               </div>
             
@@ -915,6 +915,7 @@
       function filtrarDatosMapa() {
         const desde = new Date(document.getElementById("mapStartDate").value);
         const hasta = new Date(document.getElementById("mapEndDate").value);
+
         if (!datosCargados.length || isNaN(desde) || isNaN(hasta)) return;
     
         const filtrados = datosCargados.filter(d => {
