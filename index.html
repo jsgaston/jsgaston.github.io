@@ -522,30 +522,30 @@
                 }
             }
         
-            let currentIndex = 0;
+            let index = 0;
         
             function tryNextUrl() {
-                if (currentIndex >= urls.length) {
-                    imgElement.src = 'https://placehold.co/400x300/e0e0e0/ffffff?text=Imagen+no+disponible';
-                    imgElement.alt = 'Imagen no disponible';
-                    if (callback) callback(false);
+                if (index >= urls.length) {
+                    callback(false); // No se pudo cargar ninguna
                     return;
                 }
         
+                const testUrl = urls[index];
                 const testImg = new Image();
-                testImg.onload = function () {
-                    imgElement.src = urls[currentIndex];
-                    if (callback) callback(true);
+                testImg.onload = () => {
+                    imgElement.src = testUrl;
+                    callback(true); // Cargó correctamente
                 };
-                testImg.onerror = function () {
-                    currentIndex++;
-                    tryNextUrl();
+                testImg.onerror = () => {
+                    index++;
+                    tryNextUrl(); // Probar siguiente
                 };
-                testImg.src = urls[currentIndex];
+                testImg.src = testUrl;
             }
         
-            tryNextUrl();
+            tryNextUrl(); // Iniciar
         }
+
         
 
         // Función para renderizar una entrada de diario con mejor manejo de imágenes
