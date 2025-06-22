@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Diario Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoCcTIDF08/YDKWlQyKgYdFlVEU5SCYgIKgLNTg="
+     crossorigin=""/>
     <style>
         /* Fuente Inter para un aspecto moderno y limpio */
         body {
@@ -17,7 +22,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
+            max-width: 1200px; /* Ancho mayor para la sección de mapas */
             width: 100%;
             background-color: #ffffff;
             padding: 32px;
@@ -30,7 +35,7 @@
             display: block;
             color: #374151;
         }
-        .form-input, .form-textarea {
+        .form-input, .form-textarea, .form-select {
             width: 100%;
             padding: 12px;
             border: 1px solid #d1d5db;
@@ -40,7 +45,7 @@
             background-color: #f9fafb;
             transition: border-color 0.2s;
         }
-        .form-input:focus, .form-textarea:focus {
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
             outline: none;
             border-color: #3b82f6; /* Un azul bonito al enfocar */
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
@@ -208,6 +213,49 @@
             animation: spin 1s linear infinite;
             margin-right: 8px;
         }
+
+        /* Estilos para la sección de Mapas de Recorridos */
+        #mapid {
+            height: 500px; /* Altura fija para el mapa */
+            width: 100%;
+            border-radius: 0.5rem; /* Bordes redondeados con Tailwind */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+        }
+        /* Estilos para la tabla de datos biométricos y de actividad */
+        .data-table-container {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .data-table {
+            min-width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .data-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #4a5568;
+            white-space: nowrap;
+        }
+        .data-table tr:hover {
+            background-color: #edf2f7;
+        }
+        .data-table .anomaly-row {
+            background-color: #fef2f2; /* Fondo rojo claro */
+            border-left: 4px solid #ef4444; /* Borde izquierdo rojo */
+            font-weight: 500;
+        }
+        .data-table .anomaly-text {
+            color: #dc2626; /* Rojo brillante para el texto de anomalía */
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
@@ -300,9 +348,102 @@
         </div>
 
         <div id="mainMapsSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
-            <p class="text-center text-gray-600">Aquí podrás integrar tus mapas de Google Maps o uMap. ¡En construcción!</p>
-            <p class="text-center text-gray-500 mt-4">Para añadir esta funcionalidad, crearías una nueva sección aquí y la conectarías a la API de mapas.</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos y Datos Biomédicos</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Filtros para los datos de mapas/biométricos -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Filtros de Datos de Recorrido</h3>
+                    <div class="flex flex-col space-y-4">
+                        <div>
+                            <label for="mapStartDate" class="block text-gray-700 text-sm font-bold mb-2">Fecha Inicio:</label>
+                            <input type="date" id="mapStartDate" class="form-input">
+                        </div>
+                        <div>
+                            <label for="mapEndDate" class="block text-gray-700 text-sm font-bold mb-2">Fecha Fin:</label>
+                            <input type="date" id="mapEndDate" class="form-input">
+                        </div>
+                        <button id="applyMapFilters" class="btn py-2 px-4 rounded-lg">
+                            Aplicar Filtros de Recorrido
+                        </button>
+                        <button id="resetMapFilters" class="btn bg-gray-400 hover:bg-gray-500 py-2 px-4 rounded-lg">
+                            Reiniciar Filtros de Recorrido
+                        </button>
+                    </div>
+                </div>
+                <!-- Parámetros de Detección de Anomalías -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Parámetros de Detección de Anomalías</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="minPulse" class="block text-gray-700 text-sm font-bold mb-1">Pulso Mín. (ppm):</label>
+                            <input type="number" id="minPulse" value="40" class="form-input">
+                        </div>
+                        <div>
+                            <label for="maxPulse" class="block text-gray-700 text-sm font-bold mb-1">Pulso Máx. (ppm):</label>
+                            <input type="number" id="maxPulse" value="120" class="form-input">
+                        </div>
+                        <div>
+                            <label for="minSpO2" class="block text-gray-700 text-sm font-bold mb-1">Oxígeno Mín. (%):</label>
+                            <input type="number" id="minSpO2" value="90" class="form-input">
+                        </div>
+                        <div>
+                            <label for="maxSpO2" class="block text-gray-700 text-sm font-bold mb-1">Oxígeno Máx. (%):</label>
+                            <input type="number" id="maxSpO2" value="100" class="form-input">
+                        </div>
+                        <div>
+                            <label for="minStepsPerDay" class="block text-gray-700 text-sm font-bold mb-1">Pasos Mín. Diarios:</label>
+                            <input type="number" id="minStepsPerDay" value="5000" class="form-input">
+                        </div>
+                        <div>
+                            <label for="minSleepHours" class="block text-gray-700 text-sm font-bold mb-1">Horas Sueño Mín.:</label>
+                            <input type="number" id="minSleepHours" value="6" class="form-input">
+                        </div>
+                        <div>
+                            <label for="maxSleepHours" class="block text-gray-700 text-sm font-bold mb-1">Horas Sueño Máx.:</label>
+                            <input type="number" id="maxSleepHours" value="9" class="form-input">
+                        </div>
+                        <div>
+                            <label for="minTemperature" class="block text-gray-700 text-sm font-bold mb-1">Temp. Mín. (°C):</label>
+                            <input type="number" id="minTemperature" value="35.0" step="0.1" class="form-input">
+                        </div>
+                        <div>
+                            <label for="maxTemperature" class="block text-gray-700 text-sm font-bold mb-1">Temp. Máx. (°C):</label>
+                            <input type="number" id="maxTemperature" value="37.5" step="0.1" class="form-input">
+                        </div>
+                    </div>
+                    <button id="saveAnomalySettings" class="btn bg-green-600 hover:bg-green-700 mt-4 w-full">
+                        Guardar Configuración Anomalías
+                    </button>
+                </div>
+            </div>
+
+            <div id="mapid"></div>
+
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Datos Recopilados y Anomalías</h3>
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha y Hora</th>
+                            <th>Latitud</th>
+                            <th>Longitud</th>
+                            <th>Pulso (ppm)</th>
+                            <th>SpO2 (%)</th>
+                            <th>Pasos (Diario)</th>
+                            <th>Movimiento (X/Y/Z)</th>
+                            <th>Temp. (°C)</th>
+                            <th>Anomalías</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataMapTableBody">
+                        <!-- Los datos se insertarán aquí por JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <p id="noMapDataMessage" class="text-center py-8 text-gray-500 hidden">
+                No hay datos de recorrido disponibles para el rango de fechas seleccionado.
+            </p>
         </div>
 
         <div id="mainTripsSection" class="main-tab-content hidden">
@@ -326,9 +467,21 @@
         <div id="messageBox" class="message-box w-full mt-8"></div>
     </div>
 
+    <!-- Leaflet JS para el mapa -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjGwZT6P2JyTFDsRHACkMM0aCN1R6M="
+     crossorigin=""></script>
     <script>
-        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado.
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx9q2YQCd2gYPfwoRayeO53O7DGrsUjSoiA3STD5xUVhAbh1ioDR5W0bcoCA9KecLLc/exec'; 
+        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado (Servidor de Datos para la Web).
+        const GOOGLE_APPS_SCRIPT_WEB_DATA_URL = 'URL_DE_TU_APPS_SCRIPT_SERVIDOR_DATOS';
+        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado (Receptor de Datos del Diario).
+        const GOOGLE_APPS_SCRIPT_DIARY_URL = 'https://script.google.com/macros/s/AKfycbx9q2YQCd2gYPfwoRayeO53O7DGrsUjSoiA3STD5xUVhAbh1ioDR5W0bcoCA9KecLLc/exec'; 
+
+
+        let allBiometricData = []; // Almacena todos los datos biométricos/GPS crudos
+        let map; // Objeto de mapa Leaflet
+        let markers = L.featureGroup(); // Grupo para marcadores del mapa
+        let polyline; // Línea para trazar el recorrido
 
         // Elementos del DOM para la navegación principal
         const mainTabButtons = document.querySelectorAll('.main-tab-button');
@@ -363,7 +516,40 @@
         const modalImage = document.getElementById('modalImage');
         const closeModal = document.querySelector('.close-modal');
 
-        // --- Funciones de Utilidad ---
+        // Elementos del DOM para la sección de Mapas y Datos
+        const mapStartDateInput = document.getElementById('mapStartDate');
+        const mapEndDateInput = document.getElementById('mapEndDate');
+        const applyMapFiltersBtn = document.getElementById('applyMapFilters');
+        const resetMapFiltersBtn = document.getElementById('resetMapFilters');
+        const dataMapTableBody = document.getElementById('dataMapTableBody');
+        const noMapDataMessage = document.getElementById('noMapDataMessage');
+
+        // Elementos de la configuración de anomalías
+        const minPulseInput = document.getElementById('minPulse');
+        const maxPulseInput = document.getElementById('maxPulse');
+        const minSpO2Input = document.getElementById('minSpO2');
+        const maxSpO2Input = document.getElementById('maxSpO2');
+        const minStepsPerDayInput = document.getElementById('minStepsPerDay');
+        const minSleepHoursInput = document.getElementById('minSleepHours');
+        const maxSleepHoursInput = document.getElementById('maxSleepHours');
+        const minTemperatureInput = document.getElementById('minTemperature');
+        const maxTemperatureInput = document.getElementById('maxTemperature');
+        const saveAnomalySettingsBtn = document.getElementById('saveAnomalySettings');
+
+        // Configuración de anomalías (valores por defecto)
+        let anomalySettings = {
+            minPulse: 40,
+            maxPulse: 120,
+            minSpO2: 90,
+            maxSpO2: 100,
+            minStepsPerDay: 5000,
+            minSleepHours: 6,
+            maxSleepHours: 9,
+            minTemperature: 35.0,
+            maxTemperature: 37.5
+        };
+
+        // --- Funciones de Utilidad (existentes y nuevas) ---
 
         // Función para mostrar mensajes al usuario (éxito/error)
         function showMessage(message, type) {
@@ -397,59 +583,13 @@
         }
 
         // Función para formatear la fecha
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            try {
-                return new Date(dateString).toLocaleDateString('es-ES', options);
-            } catch (e) {
-                return dateString;
-            }
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            return date.toLocaleDateString('es-ES', options);
         }
 
-        // Función mejorada para convertir URLs de servicios de hosting a URLs directas (cliente)
-        function convertToDirectImageUrl(url) {
-            if (!url || url.trim() === '') return url;
-            
-            const cleanUrl = url.trim();
-            
-            // Si ya es una URL directa, devolverla tal como está
-            if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) || 
-                cleanUrl.includes('drive.google.com/thumbnail') ||
-                cleanUrl.includes('i.ibb.co') ||
-                cleanUrl.includes('i.imgur.com') ||
-                cleanUrl.includes('i.postimg.cc')) {
-                return cleanUrl;
-            }
-            
-            // ImgBB: https://ibb.co/gMsvhD73 -> intentar obtener la URL directa
-            if (cleanUrl.includes('ibb.co/') && !cleanUrl.includes('i.ibb.co')) {
-                const match = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    // Intentar diferentes formatos de URL directa de ImgBB
-                    return `https://i.ibb.co/${match[1]}/image.jpg`;
-                }
-            }
-            
-            // Imgur: https://imgur.com/a/ABC123 -> https://i.imgur.com/ABC123.jpg
-            if (cleanUrl.includes('imgur.com') && !cleanUrl.includes('i.imgur.com')) {
-                const match = cleanUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    return `https://i.imgur.com/${match[1]}.jpg`;
-                }
-            }
-            
-            // PostImage: https://postimg.cc/ABC123 -> https://i.postimg.cc/ABC123/image.jpg
-            if (cleanUrl.includes('postimg.cc') && !cleanUrl.includes('i.postimg.cc')) {
-                const match = cleanUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
-                if (match && match[1]) {
-                    return `https://i.postimg.cc/${match[1]}/image.jpg`;
-                }
-            }
-            
-            return cleanUrl; // Devolver la URL original si no se puede convertir
-        }
-
-        // Función para intentar múltiples URLs de imagen
+        // Función para intentar múltiples URLs de imagen (EXISTENTE, no la cambio)
         function tryMultipleImageUrls(originalUrl, imgElement, callback) {
             const urls = [];
             
@@ -492,7 +632,7 @@
             tryNextUrl();
         }
 
-        // Función para renderizar una entrada de diario con mejor manejo de imágenes
+        // Función para renderizar una entrada de diario (EXISTENTE, no la cambio)
         function renderEntry(entry, containerElement) {
             const entryCard = document.createElement('div');
             entryCard.className = 'entry-card';
@@ -553,7 +693,7 @@
             containerElement.appendChild(entryCard);
         }
 
-        // Event listeners para el modal
+        // Event listeners para el modal (EXISTENTE, no las cambio)
         closeModal.addEventListener('click', function() {
             imageModal.style.display = 'none';
         });
@@ -590,6 +730,10 @@
             } else if (tabName === 'maps') {
                 mainMapsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="maps"]').classList.add('active');
+                // Al ir a la pestaña de mapas, inicializar o actualizar
+                initializeMap(); // Asegura que el mapa se inicializa si no lo estaba
+                loadAnomalySettings(); // Cargar ajustes de anomalías
+                fetchBiometricData(); // Cargar los datos del ESP32/Android
             } else if (tabName === 'trips') {
                 mainTripsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="trips"]').classList.add('active');
@@ -600,10 +744,10 @@
                 mainProjectsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="projects"]').classList.add('active');
             }
-            hideMessage();
+            hideMessage(); // Ocultar mensajes generales al cambiar de pestaña
         }
 
-        // Event listeners para los botones de las pestañas principales
+        // Event listeners para los botones de las pestañas principales (EXISTENTE, no la cambio)
         mainTabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 showMainTab(button.dataset.mainTab);
@@ -611,7 +755,7 @@
         });
 
         
-        // --- Funciones de Sub-navegación del Diario ---
+        // --- Funciones de Sub-navegación del Diario (EXISTENTE, no la cambio) ---
 
         function showDiarySubTab(subTabName) {
             // Ocultar todas las sub-secciones
@@ -633,19 +777,19 @@
             hideMessage();
         }
 
-        // Event listeners para los botones de las sub-pestañas del diario
+        // Event listeners para los botones de las sub-pestañas del diario (EXISTENTE, no la cambio)
         diarySubTabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 showDiarySubTab(button.dataset.diarySubTab);
             });
         });
 
-        // --- Funciones del Diario ---
+        // --- Funciones del Diario (EXISTENTE, no las cambio) ---
 
         async function loadLatestEntry() {
             latestEntryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última entrada del diario...</p>';
             try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getLatest`);
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_DIARY_URL}?action=getLatest`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -663,7 +807,7 @@
             }
         }
 
-        // Envío del formulario del diario
+        // Envío del formulario del diario (EXISTENTE, no la cambio)
         diaryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -722,7 +866,7 @@
             }
 
             try {
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_DIARY_URL, {
                     method: 'POST',
                     body: formData,
                 });
@@ -749,7 +893,7 @@
             }
         });
 
-        // Búsqueda de entradas por fecha
+        // Búsqueda de entradas por fecha (EXISTENTE, no la cambio)
         searchEntriesBtn.addEventListener('click', async () => {
             const startDate = startDateInput.value;
             const endDate = endDateInput.value;
@@ -768,7 +912,7 @@
             hideMessage();
 
             try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getEntriesByDate&startDate=${startDate}&endDate=${endDate}`);
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_DIARY_URL}?action=getEntriesByDate&startDate=${startDate}&endDate=${endDate}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -787,9 +931,313 @@
             }
         });
 
-        // --- Inicialización ---
+        // --- Nuevas Funciones para la Sección de Mapas y Datos Biométricos ---
+
+        /**
+         * Inicializa el mapa Leaflet.
+         * Se asegura de que se inicialice solo una vez o se reinicie correctamente.
+         */
+        function initializeMap() {
+            if (map) {
+                map.remove(); // Elimina el mapa existente si ya fue inicializado
+            }
+            map = L.map('mapid').setView([0, 0], 2); // Vista inicial, se ajustará con los datos
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            markers.addTo(map); // Añade el grupo de marcadores al mapa
+            polyline = L.polyline([], {color: 'blue'}).addTo(map); // Línea para el recorrido
+        }
+
+        /**
+         * Carga la configuración de anomalías desde localStorage o usa los valores por defecto.
+         */
+        function loadAnomalySettings() {
+            const savedSettings = localStorage.getItem('anomalySettings');
+            if (savedSettings) {
+                anomalySettings = JSON.parse(savedSettings);
+            }
+            // Asigna los valores a los inputs
+            minPulseInput.value = anomalySettings.minPulse;
+            maxPulseInput.value = anomalySettings.maxPulse;
+            minSpO2Input.value = anomalySettings.minSpO2;
+            maxSpO2Input.value = anomalySettings.maxSpO2;
+            minStepsPerDayInput.value = anomalySettings.minStepsPerDay;
+            minSleepHoursInput.value = anomalySettings.minSleepHours;
+            maxSleepHoursInput.value = anomalySettings.maxSleepHours;
+            minTemperatureInput.value = anomalySettings.minTemperature;
+            maxTemperatureInput.value = anomalySettings.maxTemperature;
+        }
+
+        /**
+         * Guarda la configuración actual de anomalías en localStorage.
+         */
+        function saveAnomalySettings() {
+            anomalySettings.minPulse = parseFloat(minPulseInput.value);
+            anomalySettings.maxPulse = parseFloat(maxPulseInput.value);
+            anomalySettings.minSpO2 = parseFloat(minSpO2Input.value);
+            anomalySettings.maxSpO2 = parseFloat(maxSpO2Input.value);
+            anomalySettings.minStepsPerDay = parseFloat(minStepsPerDayInput.value);
+            anomalySettings.minSleepHours = parseFloat(minSleepHoursInput.value);
+            anomalySettings.maxSleepHours = parseFloat(maxSleepHoursInput.value);
+            anomalySettings.minTemperature = parseFloat(minTemperatureInput.value);
+            anomalySettings.maxTemperature = parseFloat(maxTemperatureInput.value);
+
+            localStorage.setItem('anomalySettings', JSON.stringify(anomalySettings));
+            showMessage('Configuración de anomalías guardada correctamente.', 'success');
+            filterAndDisplayBiometricData(); // Refrescar datos con nueva configuración
+        }
+
+        /**
+         * Obtiene los datos biométricos/GPS de la hoja de cálculo a través del Apps Script.
+         */
+        async function fetchBiometricData() {
+            noMapDataMessage.classList.add('hidden');
+            dataMapTableBody.innerHTML = '';
+            markers.clearLayers();
+            polyline.setLatLngs([]); // Limpiar la polilínea
+
+            showMessage('Cargando datos de recorrido...', 'info');
+            try {
+                // Usamos el GOOGLE_APPS_SCRIPT_WEB_DATA_URL para obtener los datos
+                const response = await fetch(GOOGLE_APPS_SCRIPT_WEB_DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                allBiometricData = await response.json();
+
+                // Convertir Timestamps a objetos Date
+                allBiometricData.forEach(d => {
+                    d.Timestamp = new Date(d.Timestamp);
+                });
+
+                showMessage('Datos de recorrido cargados exitosamente.', 'success');
+                filterAndDisplayBiometricData(); // Mostrar datos iniciales
+            } catch (error) {
+                console.error('Error al obtener datos de recorrido:', error);
+                showMessage(`Error al cargar datos de recorrido: ${error.message}. Asegúrate de que la URL de Google Apps Script sea correcta y esté desplegada.`, 'error');
+                noMapDataMessage.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Filtra y muestra los datos biométricos en la tabla y el mapa.
+         */
+        function filterAndDisplayBiometricData() {
+            const startDate = mapStartDateInput.value ? new Date(mapStartDateInput.value + 'T00:00:00') : null;
+            const endDate = mapEndDateInput.value ? new Date(mapEndDateInput.value + 'T23:59:59') : null;
+
+            let filteredData = allBiometricData.filter(d => {
+                const timestamp = d.Timestamp;
+                return (!startDate || timestamp >= startDate) && (!endDate || timestamp <= endDate);
+            });
+
+            // Ordenar por fecha, los más recientes primero
+            filteredData.sort((a, b) => b.Timestamp.getTime() - a.Timestamp.getTime());
+
+            processAndRenderBiometricData(filteredData);
+        }
+
+        /**
+         * Procesa los datos (calcula pasos diarios, detecta anomalías) y los renderiza.
+         * @param {Array<Object>} data Los datos filtrados a procesar y mostrar.
+         */
+        function processAndRenderBiometricData(data) {
+            dataMapTableBody.innerHTML = ''; // Limpia la tabla
+            markers.clearLayers(); // Limpiar marcadores existentes del mapa
+            polyline.setLatLngs([]); // Limpiar la polilínea
+
+            if (data.length === 0) {
+                noMapDataMessage.classList.remove('hidden');
+                map.setView([0, 0], 2); // Restablece la vista del mapa
+                return;
+            } else {
+                noMapDataMessage.classList.add('hidden');
+            }
+
+            // Para calcular pasos diarios y horas de sueño
+            const dailyAggregates = {}; // { 'YYYY-MM-DD': { totalSteps: X, totalSleepTime: Y } }
+
+            let firstValidLatLng = null; // Para centrar el mapa en la primera ubicación válida
+            const latLngsForPolyline = []; // Para la línea del recorrido
+
+            data.forEach(d => {
+                const timestamp = d.Timestamp;
+                const dateKey = timestamp.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                // Acumular pasos diarios y datos de sueño (si se recolectan)
+                if (!dailyAggregates[dateKey]) {
+                    dailyAggregates[dateKey] = { totalSteps: 0, sleepEntries: [], entryCount: 0 };
+                }
+                if (d.Steps !== undefined && d.Steps !== null && !isNaN(d.Steps)) {
+                    dailyAggregates[dateKey].totalSteps += parseInt(d.Steps);
+                }
+                // Si tienes un campo para "horas de sueño" en tus datos, agrégalo aquí para agregación
+                // Por ejemplo, si cada entrada es una "lectura" que incluye el estado de sueño,
+                // la lógica sería más compleja para calcular horas totales. Aquí se asume
+                // que 'SleepHours' podría ser un campo acumulado o una indicación.
+                if (d.SleepHours !== undefined && d.SleepHours !== null && !isNaN(d.SleepHours)) {
+                     dailyAggregates[dateKey].sleepEntries.push(d.SleepHours);
+                }
+                 dailyAggregates[dateKey].entryCount++; // Contar entradas por día para promedio de sueño
+
+
+                // Detección de anomalías para esta entrada
+                const anomalies = [];
+                let isAnomaly = false;
+
+                if (d.Pulse !== undefined && d.Pulse !== null && !isNaN(d.Pulse)) {
+                    if (d.Pulse < anomalySettings.minPulse) anomalies.push('Pulso Bajo');
+                    if (d.Pulse > anomalySettings.maxPulse) anomalies.push('Pulso Alto');
+                }
+                if (d.SpO2 !== undefined && d.SpO2 !== null && !isNaN(d.SpO2)) {
+                    if (d.SpO2 < anomalySettings.minSpO2) anomalies.push('Oxígeno Bajo');
+                    if (d.SpO2 > anomalySettings.maxSpO2) anomalies.push('Oxígeno Alto');
+                }
+                 if (d.Temperature !== undefined && d.Temperature !== null && !isNaN(d.Temperature)) {
+                    if (d.Temperature < anomalySettings.minTemperature) anomalies.push('Temp. Baja');
+                    if (d.Temperature > anomalySettings.maxTemperature) anomalies.push('Temp. Alta');
+                }
+                
+                if (anomalies.length > 0) {
+                    isAnomaly = true;
+                }
+
+                // Crear fila de tabla
+                const row = dataMapTableBody.insertRow();
+                if (isAnomaly) {
+                    row.classList.add('anomaly-row');
+                }
+
+                row.insertCell().textContent = formatDate(d.Timestamp);
+                row.insertCell().textContent = d.Latitude !== undefined && d.Latitude !== 0.0 ? d.Latitude.toFixed(6) : 'N/D';
+                row.insertCell().textContent = d.Longitude !== undefined && d.Longitude !== 0.0 ? d.Longitude.toFixed(6) : 'N/D';
+                row.insertCell().textContent = d.Pulse !== undefined && d.Pulse !== -1 ? d.Pulse : 'N/D';
+                row.insertCell().textContent = d.SpO2 !== undefined && d.SpO2 !== -1 ? d.SpO2 : 'N/D';
+                
+                // Celda para Pasos Diarios (se actualizará después del bucle)
+                const dailyStepsCell = row.insertCell();
+                dailyStepsCell.dataset.dateKey = dateKey; // Guarda la clave de fecha para actualizar
+
+                row.insertCell().textContent = d.MovementX !== undefined ? `X:${d.MovementX.toFixed(2)}, Y:${d.MovementY.toFixed(2)}, Z:${d.MovementZ.toFixed(2)}` : 'N/D';
+                row.insertCell().textContent = d.Temperature !== undefined && d.Temperature !== -1.0 ? d.Temperature.toFixed(1) : 'N/D';
+                
+                // Celda de Anomalías
+                const anomalyTextCell = row.insertCell();
+                if (anomalies.length > 0) {
+                    anomalyTextCell.textContent = anomalies.join(', ');
+                    anomalyTextCell.classList.add('anomaly-text');
+                } else {
+                    anomalyTextCell.textContent = 'Ninguna';
+                }
+
+                // Añadir marcador al mapa si hay coordenadas válidas
+                if (d.Latitude && d.Longitude && d.Latitude !== 0.0 && d.Longitude !== 0.0 && !isNaN(d.Latitude) && !isNaN(d.Longitude)) {
+                    const latLng = [d.Latitude, d.Longitude];
+                    if (!firstValidLatLng) {
+                        firstValidLatLng = latLng;
+                    }
+                    latLngsForPolyline.push(latLng);
+
+                    const markerColor = isAnomaly ? '#ef4444' : '#4f46e5'; // Rojo para anomalía, morado para normal
+                    const customIcon = L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div style="background-color:${markerColor}; width:10px; height:10px; border-radius:50%; border: 1px solid white;"></div>`,
+                        iconSize: [12, 12],
+                        iconAnchor: [6, 6]
+                    });
+
+                    const marker = L.marker(latLng, { icon: customIcon })
+                        .bindPopup(`<b>${formatDate(d.Timestamp)}</b><br>Lat: ${d.Latitude.toFixed(6)}, Lon: ${d.Longitude.toFixed(6)}<br>Pulso: ${d.Pulse !== -1 ? d.Pulse : 'N/D'}<br>SpO2: ${d.SpO2 !== -1 ? d.SpO2 : 'N/D'}<br>Temp: ${d.Temperature !== -1.0 ? d.Temperature.toFixed(1) + '°C' : 'N/D'}<br>Anomalías: ${anomalies.length > 0 ? anomalies.join(', ') : 'Ninguna'}`);
+                    markers.addLayer(marker);
+                }
+            });
+
+            // Post-procesamiento para Pasos Diarios y Anomalías de Sueño
+            dataMapTableBody.querySelectorAll('td[data-date-key]').forEach(cell => {
+                const dateKey = cell.dataset.dateKey;
+                const dailyAggregate = dailyAggregates[dateKey];
+                
+                const totalStepsForDay = dailyAggregate ? dailyAggregate.totalSteps : 0;
+                cell.textContent = totalStepsForDay;
+
+                const parentRow = cell.parentElement;
+                let anomalyTextCell = parentRow.querySelector('.anomaly-text');
+                if (!anomalyTextCell) {
+                    // Si no existe, significa que no se añadió antes, lo creamos
+                    anomalyTextCell = parentRow.cells[parentRow.cells.length - 1]; // Última celda
+                    if (anomalyTextCell.textContent === 'Ninguna') anomalyTextCell.textContent = ''; // Limpiar si ya estaba "Ninguna"
+                }
+
+                // Anomalía para pasos
+                if (totalStepsForDay < anomalySettings.minStepsPerDay && totalStepsForDay > 0) { // No marcar 0 como anomalía si no hay datos significativos
+                    if (!parentRow.classList.contains('anomaly-row')) {
+                        parentRow.classList.add('anomaly-row');
+                    }
+                    if (!anomalyTextCell.textContent.includes('Pasos Bajos')) {
+                         anomalyTextCell.textContent += (anomalyTextCell.textContent ? ', ' : '') + 'Pasos Bajos';
+                         anomalyTextCell.classList.add('anomaly-text');
+                    }
+                }
+
+                // Anomalía de Sueño (si hay datos y lógica compleja para calcularlo)
+                // Esto es más complejo. Si "SleepHours" es una lectura directa de horas de sueño
+                // por cada entrada, necesitas una media o suma sensata.
+                if (dailyAggregate && dailyAggregate.sleepEntries.length > 0) {
+                    const avgSleepHours = dailyAggregate.sleepEntries.reduce((a, b) => a + b, 0) / dailyAggregate.sleepEntries.length;
+                    if (avgSleepHours < anomalySettings.minSleepHours) {
+                         if (!parentRow.classList.contains('anomaly-row')) parentRow.classList.add('anomaly-row');
+                         if (!anomalyTextCell.textContent.includes('Sueño Insuficiente')) {
+                             anomalyTextCell.textContent += (anomalyTextCell.textContent ? ', ' : '') + 'Sueño Insuficiente';
+                             anomalyTextCell.classList.add('anomaly-text');
+                         }
+                    }
+                    if (avgSleepHours > anomalySettings.maxSleepHours) {
+                         if (!parentRow.classList.contains('anomaly-row')) parentRow.classList.add('anomaly-row');
+                         if (!anomalyTextCell.textContent.includes('Exceso de Sueño')) {
+                             anomalyTextCell.textContent += (anomalyTextCell.textContent ? ', ' : '') + 'Exceso de Sueño';
+                             anomalyTextCell.classList.add('anomaly-text');
+                         }
+                    }
+                }
+                 if (anomalyTextCell.textContent === '') {
+                    anomalyTextCell.textContent = 'Ninguna';
+                    anomalyTextCell.classList.remove('anomaly-text'); // Asegurarse de que no tenga el estilo si no hay anomalías
+                }
+            });
+
+
+            // Ajustar el mapa para que muestre todos los marcadores o el primer punto válido
+            if (markers.getLayers().length > 0) {
+                map.fitBounds(markers.getBounds(), {padding: L.point(50, 50)}); // Añadir padding para que no se pegue a los bordes
+                polyline.setLatLngs(latLngsForPolyline); // Dibujar la línea de recorrido
+            } else if (firstValidLatLng) {
+                map.setView(firstValidLatLng, 13); // Centrar en el primer punto si no hay múltiples marcadores
+            }
+        }
+
+        // Event Listeners para la sección de Mapas
+        applyMapFiltersBtn.addEventListener('click', filterAndDisplayBiometricData);
+        resetMapFiltersBtn.addEventListener('click', () => {
+            mapStartDateInput.value = '';
+            mapEndDateInput.value = '';
+            filterAndDisplayBiometricData();
+        });
+        saveAnomalySettingsBtn.addEventListener('click', saveAnomalySettings);
+
+
+        // --- Inicialización General ---
         document.addEventListener('DOMContentLoaded', () => {
-            showMainTab('home');
+            showMainTab('home'); // Muestra la pestaña de inicio por defecto
+        });
+
+        // Asegurarse de que el mapa se renderice correctamente si el contenedor cambia de tamaño
+        window.addEventListener('resize', () => {
+            if (map && mainMapsSection.classList.contains('active')) { // Solo invalidate si la pestaña de mapas está activa
+                map.invalidateSize();
+            }
         });
     </script>
 </body>
