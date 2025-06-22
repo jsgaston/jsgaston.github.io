@@ -761,51 +761,43 @@
         }
 
         // Envío del formulario del diario
+        // Envío del formulario del diario
         diaryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
+        
             hideMessage();
             buttonText.textContent = 'Guardando...';
             loadingSpinner.style.display = 'block';
             diaryForm.querySelector('button[type="submit"]').disabled = true;
-
+        
+            const title = document.getElementById('title').value.trim();
             const entryText = text.value;
             const externalImageUrl = externalImageUrlInput.value.trim();
-            const titleInput = document.getElementById('title');
-            const title = titleInput.value.trim();
+            let imageData = null;
+            let imageName = '';
+        
             if (!title) {
                 showMessage('Por favor, pon un título a tu entrada.', 'error');
                 resetFormState();
                 return;
             }
-
-            formData.append('title', title);  // ← ¡Esto FALTABA!
-
-
-            
-            let imageData = null;
-            let imageName = '';
-
-            // Validación
+        
             if (!entryText.trim()) {
                 showMessage('Por favor, escribe algo en tu entrada del diario.', 'error');
                 resetFormState();
                 return;
             }
-
-            // Validar que no se usen ambos métodos de imagen
+        
             if (photoUpload.files.length > 0 && externalImageUrl !== '') {
-                showMessage('Por favor, elige SOLO UNA opción para la imagen: o subir un archivo O pegar una URL.', 'error');
+                showMessage('Por favor, elige SOLO UNA opción para la imagen.', 'error');
                 resetFormState();
                 return;
             }
-
-            // Procesar imagen si existe
+        
             if (photoUpload.files.length > 0) {
                 const file = photoUpload.files[0];
-                const MAX_FILE_SIZE = 5 * 1024 * 1024; 
-                if (file.size > MAX_FILE_SIZE) {
-                    showMessage('La imagen es demasiado grande (máximo 5MB).', 'error');
+                if (file.size > 5 * 1024 * 1024) {
+                    showMessage('La imagen es demasiado grande (máx. 5MB).', 'error');
                     resetFormState();
                     return;
                 }
@@ -813,51 +805,52 @@
                 try {
                     imageData = await readFileAsBase64(file);
                 } catch (error) {
-                    showMessage('Error al leer la imagen. Inténtalo de nuevo.', 'error');
+                    showMessage('Error al leer la imagen.', 'error');
                     resetFormState();
                     return;
                 }
             }
-
-            // Preparar datos para enviar - CORREGIDO para coincidir con el script
-            // Crear FormData
+        
             const formData = new FormData();
-            formData.append('title', title);                        // ✅ Añadir título
-            formData.append('diaryEntry', entryText);               // ✅ Texto
+            formData.append('title', title); // ✅ ESTA LÍNEA FALTABA
+            formData.append('diaryEntry', entryText);
+        
             if (externalImageUrl !== '') {
                 formData.append('externalImageUrl', externalImageUrl);
             } else if (imageData) {
                 formData.append('imageData', imageData);
                 formData.append('imageName', imageName);
             }
-
+        
             try {
                 const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                     method: 'POST',
                     body: formData,
                 });
-
+        
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+        
                 const result = await response.json();
-
+        
                 if (result.status === 'success') {
                     showMessage('¡Entrada guardada con éxito!', 'success');
                     text.value = '';
                     photoUpload.value = '';
                     externalImageUrlInput.value = '';
+                    document.getElementById('title').value = ''; // limpiar título
                 } else {
                     showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
                 }
             } catch (error) {
                 console.error('Error al enviar la entrada:', error);
-                showMessage('Ha ocurrido un error al conectar con el servidor. Inténtalo de nuevo más tarde.', 'error');
+                showMessage('Error al conectar con el servidor.', 'error');
             } finally {
                 resetFormState();
             }
         });
+
 
         // Búsqueda de entradas por fecha
         searchEntriesBtn.addEventListener('click', async () => {
