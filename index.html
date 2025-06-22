@@ -307,8 +307,6 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
             <!-- Sustituir el contenido del div con id="mainMapsSection" en tu HTML -->
 
-            <div id="mainMapsSection" class="main-tab-content hidden">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
             
               <div class="flex gap-4 mb-4">
                 <input type="date" id="mapStartDate" class="form-input" />
@@ -625,6 +623,15 @@
             } else if (tabName === 'maps') {
                 mainMapsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="maps"]').classList.add('active');
+                setTimeout(() => {
+                    if (mapa) {
+                        mapa.invalidateSize(); // Corrige tamaño del mapa si se hace visible ahora
+                    } else {
+                        iniciarMapa(); // Lo inicializa si no lo está
+                    }
+                }, 200);
+            }
+
             } else if (tabName === 'trips') {
                 mainTripsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="trips"]').classList.add('active');
