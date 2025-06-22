@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Diario Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Insertar en el <head> de tu HTML -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
     <style>
         /* Fuente Inter para un aspecto moderno y limpio */
         body {
@@ -301,8 +305,39 @@
 
         <div id="mainMapsSection" class="main-tab-content hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
-            <p class="text-center text-gray-600">Aquí podrás integrar tus mapas de Google Maps o uMap. ¡En construcción!</p>
-            <p class="text-center text-gray-500 mt-4">Para añadir esta funcionalidad, crearías una nueva sección aquí y la conectarías a la API de mapas.</p>
+            <!-- Sustituir el contenido del div con id="mainMapsSection" en tu HTML -->
+
+            <div id="mainMapsSection" class="main-tab-content hidden">
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
+            
+              <div class="flex gap-4 mb-4">
+                <input type="date" id="mapStartDate" class="form-input" />
+                <input type="date" id="mapEndDate" class="form-input" />
+                <button onclick="filtrarDatosMapa()" class="btn">Aplicar Filtros</button>
+              </div>
+            
+              <div id="mapid" style="height: 500px;" class="mb-6 rounded-xl shadow-md"></div>
+            
+              <h3 class="text-xl font-semibold text-gray-700 mb-2">Datos Recopilados</h3>
+              <div class="overflow-auto max-h-[400px] border rounded-lg shadow">
+                <table class="w-full text-sm text-left">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="px-4 py-2">Fecha</th>
+                      <th class="px-4 py-2">Lat</th>
+                      <th class="px-4 py-2">Lon</th>
+                      <th class="px-4 py-2">Pulso</th>
+                      <th class="px-4 py-2">SpO2</th>
+                      <th class="px-4 py-2">Pasos</th>
+                      <th class="px-4 py-2">Temp</th>
+                      <th class="px-4 py-2">Anomalía</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaDatosMapa"></tbody>
+                </table>
+              </div>
+            </div>
+
         </div>
 
         <div id="mainTripsSection" class="main-tab-content hidden">
@@ -792,5 +827,95 @@
             showMainTab('home');
         });
     </script>
+    <!-- Insertar al final del <body>, antes del cierre -->
+    <script>
+    const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbw1fN6Voc3yoCAh388Lgh-9bvmzbjTsv6c42nvZ0VNrxb3Cf5O_9v_DN61JLIoOiv-l/exec"; // URL del Apps Script de servidor de datos
+    let mapa, capaMarcadores, ruta;
+    
+    function iniciarMapa() {
+      mapa = L.map("mapid").setView([40.4168, -3.7038], 5); // Por defecto: Madrid
+    
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(mapa);
+    
+      capaMarcadores = L.featureGroup().addTo(mapa);
+      ruta = L.polyline([], { color: 'blue' }).addTo(mapa);
+    
+      cargarDatosMapa();
+    }
+    
+    async function cargarDatosMapa() {
+      try {
+        const res = await fetch(SERVER_DATA_URL);
+        const datos = await res.json();
+    
+        procesarYMostrarDatos(datos);
+      } catch (error) {
+        console.error("Error al obtener datos:", error);
+      }
+    }
+    
+    function procesarYMostrarDatos(datos) {
+      const cuerpoTabla = document.getElementById("tablaDatosMapa");
+      cuerpoTabla.innerHTML = "";
+      capaMarcadores.clearLayers();
+      ruta.setLatLngs([]);
+    
+      const coordenadasRuta = [];
+    
+      datos.forEach((dato) => {
+        const {
+          Timestamp, Latitude, Longitude, Pulse, SpO2, Steps,
+          Temperature
+        } = dato;
+    
+        // Filtro: si falta lat/lon, ignora
+        if (!Latitude || !Longitude) return;
+    
+        const lat = parseFloat(Latitude);
+        const lon = parseFloat(Longitude);
+        coordenadasRuta.push([lat, lon]);
+    
+        // Anomalías básicas
+        const anomalía =
+          Pulse < 40 || Pulse > 120 ||
+          SpO2 < 90 || SpO2 > 100 ||
+          Temperature < 35.0 || Temperature > 37.5
+            ? "⚠️"
+            : "";
+    
+        // Tabla
+        const fila = `<tr>
+          <td class="px-4 py-1">${new Date(Timestamp).toLocaleString()}</td>
+          <td class="px-4 py-1">${lat.toFixed(4)}</td>
+          <td class="px-4 py-1">${lon.toFixed(4)}</td>
+          <td class="px-4 py-1">${Pulse}</td>
+          <td class="px-4 py-1">${SpO2}</td>
+          <td class="px-4 py-1">${Steps}</td>
+          <td class="px-4 py-1">${Temperature}</td>
+          <td class="px-4 py-1">${anomalía}</td>
+        </tr>`;
+        cuerpoTabla.insertAdjacentHTML("beforeend", fila);
+    
+        // Mapa
+        const marker = L.marker([lat, lon]).bindPopup(
+          `📅 ${new Date(Timestamp).toLocaleString()}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
+        );
+        capaMarcadores.addLayer(marker);
+      });
+    
+      ruta.setLatLngs(coordenadasRuta);
+      if (coordenadasRuta.length > 0) mapa.fitBounds(ruta.getBounds());
+    }
+    
+    function filtrarDatosMapa() {
+      // Puedes implementar filtros por fecha desde inputs aquí si ya están cargados los datos
+      // Este ejemplo asume carga completa; luego puedes filtrar client-side
+    }
+    
+    document.addEventListener("DOMContentLoaded", iniciarMapa);
+    </script>
+
 </body>
 </html>
