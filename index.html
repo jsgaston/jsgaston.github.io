@@ -445,45 +445,53 @@
         // Función mejorada para convertir URLs de servicios de hosting a URLs directas (cliente)
         function convertToDirectImageUrl(url) {
             if (!url || url.trim() === '') return url;
-            
+        
             const cleanUrl = url.trim();
-            
-            // Si ya es una URL directa, devolverla tal como está
-            if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) || 
+        
+            if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) ||
                 cleanUrl.includes('drive.google.com/thumbnail') ||
                 cleanUrl.includes('i.ibb.co') ||
                 cleanUrl.includes('i.imgur.com') ||
                 cleanUrl.includes('i.postimg.cc')) {
                 return cleanUrl;
             }
-            
-            // ImgBB: https://ibb.co/gMsvhD73 -> intentar obtener la URL directa
+        
+            // Soporte para pasteboard.co
+            if (cleanUrl.includes('pasteboard.co/')) {
+                const match = cleanUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)(\.[a-z]+)?/);
+                if (match && match[1]) {
+                    // Intentar distintos formatos (jpg, png, webp)
+                    return `https://pasteboard.co/${match[1]}.png`; // Por defecto PNG
+                }
+            }
+        
+            // ImgBB
             if (cleanUrl.includes('ibb.co/') && !cleanUrl.includes('i.ibb.co')) {
                 const match = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
                 if (match && match[1]) {
-                    // Intentar diferentes formatos de URL directa de ImgBB
                     return `https://i.ibb.co/${match[1]}/image.jpg`;
                 }
             }
-            
-            // Imgur: https://imgur.com/a/ABC123 -> https://i.imgur.com/ABC123.jpg
+        
+            // Imgur
             if (cleanUrl.includes('imgur.com') && !cleanUrl.includes('i.imgur.com')) {
                 const match = cleanUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
                 if (match && match[1]) {
                     return `https://i.imgur.com/${match[1]}.jpg`;
                 }
             }
-            
-            // PostImage: https://postimg.cc/ABC123 -> https://i.postimg.cc/ABC123/image.jpg
+        
+            // PostImage
             if (cleanUrl.includes('postimg.cc') && !cleanUrl.includes('i.postimg.cc')) {
                 const match = cleanUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
                 if (match && match[1]) {
                     return `https://i.postimg.cc/${match[1]}/image.jpg`;
                 }
             }
-            
-            return cleanUrl; // Devolver la URL original si no se puede convertir
+        
+            return cleanUrl;
         }
+
 
         // Función para intentar múltiples URLs de imagen
         function tryMultipleImageUrls(originalUrl, imgElement, callback) {
