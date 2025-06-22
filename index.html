@@ -304,7 +304,14 @@
                   <label for="searchTitle" class="form-label mb-2">Buscar por Título:</label>
                   <input type="text" id="searchTitle" name="searchTitle" class="form-input rounded-lg" placeholder="Palabra clave del título">
                 </div>
-                <button onclick="buscarPorTitulo()" class="btn w-full">Buscar por Título</button>
+                <div class="flex gap-2 items-end mb-6">
+                  <div class="flex-1">
+                    <label for="searchTitle" class="form-label mb-2">Buscar por Título:</label>
+                    <input type="text" id="searchTitle" name="searchTitle" class="form-input rounded-lg" placeholder="Palabra clave del título">
+                  </div>
+                  <button onclick="buscarPorTitulo()" class="btn px-6 py-3">Buscar</button>
+                </div>
+
                 <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
                     <div>
@@ -580,6 +587,12 @@
         function renderEntry(entry, containerElement) {
             const entryCard = document.createElement('div');
             entryCard.className = 'entry-card';
+
+            const titleElem = document.createElement('h3');
+            titleElem.className = 'text-xl font-bold text-indigo-700 mb-2';
+            titleElem.textContent = entry.title || '(Sin título)';
+            entryCard.appendChild(titleElem);
+
 
             const datePara = document.createElement('p');
             datePara.className = 'text-sm text-gray-500 mb-2';
