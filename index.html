@@ -326,6 +326,7 @@
                       <th class="px-4 py-2">Hora</th>
                       <th class="px-4 py-2">Lat</th>
                       <th class="px-4 py-2">Lon</th>
+                      <th class="px-4 py-2">Alt</th>
                       <th class="px-4 py-2">Pulso</th>
                       <th class="px-4 py-2">SpO2</th>
                       <th class="px-4 py-2">Pasos</th>
@@ -873,11 +874,12 @@
         const coordenadasRuta = [];
     
         datos.forEach((dato) => {
-          const { Timestamp, Hour, Latitude, Longitude, Pulse, SpO2, Steps, Temperature } = dato;
+          const { Timestamp, Hour, Latitude, Longitude, Altitude, Pulse, SpO2, Steps, Temperature } = dato;
     
-          if (!Latitude || !Longitude) return;
+          if (!Latitude || !Longitude || !Altitude) return;
           const lat = parseFloat(Latitude);
           const lon = parseFloat(Longitude);
+          const alt = parseFloat(Altitude);
           coordenadasRuta.push([lat, lon]);
     
           const anomalía =
@@ -893,6 +895,7 @@
 
             <td class="px-4 py-1">${lat.toFixed(4)}</td>
             <td class="px-4 py-1">${lon.toFixed(4)}</td>
+            <td class="px-4 py-1">${alt.toFixed(4)}</td>
             <td class="px-4 py-1">${Pulse}</td>
             <td class="px-4 py-1">${SpO2}</td>
             <td class="px-4 py-1">${Steps}</td>
