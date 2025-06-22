@@ -19,6 +19,10 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            background-image: url('mi%20bandera.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
         .container {
             max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
@@ -27,6 +31,8 @@
             padding: 32px;
             border-radius: 12px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
         }
         .form-label {
             font-weight: 600;
@@ -226,13 +232,15 @@
     <div class="container rounded-xl shadow-xl flex flex-col">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
 
+        <!-- Nueva pestaña en navegación principal -->
         <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
-            <button class="main-tab-button active" data-main-tab="home">Inicio</button>
-            <button class="main-tab-button" data-main-tab="diary">Diario</button>
-            <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
-            <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
-            <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
-            <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+          <button class="main-tab-button" data-main-tab="home">Inicio</button>
+          <button class="main-tab-button" data-main-tab="diary">Diario</button>
+          <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
+          <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
+          <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
+          <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+          <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
         </nav>
 
         <div id="mainHomeSection" class="main-tab-content">
@@ -261,6 +269,13 @@
             <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
                 <form id="diaryForm" class="w-full">
                     <div class="mb-6">
+                      <label for="title" class="form-label mb-2">Título de la Entrada:</label>
+                      <input type="text" id="title" name="title" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: Paseo por el parque" />
+                    </div>
+
+
+                    
+                    <div class="mb-6">
                         <label for="text" class="form-label mb-2">Tu Entrada de Hoy:</label>
                         <textarea id="text" name="text" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
                     </div>
@@ -285,6 +300,11 @@
             </div>
 
             <div id="diaryViewSearchSection" class="diary-sub-tab-content hidden">
+                <div class="mb-6">
+                  <label for="searchTitle" class="form-label mb-2">Buscar por Título:</label>
+                  <input type="text" id="searchTitle" name="searchTitle" class="form-input rounded-lg" placeholder="Palabra clave del título">
+                </div>
+                <button onclick="buscarPorTitulo()" class="btn w-full">Buscar por Título</button>
                 <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
                     <div>
@@ -357,6 +377,18 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gestión de Proyectos</h2>
             <p class="text-center text-gray-600">Gestiona tus tareas, plazos y objetivos de tus proyectos personales o profesionales. ¡Trabajando en ello!</p>
             <p class="text-center text-gray-500 mt-4">Tableros Kanban o listas de tareas serían útiles aquí.</p>
+        </div>
+
+        <!-- Nueva sección "Perfil" -->
+        <div id="mainProfileSection" class="main-tab-content hidden">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Perfil Personal</h2>
+          <div class="space-y-4">
+            <p><strong>Nombre:</strong> Javier Santiago Gastón de Iriarte Cabrera</p>
+            <p><strong>DNI:</strong> 47033535F</p>
+            <p><strong>Contacto:</strong> <a href="mailto:javier@email.com" class="text-blue-600 underline">javier@email.com</a></p>
+            <p><strong>Teléfono:</strong> +34 600 123 456</p>
+            <p><strong>Sobre mí:</strong> Soy un entusiasta de la tecnología y me gusta registrar mi vida digitalmente. Este diario es parte de mi organización personal.</p>
+          </div>
         </div>
 
         <div id="messageBox" class="message-box w-full mt-8"></div>
@@ -948,6 +980,31 @@
         procesarYMostrarDatos(filtrados);
       }
     </script>
+
+    <script>
+        function buscarPorTitulo() {
+          const keyword = document.getElementById('searchTitle').value.trim().toLowerCase();
+          if (!keyword) {
+            showMessage('Introduce una palabra clave para buscar.', 'error');
+            return;
+          }
+        
+          fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.status === 'success' && data.entries.length > 0) {
+                searchResultsDiv.innerHTML = '';
+                data.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
+              } else {
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              showMessage('Error al buscar por título.', 'error');
+            });
+        }
+        </script>
 
 
 </body>
