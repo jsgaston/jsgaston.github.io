@@ -829,92 +829,92 @@
     </script>
     <!-- Insertar al final del <body>, antes del cierre -->
     <script>
-    const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbw1fN6Voc3yoCAh388Lgh-9bvmzbjTsv6c42nvZ0VNrxb3Cf5O_9v_DN61JLIoOiv-l/exec"; // URL del Apps Script de servidor de datos
-    let mapa, capaMarcadores, ruta;
-    
-    function iniciarMapa() {
-      mapa = L.map("mapid").setView([40.4168, -3.7038], 5); // Por defecto: Madrid
-    
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; OpenStreetMap',
-      }).addTo(mapa);
-    
-      capaMarcadores = L.featureGroup().addTo(mapa);
-      ruta = L.polyline([], { color: 'blue' }).addTo(mapa);
-    
-      cargarDatosMapa();
-    }
-    
-    async function cargarDatosMapa() {
-      try {
-        const res = await fetch(SERVER_DATA_URL);
-        const datos = await res.json();
-    
-        procesarYMostrarDatos(datos);
-      } catch (error) {
-        console.error("Error al obtener datos:", error);
-      }
-    }
-    
-    function procesarYMostrarDatos(datos) {
-      const cuerpoTabla = document.getElementById("tablaDatosMapa");
-      cuerpoTabla.innerHTML = "";
-      capaMarcadores.clearLayers();
-      ruta.setLatLngs([]);
-    
-      const coordenadasRuta = [];
-    
-      datos.forEach((dato) => {
-        const {
-          Timestamp, Latitude, Longitude, Pulse, SpO2, Steps,
-          Temperature
-        } = dato;
-    
-        // Filtro: si falta lat/lon, ignora
-        if (!Latitude || !Longitude) return;
-    
-        const lat = parseFloat(Latitude);
-        const lon = parseFloat(Longitude);
-        coordenadasRuta.push([lat, lon]);
-    
-        // Anomalías básicas
-        const anomalía =
-          Pulse < 40 || Pulse > 120 ||
-          SpO2 < 90 || SpO2 > 100 ||
-          Temperature < 35.0 || Temperature > 37.5
-            ? "⚠️"
-            : "";
-    
-        // Tabla
-        const fila = `<tr>
-          <td class="px-4 py-1">${new Date(Timestamp).toLocaleString()}</td>
-          <td class="px-4 py-1">${lat.toFixed(4)}</td>
-          <td class="px-4 py-1">${lon.toFixed(4)}</td>
-          <td class="px-4 py-1">${Pulse}</td>
-          <td class="px-4 py-1">${SpO2}</td>
-          <td class="px-4 py-1">${Steps}</td>
-          <td class="px-4 py-1">${Temperature}</td>
-          <td class="px-4 py-1">${anomalía}</td>
-        </tr>`;
-        cuerpoTabla.insertAdjacentHTML("beforeend", fila);
-    
-        // Mapa
-        const marker = L.marker([lat, lon]).bindPopup(
-          `📅 ${new Date(Timestamp).toLocaleString()}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
-        );
-        capaMarcadores.addLayer(marker);
-      });
-    
-      ruta.setLatLngs(coordenadasRuta);
-      if (coordenadasRuta.length > 0) mapa.fitBounds(ruta.getBounds());
-    }
-    
-    function filtrarDatosMapa() {
-      // Puedes implementar filtros por fecha desde inputs aquí si ya están cargados los datos
-      // Este ejemplo asume carga completa; luego puedes filtrar client-side
-    }
-    
-    document.addEventListener("DOMContentLoaded", iniciarMapa);
+        const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbw1fN6Voc3yoCAh388Lgh-9bvmzbjTsv6c42nvZ0VNrxb3Cf5O_9v_DN61JLIoOiv-l/exec"; // URL del Apps Script de servidor de datos
+        let mapa, capaMarcadores, ruta;
+        
+        function iniciarMapa() {
+          mapa = L.map("mapid").setView([40.4168, -3.7038], 5); // Por defecto: Madrid
+        
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; OpenStreetMap',
+          }).addTo(mapa);
+        
+          capaMarcadores = L.featureGroup().addTo(mapa);
+          ruta = L.polyline([], { color: 'blue' }).addTo(mapa);
+        
+          cargarDatosMapa();
+        }
+        
+        async function cargarDatosMapa() {
+          try {
+            const res = await fetch(SERVER_DATA_URL);
+            const datos = await res.json();
+        
+            procesarYMostrarDatos(datos);
+          } catch (error) {
+            console.error("Error al obtener datos:", error);
+          }
+        }
+        
+        function procesarYMostrarDatos(datos) {
+          const cuerpoTabla = document.getElementById("tablaDatosMapa");
+          cuerpoTabla.innerHTML = "";
+          capaMarcadores.clearLayers();
+          ruta.setLatLngs([]);
+        
+          const coordenadasRuta = [];
+        
+          datos.forEach((dato) => {
+            const {
+              Timestamp, Latitude, Longitude, Pulse, SpO2, Steps,
+              Temperature
+            } = dato;
+        
+            // Filtro: si falta lat/lon, ignora
+            if (!Latitude || !Longitude) return;
+        
+            const lat = parseFloat(Latitude);
+            const lon = parseFloat(Longitude);
+            coordenadasRuta.push([lat, lon]);
+        
+            // Anomalías básicas
+            const anomalía =
+              Pulse < 40 || Pulse > 120 ||
+              SpO2 < 90 || SpO2 > 100 ||
+              Temperature < 35.0 || Temperature > 37.5
+                ? "⚠️"
+                : "";
+        
+            // Tabla
+            const fila = `<tr>
+              <td class="px-4 py-1">${new Date(Timestamp).toLocaleString()}</td>
+              <td class="px-4 py-1">${lat.toFixed(4)}</td>
+              <td class="px-4 py-1">${lon.toFixed(4)}</td>
+              <td class="px-4 py-1">${Pulse}</td>
+              <td class="px-4 py-1">${SpO2}</td>
+              <td class="px-4 py-1">${Steps}</td>
+              <td class="px-4 py-1">${Temperature}</td>
+              <td class="px-4 py-1">${anomalía}</td>
+            </tr>`;
+            cuerpoTabla.insertAdjacentHTML("beforeend", fila);
+        
+            // Mapa
+            const marker = L.marker([lat, lon]).bindPopup(
+              `📅 ${new Date(Timestamp).toLocaleString()}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
+            );
+            capaMarcadores.addLayer(marker);
+          });
+        
+          ruta.setLatLngs(coordenadasRuta);
+          if (coordenadasRuta.length > 0) mapa.fitBounds(ruta.getBounds());
+        }
+        
+        function filtrarDatosMapa() {
+          // Puedes implementar filtros por fecha desde inputs aquí si ya están cargados los datos
+          // Este ejemplo asume carga completa; luego puedes filtrar client-side
+        }
+        
+        document.addEventListener("DOMContentLoaded", iniciarMapa);
     </script>
 
 </body>
