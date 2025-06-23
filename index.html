@@ -1002,7 +1002,7 @@
             showMainTab('diary');
             showDiarySubTab('view');
         
-            const keyword = document.getElementById('searchTitle').value.trim();
+            const keyword = document.getElementById('searchTitle').value.trim().toLowerCase();
             if (!keyword) {
                 showMessage('Introduce una palabra clave para buscar.', 'error');
                 return;
@@ -1015,7 +1015,6 @@
                 .then(data => {
                     if (data.status === 'success' && data.entries.length > 0) {
                         searchResultsDiv.innerHTML = '';
-        
                         data.entries.forEach(entry => {
                             console.log('✅ Entrada recibida:', entry);
                             renderEntry(entry, searchResultsDiv);
@@ -1025,11 +1024,12 @@
                     }
                 })
                 .catch(err => {
-                    console.error('Error al buscar:', err);
+                    console.error('❌ Error al buscar:', err);
                     showMessage('Error al buscar por título.', 'error');
                 });
         }
-        </script>
+</script>
+
 
 
 
