@@ -1013,6 +1013,8 @@
               }
             
               fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`)
+                alert('Se encontró: ' + data.entries.map(e => e.title).join(', '));
+
                 .then(res => res.json())
                 .then(data => {
                   if (data.status === 'success' && data.entries.length > 0) {
