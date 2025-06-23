@@ -30,7 +30,8 @@ jobs:
 
       - name: Generar JSON
         run: |
-          python3 generate_json.py
+          python generate_json.py
+
 
       - name: Commit y Push Cambios
         run: |
