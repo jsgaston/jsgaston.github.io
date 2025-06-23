@@ -999,6 +999,7 @@
 
     <script>
        function buscarPorTitulo() {
+                document.getElementById('searchEntryTab').click();
                 showMainTab('diary');
                 showDiarySubTab('view');
                 searchResultsDiv.innerHTML = ''; // limpia antes de usar
@@ -1016,7 +1017,7 @@
                 .then(data => {
                   if (data.status === 'success' && data.entries.length > 0) {
                     searchResultsDiv.innerHTML = '';
-                    data.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
+                    data.entries.forEach( console.log('✅ Entrada recibida:', entry); entry =>  renderEntry(entry, searchResultsDiv));
                   } else {
                     searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
                   }
