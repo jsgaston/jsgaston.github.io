@@ -17,10 +17,8 @@ for i in range(1, 5):  # 001 a 004
     except Exception as e:
         print(f"Error al cargar {url}: {e}")
 
-# Opcional: barajar las canciones
 shuffle(combined_songs)
 
-# Guardar archivo
 with open("music_list.json", "w", encoding="utf-8") as f:
     json.dump(combined_songs, f, ensure_ascii=False, indent=2)
 
