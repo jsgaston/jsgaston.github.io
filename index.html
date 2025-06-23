@@ -999,16 +999,23 @@
     </script>
 
     <script>
+        function normalizar(str) {
+              return (str || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim()
+                .toLowerCase();
+            }
+        
         function buscarPorTitulo() {
-            const keyword = document.getElementById('searchTitle').value.trim();
+            const raw = document.getElementById('searchTitle').value.trim();
+            const keyword = normalizar(raw);
             if (!keyword) {
                 showMessage('Introduce una palabra clave para buscar.', 'error');
                 return;
             }
         
             showMainTab('diary');
-            
-            // ⚠️ NO LLAMES A showDiarySubTab aquí, solo muestra la sección manualmente
             diaryWriteEntrySection.classList.add('hidden');
             diaryViewSearchSection.classList.remove('hidden');
             diarySubTabButtons.forEach(button => button.classList.remove('active'));
@@ -1032,6 +1039,7 @@
                     showMessage('Error al buscar por título.', 'error');
                 });
         }
+
     </script>
     
 
