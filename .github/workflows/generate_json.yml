@@ -29,8 +29,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Instalar dependencias
-        run: pip install beautifulsoup4 requests
+      - name: Instalar BeautifulSoup4
+        run: python3 -m pip install beautifulsoup4 requests
+
 
       - name: Generar JSON
         run: |
