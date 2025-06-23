@@ -25,13 +25,12 @@ jobs:
 
       - name: Instalar Dependencias
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Generar JSON
         run: |
           python generate_json.py
-
 
       - name: Commit y Push Cambios
         run: |
@@ -40,4 +39,3 @@ jobs:
           git add music_list.json
           git diff --quiet && git diff --staged --quiet || git commit -m "Actualizar lista de canciones [skip ci]"
           git push
-
