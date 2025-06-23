@@ -1099,6 +1099,10 @@
           [array[i], array[j]] = [array[j], array[i]];
         }
       }
+
+        function extractName(url) {
+          return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ""));
+        }
     
       function playPreviousTrack() {
         currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
@@ -1111,14 +1115,14 @@
       }
     
       function playNextTrack() {
-        if (!playlist.length) return;
-        if (!isRepeat) shuffleArray(playlist);
-        radioPlayer.src = '/Musica/' + playlist[currentTrack];
-        radioPlayer.load();
-        radioPlayer.play();
-        currentSongElement.innerText = playlist[currentTrack].replace(/\.[^/.]+$/, "");
-        currentTrack = (currentTrack + 1) % playlist.length;
-      }
+          if (!playlist.length) return;
+          radioPlayer.src = playlist[currentTrack];
+          radioPlayer.load();
+          radioPlayer.play();
+          currentSongElement.innerText = extractName(playlist[currentTrack]);
+          currentTrack = (currentTrack + 1) % playlist.length;
+          renderPlaylistUI(); // Actualizar la vista de lista
+        }
     
       function playCurrentTrack() {
         shuffleArray(playlist);
@@ -1129,12 +1133,13 @@
       }
     
       fetch('music_list.json')
-        .then(response => response.json())
-        .then(data => {
-          playlist = data;
-          setTimeout(playNextTrack, 500);
-        })
-        .catch(error => console.error('Error al cargar lista de canciones:', error));
+          .then(response => response.json())
+          .then(data => {
+            playlist = data;
+            setTimeout(playNextTrack, 500);
+            renderPlaylistUI(); // Opcional para mostrar la cola
+          })
+          .catch(error => console.error('Error al cargar lista de canciones:', error));
     
       radioPlayer.addEventListener('ended', playNextTrack);
 </script>
