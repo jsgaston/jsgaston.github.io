@@ -26,7 +26,10 @@ jobs:
         run: pip install requests
 
       - name: Run Python script
-        run: python generate_music_list.py
+        run: |
+          cd jsgaston.github.io
+          python generate_music_list.py
+
 
       - name: Commit and push changes
         run: |
