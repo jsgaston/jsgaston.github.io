@@ -999,7 +999,7 @@
     </script>
 
     <script>
-        function normalizar(str) {
+        function normalize(str) {
           try {
             return (str || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
           } catch (e) {
@@ -1013,7 +1013,7 @@
           console.log('🟣 buscarPorTitulo() llamada');
         
           const raw = document.getElementById('searchTitle').value.trim();
-          const keyword = normalizar(raw);
+          const keyword = normalize(raw);
           console.log('🔤 Palabra clave normalizada:', keyword);
         
           if (!keyword) {
