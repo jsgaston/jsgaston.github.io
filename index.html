@@ -998,39 +998,39 @@
     </script>
 
     <script>
-       function buscarPorTitulo() {
-                document.getElementById('searchEntryTab').click();
-                showMainTab('diary');
-                showDiarySubTab('view');
-                searchResultsDiv.innerHTML = ''; // limpia antes de usar
-                searchResultsDiv.style.display = 'block'; // por si está oculto por CSS
-
-            
-              const keyword = document.getElementById('searchTitle').value.trim().toLowerCase();
-              if (!keyword) {
+        function buscarPorTitulo() {
+            showMainTab('diary');
+            showDiarySubTab('view');
+        
+            const keyword = document.getElementById('searchTitle').value.trim();
+            if (!keyword) {
                 showMessage('Introduce una palabra clave para buscar.', 'error');
                 return;
-              }
-            
-              fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`)
-                alert('Se encontró: ' + data.entries.map(e => e.title).join(', '));
-
+            }
+        
+            searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
+        
+            fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`)
                 .then(res => res.json())
                 .then(data => {
-                  if (data.status === 'success' && data.entries.length > 0) {
-                    searchResultsDiv.innerHTML = '';
-                    data.entries.forEach( console.log('✅ Entrada recibida:', entry); entry =>  renderEntry(entry, searchResultsDiv));
-                  } else {
-                    searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
-                  }
+                    if (data.status === 'success' && data.entries.length > 0) {
+                        searchResultsDiv.innerHTML = '';
+        
+                        data.entries.forEach(entry => {
+                            console.log('✅ Entrada recibida:', entry);
+                            renderEntry(entry, searchResultsDiv);
+                        });
+                    } else {
+                        searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
+                    }
                 })
                 .catch(err => {
-                  console.error(err);
-                  showMessage('Error al buscar por título.', 'error');
+                    console.error('Error al buscar:', err);
+                    showMessage('Error al buscar por título.', 'error');
                 });
-            }
-
+        }
         </script>
+
 
 
 </body>
