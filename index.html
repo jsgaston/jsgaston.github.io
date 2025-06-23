@@ -1000,47 +1000,65 @@
 
     <script>
         function normalizar(str) {
-              return (str || '')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .trim()
-                .toLowerCase();
-            }
+          return (str || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim()
+            .toLowerCase();
+        }
         
         function buscarPorTitulo() {
-            const raw = document.getElementById('searchTitle').value.trim();
-            const keyword = normalizar(raw);
-            if (!keyword) {
-                showMessage('Introduce una palabra clave para buscar.', 'error');
-                return;
-            }
+          console.log('🟣 buscarPorTitulo() llamada');
         
-            showMainTab('diary');
-            diaryWriteEntrySection.classList.add('hidden');
-            diaryViewSearchSection.classList.remove('hidden');
-            diarySubTabButtons.forEach(button => button.classList.remove('active'));
-            document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+          const raw = document.getElementById('searchTitle').value.trim();
+          const keyword = normalizar(raw);
+          console.log('🔤 Palabra clave normalizada:', keyword);
         
-            searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
-            hideMessage();
+          if (!keyword) {
+            showMessage('Introduce una palabra clave para buscar.', 'error');
+            return;
+          }
         
-            fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success' && data.entries.length > 0) {
-                        searchResultsDiv.innerHTML = '';
-                        data.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
-                    } else {
-                        searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
-                    }
-                })
-                .catch(err => {
-                    console.error('❌ Error al buscar:', err);
-                    showMessage('Error al buscar por título.', 'error');
+          showMainTab('diary');
+          diaryWriteEntrySection.classList.add('hidden');
+          diaryViewSearchSection.classList.remove('hidden');
+          diarySubTabButtons.forEach(button => button.classList.remove('active'));
+          document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+        
+          searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
+          hideMessage();
+        
+          const url = `${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`;
+          console.log('🌐 Haciendo fetch a:', url);
+        
+          fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              console.log('📦 Respuesta recibida:', data);
+              if (data.status === 'success' && data.entries.length > 0) {
+                searchResultsDiv.innerHTML = '';
+                data.entries.forEach(entry => {
+                  console.log('✅ Entrada recibida:', entry);
+                  searchResultsDiv.innerHTML += `
+                    <div style="border:1px solid #ccc; margin-bottom:1em; padding:1em;">
+                      <strong>${entry.title}</strong><br>
+                      <em>${entry.timestamp}</em><br>
+                      <p>${entry.text}</p>
+                      ${entry.photoUrl !== 'No hay foto' ? `<img src="${entry.photoUrl}" style="max-width:100%">` : ''}
+                    </div>`;
                 });
+              } else {
+                console.log('⚠️ No se encontraron entradas');
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
+              }
+            })
+            .catch(err => {
+              console.error('❌ Error en fetch:', err);
+              showMessage('Error al buscar por título.', 'error');
+            });
         }
-
     </script>
+
     
 
 
