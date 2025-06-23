@@ -26,16 +26,13 @@ jobs:
 
       - name: Instalar Dependencias
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-
-      - name: Instalar BeautifulSoup4
-        run: python3 -m pip install beautifulsoup4 requests
-
-
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+      
       - name: Generar JSON
         run: |
-          python generate_json.py
+          python3 generate_json.py
+
 
       - name: Commit y Push Cambios
         run: |
