@@ -999,8 +999,11 @@
 
     <script>
        function buscarPorTitulo() {
-              showMainTab('diary');
-              showDiarySubTab('view');
+                showMainTab('diary');
+                showDiarySubTab('view');
+                searchResultsDiv.innerHTML = ''; // limpia antes de usar
+                searchResultsDiv.style.display = 'block'; // por si está oculto por CSS
+
             
               const keyword = document.getElementById('searchTitle').value.trim().toLowerCase();
               if (!keyword) {
