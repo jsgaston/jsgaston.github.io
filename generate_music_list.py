@@ -2,7 +2,7 @@ import requests
 import json
 from random import shuffle
 
-BASE_URL = "https://raw.githubusercontent.com/jsgaston/Musica_assets_00{}/main/song_list00{}.json"
+BASE_URL = "https://raw.githubusercontent.com/jsgaston/Musica_assets_00{}/refs/heads/main/song_list00{}.json"  #"https://raw.githubusercontent.com/jsgaston/Musica_assets_00{}/main/song_list00{}.json"  
 combined_songs = []
 
 for i in range(1, 5):  # 001 a 004
