@@ -1000,26 +1000,29 @@
 
     <script>
         function buscarPorTitulo() {
-            showMainTab('diary');
-            showDiarySubTab('view');
-        
-            const keyword = document.getElementById('searchTitle').value.trim().toLowerCase();
+            const keyword = document.getElementById('searchTitle').value.trim();
             if (!keyword) {
                 showMessage('Introduce una palabra clave para buscar.', 'error');
                 return;
             }
         
+            showMainTab('diary');
+            
+            // ⚠️ NO LLAMES A showDiarySubTab aquí, solo muestra la sección manualmente
+            diaryWriteEntrySection.classList.add('hidden');
+            diaryViewSearchSection.classList.remove('hidden');
+            diarySubTabButtons.forEach(button => button.classList.remove('active'));
+            document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+        
             searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
+            hideMessage();
         
             fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success' && data.entries.length > 0) {
                         searchResultsDiv.innerHTML = '';
-                        data.entries.forEach(entry => {
-                            console.log('✅ Entrada recibida:', entry);
-                            renderEntry(entry, searchResultsDiv);
-                        });
+                        data.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
                     } else {
                         searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
                     }
@@ -1029,7 +1032,8 @@
                     showMessage('Error al buscar por título.', 'error');
                 });
         }
-</script>
+    </script>
+    
 
 
 
