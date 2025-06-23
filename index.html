@@ -1000,12 +1000,14 @@
 
     <script>
         function normalizar(str) {
-          return (str || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .trim()
-            .toLowerCase();
+          try {
+            return (str || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+          } catch (e) {
+            Logger.log('❌ Error en normalizar(): ' + e.message + ' | Valor: ' + str);
+            return '';
+          }
         }
+
         
         function buscarPorTitulo() {
           console.log('🟣 buscarPorTitulo() llamada');
