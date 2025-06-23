@@ -402,6 +402,7 @@
 
             <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
             <p id="currentSong" class="text-red-600 font-semibold"></p>
+            <ul id="upcomingSongs" class="text-gray-700 mt-4 text-sm"></ul>
             <div class="flex space-x-2">
               <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="playPreviousTrack()">Anterior</button>
               <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="toggleRepeat()">Repetir</button>
@@ -1131,6 +1132,16 @@
         radioPlayer.play();
         currentSongElement.innerText = playlist[currentTrack].replace(/\.[^/.]+$/, "");
       }
+
+        function renderPlaylistUI() {
+          const list = document.getElementById('upcomingSongs');
+          list.innerHTML = '';
+          for (let i = 0; i < playlist.length; i++) {
+            const li = document.createElement('li');
+            li.textContent = `${i === currentTrack ? '▶️ ' : ''}${extractName(playlist[i])}`;
+            list.appendChild(li);
+          }
+        }
     
       fetch('music_list.json')
           .then(response => response.json())
