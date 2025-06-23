@@ -242,6 +242,8 @@
           <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
           <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
           <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
+          <button class="main-tab-button" data-main-tab="radio">Radio</button>
+
         </nav>
 
         <div id="mainHomeSection" class="main-tab-content">
@@ -392,6 +394,21 @@
             <p><strong>Sobre mí:</strong> Soy .</p>
           </div>
         </div>
+
+        <div id="mainRadioSection" class="main-tab-content hidden">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Radio Javi</h2>
+          <div class="flex flex-col items-center justify-center space-y-4">
+            <img src="/images/logo_radio_002.jpg" alt="Logo Radio Anarquista" class="w-48">
+            <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
+            <p id="currentSong" class="text-red-600 font-semibold"></p>
+            <div class="flex space-x-4">
+              <button class="btn" onclick="playPreviousTrack()">Anterior</button>
+              <button class="btn" onclick="toggleRepeat()">Repetir</button>
+              <button class="btn" onclick="playNextTrack()">Siguiente</button>
+            </div>
+          </div>
+        </div>
+
 
         <div id="messageBox" class="message-box w-full mt-8"></div>
     </div>
@@ -695,7 +712,11 @@
             } else if (tabName === 'projects') {
                 mainProjectsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="projects"]').classList.add('active');
+            } else if (tabName === 'radio') {
+                document.getElementById('mainRadioSection').classList.remove('hidden');
+                document.querySelector('[data-main-tab="radio"]').classList.add('active');
             }
+
             hideMessage();
         }
 
@@ -1061,10 +1082,58 @@
         }
     </script>
 
+    <script>
+      let playlist = [];
+      let currentTrack = 0;
+      let isRepeat = false;
+      const radioPlayer = document.getElementById('radioPlayer');
+      const currentSongElement = document.getElementById('currentSong');
     
-
-
-
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+    
+      function playPreviousTrack() {
+        currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
+        playCurrentTrack();
+      }
+    
+      function toggleRepeat() {
+        isRepeat = !isRepeat;
+        radioPlayer.loop = isRepeat;
+      }
+    
+      function playNextTrack() {
+        if (!playlist.length) return;
+        if (!isRepeat) shuffleArray(playlist);
+        radioPlayer.src = '/Musica/' + playlist[currentTrack];
+        radioPlayer.load();
+        radioPlayer.play();
+        currentSongElement.innerText = playlist[currentTrack].replace(/\.[^/.]+$/, "");
+        currentTrack = (currentTrack + 1) % playlist.length;
+      }
+    
+      function playCurrentTrack() {
+        shuffleArray(playlist);
+        radioPlayer.src = '/Musica/' + playlist[currentTrack];
+        radioPlayer.load();
+        radioPlayer.play();
+        currentSongElement.innerText = playlist[currentTrack].replace(/\.[^/.]+$/, "");
+      }
+    
+      fetch('music_list.json')
+        .then(response => response.json())
+        .then(data => {
+          playlist = data;
+          setTimeout(playNextTrack, 500);
+        })
+        .catch(error => console.error('Error al cargar lista de canciones:', error));
+    
+      radioPlayer.addEventListener('ended', playNextTrack);
+</script>
 
 </body>
 </html>
