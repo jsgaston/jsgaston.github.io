@@ -75,9 +75,16 @@
 const API_DIARIO = "https://script.google.com/macros/s/AKfycbxoTQVF1RMm2XckrFFXJ1heZ8P2W7carCAZaEw-XxI76bWp_oyKZy9kA1LlBPsxMQQL/exec";
 const API_MAPS = "https://script.google.com/macros/s/AKfycbwXNtcVnXevJgk-fpMvqqkc4BeSbZZ_EutueaCAkakIaBK5sx7AQL-fZpN5R08uWNy3/exec";
 
+let mapInitialized = false;
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if (id === 'mapa' && !mapInitialized) {
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    mapInitialized = true;
+  }
 }
 
 // DIARIO
@@ -122,7 +129,11 @@ function searchEntries() {
     const out = document.getElementById('searchResults');
     out.innerHTML = '';
     (res.entries || []).forEach(e => {
-      out.innerHTML += `<p><strong>${e.title}</strong><br>${e.text}<br><img src="${e.photoUrl ? `<img src="${e.photoUrl}" width="200"></p>`;
+      out.innerHTML += `<p>
+        <strong>${e.title}</strong><br>
+        ${e.text}
+        ${e.photoUrl ? `<br><img src="${e.photoUrl}" width="250" alt="Imagen de la entrada">` : ''}
+      </p>`;
     });
   });
 }
@@ -189,6 +200,7 @@ function togglePlay() {
 function toggleRepeat() {
   if (!repeatOne && !repeatAll) {
     repeatOne = true;
+    repeatAll = false;
     audio.loop = true;
     alert('Repetir una canción');
   } else if (repeatOne) {
@@ -197,10 +209,18 @@ function toggleRepeat() {
     audio.loop = false;
     alert('Repetir toda la lista');
   } else {
-    repeatOne = repeatAll = false;
+    repeatOne = false;
+    repeatAll = false;
+    audio.loop = false;
     alert('Repetición desactivada');
   }
 }
+
+audio.onended = function() {
+  if (repeatAll) {
+    nextTrack();
+  }
+};
 
 function toggleRandom() {
   random = !random;
