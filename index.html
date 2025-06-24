@@ -1201,6 +1201,9 @@ const fullSongSelect = document.getElementById('fullSongSelect');
 let songs = [];
 let currentTrack = 0;
 
+    audio.addEventListener('pause', () => {
+  document.getElementById('equalizer')?.classList.add('hidden');
+
 // Inicializar lista
 fetch('music_list.json')
   .then(res => res.json())
@@ -1261,20 +1264,20 @@ function playTrack(index) {
     document.getElementById('equalizer')?.classList.remove('hidden');
 
 
-  if (audio.src !== song.url) {
+if (audio.src !== song.url) {
   audio.src = song.url;
-  audio.play().catch(err => console.error('Reproducción fallida:', err));
 }
+audio.play().catch(err => console.error('Reproducción fallida:', err));
+
 
   currentSongSpan.textContent = song.title || `Canción ${index + 1}`;
   nextSongSpan.textContent = `Siguiente: ${next?.title || '---'}`;
-  audio.play().catch(err => console.error('Reproducción fallida:', err));
+
 
   renderSongList();
   fullSongSelect.selectedIndex = index + 1; // +1 por el placeholder
     
-audio.addEventListener('pause', () => {
-  document.getElementById('equalizer')?.classList.add('hidden');
+
 });
 
 
@@ -1288,6 +1291,7 @@ function nextTrack() {
   currentTrack = (currentTrack + 1) % songs.length;
   playTrack(currentTrack);
 }
+
 
 // Reproducir automáticamente la siguiente
 audio.addEventListener('ended', nextTrack);
