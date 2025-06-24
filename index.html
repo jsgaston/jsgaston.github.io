@@ -2,132 +2,226 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Página Completa</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Web Completa</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    body { font-family: sans-serif; margin: 0; padding: 0; }
-    .nav { display: flex; gap: 10px; background: #ddd; padding: 10px; }
-    .nav button { padding: 10px; cursor: pointer; }
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
+    nav { background: #333; color: white; display: flex; gap: 10px; padding: 10px; }
+    nav button { background: #444; border: none; color: white; padding: 10px 20px; cursor: pointer; }
     .section { display: none; padding: 20px; }
     .section.active { display: block; }
-    #map { height: 400px; width: 100%; }
-    .song-list li { cursor: pointer; color: blue; }
+    .highlight { background: #dff0d8; padding: 10px; margin-top: 10px; border-left: 5px solid green; }
+    #map { height: 400px; }
+    .controls { margin: 10px 0; }
+    .controls button { margin-right: 8px; }
+    .song-list { margin-top: 15px; }
+    .song-list li { cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="nav">
+  <nav>
     <button onclick="showSection('home')">Inicio</button>
     <button onclick="showSection('radio')">Radio</button>
     <button onclick="showSection('diario')">Diario</button>
     <button onclick="showSection('mapa')">Mapa</button>
-  </div>
+  </nav>
 
   <div id="home" class="section active">
     <h2>Bienvenido</h2>
-    <p>Selecciona una sección para comenzar.</p>
+    <div id="latestEntryHome">Cargando última entrada...</div>
   </div>
 
   <div id="radio" class="section">
-    <h2>🎧 Mi Radio</h2>
-    <ul id="songList" class="song-list"></ul>
-    <audio id="audioPlayer" controls style="width:100%; margin-top:10px;"></audio>
+    <h2>🎧 Radio</h2>
+    <div class="controls">
+      <button onclick="togglePlay()">▶️/⏸️</button>
+      <button onclick="prevTrack()">⏮️</button>
+      <button onclick="nextTrack()">⏭️</button>
+      <button onclick="toggleRepeat()">🔁</button>
+      <button onclick="toggleRandom()">🔀</button>
+      <button onclick="toggleList()">🎵 Mostrar/Ocultar lista</button>
+    </div>
+    <audio id="player" controls style="width: 100%"></audio>
+    <ul id="songList" class="song-list" style="display:none;"></ul>
   </div>
 
   <div id="diario" class="section">
     <h2>📓 Diario</h2>
     <form id="diaryForm">
       <input type="text" id="title" placeholder="Título" required><br><br>
-      <textarea id="entry" placeholder="Escribe aquí..." rows="5" required></textarea><br><br>
+      <textarea id="entry" placeholder="Escribe aquí..." rows="4" required></textarea><br><br>
+      <input type="url" id="imageUrl" placeholder="URL de imagen (opcional)"><br><br>
       <button type="submit">Guardar</button>
     </form>
-    <div id="diaryResult"></div>
+    <div id="confirmationMsg"></div>
     <hr>
-    <h3>🔎 Buscar por Título</h3>
-    <input type="text" id="searchTitle" placeholder="Buscar título...">
-    <button onclick="searchByTitle()">Buscar</button>
+    <h3>Buscar entradas</h3>
+    <input type="text" id="searchTitle" placeholder="Título">
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+    <button onclick="searchEntries()">Buscar</button>
     <div id="searchResults"></div>
   </div>
 
   <div id="mapa" class="section">
-    <h2>🗺️ Mapa en Vivo</h2>
+    <h2>🗺️ Mapa</h2>
     <div id="map"></div>
   </div>
 
 <script>
-  const API_DIARIO = "https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxxxxx/exec";
-  const API_MAPS = "https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxxxxx/exec";
+const API_DIARIO = "https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxx/exec";
+const API_MAPS = "https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxx/exec";
 
-  function showSection(id) { 
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// DIARIO
+document.getElementById('diaryForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const data = {
+    title: document.getElementById('title').value,
+    diaryEntry: document.getElementById('entry').value,
+    externalImageUrl: document.getElementById('imageUrl').value
+  };
+  fetch(API_DIARIO, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(res => res.json())
+    .then(res => {
+      document.getElementById('confirmationMsg').innerHTML =
+        `<div class="highlight">${res.message || 'Guardado correctamente.'}</div>`;
+    });
+});
+
+function searchEntries() {
+  const title = document.getElementById('searchTitle').value.trim();
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
+  let url = API_DIARIO;
+  if (title) {
+    url += `?action=searchByTitle&keyword=${encodeURIComponent(title)}`;
+  } else if (start && end) {
+    url += `?action=getEntriesByDate&startDate=${start}&endDate=${end}`;
+  } else {
+    return alert("Introduce título o fecha de búsqueda.");
   }
 
-  // RADIO
-  const player = document.getElementById('audioPlayer');
-  fetch('music_list.json')
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById('songList');
-      data.forEach((song, i) => {
-        const li = document.createElement('li');
-        li.textContent = song.title;
-        li.onclick = () => {
-          player.src = song.url;
-          player.play();
-        };
-        list.appendChild(li);
-      });
-    });
-
-  // DIARIO
-  document.getElementById('diaryForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const data = {
-      title: document.getElementById('title').value,
-      diaryEntry: document.getElementById('entry').value
-    };
-    fetch(API_DIARIO, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
-    })
-    .then(r => r.json())
-    .then(res => {
-      document.getElementById('diaryResult').textContent = res.message || 'Guardado';
+  fetch(url).then(res => res.json()).then(res => {
+    const out = document.getElementById('searchResults');
+    out.innerHTML = '';
+    (res.entries || []).forEach(e => {
+      out.innerHTML += `<p><strong>${e.title}</strong><br>${e.text}<br><img src="${e.photoUrl}" width="200"></p>`;
     });
   });
+}
 
-  function searchByTitle() {
-    const keyword = document.getElementById('searchTitle').value;
-    fetch(API_DIARIO + "?action=searchByTitle&keyword=" + encodeURIComponent(keyword))
-      .then(r => r.json())
-      .then(res => {
-        const div = document.getElementById('searchResults');
-        div.innerHTML = '';
-        res.entries?.forEach(e => {
-          div.innerHTML += `<p><strong>${e.title}</strong>: ${e.text}</p>`;
-        });
-      });
+fetch(API_DIARIO + "?action=getLatest")
+  .then(res => res.json())
+  .then(res => {
+    const e = res.entry;
+    if (e) {
+      document.getElementById('latestEntryHome').innerHTML =
+        `<h3>${e.title}</h3><p>${e.text}</p><img src="${e.photoUrl}" width="250">`;
+    }
+  });
+
+// RADIO
+let playlist = [];
+let currentIndex = 0;
+let repeatOne = false;
+let repeatAll = false;
+let random = false;
+const audio = document.getElementById('player');
+
+fetch('music_list.json').then(r => r.json()).then(data => {
+  playlist = data;
+  updateSongList();
+  loadTrack(0);
+});
+
+function updateSongList() {
+  const ul = document.getElementById('songList');
+  ul.innerHTML = '';
+  playlist.forEach((s, i) => {
+    const li = document.createElement('li');
+    li.textContent = s.title;
+    li.onclick = () => loadTrack(i);
+    ul.appendChild(li);
+  });
+}
+
+function loadTrack(i) {
+  currentIndex = i;
+  audio.src = playlist[i].url;
+  audio.play();
+}
+
+function nextTrack() {
+  if (random) {
+    currentIndex = Math.floor(Math.random() * playlist.length);
+  } else {
+    currentIndex = (currentIndex + 1) % playlist.length;
   }
+  loadTrack(currentIndex);
+}
 
-  // MAPA
-  const map = L.map('map').setView([40.4168, -3.7038], 5);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+function prevTrack() {
+  currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+  loadTrack(currentIndex);
+}
 
-  fetch(API_MAPS)
-    .then(res => res.json())
-    .then(data => {
-      data.forEach(p => {
-        if (p.Latitude && p.Longitude)
-          L.marker([+p.Latitude, +p.Longitude]).addTo(map)
-            .bindPopup("📍 Pulsaciones: " + p.Pulse + "<br>SPO2: " + p.SpO2);
-      });
+function togglePlay() {
+  if (audio.paused) audio.play(); else audio.pause();
+}
+
+function toggleRepeat() {
+  if (!repeatOne && !repeatAll) {
+    repeatOne = true;
+    audio.loop = true;
+    alert('Repetir una canción');
+  } else if (repeatOne) {
+    repeatOne = false;
+    repeatAll = true;
+    audio.loop = false;
+    alert('Repetir toda la lista');
+  } else {
+    repeatOne = repeatAll = false;
+    alert('Repetición desactivada');
+  }
+}
+
+function toggleRandom() {
+  random = !random;
+  alert('Aleatorio: ' + (random ? 'activado' : 'desactivado'));
+}
+
+function toggleList() {
+  const list = document.getElementById('songList');
+  list.style.display = list.style.display === 'none' ? 'block' : 'none';
+}
+
+// MAPA
+const map = L.map('map').setView([40.4, -3.7], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+fetch(API_MAPS)
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(p => {
+      if (p.Latitude && p.Longitude) {
+        L.marker([+p.Latitude, +p.Longitude]).addTo(map)
+          .bindPopup(`Pulso: ${p.Pulse}<br>SpO2: ${p.SpO2}`);
+      }
     });
+  });
 </script>
 </body>
 </html>
