@@ -161,13 +161,108 @@ fetch(API_DIARIO + "?action=getLatest")
   });
 
 // RADIO
-const audio = document.getElementById('audio');
-const canvas = document.getElementById('visualizer');
-const ctx = canvas.getContext('2d');
 let playlist = [];
 let currentIndex = 0;
-let visualStarted = false;
-let audioCtx, analyser, source, bufferLength, dataArray;
+let repeatOne = false;
+let repeatAll = false;
+let random = false;
+const audio = document.getElementById('audio');
+
+
+fetch("music_list.json")
+  .then(res => res.json())
+  .then(data => {
+    playlist = data;
+    loadTrack(currentIndex);
+    updateSongList();
+  })
+  .catch(err => console.error("Error al cargar playlist:", err));
+
+function updateSongList() {
+  const ul = document.getElementById("songList");
+  ul.innerHTML = "";
+  playlist.forEach((s, i) => {
+    const li = document.createElement("li");
+    let prefix = i === currentIndex ? "🎶 " : (i === (currentIndex + 1) % playlist.length ? "➡️ " : "");
+    li.textContent = `${prefix}${s.title}`;
+    li.onclick = () => loadTrack(i);
+    ul.appendChild(li);
+  });
+}
+
+
+function loadTrack(i) {
+  currentIndex = i;
+  audio.src = playlist[i].url;
+  audio.play().then(() => {
+    document.getElementById("currentSong").textContent = playlist[i].title;
+    const nextIndex = (i + 1) % playlist.length;
+    document.getElementById("nextSong").textContent = playlist[nextIndex].title;
+    updateSongList();
+  });
+}
+
+
+
+
+
+function nextTrack() {
+  if (random) {
+    currentIndex = Math.floor(Math.random() * playlist.length);
+  } else {
+    currentIndex = (currentIndex + 1) % playlist.length;
+  }
+  loadTrack(currentIndex);
+}
+
+function prevTrack() {
+  currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+  loadTrack(currentIndex);
+}
+
+function togglePlay() {
+  if (audio.paused) audio.play(); else audio.pause();
+}
+
+function toggleRepeat() {
+  if (!repeatOne && !repeatAll) {
+    repeatOne = true;
+    repeatAll = false;
+    audio.loop = true;
+    alert('Repetir una canción');
+  } else if (repeatOne) {
+    repeatOne = false;
+    repeatAll = true;
+    audio.loop = false;
+    alert('Repetir toda la lista');
+  } else {
+    repeatOne = false;
+    repeatAll = false;
+    audio.loop = false;
+    alert('Repetición desactivada');
+  }
+}
+
+audio.onended = function() {
+  if (repeatAll) {
+    nextTrack();
+  }
+};
+
+function toggleRandom() {
+  random = !random;
+  alert('Aleatorio: ' + (random ? 'activado' : 'desactivado'));
+}
+
+function toggleList() {
+  const list = document.getElementById('songList');
+  list.style.display = list.style.display === 'none' ? 'block' : 'none';
+}
+
+  audio.onended = () => {
+  const nextIndex = (currentIndex + 1) % playlist.length;
+  loadTrack(nextIndex);
+};
 
 function startRadio() {
   fetch("music_list.json")
@@ -185,28 +280,32 @@ function startRadio() {
     });
 }
 
-function loadTrack(i) {
-  currentIndex = i;
-  audio.src = playlist[i].url;
-  audio.play().then(() => {
-    document.getElementById("currentSong").textContent = playlist[i].title;
-    const nextIndex = (i + 1) % playlist.length;
-    document.getElementById("nextSong").textContent = playlist[nextIndex].title;
-    updateSongList();
-  });
-}
 
-function updateSongList() {
-  const ul = document.getElementById("songList");
-  ul.innerHTML = "";
-  playlist.forEach((s, i) => {
-    const li = document.createElement("li");
-    let prefix = i === currentIndex ? "🎶 " : (i === (currentIndex + 1) % playlist.length ? "➡️ " : "");
-    li.textContent = `${prefix}${s.title}`;
-    li.onclick = () => loadTrack(i);
-    ul.appendChild(li);
+
+
+
+// MAPA
+const map = L.map('map').setView([40.4, -3.7], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+fetch(API_MAPS)
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(p => {
+      if (p.Latitude && p.Longitude) {
+        L.marker([+p.Latitude, +p.Longitude]).addTo(map)
+          .bindPopup(`Pulso: ${p.Pulse}<br>SpO2: ${p.SpO2}`);
+      }
+    });
   });
-}
+
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
+
+let visualStarted = false;
+let audioCtx, analyser, source, bufferLength, dataArray;
 
 function initVisualizer() {
   if (visualStarted) return;
@@ -221,6 +320,7 @@ function initVisualizer() {
   dataArray = new Uint8Array(bufferLength);
   drawVisualizer();
 }
+
 
 function drawVisualizer() {
   requestAnimationFrame(drawVisualizer);
@@ -239,6 +339,22 @@ function drawVisualizer() {
     x += barWidth + 1;
   }
 }
+
+// Activa visualizador al primer play del usuario
+audio.addEventListener('play', () => {
+  if (!visualStarted) {
+    setTimeout(() => {
+      initVisualizer();
+    }, 300); // da tiempo a que el audio comience
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+});
+
+
+
+  
 </script>
 </body>
 </html>
