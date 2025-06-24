@@ -1242,9 +1242,23 @@ function prevTrack() {
 }
 
 function nextTrack() {
-  currentTrack = (currentTrack + 1) % songs.length;
-  playTrack(currentTrack);
+  if (repeatMode === 'one') {
+    playTrack(currentTrack);
+  } else if (isShuffling) {
+    let next;
+    do {
+      next = Math.floor(Math.random() * songs.length);
+    } while (songs.length > 1 && next === currentTrack);
+    playTrack(next);
+  } else {
+    if (currentTrack + 1 < songs.length) {
+      playTrack(currentTrack + 1);
+    } else if (repeatMode === 'all') {
+      playTrack(0);
+    }
+  }
 }
+
 
 // Reproducir automáticamente la siguiente
 audio.addEventListener('ended', nextTrack);
