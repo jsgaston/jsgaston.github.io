@@ -160,11 +160,14 @@ let repeatAll = false;
 let random = false;
 const audio = document.getElementById('player');
 
-fetch('music_list.json').then(r => r.json()).then(data => {
-  playlist = data;
-  updateSongList();
-  loadTrack(0);
-});
+fetch("music_list.json")
+  .then(res => res.json())
+  .then(data => {
+    playlist = data;
+    loadTrack(currentIndex);
+    updateSongList();
+  })
+  .catch(err => console.error("Error al cargar playlist:", err));
 
 function updateSongList() {
   const ul = document.getElementById('songList');
@@ -185,18 +188,17 @@ function updateSongList() {
 
 
 function loadTrack(i) {
+  if (!playlist[i]) return;
   currentIndex = i;
   audio.src = playlist[i].url;
   audio.play();
 
-  // Actualiza texto
-  document.getElementById('currentSong').textContent = playlist[i].title || '---';
+  document.getElementById("currentSong").textContent = playlist[i].title || "Sonando";
   const nextIndex = (i + 1) % playlist.length;
-  document.getElementById('nextSong').textContent = playlist[nextIndex]?.title || '---';
-
-  // Actualiza lista con indicadores
+  document.getElementById("nextSong").textContent = playlist[nextIndex]?.title || "A continuación";
   updateSongList();
 }
+
 
 
 
@@ -252,6 +254,11 @@ function toggleList() {
   const list = document.getElementById('songList');
   list.style.display = list.style.display === 'none' ? 'block' : 'none';
 }
+
+  audio.onended = () => {
+  const nextIndex = (currentIndex + 1) % playlist.length;
+  loadTrack(nextIndex);
+};
 
 
 
