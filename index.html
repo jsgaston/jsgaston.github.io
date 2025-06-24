@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi Web Completa</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -62,20 +62,7 @@
 
   <div id="diario" class="section">
     <h2>📓 Diario</h2>
-    <form id="diaryForm">
-      <input type="text" id="title" placeholder="Título" required><br><br>
-      <textarea id="entry" placeholder="Escribe aquí..." rows="4" required></textarea><br><br>
-      <input type="url" id="imageUrl" placeholder="URL de imagen (opcional)"><br><br>
-      <button type="submit">Guardar</button>
-    </form>
-    <div id="confirmationMsg"></div>
-    <hr>
-    <h3>Buscar entradas</h3>
-    <input type="text" id="searchTitle" placeholder="Título">
-    <input type="date" id="startDate">
-    <input type="date" id="endDate">
-    <button onclick="searchEntries()">Buscar</button>
-    <div id="searchResults"></div>
+    <div id="latestEntry">Cargando entrada...</div>
   </div>
 
   <div id="mapa" class="section">
@@ -84,185 +71,39 @@
   </div>
 
 <script>
-const API_DIARIO = "https://script.google.com/macros/s/AKfycbxoTQVF1RMm2XckrFFXJ1heZ8P2W7carCAZaEw-XxI76bWp_oyKZy9kA1LlBPsxMQQL/exec";
-const API_MAPS = "https://script.google.com/macros/s/AKfycbwXNtcVnXevJgk-fpMvqqkc4BeSbZZ_EutueaCAkakIaBK5sx7AQL-fZpN5R08uWNy3/exec";
+const API_DIARIO = "https://script.google.com/macros/s/AKfycbxVmMznPpXMH5i_U5XRojZsUBSlTGVZC2kQZbX5pHjPtBXbSMw43eEVGopAYgGRz6Ei/exec";
+const API_MAPS = "https://script.google.com/macros/s/AKfycbz2SGXerStzhT2mYiKpK0JJLyrZTgrD5L_3WT-jZCK09YdE4AXfFtxkUC8j4gysAcFv/exec";
 
-let mapInitialized = false;
 function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if (id === 'mapa' && !mapInitialized) {
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
-    mapInitialized = true;
-  }
-}
-
-// DIARIO
-document.getElementById('diaryForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const data = {
-    title: document.getElementById('title').value,
-    diaryEntry: document.getElementById('entry').value,
-    externalImageUrl: document.getElementById('imageUrl').value
-  };
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("diaryEntry", data.diaryEntry);
-    formData.append("externalImageUrl", data.externalImageUrl);
-    
-    fetch(API_DIARIO, {
-      method: 'POST',
-      body: formData
-    })
-
-    .then(res => res.json())
-    .then(res => {
-      document.getElementById('confirmationMsg').innerHTML =
-        `<div class="highlight">${res.message || 'Guardado correctamente.'}</div>`;
-    });
-});
-
-function searchEntries() {
-  const title = document.getElementById('searchTitle').value.trim();
-  const start = document.getElementById('startDate').value;
-  const end = document.getElementById('endDate').value;
-  let url = API_DIARIO;
-  if (title) {
-    url += `?action=searchByTitle&keyword=${encodeURIComponent(title)}`;
-  } else if (start && end) {
-    url += `?action=getEntriesByDate&startDate=${start}&endDate=${end}`;
-  } else {
-    return alert("Introduce título o fecha de búsqueda.");
-  }
-
-  fetch(url).then(res => res.json()).then(res => {
-    const out = document.getElementById('searchResults');
-    out.innerHTML = '';
-    (res.entries || []).forEach(e => {
-      out.innerHTML += `<p>
-        <strong>${e.title}</strong><br>
-        ${e.text}
-        ${e.photoUrl ? `<br><img src="${e.photoUrl}" width="250" alt="Imagen de la entrada">` : ''}
-      </p>`;
-    });
-  });
 }
 
 fetch(API_DIARIO + "?action=getLatest")
-  .then(res => res.json())
-  .then(res => {
-    const e = res.entry;
-    if (e) {
-      document.getElementById('latestEntryHome').innerHTML =
-        `<h3>${e.title}</h3><p>${e.text}</p><img src="${e.photoUrl}" width="250">`;
-    }
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById("latestEntry").innerHTML = data.html;
+    document.getElementById("latestEntryHome").innerHTML = data.html;
   });
 
-// RADIO
+fetch(API_MAPS)
+  .then(r => r.json())
+  .then(data => {
+    const map = L.map('map').setView([data.lat, data.lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.marker([data.lat, data.lng]).addTo(map).bindPopup('Última ubicación').openPopup();
+  });
+
+// Radio
+const audio = document.getElementById('audio');
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
 let playlist = [];
 let currentIndex = 0;
-let repeatOne = false;
-let repeatAll = false;
+let repeat = false;
 let random = false;
-const audio = document.getElementById('audio');
-
-
-fetch("music_list.json")
-  .then(res => res.json())
-  .then(data => {
-    playlist = data;
-    loadTrack(currentIndex);
-    updateSongList();
-  })
-  .catch(err => console.error("Error al cargar playlist:", err));
-
-function updateSongList() {
-  const ul = document.getElementById("songList");
-  ul.innerHTML = "";
-  playlist.forEach((s, i) => {
-    const li = document.createElement("li");
-    let prefix = i === currentIndex ? "🎶 " : (i === (currentIndex + 1) % playlist.length ? "➡️ " : "");
-    li.textContent = `${prefix}${s.title}`;
-    li.onclick = () => loadTrack(i);
-    ul.appendChild(li);
-  });
-}
-
-
-function loadTrack(i) {
-  currentIndex = i;
-  audio.src = playlist[i].url;
-  audio.play().then(() => {
-    document.getElementById("currentSong").textContent = playlist[i].title;
-    const nextIndex = (i + 1) % playlist.length;
-    document.getElementById("nextSong").textContent = playlist[nextIndex].title;
-    updateSongList();
-  });
-}
-
-
-
-
-
-function nextTrack() {
-  if (random) {
-    currentIndex = Math.floor(Math.random() * playlist.length);
-  } else {
-    currentIndex = (currentIndex + 1) % playlist.length;
-  }
-  loadTrack(currentIndex);
-}
-
-function prevTrack() {
-  currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-  loadTrack(currentIndex);
-}
-
-function togglePlay() {
-  if (audio.paused) audio.play(); else audio.pause();
-}
-
-function toggleRepeat() {
-  if (!repeatOne && !repeatAll) {
-    repeatOne = true;
-    repeatAll = false;
-    audio.loop = true;
-    alert('Repetir una canción');
-  } else if (repeatOne) {
-    repeatOne = false;
-    repeatAll = true;
-    audio.loop = false;
-    alert('Repetir toda la lista');
-  } else {
-    repeatOne = false;
-    repeatAll = false;
-    audio.loop = false;
-    alert('Repetición desactivada');
-  }
-}
-
-audio.onended = function() {
-  if (repeatAll) {
-    nextTrack();
-  }
-};
-
-function toggleRandom() {
-  random = !random;
-  alert('Aleatorio: ' + (random ? 'activado' : 'desactivado'));
-}
-
-function toggleList() {
-  const list = document.getElementById('songList');
-  list.style.display = list.style.display === 'none' ? 'block' : 'none';
-}
-
-  audio.onended = () => {
-  const nextIndex = (currentIndex + 1) % playlist.length;
-  loadTrack(nextIndex);
-};
+let visualStarted = false;
+let audioCtx, analyser, source, bufferLength, dataArray;
 
 function startRadio() {
   fetch("music_list.json")
@@ -280,32 +121,44 @@ function startRadio() {
     });
 }
 
-
-
-
-
-// MAPA
-const map = L.map('map').setView([40.4, -3.7], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-fetch(API_MAPS)
-  .then(res => res.json())
-  .then(data => {
-    data.forEach(p => {
-      if (p.Latitude && p.Longitude) {
-        L.marker([+p.Latitude, +p.Longitude]).addTo(map)
-          .bindPopup(`Pulso: ${p.Pulse}<br>SpO2: ${p.SpO2}`);
-      }
-    });
+function loadTrack(i) {
+  if (!playlist.length) return;
+  currentIndex = i;
+  audio.src = playlist[i].url;
+  audio.play().then(() => {
+    document.getElementById("currentSong").textContent = playlist[i].title;
+    const nextIndex = (i + 1) % playlist.length;
+    document.getElementById("nextSong").textContent = playlist[nextIndex].title;
+    updateSongList();
   });
+}
 
-const canvas = document.getElementById('visualizer');
-const ctx = canvas.getContext('2d');
+function prevTrack() {
+  currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+  loadTrack(currentIndex);
+}
+function nextTrack() {
+  currentIndex = random ? Math.floor(Math.random() * playlist.length) : (currentIndex + 1) % playlist.length;
+  loadTrack(currentIndex);
+}
+function toggleRepeat() { repeat = !repeat; }
+function toggleRandom() { random = !random; }
+function toggleList() {
+  const list = document.getElementById("songList");
+  list.style.display = list.style.display === "none" ? "block" : "none";
+}
 
-let visualStarted = false;
-let audioCtx, analyser, source, bufferLength, dataArray;
+function updateSongList() {
+  const ul = document.getElementById("songList");
+  ul.innerHTML = "";
+  playlist.forEach((s, i) => {
+    const li = document.createElement("li");
+    let prefix = i === currentIndex ? "🎶 " : (i === (currentIndex + 1) % playlist.length ? "➡️ " : "");
+    li.textContent = `${prefix}${s.title}`;
+    li.onclick = () => loadTrack(i);
+    ul.appendChild(li);
+  });
+}
 
 function initVisualizer() {
   if (visualStarted) return;
@@ -320,7 +173,6 @@ function initVisualizer() {
   dataArray = new Uint8Array(bufferLength);
   drawVisualizer();
 }
-
 
 function drawVisualizer() {
   requestAnimationFrame(drawVisualizer);
@@ -340,21 +192,13 @@ function drawVisualizer() {
   }
 }
 
-// Activa visualizador al primer play del usuario
-audio.addEventListener('play', () => {
-  if (!visualStarted) {
-    setTimeout(() => {
-      initVisualizer();
-    }, 300); // da tiempo a que el audio comience
-  }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
+audio.addEventListener("ended", () => {
+  if (repeat) {
+    loadTrack(currentIndex);
+  } else {
+    nextTrack();
   }
 });
-
-
-
-  
 </script>
 </body>
 </html>
