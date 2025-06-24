@@ -304,11 +304,7 @@ fetch(API_MAPS)
     });
   });
 
-const canvas = document.getElementById('visualizer');
-const ctx = canvas.getContext('2d');
 
-let visualStarted = false;
-let audioCtx, analyser, source, bufferLength, dataArray;
 
 function initVisualizer() {
   if (visualStarted) return;
