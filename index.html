@@ -258,22 +258,6 @@
 }
 
 
-        @keyframes eq {
-  0% { transform: scaleY(1); }
-  50% { transform: scaleY(1.5); }
-  100% { transform: scaleY(1); }
-}
-.animate-eq {
-  animation: eq 0.8s infinite;
-  transform-origin: bottom;
-}
-.delay-75 { animation-delay: 0.1s; }
-.delay-150 { animation-delay: 0.2s; }
-.delay-225 { animation-delay: 0.3s; }
-.delay-300 { animation-delay: 0.4s; }
-
-
-
         
     </style>
 </head>
@@ -460,26 +444,12 @@
   <div class="song-info-title">🎵 Sonando ahora:</div>
   <div id="currentSong" class="song-info-content">---</div>
   <div id="nextSong" class="song-info-next">Siguiente: ---</div>
-
-              <div class="mt-3 flex justify-center gap-4">
-  <button onclick="buscarCantante()" class="radio-button text-sm px-4 py-2">🔍 Buscar Cantante</button>
-  <button onclick="buscarLetra()" class="radio-button text-sm px-4 py-2">🎤 Ver Letra</button>
-</div>
-
 </div>
 
         
           <!-- Reproductor + botones -->
           <div class="flex flex-col items-center gap-3 my-4">
             <audio id="audio" controls class="w-full max-w-md rounded-lg shadow-md bg-white p-2"></audio>
-              <div id="equalizer" class="flex justify-center gap-1 mt-2 hidden">
-  <div class="bar h-5 w-1 bg-purple-500 animate-eq"></div>
-  <div class="bar h-3 w-1 bg-purple-500 animate-eq delay-75"></div>
-  <div class="bar h-4 w-1 bg-purple-500 animate-eq delay-150"></div>
-  <div class="bar h-6 w-1 bg-purple-500 animate-eq delay-225"></div>
-  <div class="bar h-3 w-1 bg-purple-500 animate-eq delay-300"></div>
-</div>
-
             <div class="flex gap-4 justify-center">
   <button onclick="prevTrack()" class="radio-button">⏮️ Anterior</button>
   <button onclick="nextTrack()" class="radio-button">⏭️ Siguiente</button>
@@ -802,13 +772,9 @@
                 mainProjectsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="projects"]').classList.add('active');
             } else if (tabName === 'radio') {
-    document.getElementById('mainRadioSection').classList.remove('hidden');
-    document.querySelector('[data-main-tab="radio"]').classList.add('active');
-    
-    // ✅ reproducir la radio si aún no ha empezado
-    if (!audio.src) playTrack(0);
-}
-
+                document.getElementById('mainRadioSection').classList.remove('hidden');
+                document.querySelector('[data-main-tab="radio"]').classList.add('active');
+            }
 
             hideMessage();
         }
@@ -1201,9 +1167,6 @@ const fullSongSelect = document.getElementById('fullSongSelect');
 let songs = [];
 let currentTrack = 0;
 
-    audio.addEventListener('pause', () => {
-  document.getElementById('equalizer')?.classList.add('hidden');
-
 // Inicializar lista
 fetch('music_list.json')
   .then(res => res.json())
@@ -1230,13 +1193,10 @@ function renderSongList() {
     li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
 
     if (i === currentTrack) {
-  li.innerHTML = `🔊 <strong>${songs[i].title || `Canción ${i + 1}`}</strong>`;
-  li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
-} else {
-  li.textContent = songs[i].title || `Canción ${i + 1}`;
-  li.classList.add('hover:bg-gray-100');
-}
-
+      li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
+    } else {
+      li.classList.add('hover:bg-gray-100');
+    }
 
     li.onclick = () => playTrack(i);
     songListElement.appendChild(li);
@@ -1261,25 +1221,15 @@ function playTrack(index) {
   currentTrack = index;
   const song = songs[index];
   const next = songs[(index + 1) % songs.length];
-    document.getElementById('equalizer')?.classList.remove('hidden');
 
-
-if (audio.src !== song.url) {
   audio.src = song.url;
-}
-audio.play().catch(err => console.error('Reproducción fallida:', err));
-
-
   currentSongSpan.textContent = song.title || `Canción ${index + 1}`;
   nextSongSpan.textContent = `Siguiente: ${next?.title || '---'}`;
-
+  audio.play().catch(err => console.error('Reproducción fallida:', err));
 
   renderSongList();
   fullSongSelect.selectedIndex = index + 1; // +1 por el placeholder
-    
-
-});
-
+}
 
 // Botones
 function prevTrack() {
@@ -1291,7 +1241,6 @@ function nextTrack() {
   currentTrack = (currentTrack + 1) % songs.length;
   playTrack(currentTrack);
 }
-
 
 // Reproducir automáticamente la siguiente
 audio.addEventListener('ended', nextTrack);
@@ -1317,9 +1266,8 @@ function renderFullSelect() {
 
   const input = document.createElement('input');
   input.setAttribute('list', 'songOptions');
-input.className = 'form-input w-full max-w-md mx-auto mt-3 bg-white border-2 border-indigo-300 rounded-xl px-4 py-2 shadow focus:outline-none focus:ring focus:ring-indigo-200 text-gray-700 placeholder-gray-400';
-input.placeholder = '🔎 Busca una canción por nombre...';
-
+  input.className = 'form-input w-full max-w-md mx-auto rounded-md border border-gray-300 mt-2';
+  input.placeholder = 'Escribe parte del nombre de la canción...';
 
   input.addEventListener('change', () => {
     const title = input.value.toLowerCase();
@@ -1332,19 +1280,6 @@ input.placeholder = '🔎 Busca una canción por nombre...';
   fullSongSelect.replaceWith(input);
   document.body.appendChild(datalist);
 }
-
-    function buscarCantante() {
-  const query = (songs[currentTrack]?.title || '').split(' - ')[0];
-  const url = `https://www.google.com/search?q=${encodeURIComponent(query + ' cantante')}`;
-  window.open(url, '_blank');
-}
-
-function buscarLetra() {
-  const query = songs[currentTrack]?.title || '';
-  const url = `https://www.google.com/search?q=${encodeURIComponent(query + ' letra')}`;
-  window.open(url, '_blank');
-}
-
 
 </script>
 
