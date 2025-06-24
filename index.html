@@ -275,17 +275,9 @@ fetch(API_MAPS)
 
 const canvas = document.getElementById('visualizer');
 const ctx = canvas.getContext('2d');
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const analyser = audioCtx.createAnalyser();
-const source = audioCtx.createMediaElementSource(audio);
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
-analyser.fftSize = 256;
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
 
 let visualStarted = false;
-let audioCtx, analyser, source, dataArray, bufferLength;
+let audioCtx, analyser, source, bufferLength, dataArray;
 
 function initVisualizer() {
   if (visualStarted) return;
@@ -313,7 +305,7 @@ function drawVisualizer() {
   const barWidth = (canvas.width / bufferLength) * 2.5;
   let x = 0;
 
-  for(let i = 0; i < bufferLength; i++) {
+  for (let i = 0; i < bufferLength; i++) {
     const barHeight = dataArray[i] * 0.7;
     const r = 150 + barHeight / 2;
     const g = 50 + barHeight / 3;
@@ -321,23 +313,19 @@ function drawVisualizer() {
 
     ctx.fillStyle = `rgb(${r},${g},${b})`;
     ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-
     x += barWidth + 1;
   }
 }
 
+// Activa visualizador al primer play del usuario
 audio.addEventListener('play', () => {
-  if (audioCtx?.state === 'suspended') {
+  if (!visualStarted) {
+    initVisualizer();
+  } else if (audioCtx?.state === 'suspended') {
     audioCtx.resume();
   }
-  initVisualizer();
 });
-  audio.onplay = () => {
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  drawVisualizer();
-};
+
 
   
 </script>
