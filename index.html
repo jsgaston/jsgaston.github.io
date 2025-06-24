@@ -253,6 +253,26 @@ function toggleList() {
   list.style.display = list.style.display === 'none' ? 'block' : 'none';
 }
 
+
+
+
+// MAPA
+const map = L.map('map').setView([40.4, -3.7], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+fetch(API_MAPS)
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(p => {
+      if (p.Latitude && p.Longitude) {
+        L.marker([+p.Latitude, +p.Longitude]).addTo(map)
+          .bindPopup(`Pulso: ${p.Pulse}<br>SpO2: ${p.SpO2}`);
+      }
+    });
+  });
+
 const canvas = document.getElementById('visualizer');
 const ctx = canvas.getContext('2d');
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -293,24 +313,7 @@ audio.onplay = () => {
   }
   drawVisualizer();
 };
-
-
-// MAPA
-const map = L.map('map').setView([40.4, -3.7], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-fetch(API_MAPS)
-  .then(res => res.json())
-  .then(data => {
-    data.forEach(p => {
-      if (p.Latitude && p.Longitude) {
-        L.marker([+p.Latitude, +p.Longitude]).addTo(map)
-          .bindPopup(`Pulso: ${p.Pulse}<br>SpO2: ${p.SpO2}`);
-      }
-    });
-  });
+  
 </script>
 </body>
 </html>
