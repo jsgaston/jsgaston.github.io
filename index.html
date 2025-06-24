@@ -219,6 +219,46 @@
             animation: spin 1s linear infinite;
             margin-right: 8px;
         }
+        .radio-button {
+  background: linear-gradient(to right, #6366f1, #8b5cf6);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-weight: bold;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.radio-button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+}
+
+.song-info-box {
+  background-color: #f3f4f6;
+  border: 2px solid #6366f1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+}
+.song-info-title {
+  font-weight: 700;
+  color: #374151;
+  font-size: 1rem;
+}
+.song-info-content {
+  font-size: 1.2rem;
+  color: #4f46e5;
+}
+.song-info-next {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 0.3rem;
+}
+
+
+        
     </style>
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
@@ -400,19 +440,21 @@
           <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">🎧 Mi Radio Personal</h2>
         
           <!-- Canción actual -->
-          <div class="text-center mb-2">
-            <div class="text-lg font-semibold text-gray-700">Sonando ahora:</div>
-            <div id="currentSong" class="text-xl font-bold text-indigo-600">---</div>
-            <div id="nextSong" class="text-sm text-gray-500 mt-1 italic">Siguiente: ---</div>
-          </div>
+          <div class="song-info-box text-center mb-4">
+  <div class="song-info-title">🎵 Sonando ahora:</div>
+  <div id="currentSong" class="song-info-content">---</div>
+  <div id="nextSong" class="song-info-next">Siguiente: ---</div>
+</div>
+
         
           <!-- Reproductor + botones -->
           <div class="flex flex-col items-center gap-3 my-4">
             <audio id="audio" controls class="w-full max-w-md rounded-lg shadow-md bg-white p-2"></audio>
-            <div class="flex gap-4">
-              <button onclick="prevTrack()" class="btn text-sm px-4 py-2">⏮️ Anterior</button>
-              <button onclick="nextTrack()" class="btn text-sm px-4 py-2">Siguiente ⏭️</button>
-            </div>
+            <div class="flex gap-4 justify-center">
+  <button onclick="prevTrack()" class="radio-button">⏮️ Anterior</button>
+  <button onclick="nextTrack()" class="radio-button">⏭️ Siguiente</button>
+</div>
+
           </div>
         
           <!-- Lista de 11 canciones centrada -->
@@ -1208,6 +1250,37 @@ fullSongSelect.addEventListener('change', (e) => {
   const index = parseInt(e.target.value);
   if (!isNaN(index)) playTrack(index);
 });
+
+    // Habilitar autocompletado en select usando datalist
+function renderFullSelect() {
+  fullSongSelect.innerHTML = '';
+  const datalist = document.createElement('datalist');
+  datalist.id = 'songOptions';
+
+  songs.forEach((song, i) => {
+    const option = document.createElement('option');
+    option.value = song.title || `Canción ${i + 1}`;
+    option.dataset.index = i;
+    datalist.appendChild(option);
+  });
+
+  const input = document.createElement('input');
+  input.setAttribute('list', 'songOptions');
+  input.className = 'form-input w-full max-w-md mx-auto rounded-md border border-gray-300 mt-2';
+  input.placeholder = 'Escribe parte del nombre de la canción...';
+
+  input.addEventListener('change', () => {
+    const title = input.value.toLowerCase();
+    const match = songs.findIndex(s => (s.title || '').toLowerCase() === title);
+    if (match >= 0) {
+      playTrack(match);
+    }
+  });
+
+  fullSongSelect.replaceWith(input);
+  document.body.appendChild(datalist);
+}
+
 </script>
 
 
