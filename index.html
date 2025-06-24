@@ -802,9 +802,13 @@
                 mainProjectsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="projects"]').classList.add('active');
             } else if (tabName === 'radio') {
-                document.getElementById('mainRadioSection').classList.remove('hidden');
-                document.querySelector('[data-main-tab="radio"]').classList.add('active');
-            }
+    document.getElementById('mainRadioSection').classList.remove('hidden');
+    document.querySelector('[data-main-tab="radio"]').classList.add('active');
+    
+    // ✅ reproducir la radio si aún no ha empezado
+    if (!audio.src) playTrack(0);
+}
+
 
             hideMessage();
         }
@@ -1257,7 +1261,11 @@ function playTrack(index) {
     document.getElementById('equalizer')?.classList.remove('hidden');
 
 
+  if (audio.src !== song.url) {
   audio.src = song.url;
+  audio.play().catch(err => console.error('Reproducción fallida:', err));
+}
+
   currentSongSpan.textContent = song.title || `Canción ${index + 1}`;
   nextSongSpan.textContent = `Siguiente: ${next?.title || '---'}`;
   audio.play().catch(err => console.error('Reproducción fallida:', err));
