@@ -48,7 +48,7 @@
       <button onclick="toggleRandom()">🔀</button>
       <button onclick="toggleList()">🎵 list</button>
     </div>
-    <audio id="audio" controls autoplay></audio>
+    <audio id="audio" controls ></audio>
     
 
     <canvas id="visualizer" width="600" height="100" style="width:100%; background:#111; display:block; margin-top:10px;"></canvas>
@@ -194,13 +194,17 @@ function loadTrack(i) {
   if (!playlist[i]) return;
   currentIndex = i;
   audio.src = playlist[i].url;
-  audio.play();
 
-  document.getElementById("currentSong").textContent = playlist[i].title || "Sonando";
-  const nextIndex = (i + 1) % playlist.length;
-  document.getElementById("nextSong").textContent = playlist[nextIndex]?.title || "A continuación";
-  updateSongList();
+  audio.play().then(() => {
+    document.getElementById("currentSong").textContent = playlist[i].title || "Sonando";
+    const nextIndex = (i + 1) % playlist.length;
+    document.getElementById("nextSong").textContent = playlist[nextIndex]?.title || "A continuación";
+    updateSongList();
+  }).catch(err => {
+    console.warn("Audio bloqueado hasta interacción del usuario:", err);
+  });
 }
+
 
 
 
@@ -264,9 +268,18 @@ function toggleList() {
 };
 
 function startRadio() {
-  loadTrack(currentIndex);
-  // visualizador se activará automáticamente en play
+  // No cargar antes del click del usuario
+  fetch("music_list.json")
+    .then(res => res.json())
+    .then(data => {
+      playlist = data;
+      loadTrack(currentIndex); // ← esto ya hace audio.src y audio.play()
+      initVisualizer(); // ← conectamos visualizador después de crear src
+      updateSongList();
+    })
+    .catch(err => console.error("Error al cargar playlist:", err));
 }
+
 
 
 
@@ -300,15 +313,19 @@ function initVisualizer() {
 
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
+
+  // solo una vez, después del primer .src ya puesto
   source = audioCtx.createMediaElementSource(audio);
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
+
   analyser.fftSize = 256;
   bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
 
   drawVisualizer();
 }
+
 
 function drawVisualizer() {
   requestAnimationFrame(drawVisualizer);
