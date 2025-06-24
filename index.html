@@ -1142,7 +1142,7 @@
           list.innerHTML = '';
           for (let i = 0; i < playlist.length; i++) {
             const li = document.createElement('li');
-            li.textContent = `${i -1 === currentTrack ? '▶️ ' : ''}${extractName(playlist[i])}`;
+            li.textContent = `${i +1 === currentTrack ? '▶️ ' : ''}${extractName(playlist[i])}`;
             list.appendChild(li);
           }
         }
