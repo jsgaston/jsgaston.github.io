@@ -410,9 +410,6 @@
             <audio id="audio" controls class="w-full max-w-lg"></audio>
           </div>
           <ul id="songList" class="song-list list-disc px-6 text-left text-gray-800 hidden"></ul>
-          <div id="expandButtonContainer" class="flex justify-center mt-4">
-            <button id="expandButton" onclick="expandSongList()" class="btn">Mostrar más canciones</button>
-          </div>
         </div>
 
 
@@ -1112,9 +1109,14 @@ const currentSongSpan = document.getElementById('currentSong');
 const audio = document.getElementById('audio');
 let songs = [];
 let currentTrack = 0;
-let showingAll = false;
+const PAGE_SIZE = 10;
+let currentPage = 0;
 
-// Cargar lista
+const nextSongInfo = document.createElement('div');
+nextSongInfo.className = 'text-center text-sm text-gray-600';
+currentSongSpan.parentNode.appendChild(nextSongInfo);
+
+// Cargar canciones
 fetch('music_list.json')
   .then(res => res.json())
   .then(data => {
@@ -1127,17 +1129,32 @@ fetch('music_list.json')
     currentSongSpan.textContent = 'Error al cargar canciones';
   });
 
+// Mostrar lista paginada
 function renderSongList() {
   songListElement.innerHTML = '';
-  const max = showingAll ? songs.length : 10;
-  songs.slice(0, max).forEach((song, index) => {
+  const start = currentPage * PAGE_SIZE;
+  const end = Math.min(start + PAGE_SIZE, songs.length);
+
+  for (let i = start; i < end; i++) {
     const li = document.createElement('li');
-    li.textContent = song.title || `Canción ${index + 1}`;
-    li.classList.add('cursor-pointer', 'hover:underline');
-    li.onclick = () => playTrack(index);
+    li.textContent = songs[i].title || `Canción ${i + 1}`;
+    li.classList.add('cursor-pointer', 'hover:underline', 'py-1');
+    li.dataset.index = i;
+
+    if (i === currentTrack) li.classList.add('font-bold', 'text-indigo-600');
+
+    li.onclick = () => playTrack(i);
     songListElement.appendChild(li);
+  }
+}
+
+function highlightCurrent() {
+  document.querySelectorAll('#songList li').forEach(li => {
+    li.classList.remove('font-bold', 'text-indigo-600');
+    if (parseInt(li.dataset.index) === currentTrack) {
+      li.classList.add('font-bold', 'text-indigo-600');
+    }
   });
-  document.getElementById('expandButtonContainer').style.display = showingAll || songs.length <= 10 ? 'none' : 'flex';
 }
 
 function playTrack(index) {
@@ -1145,8 +1162,21 @@ function playTrack(index) {
     currentTrack = index;
     audio.src = songs[index].url;
     currentSongSpan.textContent = songs[index].title || `Canción ${index + 1}`;
+    updateNextSongText();
     audio.play().catch(err => console.error('No se pudo reproducir:', err));
+
+    const pageNeeded = Math.floor(currentTrack / PAGE_SIZE);
+    if (pageNeeded !== currentPage) {
+      currentPage = pageNeeded;
+      renderSongList();
+    }
+    highlightCurrent();
   }
+}
+
+function updateNextSongText() {
+  const next = songs[(currentTrack + 1) % songs.length];
+  nextSongInfo.textContent = `Siguiente: ${next?.title || '---'}`;
 }
 
 function prevTrack() {
@@ -1162,12 +1192,8 @@ function nextTrack() {
 function toggleList() {
   songListElement.classList.toggle('hidden');
 }
-
-function expandSongList() {
-  showingAll = true;
-  renderSongList();
-}
 </script>
+
 
 
 
