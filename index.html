@@ -1246,14 +1246,17 @@
           }
         
           function playCurrentTrack() {
-            radioPlayer.src = playlist[currentTrack];
-            radioPlayer.load();
-            radioPlayer.play();
-            currentSong.innerText = extractName(playlist[currentTrack]);
-            const next = playlist[(currentTrack + 1) % playlist.length] || '';
-            nextSong.innerText = `Siguiente: 🎵 ${extractName(next)}`;
-            renderPlaylistUI();
-          }
+              radioPlayer.src = playlist[currentTrack];
+              radioPlayer.load();
+              radioPlayer.play().catch(err => {
+                console.warn('No se pudo reproducir automáticamente:', err);
+              });
+              currentSong.innerText = extractName(playlist[currentTrack]);
+              const next = playlist[(currentTrack + 1) % playlist.length] || '';
+              nextSong.innerText = `Siguiente: 🎵 ${extractName(next)}`;
+              renderPlaylistUI();
+            }
+
         
           function playNextTrack() {
             if (!playlist.length) return;
