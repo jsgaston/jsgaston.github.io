@@ -284,6 +284,25 @@ analyser.fftSize = 256;
 const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(bufferLength);
 
+let visualStarted = false;
+let audioCtx, analyser, source, dataArray, bufferLength;
+
+function initVisualizer() {
+  if (visualStarted) return;
+  visualStarted = true;
+
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  analyser.fftSize = 256;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
+
+  drawVisualizer();
+}
+
 function drawVisualizer() {
   requestAnimationFrame(drawVisualizer);
   analyser.getByteFrequencyData(dataArray);
@@ -307,12 +326,13 @@ function drawVisualizer() {
   }
 }
 
-audio.onplay = () => {
-  if (audioCtx.state === 'suspended') {
+audio.addEventListener('play', () => {
+  if (audioCtx?.state === 'suspended') {
     audioCtx.resume();
   }
-  drawVisualizer();
-};
+  initVisualizer();
+});
+
   
 </script>
 </body>
