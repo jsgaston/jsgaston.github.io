@@ -332,6 +332,12 @@ audio.addEventListener('play', () => {
   }
   initVisualizer();
 });
+  audio.onplay = () => {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  drawVisualizer();
+};
 
   
 </script>
