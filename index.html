@@ -1,279 +1,89 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi Página Personal</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
-
-    <style>
-        /* Fuente Inter para un aspecto moderno y limpio */
-        body {
-          font-family: 'Inter', sans-serif;
-          background-color: #f3f4f6;
-          background-image: url('mi%20bandera.jpg');
-          background-size: cover;
-          background-position: center;
-          background-attachment: fixed;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          margin: 0;
-        }
-    
-        .container {
-          max-width: 1000px;
-          width: 100%;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(8px);
-          border-radius: 16px;
-          padding: 30px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: block;
-            color: #374151;
-        }
-        .form-input, .form-textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-us: 8px;
-            font-size: 1rem;
-            color: #1f2937;
-            background-color: #f9fafb;
-            transition: border-color 0.2s;
-        }
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #3b82f6; /* Un azul bonito al enfocar */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-        }
-        .btn {
-            background-color: #4f46e5; /* Morado intenso */
-            color: white;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn:hover {
-            background-color: #4338ca; /* Morado más oscuro al pasar el ratón */
-            transform: translateY(-1px);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-        .message-box {
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-weight: 500;
-            display: none; /* Oculto por defecto */
-        }
-        .message-box.success {
-            background-color: #d1fae5; /* Verde claro */
-            color: #065f46; /* Verde oscuro */
-            border: 1px solid #10b981;
-        }
-        .message-box.error {
-            background-color: #fee2e2; /* Rojo claro */
-            color: #991b1b; /* Rojo oscuro */
-            border: 1px solid #ef4444;
-        }
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #ffffff;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: none; /* Oculto por defecto */
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Estilos para las pestañas de navegación principal */
-        .main-tab-button {
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            font-weight: 600;
-            cursor: pointer;
-            background-color: #e5e7eb; /* Gris claro */
-            color: #4b5563;
-            transition: background-color 0.2s, color 0.2s;
-            white-space: nowrap; /* Evita que el texto se rompa */
-        }
-        .main-tab-button.active {
-            background-color: #ffffff;
-            color: #4f46e5; /* Morado */
-            box-shadow: 0 -2px 0 0 #4f46e5 inset; /* Subrayado morado */
-        }
-        .main-tab-content {
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        /* Estilos para las sub-pestañas del diario */
-        .diary-sub-tab-button {
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            background-color: #f3f4f6;
-            color: #6b7280;
-            transition: background-color 0.2s, color 0.2s;
-            margin-right: 8px; /* Espacio entre botones */
-        }
-        .diary-sub-tab-button.active {
-            background-color: #e0e7ff; /* Azul claro */
-            color: #4f46e5; /* Morado */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .diary-sub-tab-content {
-            padding-top: 16px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-        .entry-card {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .entry-card img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            margin-top: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .entry-card img:hover {
-            transform: scale(1.02);
-        }
-        
-        /* Estilos para el modal de imagen */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-        }
-        .modal-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            padding: 20px;
-        }
-        .modal-image {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 8px;
-        }
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-modal:hover {
-            color: #ccc;
-        }
-        
-        /* Indicador de carga para imágenes */
-        .image-loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #4f46e5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-    
-        .radio-btn {
-          padding: 10px 16px;
-          border-radius: 6px;
-          font-size: 20px;
-          font-weight: 600;
-          border: none;
-          cursor: pointer;
-          color: white;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          transition: transform 0.2s, box-shadow 0.3s;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-        .radio-btn:hover {
-          transform: scale(1.05);
-          box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
-        }
-    
-        .radio-btn.repeat-none {
-          background: linear-gradient(to right, #9ca3af, #6b7280);
-        }
-        .radio-btn.repeat-one {
-          background: linear-gradient(to right, #facc15, #f97316);
-        }
-        .radio-btn.repeat-all {
-          background: linear-gradient(to right, #10b981, #3b82f6);
-        }
-    
-        #visualizerCanvas {
-          width: 100%;
-          height: 100px;
-          margin-top: 12px;
-          background: radial-gradient(circle at center, #c4b5fd, #e0e7ff);
-          border-radius: 12px;
-          box-shadow: 0 0 18px rgba(139, 92, 246, 0.4);
-          transition: all 0.4s ease;
-        }
-    
-        #togglePlaylistBtn,
-        #togglePlaylistBtnTop {
-          margin-top: 10px;
-        }
-    
-        #nextSong {
-          font-style: italic;
-          color: #6b7280;
-          font-size: 0.9rem;
-          margin-top: 0;
-        }
-    
-        ul#upcomingSongs {
-          margin-top: 10px;
-          padding-left: 0;
-          list-style: none;
-          font-size: 14px;
-          color: #374151;
-        }
-            
-    </style>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+      background-image: url('mi%20bandera.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    nav {
+      display: flex;
+      overflow-x: auto;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 20px;
+    }
+    .main-tab-button {
+      padding: 12px 20px;
+      border-radius: 8px 8px 0 0;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: #e5e7eb;
+      color: #4b5563;
+      transition: background-color 0.2s, color 0.2s;
+      white-space: nowrap;
+      margin-right: 4px;
+    }
+    .main-tab-button.active {
+      background-color: #ffffff;
+      color: #4f46e5;
+      box-shadow: 0 -2px 0 0 #4f46e5 inset;
+    }
+    .main-tab-content {
+      display: none;
+      padding-top: 24px;
+    }
+    .main-tab-content.active {
+      display: block;
+    }
+    .radio-btn {
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      transition: transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      margin: 4px;
+    }
+    .radio-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
+    }
+    #visualizerCanvas {
+      width: 100%;
+      height: 100px;
+      margin-top: 12px;
+      background: radial-gradient(circle at center, #c4b5fd, #e0e7ff);
+      border-radius: 12px;
+      box-shadow: 0 0 18px rgba(139, 92, 246, 0.4);
+    }
+  </style>
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
     <!-- Modal para ver imágenes en grande -->
@@ -285,22 +95,22 @@
     </div>
 
     <div class="container">
-        <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
-
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
         <!-- Nueva pestaña en navegación principal -->
         <nav class="flex justify-center gap-4 mb-6">
-          <button class="radio-btn" data-main-tab="home">Inicio</button>
-          <button onclick="showTab('diary')">📓 Diario</button>
-          <button class="radio-btn" data-main-tab="maps">Mapas de Recorridos</button>
-          <button class="radio-btn" data-main-tab="trips">Organizar Viajes</button>
-          <button class="radio-btn" data-main-tab="menus">Menús de Comida</button>
-          <button class="radio-btn" data-main-tab="projects">Proyectos</button>
-          <button class="radio-btn" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
-          <button onclick="showTab('radio')">🎧 Radio</button>
+          <button class="main-tab-button active" data-tab="home">Inicio</button>
+          <button class="main-tab-button" data-tab="diary">📓 Diario</button>
+          <button class="main-tab-button" data-tab="maps">Mapas de Recorridos</button>
+          <button class="main-tab-button" data-tab="trips">Organizar Viajes</button>
+          <button class="main-tab-button" data-tab="menus">Menús de Comida</button>
+          <button class="main-tab-button" data-tab="projects">Proyectos</button>
+          <button class="main-tab-button" data-tab="profile">Perfil</button> <!-- Nueva pestaña -->
+          <button class="main-tab-button" data-tab="radio">🎧 Radio</button>
 
         </nav>
 
-        <div id="mainHomeSection" class="main-tab-content">
+        <div id="home" class="main-tab-content active">
+
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
             <p class="text-center text-gray-600 mb-8">Explora las pestañas de arriba.</p>
             
@@ -450,12 +260,12 @@
         </div>
 
         <div id="radio" class="main-tab-content">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Radio Javi</h2>
+          <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Radio Javi</h2>
     
-          <div class="flex flex-col items-center space-y-4">
-            <div class="flex flex-wrap justify-center gap-3">
-              <button class="radio-btn" onclick="startRadio()">⏻ Encender</button>
-              <button class="radio-btn" onclick="shuffleAndPlay()">🔀 Aleatorio</button>
+      <div class="flex flex-col items-center space-y-4">
+        <div class="flex flex-wrap justify-center gap-3">
+              <button class="radio-btn" onclick="startRadio()">⏻ </button>
+              <button class="radio-btn" onclick="shuffleAndPlay()">🔀 </button>
               <button class="radio-btn" onclick="playPreviousTrack()">⏮️</button>
               <button id="repeatToggle" class="radio-btn repeat-none" onclick="toggleRepeatMode()">🔁</button>
               <button class="radio-btn" onclick="playNextTrack()">⏭️</button>
@@ -1277,39 +1087,46 @@
               playCurrentTrack();
             }
             
-            function startRadio() {
-              if (radioStarted) return;
-              audioCtx.resume().then(() => {
-                radioStarted = true;
-                fetch('music_list.json')
-                  .then(res => res.json())
-                  .then(data => {
-                    playlist = data.map(song => song.url || song);
-                    currentTrack = 0;
-                    setupVisualizer();
-                    playCurrentTrack();
-                  })
-                  .catch(err => {
-                    console.error('Error al cargar lista de música:', err);
-                  });
+            const tabs = document.querySelectorAll('.main-tab-button');
+            const contents = document.querySelectorAll('.main-tab-content');
+            tabs.forEach(tab => {
+              tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
               });
-            }
-            
-            radioPlayer.addEventListener('ended', () => {
-              if (repeatMode === 1) {
-                radioPlayer.currentTime = 0;
-                radioPlayer.play();
-              } else if (repeatMode === 2) {
-                playNextTrack();
-              } else {
-                if (currentTrack < playlist.length - 1) playNextTrack();
-              }
             });
-            
-            function showTab(tabId) {
-              document.querySelectorAll('.main-tab-content').forEach(el => el.style.display = 'none');
-              document.getElementById(tabId).style.display = 'block';
+        
+            const radioPlayer = document.getElementById('radioPlayer');
+            const currentSong = document.getElementById('currentSong');
+            let playlist = [
+              { title: "Canción 1", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+              { title: "Canción 2", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
+            ];
+            let currentIndex = 0;
+        
+            function startRadio() {
+              playTrack(currentIndex);
             }
+            
+            function playTrack(index) {
+              const song = playlist[index];
+              radioPlayer.src = song.url;
+              currentSong.textContent = "Sonando: " + song.title;
+              radioPlayer.play();
+            }
+        
+            function playNextTrack() {
+              currentIndex = (currentIndex + 1) % playlist.length;
+              playTrack(currentIndex);
+            }
+        
+            function playPreviousTrack() {
+              currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+              playTrack(currentIndex);
+            }
+
 
         </script>
 
