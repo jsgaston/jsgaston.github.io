@@ -36,8 +36,11 @@
 
   <div id="radio" class="section">
     <h2>🎧 Radio</h2>
+    <div id="nowPlaying">
+      <strong>Sonando:</strong> <span id="currentSong">---</span><br>
+      <strong>A continuación:</strong> <span id="nextSong">---</span>
+    </div>
     <div class="controls">
-      <button onclick="togglePlay()">▶️/⏸️</button>
       <button onclick="prevTrack()">⏮️</button>
       <button onclick="nextTrack()">⏭️</button>
       <button onclick="toggleRepeat()">🔁</button>
@@ -177,7 +180,14 @@ function loadTrack(i) {
   currentIndex = i;
   audio.src = playlist[i].url;
   audio.play();
+
+  // Actualiza texto de canciones
+  document.getElementById('currentSong').textContent = playlist[i].title || '---';
+
+  const nextIndex = (i + 1) % playlist.length;
+  document.getElementById('nextSong').textContent = playlist[nextIndex]?.title || '---';
 }
+
 
 function nextTrack() {
   if (random) {
