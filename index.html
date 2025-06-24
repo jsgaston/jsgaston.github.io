@@ -503,7 +503,7 @@
             <canvas id="visualizerCanvas" width="600" height="100"></canvas>
         
             <!-- Reproductor de audio oculto -->
-            <audio id="radioPlayer" class="hidden" controls></audio>
+            <audio id="radioPlayer" controls style="width: 100%; max-width: 400px;"></audio>
         
             <!-- Canción actual y siguiente -->
             <p id="currentSong" class="text-indigo-700 font-semibold text-lg mt-2"></p>
@@ -1321,21 +1321,23 @@
           }
         
           function startRadio() {
-            if (radioStarted) return;
-            audioCtx.resume().then(() => {
-              radioStarted = true;
-              fetch('music_list.json')
-                .then(res => res.json())
-                .then(data => {
-                  playlist = data.map(song => song.url || song); // soporta ambos formatos
-                  currentTrack = 0;
-                  setupVisualizer();
-                  playCurrentTrack();
-                })
-                .catch(err => {
-                  console.error('Error al cargar lista de música:', err);
-                });
-            });
+              if (radioStarted) return;
+              audioCtx.resume().then(() => {
+                radioStarted = true;
+                fetch('music_list.json')
+                  .then(res => res.json())
+                  .then(data => {
+                    playlist = data.map(song => song.url || song);
+                    currentTrack = 0;
+                    setupVisualizer();
+                    playCurrentTrack();
+                  })
+                  .catch(err => {
+                    console.error('Error al cargar lista de música:', err);
+                  });
+              });
+            }
+
           }
         
           radioPlayer.addEventListener('ended', () => {
