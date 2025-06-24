@@ -88,11 +88,17 @@ document.getElementById('diaryForm').addEventListener('submit', e => {
     diaryEntry: document.getElementById('entry').value,
     externalImageUrl: document.getElementById('imageUrl').value
   };
-  fetch(API_DIARIO, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(res => res.json())
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("diaryEntry", data.diaryEntry);
+    formData.append("externalImageUrl", data.externalImageUrl);
+    
+    fetch(API_DIARIO, {
+      method: 'POST',
+      body: formData
+    })
+
+    .then(res => res.json())
     .then(res => {
       document.getElementById('confirmationMsg').innerHTML =
         `<div class="highlight">${res.message || 'Guardado correctamente.'}</div>`;
@@ -116,7 +122,7 @@ function searchEntries() {
     const out = document.getElementById('searchResults');
     out.innerHTML = '';
     (res.entries || []).forEach(e => {
-      out.innerHTML += `<p><strong>${e.title}</strong><br>${e.text}<br><img src="${e.photoUrl}" width="200"></p>`;
+      out.innerHTML += `<p><strong>${e.title}</strong><br>${e.text}<br><img src="${e.photoUrl ? `<img src="${e.photoUrl}" width="200"></p>`;
     });
   });
 }
