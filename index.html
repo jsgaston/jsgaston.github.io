@@ -48,6 +48,7 @@
       <button onclick="toggleList()">🎵 Mostrar/Ocultar lista</button>
     </div>
     <audio id="player" controls style="width: 100%"></audio>
+    <canvas id="visualizer" width="600" height="100" style="width:100%; background:#111; display:block; margin-top:10px;"></canvas>
     <ul id="songList" class="song-list" style="display:none;"></ul>
   </div>
 
@@ -170,23 +171,33 @@ function updateSongList() {
   ul.innerHTML = '';
   playlist.forEach((s, i) => {
     const li = document.createElement('li');
-    li.textContent = s.title;
+    let prefix = '';
+    if (i === currentIndex) {
+      prefix = '🎶 ';
+    } else if (i === (currentIndex + 1) % playlist.length) {
+      prefix = '➡️ ';
+    }
+    li.textContent = `${prefix}${s.title}`;
     li.onclick = () => loadTrack(i);
     ul.appendChild(li);
   });
 }
+
 
 function loadTrack(i) {
   currentIndex = i;
   audio.src = playlist[i].url;
   audio.play();
 
-  // Actualiza texto de canciones
+  // Actualiza texto
   document.getElementById('currentSong').textContent = playlist[i].title || '---';
-
   const nextIndex = (i + 1) % playlist.length;
   document.getElementById('nextSong').textContent = playlist[nextIndex]?.title || '---';
+
+  // Actualiza lista con indicadores
+  updateSongList();
 }
+
 
 
 function nextTrack() {
@@ -241,6 +252,48 @@ function toggleList() {
   const list = document.getElementById('songList');
   list.style.display = list.style.display === 'none' ? 'block' : 'none';
 }
+
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioCtx.createAnalyser();
+const source = audioCtx.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+analyser.fftSize = 256;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+
+function drawVisualizer() {
+  requestAnimationFrame(drawVisualizer);
+  analyser.getByteFrequencyData(dataArray);
+
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const barWidth = (canvas.width / bufferLength) * 2.5;
+  let x = 0;
+
+  for(let i = 0; i < bufferLength; i++) {
+    const barHeight = dataArray[i] * 0.7;
+    const r = 150 + barHeight / 2;
+    const g = 50 + barHeight / 3;
+    const b = 200;
+
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+    x += barWidth + 1;
+  }
+}
+
+audio.onplay = () => {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  drawVisualizer();
+};
+
 
 // MAPA
 const map = L.map('map').setView([40.4, -3.7], 6);
