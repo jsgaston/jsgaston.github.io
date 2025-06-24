@@ -472,28 +472,34 @@
 
         <div id="mainRadioSection" class="main-tab-content hidden">
           <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Radio Javi</h2>
-        <button onclick="mezclarYReproducir()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">🎲 Aleatorio</button>
-
+        
           <div class="flex flex-col items-center justify-center space-y-4">
-              <div class="flex space-x-3">
-                <button class="radio-btn" onclick="playPreviousTrack()">⏮️</button>
-                <button id="repeatToggle" class="radio-btn" onclick="toggleRepeatMode()">🔁</button>
-                <button class="radio-btn" onclick="playNextTrack()">⏭️</button>
-              </div>
-            
-              <canvas id="visualizerCanvas" width="600" height="100"></canvas>
-            
-              <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
-            
-              <p id="currentSong" class="text-indigo-700 font-semibold text-lg"></p>
-              <p id="nextSong" class="text-gray-500 text-sm italic">Siguiente: 🎵</p>
-            
-              <p id="togglePlaylistBtnTop" onclick="togglePlaylist()" class="cursor-pointer text-blue-700 hover:text-blue-900 mt-2">⬇️ Mostrar lista</p>
-              <ul id="upcomingSongs" class="text-gray-700 mt-2 text-sm"></ul>
-              <p id="togglePlaylistBtn" onclick="togglePlaylist()" class="cursor-pointer text-blue-700 hover:text-blue-900">⬆️ Ocultar lista</p>
+            <!-- Botones de control -->
+            <div class="flex flex-wrap justify-center gap-4">
+              <button class="radio-btn" onclick="startRadio()">⏻ Encender</button>
+              <button class="radio-btn" onclick="shuffleAndPlay()">🔀 Aleatorio</button>
+              <button class="radio-btn" onclick="playPreviousTrack()">⏮️</button>
+              <button id="repeatToggle" class="radio-btn repeat-none" onclick="toggleRepeatMode()">🔁</button>
+              <button class="radio-btn" onclick="playNextTrack()">⏭️</button>
             </div>
-
+        
+            <!-- Visualizador de audio -->
+            <canvas id="visualizerCanvas" width="600" height="100"></canvas>
+        
+            <!-- Reproductor de audio oculto -->
+            <audio id="radioPlayer" class="hidden" controls></audio>
+        
+            <!-- Canción actual y siguiente -->
+            <p id="currentSong" class="text-indigo-700 font-semibold text-lg mt-2"></p>
+            <p id="nextSong" class="text-gray-500 text-sm italic">Siguiente: 🎵</p>
+        
+            <!-- Mostrar/ocultar lista -->
+            <button id="togglePlaylistBtnTop" onclick="togglePlaylist()" class="radio-btn">⬇️ Mostrar lista</button>
+            <ul id="upcomingSongs" class="text-gray-700 mt-2 text-sm"></ul>
+            <button id="togglePlaylistBtn" onclick="togglePlaylist()" class="radio-btn">⬆️ Ocultar lista</button>
+          </div>
         </div>
+
 
 
         <div id="messageBox" class="message-box w-full mt-8"></div>
@@ -1177,143 +1183,152 @@
         }
     </script>
 
-    <script>
-      let playlist = [];
-      let currentTrack = 0;
-      let isRepeat = false;
-      const radioPlayer = document.getElementById('radioPlayer');
-      const currentSongElement = document.getElementById('currentSong');
-    
-      function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-      }
-
-        function extractName(url) {
-          return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ""));
-        }
-    
-      function playPreviousTrack() {
-        currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
-        playCurrentTrack();
-      }
-    
-      let repeatMode = 0; // 0: none, 1: repeat one, 2: repeat all
-
-        function toggleRepeatMode() {
-          repeatMode = (repeatMode + 1) % 3;
-          const btn = document.getElementById('repeatToggle');
-          
-          btn.classList.remove('repeat-none', 'repeat-one', 'repeat-all');
+     <script>
+          let playlist = [];
+          let currentTrack = 0;
+          let repeatMode = 0; // 0: no repeat, 1: repeat one, 2: repeat all
+          let isPlaylistVisible = true;
+          let radioStarted = false;
         
-          if (repeatMode === 0) {
-            btn.innerText = '🔁';
-            btn.classList.add('repeat-none');
-            radioPlayer.loop = false;
-          } else if (repeatMode === 1) {
-            btn.innerText = '🔂';
-            btn.classList.add('repeat-one');
-            radioPlayer.loop = true;
-          } else {
-            btn.innerText = '🔁♻️';
-            btn.classList.add('repeat-all');
-            radioPlayer.loop = false;
+          const radioPlayer = document.getElementById('radioPlayer');
+          const currentSong = document.getElementById('currentSong');
+          const nextSong = document.getElementById('nextSong');
+          const repeatToggle = document.getElementById('repeatToggle');
+        
+          // Visualizador
+          const canvas = document.getElementById('visualizerCanvas');
+          const ctx = canvas.getContext('2d');
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 128;
+          const bufferLength = analyser.frequencyBinCount;
+          const dataArray = new Uint8Array(bufferLength);
+        
+          function setupVisualizer() {
+            const source = audioCtx.createMediaElementSource(radioPlayer);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            drawVisualizer();
           }
-        }
-
-
-        let isPlaylistVisible = true;
-        function togglePlaylist() {
-          isPlaylistVisible = !isPlaylistVisible;
-          document.getElementById('upcomingSongs').style.display = isPlaylistVisible ? 'block' : 'none';
-          document.getElementById('togglePlaylistBtn').innerText = isPlaylistVisible ? '⬇️ Ocultar lista' : '⬆️ Mostrar lista';
-        }
-
-
-    
-      function playNextTrack() {
-          if (!playlist.length) return;
-          radioPlayer.src = playlist[currentTrack];
-          radioPlayer.load();
-          radioPlayer.play();
-          const next = playlist[(currentTrack + 1) % playlist.length] || '';
-          document.getElementById('nextSong').innerText = `Siguiente: 🎵 ${extractName(next)}`;
-          currentSongElement.innerText = extractName(playlist[currentTrack]);
-          currentTrack = (currentTrack + 1) % playlist.length;
-          renderPlaylistUI(); // Actualizar la vista de lista
-        }
-    
-      function playCurrentTrack() {
-        shuffleArray(playlist);
-        radioPlayer.src = '/Musica/' + playlist[currentTrack];
-        radioPlayer.load();
-        radioPlayer.play();
-        currentSongElement.innerText = playlist[currentTrack].replace(/\.[^/.]+$/, "");
-      }
-
-        function renderPlaylistUI() {
-          const next = playlist[(currentTrack + 1) % playlist.length] || '';
-          document.getElementById('nextSong').innerText = `Siguiente: 🎵 ${extractName(next)}`;
-          const list = document.getElementById('upcomingSongs');
-          list.innerHTML = '';
-          for (let i = 0; i < playlist.length; i++) {
-            const li = document.createElement('li');
-            li.textContent = `${i +1 === currentTrack ? '▶️ ' : ''}${extractName(playlist[i])}`;
-            list.appendChild(li);
+        
+          function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+            analyser.getByteFrequencyData(dataArray);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const barWidth = canvas.width / bufferLength;
+            for (let i = 0; i < bufferLength; i++) {
+              const value = dataArray[i];
+              const hue = 180 + i * 3;
+              ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+              ctx.fillRect(i * barWidth, canvas.height - value, barWidth - 2, value);
+            }
           }
-        }
-    
-      fetch('music_list.json')
-          .then(response => response.json())
-          .then(data => {
-            playlist = data;
-            setTimeout(playNextTrack, 500);
-            renderPlaylistUI(); // Opcional para mostrar la cola
-          })
-          .catch(error => console.error('Error al cargar lista de canciones:', error));
-    
-      radioPlayer.addEventListener('ended', () => {
-          if (repeatMode === 1) {
-            radioPlayer.currentTime = 0;
+        
+          function extractName(url) {
+            return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ''));
+          }
+        
+          function playCurrentTrack() {
+            radioPlayer.src = playlist[currentTrack];
+            radioPlayer.load();
             radioPlayer.play();
-          } else if (repeatMode === 2) {
-            playNextTrack(); // circular
-          } else {
-            // si no hay más canciones, detener
-            if (currentTrack !== 0) playNextTrack();
+            currentSong.innerText = extractName(playlist[currentTrack]);
+            const next = playlist[(currentTrack + 1) % playlist.length] || '';
+            nextSong.innerText = `Siguiente: 🎵 ${extractName(next)}`;
+            renderPlaylistUI();
           }
-        });
-
-        const canvas = document.getElementById('visualizerCanvas');
-        const ctx = canvas.getContext('2d');
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioCtx.createMediaElementSource(radioPlayer);
-        const analyser = audioCtx.createAnalyser();
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-        analyser.fftSize = 128;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
         
-        function drawVisualizer() {
-          requestAnimationFrame(drawVisualizer);
-          analyser.getByteFrequencyData(dataArray);
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-          const barWidth = canvas.width / bufferLength;
-          for (let i = 0; i < bufferLength; i++) {
-            const value = dataArray[i];
-            const hue = 180 + i * 3;
-            ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
-            ctx.fillRect(i * barWidth, canvas.height - value, barWidth - 2, value);
+          function playNextTrack() {
+            if (!playlist.length) return;
+            if (repeatMode !== 1) currentTrack = (currentTrack + 1) % playlist.length;
+            playCurrentTrack();
           }
-        }
-        drawVisualizer();
+        
+          function playPreviousTrack() {
+            currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
+            playCurrentTrack();
+          }
+        
+          function toggleRepeatMode() {
+            repeatMode = (repeatMode + 1) % 3;
+            repeatToggle.classList.remove('repeat-none', 'repeat-one', 'repeat-all');
+            if (repeatMode === 0) {
+              repeatToggle.innerText = '🔁';
+              repeatToggle.classList.add('repeat-none');
+              radioPlayer.loop = false;
+            } else if (repeatMode === 1) {
+              repeatToggle.innerText = '🔂';
+              repeatToggle.classList.add('repeat-one');
+              radioPlayer.loop = true;
+            } else {
+              repeatToggle.innerText = '∞';
+              repeatToggle.classList.add('repeat-all');
+              radioPlayer.loop = false;
+            }
+          }
+        
+          function togglePlaylist() {
+            isPlaylistVisible = !isPlaylistVisible;
+            const display = isPlaylistVisible ? 'block' : 'none';
+            const label = isPlaylistVisible ? '⬆️ Ocultar lista' : '⬇️ Mostrar lista';
+            document.getElementById('upcomingSongs').style.display = display;
+            document.getElementById('togglePlaylistBtn').innerText = label;
+            document.getElementById('togglePlaylistBtnTop').innerText = label;
+          }
+        
+          function renderPlaylistUI() {
+            const list = document.getElementById('upcomingSongs');
+            list.innerHTML = '';
+            playlist.forEach((track, i) => {
+              const li = document.createElement('li');
+              li.textContent = `${i + 1 === currentTrack ? '▶️ ' : ''}${extractName(track)}`;
+              list.appendChild(li);
+            });
+          }
+        
+          function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [array[i], array[j]] = [array[j], array[i]];
+            }
+          }
+        
+          function shuffleAndPlay() {
+            shuffleArray(playlist);
+            currentTrack = 0;
+            playCurrentTrack();
+          }
+        
+          function startRadio() {
+            if (radioStarted) return;
+            audioCtx.resume().then(() => {
+              radioStarted = true;
+              fetch('music_list.json')
+                .then(res => res.json())
+                .then(data => {
+                  playlist = data.map(song => song.url || song); // soporta ambos formatos
+                  currentTrack = 0;
+                  setupVisualizer();
+                  playCurrentTrack();
+                })
+                .catch(err => {
+                  console.error('Error al cargar lista de música:', err);
+                });
+            });
+          }
+        
+          radioPlayer.addEventListener('ended', () => {
+            if (repeatMode === 1) {
+              radioPlayer.currentTime = 0;
+              radioPlayer.play();
+            } else if (repeatMode === 2) {
+              playNextTrack();
+            } else {
+              if (currentTrack < playlist.length - 1) playNextTrack();
+            }
+          });
+        </script>
 
-
-</script>
 
      <script>
           function mezclarYReproducir() {
