@@ -402,14 +402,16 @@
           <div class="flex flex-col items-center justify-center space-y-4">
             <!--<img src="/images/logo_radio_002.jpg" alt="Logo Radio Anarquista" class="w-24 rounded-full shadow-md border border-gray-300">  -->
 
-            <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
-            <p id="currentSong" class="text-red-600 font-semibold"></p>
-            <ul id="upcomingSongs" class="text-gray-700 mt-4 text-sm"></ul>
             <div class="flex space-x-2">
               <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="playPreviousTrack()">Anterior</button>
               <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="toggleRepeat()">Repetir</button>
               <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="playNextTrack()">Siguiente</button>
             </div>
+
+            <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
+            <p id="currentSong" class="text-red-600 font-semibold"></p>
+            <ul id="upcomingSongs" class="text-gray-700 mt-4 text-sm"></ul>
+            
 
           </div>
         </div>
