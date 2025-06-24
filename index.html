@@ -219,6 +219,61 @@
             animation: spin 1s linear infinite;
             margin-right: 8px;
         }
+
+        .radio-btn {
+          padding: 10px 16px;
+          border-radius: 6px;
+          background: linear-gradient(135deg, #f43f5e, #6366f1);
+          color: white;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.3s;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .radio-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+
+        .radio-btn.active {
+          background: linear-gradient(135deg, #22c55e, #3b82f6);
+          box-shadow: 0 0 10px rgba(59,130,246,0.6);
+        }
+
+        #togglePlaylistBtn {
+          margin-top: 10px;
+          cursor: pointer;
+          font-weight: 500;
+          color: #4f46e5;
+          transition: color 0.2s;
+        }
+        #togglePlaylistBtn:hover {
+          color: #4338ca;
+        }
+
+        .radio-btn.repeat-mode {
+          transition: all 0.3s ease;
+        }
+        
+        .radio-btn.repeat-none {
+          background: linear-gradient(to right, #9ca3af, #6b7280); /* gris neutro */
+        }
+        .radio-btn.repeat-one {
+          background: linear-gradient(to right, #f43f5e, #f59e0b); /* coral-dorado */
+        }
+        .radio-btn.repeat-all {
+          background: linear-gradient(to right, #10b981, #3b82f6); /* verde-azul */
+        }
+
+
+
+
+
+
+
+        
     </style>
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
@@ -403,14 +458,17 @@
             <!--<img src="/images/logo_radio_002.jpg" alt="Logo Radio Anarquista" class="w-24 rounded-full shadow-md border border-gray-300">  -->
 
             <div class="flex space-x-2">
-              <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="playPreviousTrack()">Anterior</button>
-              <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="toggleRepeat()">Repetir</button>
-              <button class="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700" onclick="playNextTrack()">Siguiente</button>
+                <button class="radio-btn" onclick="playPreviousTrack()">⏮️ Anterior</button>
+                <button id="repeatToggle" class="radio-btn" onclick="toggleRepeatMode()">🔁</button>
+                <button class="radio-btn" onclick="playNextTrack()">⏭️ Siguiente</button>
+
             </div>
 
             <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
             <p id="currentSong" class="text-red-600 font-semibold"></p>
             <ul id="upcomingSongs" class="text-gray-700 mt-4 text-sm"></ul>
+            <p id="togglePlaylistBtn" onclick="togglePlaylist()">⬇️ Mostrar lista</p>
+
             
 
           </div>
@@ -1114,10 +1172,38 @@
         playCurrentTrack();
       }
     
-      function toggleRepeat() {
-        isRepeat = !isRepeat;
-        radioPlayer.loop = isRepeat;
-      }
+      let repeatMode = 0; // 0: none, 1: repeat one, 2: repeat all
+
+        function toggleRepeatMode() {
+          repeatMode = (repeatMode + 1) % 3;
+          const btn = document.getElementById('repeatToggle');
+          
+          btn.classList.remove('repeat-none', 'repeat-one', 'repeat-all');
+        
+          if (repeatMode === 0) {
+            btn.innerText = '🔁';
+            btn.classList.add('repeat-none');
+            radioPlayer.loop = false;
+          } else if (repeatMode === 1) {
+            btn.innerText = '🔂';
+            btn.classList.add('repeat-one');
+            radioPlayer.loop = true;
+          } else {
+            btn.innerText = '🔁♻️';
+            btn.classList.add('repeat-all');
+            radioPlayer.loop = false;
+          }
+        }
+
+
+        let isPlaylistVisible = true;
+        function togglePlaylist() {
+          isPlaylistVisible = !isPlaylistVisible;
+          document.getElementById('upcomingSongs').style.display = isPlaylistVisible ? 'block' : 'none';
+          document.getElementById('togglePlaylistBtn').innerText = isPlaylistVisible ? '⬇️ Ocultar lista' : '⬆️ Mostrar lista';
+        }
+
+
     
       function playNextTrack() {
           if (!playlist.length) return;
@@ -1156,7 +1242,18 @@
           })
           .catch(error => console.error('Error al cargar lista de canciones:', error));
     
-      radioPlayer.addEventListener('ended', playNextTrack);
+      radioPlayer.addEventListener('ended', () => {
+          if (repeatMode === 1) {
+            radioPlayer.currentTime = 0;
+            radioPlayer.play();
+          } else if (repeatMode === 2) {
+            playNextTrack(); // circular
+          } else {
+            // si no hay más canciones, detener
+            if (currentTrack !== 0) playNextTrack();
+          }
+        });
+
 </script>
 
      <script>
