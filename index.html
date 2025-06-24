@@ -265,8 +265,9 @@ function toggleList() {
 
 function startRadio() {
   loadTrack(currentIndex);
-  initVisualizer();
+  // visualizador se activará automáticamente en play
 }
+
 
 
 
@@ -334,11 +335,15 @@ function drawVisualizer() {
 // Activa visualizador al primer play del usuario
 audio.addEventListener('play', () => {
   if (!visualStarted) {
-    initVisualizer();
-  } else if (audioCtx?.state === 'suspended') {
+    setTimeout(() => {
+      initVisualizer();
+    }, 300); // da tiempo a que el audio comience
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
 });
+
 
 
   
