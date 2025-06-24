@@ -1,204 +1,1237 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Web Completa</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    body { font-family: sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
-    nav { background: #333; color: white; display: flex; gap: 10px; padding: 10px; }
-    nav button { background: #444; border: none; color: white; padding: 10px 20px; cursor: pointer; }
-    .section { display: none; padding: 20px; }
-    .section.active { display: block; }
-    .highlight { background: #dff0d8; padding: 10px; margin-top: 10px; border-left: 5px solid green; }
-    #map { height: 400px; }
-    .controls { margin: 10px 0; }
-    .controls button { margin-right: 8px; }
-    .song-list { margin-top: 15px; }
-    .song-list li { cursor: pointer; }
-    #startButton {
-      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Green_Light_Icon.svg/1024px-Green_Light_Icon.svg.png') no-repeat center center;
-      background-size: contain;
-      width: 40px;
-      height: 40px;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <nav>
-    <button onclick="showSection('home')">Inicio</button>
-    <button onclick="showSection('radio')">Radio</button>
-    <button onclick="showSection('diario')">Diario</button>
-    <button onclick="showSection('mapa')">Mapa</button>
-  </nav>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Pagina Personal</title>
+    <!--<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!--<script src="https://cdn.tailwindcss.com"></script>
+    <!-- Insertar en el <head> de tu HTML -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-  <div id="home" class="section active">
-    <h2>Bienvenido</h2>
-    <div id="latestEntryHome">Cargando última entrada...</div>
-  </div>
-
-  <div id="radio" class="section">
-    <h2>🎧 Radio</h2>
-    <div id="nowPlaying">
-      <strong>Sonando:</strong> <span id="currentSong">---</span><br>
-      <strong>A continuación:</strong> <span id="nextSong">---</span>
-    </div>
-    <div class="controls">
-      <button id="startButton" onclick="startRadio()"></button>
-      <button onclick="prevTrack()">⏮️</button>
-      <button onclick="nextTrack()">⏭️</button>
-      <button onclick="toggleRepeat()">🔁</button>
-      <button onclick="toggleRandom()">🔀</button>
-      <button onclick="toggleList()">🎵 list</button>
-    </div>
-    <audio id="audio" controls></audio>
-    <canvas id="visualizer" width="600" height="100" style="width:100%; background:#111; display:block; margin-top:10px;"></canvas>
-    <ul id="songList" class="song-list" style="display:none;"></ul>
-  </div>
-
-  <div id="diario" class="section">
-    <h2>📓 Diario</h2>
-    <div id="latestEntry">Cargando entrada...</div>
-  </div>
-
-  <div id="mapa" class="section">
-    <h2>🗺️ Mapa</h2>
-    <div id="map"></div>
-  </div>
-
-<script>
-const API_DIARIO = "https://script.google.com/macros/s/AKfycbxVmMznPpXMH5i_U5XRojZsUBSlTGVZC2kQZbX5pHjPtBXbSMw43eEVGopAYgGRz6Ei/exec";
-const API_MAPS = "https://script.google.com/macros/s/AKfycbz2SGXerStzhT2mYiKpK0JJLyrZTgrD5L_3WT-jZCK09YdE4AXfFtxkUC8j4gysAcFv/exec";
-
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-fetch(API_DIARIO + "?action=getLatest")
-  .then(r => r.json())
-  .then(data => {
-    document.getElementById("latestEntry").innerHTML = data.html;
-    document.getElementById("latestEntryHome").innerHTML = data.html;
-  });
-
-fetch(API_MAPS)
-  .then(r => r.json())
-  .then(data => {
-    const map = L.map('map').setView([data.lat, data.lng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    L.marker([data.lat, data.lng]).addTo(map).bindPopup('Última ubicación').openPopup();
-  });
-
-// Radio
-const audio = document.getElementById('audio');
-const canvas = document.getElementById('visualizer');
-const ctx = canvas.getContext('2d');
-let playlist = [];
-let currentIndex = 0;
-let repeat = false;
-let random = false;
-let visualStarted = false;
-let audioCtx, analyser, source, bufferLength, dataArray;
-
-function startRadio() {
-  fetch("music_list.json")
-    .then(res => res.json())
-    .then(data => {
-      playlist = data;
-      loadTrack(currentIndex);
-      audio.addEventListener('play', () => {
-        if (!visualStarted) {
-          initVisualizer();
-        } else if (audioCtx?.state === 'suspended') {
-          audioCtx.resume();
+    <style>
+        /* Fuente Inter para un aspecto moderno y limpio */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Un gris claro para el fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: url('mi%20bandera.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
-      });
-    });
+        .container {
+            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
+            width: 100%;
+            background-color: #ffffff;
+            padding: 32px;
+            border-us: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #374151;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-us: 8px;
+            font-size: 1rem;
+            color: #1f2937;
+            background-color: #f9fafb;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6; /* Un azul bonito al enfocar */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .btn {
+            background-color: #4f46e5; /* Morado intenso */
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #4338ca; /* Morado más oscuro al pasar el ratón */
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .message-box {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none; /* Oculto por defecto */
+        }
+        .message-box.success {
+            background-color: #d1fae5; /* Verde claro */
+            color: #065f46; /* Verde oscuro */
+            border: 1px solid #10b981;
+        }
+        .message-box.error {
+            background-color: #fee2e2; /* Rojo claro */
+            color: #991b1b; /* Rojo oscuro */
+            border: 1px solid #ef4444;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none; /* Oculto por defecto */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Estilos para las pestañas de navegación principal */
+        .main-tab-button {
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #e5e7eb; /* Gris claro */
+            color: #4b5563;
+            transition: background-color 0.2s, color 0.2s;
+            white-space: nowrap; /* Evita que el texto se rompa */
+        }
+        .main-tab-button.active {
+            background-color: #ffffff;
+            color: #4f46e5; /* Morado */
+            box-shadow: 0 -2px 0 0 #4f46e5 inset; /* Subrayado morado */
+        }
+        .main-tab-content {
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* Estilos para las sub-pestañas del diario */
+        .diary-sub-tab-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            transition: background-color 0.2s, color 0.2s;
+            margin-right: 8px; /* Espacio entre botones */
+        }
+        .diary-sub-tab-button.active {
+            background-color: #e0e7ff; /* Azul claro */
+            color: #4f46e5; /* Morado */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .diary-sub-tab-content {
+            padding-top: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        .entry-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .entry-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin-top: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .entry-card img:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Estilos para el modal de imagen */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+        }
+        .modal-image {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #ccc;
+        }
+        
+        /* Indicador de carga para imágenes */
+        .image-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
+    <!-- Modal para ver imágenes en grande -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="Imagen ampliada">
+        </div>
+    </div>
+
+    <div class="container rounded-xl shadow-xl flex flex-col">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
+
+        <!-- Nueva pestaña en navegación principal -->
+        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
+          <button class="main-tab-button" data-main-tab="home">Inicio</button>
+          <button class="main-tab-button" data-main-tab="diary">Diario</button>
+          <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
+          <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
+          <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
+          <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+          <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
+          <button class="main-tab-button" data-main-tab="radio">Radio</button>
+
+        </nav>
+
+        <div id="mainHomeSection" class="main-tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
+            <p class="text-center text-gray-600 mb-8">Explora las pestañas de arriba.</p>
+            
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Entrada del Diario:</h3>
+            <div id="latestEntryContent" class="text-gray-700">
+                <p class="text-center text-gray-500">Cargando última entrada del diario...</p>
+            </div>
+            <div class="flex justify-center mt-8">
+                <button onclick="showMainTab('diary'); showDiarySubTab('write')" class="btn py-3 px-6 rounded-lg text-lg">
+                    <span>Ir al Diario</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="mainDiarySection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Diario Digital</h2>
+            
+            <nav class="flex border-b border-gray-200 mb-6">
+                <button class="diary-sub-tab-button active" data-diary-sub-tab="write">Escribir Entrada</button>
+                <button class="diary-sub-tab-button" data-diary-sub-tab="view">Ver/Buscar Entradas</button>
+            </nav>
+
+            <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
+                <form id="diaryForm" class="w-full">
+                    <div class="mb-6">
+                      <label for="title" class="form-label mb-2">Título de la Entrada:</label>
+                      <input type="text" id="title" name="title" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: Paseo por el parque" />
+                    </div>
+                    <div class="mb-6">
+                        <label for="text" class="form-label mb-2">Tu Entrada de Hoy:</label>
+                        <textarea id="text" name="text" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="photoUpload" class="form-label mb-2">Adjuntar Foto (desde tu ordenador):</label>
+                        <input type="file" id="photoUpload" name="photoUpload" accept="image/*" class="form-input rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
+                        <p class="text-sm text-gray-500 mt-1">Se subirá a tu Google Drive.</p>
+                    </div>
+
+                    <div class="mb-8">
+                        <label for="externalImageUrl" class="form-label mb-2">O pegar URL de imagen (https://es.imgbb.com/  https://pasteboard.co/  https://postimages.org/  https://imgur.com/):</label>
+                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ibb.co/ABC123 o https://i.imgur.com/ejemplo.jpg">
+                        <p class="text-sm text-gray-500 mt-1">Soporta ImgBB, Imgur, PostImage y URLs directas. Se procesará automáticamente.</p>
+                    </div>
+
+                    <button type="submit" class="btn w-full">
+                        <span id="buttonText">Guardar Entrada</span>
+                        <div id="loadingSpinner" class="loading-spinner"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div id="diaryViewSearchSection" class="diary-sub-tab-content hidden">
+                
+                <div class="flex gap-2 items-end mb-6">
+                  <div class="flex-1">
+                    <label for="searchTitle" class="form-label mb-2">Buscar por Título:</label>
+                    <input type="text" id="searchTitle" name="searchTitle" class="form-input rounded-lg" placeholder="Palabra clave del título">
+                  </div>
+                  <button onclick="buscarPorTitulo()" class="btn px-6 py-3">Buscar</button>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                    <div>
+                        <label for="startDate" class="form-label">Desde:</label>
+                        <input type="datetime-local" id="startDate" class="form-input w-auto">
+                    </div>
+                    <div>
+                        <label for="endDate" class="form-label">Hasta:</label>
+                        <input type="datetime-local" id="endDate" class="form-input w-auto">
+                    </div>
+                    <button id="searchEntriesBtn" class="btn mt-6 sm:mt-0 px-6 py-3">Buscar</button>
+                </div>
+                <div id="searchResults" class="text-gray-700">
+                    <p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainMapsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
+            <!-- Sustituir el contenido del div con id="mainMapsSection" en tu HTML -->
+
+            
+              <div class="flex gap-4 mb-4">
+                <input type="datetime-local" id="mapStartDate" class="form-input" value="2025-06-21T00:00">
+                <input type="datetime-local" id="mapEndDate" class="form-input" value="2025-06-22T23:59">
+
+                <button onclick="filtrarDatosMapa()" class="btn">Aplicar Filtros</button>
+              </div>
+            
+              <div id="mapid" style="height: 500px;" class="mb-6 rounded-xl shadow-md"></div>
+            
+              <h3 class="text-xl font-semibold text-gray-700 mb-2">Datos Recopilados</h3>
+              <div class="overflow-auto max-h-[400px] border rounded-lg shadow">
+                <table class="w-full text-sm text-left">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="px-4 py-2">Fecha</th>
+                      <th class="px-4 py-2">Hora</th>
+                      <th class="px-4 py-2">Lat</th>
+                      <th class="px-4 py-2">Lon</th>
+                      <th class="px-4 py-2">Alt</th>
+                      <th class="px-4 py-2">Pulso</th>
+                      <th class="px-4 py-2">SpO2</th>
+                      <th class="px-4 py-2">Pasos</th>
+                      <th class="px-4 py-2">Temp</th>
+                      <th class="px-4 py-2">Anomalía</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablaDatosMapa"></tbody>
+                </table>
+              </div>
+          
+
+        </div>
+
+        <div id="mainTripsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Organizar Viajes</h2>
+            <p class="text-center text-gray-600">Planifica tus viajes, rutas y presupuestos. ¡Próximamente!</p>
+            <p class="text-center text-gray-500 mt-4">Puedes añadir formularios y listas para gestionar tus planes de viaje.</p>
+        </div>
+
+        <div id="mainMenusSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Menús de Comida</h2>
+            <p class="text-center text-gray-600">Organiza tus comidas semanales y listas de la compra. ¡Paciencia, pronto estará listo!</p>
+            <p class="text-center text-gray-500 mt-4">Aquí podrías tener un calendario, recetas y opciones de filtrado.</p>
+        </div>
+
+        <div id="mainProjectsSection" class="main-tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gestión de Proyectos</h2>
+            <p class="text-center text-gray-600">Gestiona tus tareas, plazos y objetivos de tus proyectos personales o profesionales. ¡Trabajando en ello!</p>
+            <p class="text-center text-gray-500 mt-4">Tableros Kanban o listas de tareas serían útiles aquí.</p>
+        </div>
+
+        <!-- Nueva sección "Perfil" -->
+        <div id="mainProfileSection" class="main-tab-content hidden">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Perfil Personal</h2>
+          <div class="space-y-4">
+            <p><strong>Nombre:</strong> Javier Santiago Gastón de Iriarte Cabrera</p>
+            <p><strong>DNI:</strong> 47033535F</p>
+            <p><strong>Contacto:</strong> <a href="mailto:javier@email.com" class="text-blue-600 underline">javier@email.com</a></p>
+            <p><strong>Teléfono:</strong> +34 669 574 483</p>
+            <p><strong>Sobre mí:</strong> Soy .</p>
+          </div>
+        </div>
+
+        <!-- Sección de Radio -->
+        <div id="mainRadioSection" class="main-tab-content hidden">
+          <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">🎧 Mi Radio Personal</h2>
+          <div class="text-center mb-4">
+            <strong>Sonando:</strong> <span id="currentSong">---</span>
+          </div>
+          <div class="flex justify-center gap-2 mb-4">
+            <button onclick="prevTrack()" class="btn">⏮️</button>
+            <button onclick="nextTrack()" class="btn">⏭️</button>
+            <button onclick="toggleList()" class="btn">🎵 Ver Lista</button>
+          </div>
+          <div class="flex justify-center mb-4">
+            <audio id="audio" controls class="w-full max-w-lg"></audio>
+          </div>
+          <ul id="songList" class="song-list list-disc px-6 text-left text-gray-800 hidden"></ul>
+          <div id="expandButtonContainer" class="flex justify-center mt-4">
+            <button id="expandButton" onclick="expandSongList()" class="btn">Mostrar más canciones</button>
+          </div>
+        </div>
+
+
+        <div id="messageBox" class="message-box w-full mt-8"></div>
+    </div>
+
+    <script>
+        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado.
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoTQVF1RMm2XckrFFXJ1heZ8P2W7carCAZaEw-XxI76bWp_oyKZy9kA1LlBPsxMQQL/exec'; 
+
+        // Elementos del DOM para la navegación principal
+        const mainTabButtons = document.querySelectorAll('.main-tab-button');
+        const mainHomeSection = document.getElementById('mainHomeSection');
+        const mainDiarySection = document.getElementById('mainDiarySection');
+        const mainMapsSection = document.getElementById('mainMapsSection');
+        const mainTripsSection = document.getElementById('mainTripsSection');
+        const mainMenusSection = document.getElementById('mainMenusSection');
+        const mainProjectsSection = document.getElementById('mainProjectsSection');
+
+        // Elementos del DOM para la sub-navegación del Diario
+        const diarySubTabButtons = document.querySelectorAll('.diary-sub-tab-button');
+        const diaryWriteEntrySection = document.getElementById('diaryWriteEntrySection');
+        const diaryViewSearchSection = document.getElementById('diaryViewSearchSection');
+
+        // Elementos del DOM para la lógica del Diario
+        const latestEntryContent = document.getElementById('latestEntryContent');
+        const searchEntriesBtn = document.getElementById('searchEntriesBtn');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const searchResultsDiv = document.getElementById('searchResults');
+        const diaryForm = document.getElementById('diaryForm');
+        const text = document.getElementById('text');
+        const photoUpload = document.getElementById('photoUpload');
+        const externalImageUrlInput = document.getElementById('externalImageUrl');
+        const messageBox = document.getElementById('messageBox');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+
+        // Elementos del modal
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.querySelector('.close-modal');
+
+        // --- Funciones de Utilidad ---
+
+        // Función para mostrar mensajes al usuario (éxito/error)
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box w-full ${type}`;
+            messageBox.style.display = 'block';
+        }
+
+        // Función para ocultar mensajes
+        function hideMessage() {
+            messageBox.style.display = 'none';
+            messageBox.textContent = '';
+            messageBox.className = 'message-box w-full';
+        }
+
+        // Función auxiliar para leer un archivo como Base64
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Función para resetear el estado del formulario
+        function resetFormState() {
+            buttonText.textContent = 'Guardar Entrada';
+            loadingSpinner.style.display = 'none';
+            diaryForm.querySelector('button[type="submit"]').disabled = false;
+        }
+
+        // Función para formatear la fecha
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            try {
+                return new Date(dateString).toLocaleDateString('es-ES', options);
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Función mejorada para convertir URLs de servicios de hosting a URLs directas (cliente)
+        function convertToDirectImageUrl(url) {
+            if (!url || url.trim() === '') return null;
+        
+            const cleanUrl = url.trim();
+        
+            // Si ya es directa, úsala
+            if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) ||
+                cleanUrl.includes('drive.google.com/thumbnail') ||
+                cleanUrl.includes('i.ibb.co') ||
+                cleanUrl.includes('i.imgur.com') ||
+                cleanUrl.includes('i.postimg.cc')) {
+                return cleanUrl;
+            }
+        
+            // pasteboard.co
+            const pasteboard = cleanUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)(\.[a-z]+)?/);
+            if (pasteboard) {
+                return `https://pasteboard.co/${pasteboard[1]}.png`;
+            }
+        
+            // imgbb
+            const imgbb = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+            if (imgbb) {
+                return `https://i.ibb.co/${imgbb[1]}/image.png`;
+            }
+        
+            // imgur
+            const imgur = cleanUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
+            if (imgur) {
+                return `https://i.imgur.com/${imgur[1]}.jpg`;
+            }
+        
+            // postimages
+            const postimg = cleanUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
+            if (postimg) {
+                return `https://i.postimg.cc/${postimg[1]}/image.jpg`;
+            }
+        
+            return cleanUrl;
+        }
+        
+
+
+        // Función para intentar múltiples URLs de imagen
+        function tryMultipleImageUrls(originalUrl, imgElement, callback) {
+            const urls = [];
+        
+            const directUrl = convertToDirectImageUrl(originalUrl);
+            if (directUrl) urls.push(directUrl);
+        
+            // Agregar variantes por host
+            const imgbb = originalUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+            if (imgbb) {
+                const base = `https://i.ibb.co/${imgbb[1]}`;
+                urls.push(`${base}/image.png`, `${base}/image.jpg`, `${base}/image.webp`);
+            }
+        
+            const pasteboard = originalUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)/);
+            if (pasteboard) {
+                const base = `https://pasteboard.co/${pasteboard[1]}`;
+                urls.push(`${base}.png`, `${base}.jpg`, `${base}.webp`);
+            }
+        
+            const imgur = originalUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
+            if (imgur) {
+                urls.push(`https://i.imgur.com/${imgur[1]}.jpg`);
+            }
+        
+            const postimg = originalUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
+            if (postimg) {
+                const base = `https://i.postimg.cc/${postimg[1]}`;
+                urls.push(`${base}/image.jpg`, `${base}/image.png`, `${base}/image.webp`);
+            }
+        
+            let index = 0;
+        
+            function tryNextUrl() {
+                if (index >= urls.length) {
+                    callback(false); // ninguna funcionó
+                    return;
+                }
+        
+                const testUrl = urls[index];
+                const testImg = new Image();
+                testImg.onload = () => {
+                    imgElement.src = testUrl;
+                    callback(true);
+                };
+                testImg.onerror = () => {
+                    index++;
+                    tryNextUrl();
+                };
+                testImg.src = testUrl;
+            }
+        
+            tryNextUrl();
+        }
+
+
+        
+
+        // Función para renderizar una entrada de diario con mejor manejo de imágenes
+        function renderEntry(entry, containerElement) {
+                        
+            const entryCard = document.createElement('div');
+            entryCard.className = 'entry-card';
+
+            const titleElem = document.createElement('h3');
+            titleElem.className = 'text-xl font-bold text-indigo-700 mb-2';
+            titleElem.textContent = entry.title || '(Sin título)';
+            entryCard.appendChild(titleElem);
+
+
+            const datePara = document.createElement('p');
+            datePara.className = 'text-sm text-gray-500 mb-2';
+            datePara.textContent = `Fecha: ${formatDate(entry.timestamp)}`;
+            entryCard.appendChild(datePara);
+
+            const textPara = document.createElement('p');
+            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap';
+            textPara.textContent = entry.text;
+            entryCard.appendChild(textPara);
+
+            // Verificar si hay una URL de foto válida
+            if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'mt-4';
+                
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.innerHTML = '<span class="image-loading"></span>Cargando imagen...';
+                loadingIndicator.className = 'text-sm text-gray-500 flex items-center';
+                imageContainer.appendChild(loadingIndicator);
+                
+                const img = document.createElement('img');
+                img.className = 'mt-4 rounded-lg shadow-md hidden';
+                img.alt = 'Foto de la entrada del diario';
+                
+                // Añadir evento de clic para mostrar en modal
+                img.addEventListener('click', function() {
+                    modalImage.src = this.src;
+                    imageModal.style.display = 'block';
+                });
+                
+                imageContainer.appendChild(img);
+                entryCard.appendChild(imageContainer);
+                
+                // Intentar cargar la imagen con múltiples URLs si es necesario
+                tryMultipleImageUrls(entry.photoUrl, img, function(success) {
+                    loadingIndicator.style.display = 'none';
+                    if (success) {
+                        img.classList.remove('hidden');
+                    } else {
+                        const errorPara = document.createElement('p');
+                        errorPara.className = 'text-sm text-red-500 mt-2';
+                        errorPara.textContent = 'No se pudo cargar la imagen';
+                        imageContainer.appendChild(errorPara);
+                    }
+                });
+                
+            } else if (entry.photoUrl && entry.photoUrl.startsWith('Error')) {
+                const errorPara = document.createElement('p');
+                errorPara.className = 'text-sm text-red-500 mt-2';
+                errorPara.textContent = `Error con la foto: ${entry.photoUrl}`;
+                entryCard.appendChild(errorPara);
+            }
+
+            containerElement.appendChild(entryCard);
+        }
+
+        // Event listeners para el modal
+        closeModal.addEventListener('click', function() {
+            imageModal.style.display = 'none';
+        });
+
+        imageModal.addEventListener('click', function(e) {
+            if (e.target === imageModal) {
+                imageModal.style.display = 'none';
+            }
+        });
+
+        // --- Funciones de Navegación Principal ---
+
+        function showMainTab(tabName) {
+            // Ocultar todas las secciones
+            mainHomeSection.classList.add('hidden');
+            mainDiarySection.classList.add('hidden');
+            mainMapsSection.classList.add('hidden');
+            mainTripsSection.classList.add('hidden');
+            mainMenusSection.classList.add('hidden');
+            mainProjectsSection.classList.add('hidden');
+            document.getElementById('mainRadioSection').classList.add('hidden'); // <-- añádelo donde ocultas todas
+
+
+            // Desactivar todos los botones
+            mainTabButtons.forEach(button => button.classList.remove('active'));
+
+            // Mostrar la sección correspondiente
+            if (tabName === 'home') {
+                mainHomeSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="home"]').classList.add('active');
+                loadLatestEntry();
+            } else if (tabName === 'diary') {
+                mainDiarySection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="diary"]').classList.add('active');
+                showDiarySubTab('write');
+            } else if (tabName === 'maps') {
+              mainMapsSection.classList.remove('hidden');
+              document.querySelector('[data-main-tab="maps"]').classList.add('active');
+              setTimeout(() => {
+                if (!mapa) iniciarMapa(); else mapa.invalidateSize();
+              }, 300);
+            } else if (tabName === 'trips') {
+                mainTripsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="trips"]').classList.add('active');
+            } else if (tabName === 'menus') {
+                mainMenusSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="menus"]').classList.add('active');
+            } else if (tabName === 'projects') {
+                mainProjectsSection.classList.remove('hidden');
+                document.querySelector('[data-main-tab="projects"]').classList.add('active');
+            } else if (tabName === 'radio') {
+                document.getElementById('mainRadioSection').classList.remove('hidden');
+                document.querySelector('[data-main-tab="radio"]').classList.add('active');
+            }
+
+            hideMessage();
+        }
+
+        // Event listeners para los botones de las pestañas principales
+        mainTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showMainTab(button.dataset.mainTab);
+            });
+        });
+
+        
+        // --- Funciones de Sub-navegación del Diario ---
+
+        function showDiarySubTab(subTabName) {
+            // Ocultar todas las sub-secciones
+            diaryWriteEntrySection.classList.add('hidden');
+            diaryViewSearchSection.classList.add('hidden');
+
+            // Desactivar todos los botones de sub-pestaña
+            diarySubTabButtons.forEach(button => button.classList.remove('active'));
+
+            // Mostrar la sub-sección correspondiente
+            if (subTabName === 'write') {
+                diaryWriteEntrySection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
+            } else if (subTabName === 'view') {
+                diaryViewSearchSection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
+            }
+            hideMessage();
+        }
+
+        // Event listeners para los botones de las sub-pestañas del diario
+        diarySubTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showDiarySubTab(button.dataset.diarySubTab);
+            });
+        });
+
+        // --- Funciones del Diario ---
+
+        async function loadLatestEntry() {
+            latestEntryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última entrada del diario...</p>';
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getLatest`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success' && result.entry) {
+                    latestEntryContent.innerHTML = '';
+                    renderEntry(result.entry, latestEntryContent);
+                } else {
+                    latestEntryContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas para mostrar.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error al cargar la última entrada:', error);
+                latestEntryContent.innerHTML = '<p class="text-center text-red-500">Error al cargar la última entrada.</p>';
+            }
+        }
+
+        // Envío del formulario del diario
+        diaryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+        
+            hideMessage();
+            buttonText.textContent = 'Guardando...';
+            loadingSpinner.style.display = 'block';
+            diaryForm.querySelector('button[type="submit"]').disabled = true;
+        
+            const title = document.getElementById('title').value.trim();
+            const entryText = text.value;
+            const externalImageUrl = externalImageUrlInput.value.trim();
+            let imageData = null;
+            let imageName = '';
+        
+            if (!title) {
+                showMessage('Por favor, pon un título a tu entrada.', 'error');
+                resetFormState();
+                return;
+            }
+        
+            if (!entryText.trim()) {
+                showMessage('Por favor, escribe algo en tu entrada del diario.', 'error');
+                resetFormState();
+                return;
+            }
+        
+            if (photoUpload.files.length > 0 && externalImageUrl !== '') {
+                showMessage('Por favor, elige SOLO UNA opción para la imagen.', 'error');
+                resetFormState();
+                return;
+            }
+        
+            if (photoUpload.files.length > 0) {
+                const file = photoUpload.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    showMessage('La imagen es demasiado grande (máx. 5MB).', 'error');
+                    resetFormState();
+                    return;
+                }
+                imageName = file.name;
+                try {
+                    imageData = await readFileAsBase64(file);
+                } catch (error) {
+                    showMessage('Error al leer la imagen.', 'error');
+                    resetFormState();
+                    return;
+                }
+            }
+        
+            const formData = new FormData();
+               
+                formData.append('title', title);           // Campo 1: Título
+                formData.append('diaryEntry', entryText);  // Campo 2: Texto del diario
+                
+                if (externalImageUrl !== '') {
+                  formData.append('externalImageUrl', externalImageUrl);
+                } else if (imageData) {
+                  formData.append('imageData', imageData);
+                  formData.append('imageName', imageName);
+                }
+
+
+        
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+        
+                const result = await response.json();
+        
+                if (result.status === 'success') {
+                    showMessage('¡Entrada guardada con éxito!', 'success');
+                    text.value = '';
+                    photoUpload.value = '';
+                    externalImageUrlInput.value = '';
+                    document.getElementById('title').value = ''; // limpiar título
+                } else {
+                    showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error al enviar la entrada:', error);
+                showMessage('Error al conectar con el servidor.', 'error');
+            } finally {
+                resetFormState();
+            }
+        });
+
+
+        // Búsqueda de entradas por fecha
+        searchEntriesBtn.addEventListener('click', async () => {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (!startDate || !endDate) {
+                showMessage('Por favor, selecciona tanto la fecha de inicio como la de fin para buscar.', 'error');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                showMessage('La fecha de inicio no puede ser posterior a la fecha de fin.', 'error');
+                return;
+            }
+
+            searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando entradas...</p>';
+            hideMessage();
+
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getEntriesByDate&startDate=${startDate}&endDate=${endDate}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.status === 'success' && result.entries && result.entries.length > 0) {
+                    searchResultsDiv.innerHTML = '';
+                    result.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    result.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
+                } else {
+                    searchResultsDiv.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No se encontraron entradas para el rango de fechas seleccionado.'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error al buscar entradas:', error);
+                searchResultsDiv.innerHTML = '<p class="text-center text-red-500">Error al buscar entradas. Inténtalo de nuevo.</p>';
+            }
+        });
+
+        // --- Inicialización ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showMainTab('home');
+        });
+    </script>
+    <!-- Insertar al final del <body>, antes del cierre -->
+    <script>
+      const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbwXNtcVnXevJgk-fpMvqqkc4BeSbZZ_EutueaCAkakIaBK5sx7AQL-fZpN5R08uWNy3/exec";
+      let mapa, capaMarcadores, ruta, datosCargados = [];
+    
+      function iniciarMapa() {
+        mapa = L.map("mapid").setView([40.4168, -3.7038], 5);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; OpenStreetMap',
+        }).addTo(mapa);
+    
+        capaMarcadores = L.featureGroup().addTo(mapa);
+        ruta = L.polyline([], { color: 'blue' }).addTo(mapa);
+        cargarDatosMapa();
+      }
+    
+      async function cargarDatosMapa() {
+        try {
+          const res = await fetch(SERVER_DATA_URL);
+          const datos = await res.json();
+    
+          if (!Array.isArray(datos) || datos.length === 0) {
+            console.warn("No se recibieron datos válidos.");
+            document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="9" class="px-4 py-2 text-center text-gray-500">No hay datos disponibles</td></tr>';
+            return;
+          }
+    
+          datosCargados = datos;
+          procesarYMostrarDatos(datos);
+        } catch (error) {
+          console.error("Error al obtener datos:", error);
+          document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="9" class="px-4 py-2 text-center text-red-500">Error al obtener datos</td></tr>';
+        }
+      }
+    
+      function procesarYMostrarDatos(datos) {
+        const cuerpoTabla = document.getElementById("tablaDatosMapa");
+        cuerpoTabla.innerHTML = "";
+        capaMarcadores.clearLayers();
+        ruta.setLatLngs([]);
+        const coordenadasRuta = [];
+    
+        datos.forEach((dato) => {
+          const { Timestamp, Hour, Latitude, Longitude, Altitude, Pulse, SpO2, Steps, Temperature } = dato;
+    
+          if (!Latitude || !Longitude || !Altitude) return;
+          const lat = parseFloat(Latitude);
+          const lon = parseFloat(Longitude);
+          const alt = parseFloat(Altitude);
+          coordenadasRuta.push([lat, lon, alt]);
+    
+          const anomalía =
+            Pulse < 40 || Pulse > 120 ||
+            SpO2 < 90 || SpO2 > 100 ||
+            Temperature < 35.0 || Temperature > 37.5 ? "⚠️" : "";
+    
+          const fila = `<tr>
+            <td class="px-4 py-1">${new Date(Timestamp).toLocaleDateString()}</td>
+          
+
+            <td class="px-4 py-1">${new Date(Timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</td>
+
+            <td class="px-4 py-1">${lat.toFixed(4)}</td>
+            <td class="px-4 py-1">${lon.toFixed(4)}</td>
+            <td class="px-4 py-1">${alt.toFixed(1)}</td>
+            <td class="px-4 py-1">${Pulse}</td>
+            <td class="px-4 py-1">${SpO2}</td>
+            <td class="px-4 py-1">${Steps}</td>
+            <td class="px-4 py-1">${Temperature}</td>
+            <td class="px-4 py-1">${anomalía}</td>
+          </tr>`;
+          cuerpoTabla.insertAdjacentHTML("beforeend", fila);
+    
+          const fecha = new Date(Timestamp);
+            const hora = fecha.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+            
+            const marker = L.marker([lat, lon]).bindPopup(
+              `🕒 ${hora}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
+            );
+
+          capaMarcadores.addLayer(marker);
+        });
+    
+        ruta.setLatLngs(coordenadasRuta);
+        if (coordenadasRuta.length > 0) mapa.fitBounds(ruta.getBounds());
+      }
+    
+      function filtrarDatosMapa() {
+        const desde = new Date(document.getElementById("mapStartDate").value);
+        const hasta = new Date(document.getElementById("mapEndDate").value);
+
+
+        if (!datosCargados.length || isNaN(desde) || isNaN(hasta)) return;
+    
+        const filtrados = datosCargados.filter(d => {
+          const fecha = new Date(d.Timestamp);
+          return fecha >= desde && fecha <= hasta;
+        });
+        procesarYMostrarDatos(filtrados);
+      }
+    </script>
+
+    <script>
+        function normalize(str) {
+          try {
+            return (str || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+          } catch (e) {
+            Logger.log('❌ Error en normalizar(): ' + e.message + ' | Valor: ' + str);
+            return '';
+          }
+        }
+
+        
+        function buscarPorTitulo() {
+          console.log('🟣 buscarPorTitulo() llamada');
+        
+          const raw = document.getElementById('searchTitle').value.trim();
+          const keyword = normalize(raw);
+          console.log('🔤 Palabra clave normalizada:', keyword);
+        
+          if (!keyword) {
+            showMessage('Introduce una palabra clave para buscar.', 'error');
+            return;
+          }
+        
+          showMainTab('diary');
+          diaryWriteEntrySection.classList.add('hidden');
+          diaryViewSearchSection.classList.remove('hidden');
+          diarySubTabButtons.forEach(button => button.classList.remove('active'));
+          document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+        
+          searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
+          hideMessage();
+        
+          const url = `${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`;
+          console.log('🌐 Haciendo fetch a:', url);
+        
+          fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              console.log('📦 Respuesta recibida:', data);
+              if (data.status === 'success' && data.entries.length > 0) {
+                searchResultsDiv.innerHTML = '';
+                data.entries.forEach(entry => {
+                  console.log('✅ Entrada recibida:', entry);
+                  searchResultsDiv.innerHTML += `
+                    <div style="border:1px solid #ccc; margin-bottom:1em; padding:1em;">
+                      <strong>${entry.title}</strong><br>
+                      <em>${entry.timestamp}</em><br>
+                      <p>${entry.text}</p>
+                      ${entry.photoUrl !== 'No hay foto' ? `<img src="${entry.photoUrl}" style="max-width:100%">` : ''}
+                    </div>`;
+                });
+              } else {
+                console.log('⚠️ No se encontraron entradas');
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
+              }
+            })
+            .catch(err => {
+              console.error('❌ Error en fetch:', err);
+              showMessage('Error al buscar por título.', 'error');
+            });
+        }
+    </script>
+
+    <script>
+      let playlist = [];
+      let currentTrack = 0;
+      let isRepeat = false;
+      const radioPlayer = document.getElementById('radioPlayer');
+      const currentSongElement = document.getElementById('currentSong');
+    
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+        function extractName(url) {
+          return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ""));
+        }
+    
+      function playPreviousTrack() {
+        currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
+        playCurrentTrack();
+      }
+    
+      function toggleRepeat() {
+        isRepeat = !isRepeat;
+        radioPlayer.loop = isRepeat;
+      }
+    
+      function playNextTrack() {
+          if (!playlist.length) return;
+          radioPlayer.src = playlist[currentTrack];
+          radioPlayer.load();
+          radioPlayer.play();
+          currentSongElement.innerText = extractName(playlist[currentTrack]);
+          currentTrack = (currentTrack + 1) % playlist.length;
+          renderPlaylistUI(); // Actualizar la vista de lista
+        }
+    
+      function playCurrentTrack() {
+        shuffleArray(playlist);
+        radioPlayer.src = '/Musica/' + playlist[currentTrack];
+        radioPlayer.load();
+        radioPlayer.play();
+        currentSongElement.innerText = playlist[currentTrack].replace(/\.[^/.]+$/, "");
+      }
+
+        function renderPlaylistUI() {
+          const list = document.getElementById('upcomingSongs');
+          list.innerHTML = '';
+          for (let i = 0; i < playlist.length; i++) {
+            const li = document.createElement('li');
+            li.textContent = `${i +1 === currentTrack ? '▶️ ' : ''}${extractName(playlist[i])}`;
+            list.appendChild(li);
+          }
+        }
+    
+      fetch('music_list.json')
+          .then(response => response.json())
+          .then(data => {
+            playlist = data;
+            setTimeout(playNextTrack, 500);
+            renderPlaylistUI(); // Opcional para mostrar la cola
+          })
+          .catch(error => console.error('Error al cargar lista de canciones:', error));
+    
+      radioPlayer.addEventListener('ended', playNextTrack);
+     </script>
+
+     <script>
+          function mezclarYReproducir() {
+            fetch('music_list.json')
+              .then(response => response.json())
+              .then(data => {
+                playlist = data.map(song => song.url);
+                shuffleArray(playlist);
+                currentTrack = 0;
+                playNextTrack();
+              })
+              .catch(error => console.error('Error al mezclar canciones:', error));
+          }
+    </script>
+
+
+  <script>
+const songListElement = document.getElementById('songList');
+const currentSongSpan = document.getElementById('currentSong');
+const audio = document.getElementById('audio');
+let songs = [];
+let currentTrack = 0;
+let showingAll = false;
+
+// Cargar lista
+fetch('music_list.json')
+  .then(res => res.json())
+  .then(data => {
+    songs = data;
+    renderSongList();
+    playTrack(0);
+  });
+
+function renderSongList() {
+  songListElement.innerHTML = '';
+  const max = showingAll ? songs.length : 10;
+  songs.slice(0, max).forEach((song, index) => {
+    const li = document.createElement('li');
+    li.textContent = song.title;
+    li.classList.add('cursor-pointer', 'hover:underline');
+    li.onclick = () => playTrack(index);
+    songListElement.appendChild(li);
+  });
+  document.getElementById('expandButtonContainer').style.display = showingAll || songs.length <= 10 ? 'none' : 'flex';
 }
 
-function loadTrack(i) {
-  if (!playlist.length) return;
-  currentIndex = i;
-  audio.src = playlist[i].url;
-  audio.play().then(() => {
-    document.getElementById("currentSong").textContent = playlist[i].title;
-    const nextIndex = (i + 1) % playlist.length;
-    document.getElementById("nextSong").textContent = playlist[nextIndex].title;
-    updateSongList();
-  });
+function playTrack(index) {
+  if (songs[index]) {
+    currentTrack = index;
+    audio.src = songs[index].url;
+    currentSongSpan.textContent = songs[index].title;
+    audio.play();
+  }
 }
 
 function prevTrack() {
-  currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-  loadTrack(currentIndex);
+  currentTrack = (currentTrack - 1 + songs.length) % songs.length;
+  playTrack(currentTrack);
 }
+
 function nextTrack() {
-  currentIndex = random ? Math.floor(Math.random() * playlist.length) : (currentIndex + 1) % playlist.length;
-  loadTrack(currentIndex);
+  currentTrack = (currentTrack + 1) % songs.length;
+  playTrack(currentTrack);
 }
-function toggleRepeat() { repeat = !repeat; }
-function toggleRandom() { random = !random; }
+
 function toggleList() {
-  const list = document.getElementById("songList");
-  list.style.display = list.style.display === "none" ? "block" : "none";
+  songListElement.classList.toggle('hidden');
 }
 
-function updateSongList() {
-  const ul = document.getElementById("songList");
-  ul.innerHTML = "";
-  playlist.forEach((s, i) => {
-    const li = document.createElement("li");
-    let prefix = i === currentIndex ? "🎶 " : (i === (currentIndex + 1) % playlist.length ? "➡️ " : "");
-    li.textContent = `${prefix}${s.title}`;
-    li.onclick = () => loadTrack(i);
-    ul.appendChild(li);
-  });
+function expandSongList() {
+  showingAll = true;
+  renderSongList();
 }
-
-function initVisualizer() {
-  if (visualStarted) return;
-  visualStarted = true;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  analyser.fftSize = 256;
-  bufferLength = analyser.frequencyBinCount;
-  dataArray = new Uint8Array(bufferLength);
-  drawVisualizer();
-}
-
-function drawVisualizer() {
-  requestAnimationFrame(drawVisualizer);
-  analyser.getByteFrequencyData(dataArray);
-  ctx.fillStyle = '#111';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  const barWidth = (canvas.width / bufferLength) * 2.5;
-  let x = 0;
-  for (let i = 0; i < bufferLength; i++) {
-    const barHeight = dataArray[i] * 0.7;
-    const r = 150 + barHeight / 2;
-    const g = 50 + barHeight / 3;
-    const b = 200;
-    ctx.fillStyle = `rgb(${r},${g},${b})`;
-    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-    x += barWidth + 1;
-  }
-}
-
-audio.addEventListener("ended", () => {
-  if (repeat) {
-    loadTrack(currentIndex);
-  } else {
-    nextTrack();
-  }
-});
 </script>
+
+
 </body>
 </html>
