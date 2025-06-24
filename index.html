@@ -1155,38 +1155,5 @@
       radioPlayer.addEventListener('ended', playNextTrack);
 </script>
 
-<button onclick="shuffleAndLoadMusic()" style="margin: 10px; padding: 10px; font-size: 16px;">🎲 Aleatorio</button>
-
-<script>
-async function shuffleAndLoadMusic() {
-    const response = await fetch('music_list.json');
-    const musicList = await response.json();
-
-    // Mezclar aleatoriamente la lista
-    for (let i = musicList.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [musicList[i], musicList[j]] = [musicList[j], musicList[i]];
-    }
-
-    const player = document.getElementById('audio-player');
-    const playlist = document.getElementById('playlist');
-    playlist.innerHTML = ''; // Limpiar lista existente
-
-    musicList.forEach((song, index) => {
-        const li = document.createElement('li');
-        li.textContent = song.title;
-        li.onclick = () => {
-            player.src = song.url;
-            player.play();
-        };
-        playlist.appendChild(li);
-
-        if (index === 0) {
-            player.src = song.url; // Cargar la primera canción aleatoria
-        }
-    });
-}
-</script>
-
 </body>
 </html>
