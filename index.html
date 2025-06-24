@@ -253,6 +253,12 @@
           color: #4338ca;
         }
 
+        #togglePlaylistBtn,
+        #togglePlaylistBtnTop {
+          margin-top: 10px;
+        }
+
+
         .radio-btn {
           padding: 10px 16px;
           border-radius: 6px;
@@ -279,6 +285,7 @@
         .radio-btn.repeat-all {
           background: linear-gradient(to right, #10b981, #3b82f6);
         }
+
         
         #visualizerCanvas {
           width: 100%;
@@ -505,7 +512,8 @@
             <!-- Mostrar/ocultar lista -->
             <button id="togglePlaylistBtnTop" onclick="togglePlaylist()" class="radio-btn">⬇️ Mostrar lista</button>
             <ul id="upcomingSongs" class="text-gray-700 mt-2 text-sm"></ul>
-            <button id="togglePlaylistBtn" onclick="togglePlaylist()" class="radio-btn">⬆️ Ocultar lista</button>
+            <button id="togglePlaylistBtn" onclick="togglePlaylist()" class="radio-btn" style="display: none;">⬆️ Ocultar lista</button>
+
           </div>
         </div>
 
@@ -1258,32 +1266,36 @@
             playCurrentTrack();
           }
         
-          function toggleRepeatMode() {
-            repeatMode = (repeatMode + 1) % 3;
-            repeatToggle.classList.remove('repeat-none', 'repeat-one', 'repeat-all');
-            if (repeatMode === 0) {
-              repeatToggle.innerText = '🔁';
-              repeatToggle.classList.add('repeat-none');
-              radioPlayer.loop = false;
-            } else if (repeatMode === 1) {
-              repeatToggle.innerText = '🔂';
-              repeatToggle.classList.add('repeat-one');
-              radioPlayer.loop = true;
-            } else {
-              repeatToggle.innerText = '∞';
-              repeatToggle.classList.add('repeat-all');
-              radioPlayer.loop = false;
+            function toggleRepeatMode() {
+              repeatMode = (repeatMode + 1) % 3;
+              repeatToggle.classList.remove('repeat-none', 'repeat-one', 'repeat-all');
+            
+              if (repeatMode === 0) {
+                repeatToggle.classList.add('repeat-none');
+                radioPlayer.loop = false;
+              } else if (repeatMode === 1) {
+                repeatToggle.classList.add('repeat-one');
+                radioPlayer.loop = true;
+              } else {
+                repeatToggle.classList.add('repeat-all');
+                radioPlayer.loop = false;
+              }
             }
-          }
+
         
           function togglePlaylist() {
-            isPlaylistVisible = !isPlaylistVisible;
-            const display = isPlaylistVisible ? 'block' : 'none';
-            const label = isPlaylistVisible ? '⬆️ Ocultar lista' : '⬇️ Mostrar lista';
-            document.getElementById('upcomingSongs').style.display = display;
-            document.getElementById('togglePlaylistBtn').innerText = label;
-            document.getElementById('togglePlaylistBtnTop').innerText = label;
-          }
+              isPlaylistVisible = !isPlaylistVisible;
+              const display = isPlaylistVisible ? 'block' : 'none';
+              const label = isPlaylistVisible ? '⬆️ Ocultar lista' : '⬇️ Mostrar lista';
+            
+              document.getElementById('upcomingSongs').style.display = display;
+              document.getElementById('togglePlaylistBtnTop').innerText = label;
+            
+              const bottomBtn = document.getElementById('togglePlaylistBtn');
+              bottomBtn.innerText = label;
+              bottomBtn.style.display = isPlaylistVisible ? 'inline-block' : 'none';
+            }
+
         
           function renderPlaylistUI() {
             const list = document.getElementById('upcomingSongs');
