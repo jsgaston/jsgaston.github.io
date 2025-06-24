@@ -1,1150 +1,133 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Página Personal</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <title>Mi Página Completa</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f3f4f6;
-      background-image: url('mi%20bandera.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 1000px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-    nav {
-      display: flex;
-      overflow-x: auto;
-      border-bottom: 1px solid #ccc;
-      margin-bottom: 20px;
-    }
-    .main-tab-button {
-      padding: 12px 20px;
-      border-radius: 8px 8px 0 0;
-      font-weight: 600;
-      cursor: pointer;
-      background-color: #e5e7eb;
-      color: #4b5563;
-      transition: background-color 0.2s, color 0.2s;
-      white-space: nowrap;
-      margin-right: 4px;
-    }
-    .main-tab-button.active {
-      background-color: #ffffff;
-      color: #4f46e5;
-      box-shadow: 0 -2px 0 0 #4f46e5 inset;
-    }
-    .main-tab-content {
-      display: none;
-      padding-top: 24px;
-    }
-    .main-tab-content.active {
-      display: block;
-    }
-    .radio-btn {
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      color: white;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      transition: transform 0.2s, box-shadow 0.3s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      margin: 4px;
-    }
-    .radio-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
-    }
-    #visualizerCanvas {
-      width: 100%;
-      height: 100px;
-      margin-top: 12px;
-      background: radial-gradient(circle at center, #c4b5fd, #e0e7ff);
-      border-radius: 12px;
-      box-shadow: 0 0 18px rgba(139, 92, 246, 0.4);
-    }
+    body { font-family: sans-serif; margin: 0; padding: 0; }
+    .nav { display: flex; gap: 10px; background: #ddd; padding: 10px; }
+    .nav button { padding: 10px; cursor: pointer; }
+    .section { display: none; padding: 20px; }
+    .section.active { display: block; }
+    #map { height: 400px; width: 100%; }
+    .song-list li { cursor: pointer; color: blue; }
   </style>
 </head>
-<body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
-    <!-- Modal para ver imágenes en grande -->
-    <div id="imageModal" class="modal">
-        <span class="close-modal">&times;</span>
-        <div class="modal-content">
-            <img id="modalImage" class="modal-image" src="" alt="Imagen ampliada">
-        </div>
-    </div>
+<body>
+  <div class="nav">
+    <button onclick="showSection('home')">Inicio</button>
+    <button onclick="showSection('radio')">Radio</button>
+    <button onclick="showSection('diario')">Diario</button>
+    <button onclick="showSection('mapa')">Mapa</button>
+  </div>
 
-    <div class="container">
-    <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
-        <!-- Nueva pestaña en navegación principal -->
-        <nav class="flex justify-center gap-4 mb-6">
-          <button class="main-tab-button active" data-tab="home">Inicio</button>
-          <button class="main-tab-button" data-tab="diary">📓 Diario</button>
-          <button class="main-tab-button" data-tab="maps">Mapas de Recorridos</button>
-          <button class="main-tab-button" data-tab="trips">Organizar Viajes</button>
-          <button class="main-tab-button" data-tab="menus">Menús de Comida</button>
-          <button class="main-tab-button" data-tab="projects">Proyectos</button>
-          <button class="main-tab-button" data-tab="profile">Perfil</button> <!-- Nueva pestaña -->
-          <button class="main-tab-button" data-tab="radio">🎧 Radio</button>
+  <div id="home" class="section active">
+    <h2>Bienvenido</h2>
+    <p>Selecciona una sección para comenzar.</p>
+  </div>
 
-        </nav>
+  <div id="radio" class="section">
+    <h2>🎧 Mi Radio</h2>
+    <ul id="songList" class="song-list"></ul>
+    <audio id="audioPlayer" controls style="width:100%; margin-top:10px;"></audio>
+  </div>
 
-        <div id="home" class="main-tab-content active">
+  <div id="diario" class="section">
+    <h2>📓 Diario</h2>
+    <form id="diaryForm">
+      <input type="text" id="title" placeholder="Título" required><br><br>
+      <textarea id="entry" placeholder="Escribe aquí..." rows="5" required></textarea><br><br>
+      <button type="submit">Guardar</button>
+    </form>
+    <div id="diaryResult"></div>
+    <hr>
+    <h3>🔎 Buscar por Título</h3>
+    <input type="text" id="searchTitle" placeholder="Buscar título...">
+    <button onclick="searchByTitle()">Buscar</button>
+    <div id="searchResults"></div>
+  </div>
 
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
-            <p class="text-center text-gray-600 mb-8">Explora las pestañas de arriba.</p>
-            
-            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Entrada del Diario:</h3>
-            <div id="latestEntryContent" class="text-gray-700">
-                <p class="text-center text-gray-500">Cargando última entrada del diario...</p>
-            </div>
-            <div class="flex justify-center mt-8">
-                <button onclick="showMainTab('diary'); showDiarySubTab('write')" class="btn py-3 px-6 rounded-lg text-lg">
-                    <span>Ir al Diario</span>
-                </button>
-            </div>
-        </div>
+  <div id="mapa" class="section">
+    <h2>🗺️ Mapa en Vivo</h2>
+    <div id="map"></div>
+  </div>
 
-        <div id="mainDiarySection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Diario Digital</h2>
-            
-            <nav class="flex border-b border-gray-200 mb-6">
-                <button class="diary-sub-tab-button active" data-diary-sub-tab="write">Escribir Entrada</button>
-                <button class="diary-sub-tab-button" data-diary-sub-tab="view">Ver/Buscar Entradas</button>
-            </nav>
+<script>
+  const API_DIARIO = "https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxxxxx/exec";
+  const API_MAPS = "https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxxxxx/exec";
 
-            <div id="diaryWriteEntrySection" class="diary-sub-tab-content">
-                <form id="diaryForm" class="w-full">
-                    <div class="mb-6">
-                      <label for="title" class="form-label mb-2">Título de la Entrada:</label>
-                      <input type="text" id="title" name="title" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: Paseo por el parque" />
-                    </div>
-                    <div class="mb-6">
-                        <label for="text" class="form-label mb-2">Tu Entrada de Hoy:</label>
-                        <textarea id="text" name="text" rows="8" class="form-textarea rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué te ha pasado hoy? Escribe aquí tu historia..."></textarea>
-                    </div>
+  function showSection(id) { 
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+  }
 
-                    <div class="mb-4">
-                        <label for="photoUpload" class="form-label mb-2">Adjuntar Foto (desde tu ordenador):</label>
-                        <input type="file" id="photoUpload" name="photoUpload" accept="image/*" class="form-input rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
-                        <p class="text-sm text-gray-500 mt-1">Se subirá a tu Google Drive.</p>
-                    </div>
+  // RADIO
+  const player = document.getElementById('audioPlayer');
+  fetch('music_list.json')
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById('songList');
+      data.forEach((song, i) => {
+        const li = document.createElement('li');
+        li.textContent = song.title;
+        li.onclick = () => {
+          player.src = song.url;
+          player.play();
+        };
+        list.appendChild(li);
+      });
+    });
 
-                    <div class="mb-8">
-                        <label for="externalImageUrl" class="form-label mb-2">O pegar URL de imagen (https://es.imgbb.com/  https://pasteboard.co/  https://postimages.org/  https://imgur.com/):</label>
-                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ibb.co/ABC123 o https://i.imgur.com/ejemplo.jpg">
-                        <p class="text-sm text-gray-500 mt-1">Soporta ImgBB, Imgur, PostImage y URLs directas. Se procesará automáticamente.</p>
-                    </div>
+  // DIARIO
+  document.getElementById('diaryForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const data = {
+      title: document.getElementById('title').value,
+      diaryEntry: document.getElementById('entry').value
+    };
+    fetch(API_DIARIO, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(res => {
+      document.getElementById('diaryResult').textContent = res.message || 'Guardado';
+    });
+  });
 
-                    <button type="submit" class="btn w-full">
-                        <span id="buttonText">Guardar Entrada</span>
-                        <div id="loadingSpinner" class="loading-spinner"></div>
-                    </button>
-                </form>
-            </div>
-
-            <div id="diaryViewSearchSection" class="diary-sub-tab-content hidden">
-                
-                <div class="flex gap-2 items-end mb-6">
-                  <div class="flex-1">
-                    <label for="searchTitle" class="form-label mb-2">Buscar por Título:</label>
-                    <input type="text" id="searchTitle" name="searchTitle" class="form-input rounded-lg" placeholder="Palabra clave del título">
-                  </div>
-                  <button onclick="buscarPorTitulo()" class="btn px-6 py-3">Buscar</button>
-                </div>
-
-                <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Entradas por Fecha</h3>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-                    <div>
-                        <label for="startDate" class="form-label">Desde:</label>
-                        <input type="datetime-local" id="startDate" class="form-input w-auto">
-                    </div>
-                    <div>
-                        <label for="endDate" class="form-label">Hasta:</label>
-                        <input type="datetime-local" id="endDate" class="form-input w-auto">
-                    </div>
-                    <button id="searchEntriesBtn" class="btn mt-6 sm:mt-0 px-6 py-3">Buscar</button>
-                </div>
-                <div id="searchResults" class="text-gray-700">
-                    <p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="mainMapsSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mapas de Recorridos</h2>
-            <!-- Sustituir el contenido del div con id="mainMapsSection" en tu HTML -->
-
-            
-              <div class="flex gap-4 mb-4">
-                <input type="datetime-local" id="mapStartDate" class="form-input" value="2025-06-21T00:00">
-                <input type="datetime-local" id="mapEndDate" class="form-input" value="2025-06-22T23:59">
-
-                <button onclick="filtrarDatosMapa()" class="btn">Aplicar Filtros</button>
-              </div>
-            
-              <div id="mapid" style="height: 500px;" class="mb-6 rounded-xl shadow-md"></div>
-            
-              <h3 class="text-xl font-semibold text-gray-700 mb-2">Datos Recopilados</h3>
-              <div class="overflow-auto max-h-[400px] border rounded-lg shadow">
-                <table class="w-full text-sm text-left">
-                  <thead class="bg-gray-100">
-                    <tr>
-                      <th class="px-4 py-2">Fecha</th>
-                      <th class="px-4 py-2">Hora</th>
-                      <th class="px-4 py-2">Lat</th>
-                      <th class="px-4 py-2">Lon</th>
-                      <th class="px-4 py-2">Alt</th>
-                      <th class="px-4 py-2">Pulso</th>
-                      <th class="px-4 py-2">SpO2</th>
-                      <th class="px-4 py-2">Pasos</th>
-                      <th class="px-4 py-2">Temp</th>
-                      <th class="px-4 py-2">Anomalía</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tablaDatosMapa"></tbody>
-                </table>
-              </div>
-          
-
-        </div>
-
-        <div id="mainTripsSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Organizar Viajes</h2>
-            <p class="text-center text-gray-600">Planifica tus viajes, rutas y presupuestos. ¡Próximamente!</p>
-            <p class="text-center text-gray-500 mt-4">Puedes añadir formularios y listas para gestionar tus planes de viaje.</p>
-        </div>
-
-        <div id="mainMenusSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Menús de Comida</h2>
-            <p class="text-center text-gray-600">Organiza tus comidas semanales y listas de la compra. ¡Paciencia, pronto estará listo!</p>
-            <p class="text-center text-gray-500 mt-4">Aquí podrías tener un calendario, recetas y opciones de filtrado.</p>
-        </div>
-
-        <div id="mainProjectsSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gestión de Proyectos</h2>
-            <p class="text-center text-gray-600">Gestiona tus tareas, plazos y objetivos de tus proyectos personales o profesionales. ¡Trabajando en ello!</p>
-            <p class="text-center text-gray-500 mt-4">Tableros Kanban o listas de tareas serían útiles aquí.</p>
-        </div>
-
-        <!-- Nueva sección "Perfil" -->
-        <div id="mainProfileSection" class="main-tab-content hidden">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Perfil Personal</h2>
-          <div class="space-y-4">
-            <p><strong>Nombre:</strong> Javier Santiago Gastón de Iriarte Cabrera</p>
-            <p><strong>DNI:</strong> 47033535F</p>
-            <p><strong>Contacto:</strong> <a href="mailto:javier@email.com" class="text-blue-600 underline">javier@email.com</a></p>
-            <p><strong>Teléfono:</strong> +34 669 574 483</p>
-            <p><strong>Sobre mí:</strong> Soy .</p>
-          </div>
-        </div>
-
-        <div id="radio" class="main-tab-content">
-          <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Radio Javi</h2>
-    
-      <div class="flex flex-col items-center space-y-4">
-        <div class="flex flex-wrap justify-center gap-3">
-              <button class="radio-btn" onclick="startRadio()">⏻ </button>
-              <button class="radio-btn" onclick="shuffleAndPlay()">🔀 </button>
-              <button class="radio-btn" onclick="playPreviousTrack()">⏮️</button>
-              <button id="repeatToggle" class="radio-btn repeat-none" onclick="toggleRepeatMode()">🔁</button>
-              <button class="radio-btn" onclick="playNextTrack()">⏭️</button>
-            </div>
-    
-            <canvas id="visualizerCanvas" width="600" height="100"></canvas>
-    
-            <audio id="radioPlayer" controls style="width: 100%; max-width: 500px; margin-top: 10px;"></audio>
-    
-            <p id="currentSong" class="text-indigo-700 font-semibold text-lg mt-2"></p>
-            <p id="nextSong" class="text-gray-500 text-sm italic">Siguiente: 🎵</p>
-    
-            <button id="togglePlaylistBtnTop" onclick="togglePlaylist()" class="radio-btn">⬇️ Mostrar lista</button>
-            <ul id="upcomingSongs" class="text-gray-700 mt-2 text-sm"></ul>
-            <button id="togglePlaylistBtn" onclick="togglePlaylist()" class="radio-btn" style="display: none;">⬆️ Ocultar lista</button>
-          </div>
-        </div>
-      </div>
-
-
-
-        <div id="messageBox" class="message-box w-full mt-8"></div>
-    </div>
-
-    <script>
-        // ¡IMPORTANTE! Reemplaza este URL con el URL de tu Google Apps Script desplegado.
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoTQVF1RMm2XckrFFXJ1heZ8P2W7carCAZaEw-XxI76bWp_oyKZy9kA1LlBPsxMQQL/exec'; 
-
-        // Elementos del DOM para la navegación principal
-        const mainTabButtons = document.querySelectorAll('.main-tab-button');
-        const mainHomeSection = document.getElementById('mainHomeSection');
-        const mainDiarySection = document.getElementById('mainDiarySection');
-        const mainMapsSection = document.getElementById('mainMapsSection');
-        const mainTripsSection = document.getElementById('mainTripsSection');
-        const mainMenusSection = document.getElementById('mainMenusSection');
-        const mainProjectsSection = document.getElementById('mainProjectsSection');
-
-        // Elementos del DOM para la sub-navegación del Diario
-        const diarySubTabButtons = document.querySelectorAll('.diary-sub-tab-button');
-        const diaryWriteEntrySection = document.getElementById('diaryWriteEntrySection');
-        const diaryViewSearchSection = document.getElementById('diaryViewSearchSection');
-
-        // Elementos del DOM para la lógica del Diario
-        const latestEntryContent = document.getElementById('latestEntryContent');
-        const searchEntriesBtn = document.getElementById('searchEntriesBtn');
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const searchResultsDiv = document.getElementById('searchResults');
-        const diaryForm = document.getElementById('diaryForm');
-        const text = document.getElementById('text');
-        const photoUpload = document.getElementById('photoUpload');
-        const externalImageUrlInput = document.getElementById('externalImageUrl');
-        const messageBox = document.getElementById('messageBox');
-        const buttonText = document.getElementById('buttonText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-
-        // Elementos del modal
-        const imageModal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('modalImage');
-        const closeModal = document.querySelector('.close-modal');
-
-        // --- Funciones de Utilidad ---
-
-        // Función para mostrar mensajes al usuario (éxito/error)
-        function showMessage(message, type) {
-            messageBox.textContent = message;
-            messageBox.className = `message-box w-full ${type}`;
-            messageBox.style.display = 'block';
-        }
-
-        // Función para ocultar mensajes
-        function hideMessage() {
-            messageBox.style.display = 'none';
-            messageBox.textContent = '';
-            messageBox.className = 'message-box w-full';
-        }
-
-        // Función auxiliar para leer un archivo como Base64
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Función para resetear el estado del formulario
-        function resetFormState() {
-            buttonText.textContent = 'Guardar Entrada';
-            loadingSpinner.style.display = 'none';
-            diaryForm.querySelector('button[type="submit"]').disabled = false;
-        }
-
-        // Función para formatear la fecha
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            try {
-                return new Date(dateString).toLocaleDateString('es-ES', options);
-            } catch (e) {
-                return dateString;
-            }
-        }
-
-        // Función mejorada para convertir URLs de servicios de hosting a URLs directas (cliente)
-        function convertToDirectImageUrl(url) {
-            if (!url || url.trim() === '') return null;
-        
-            const cleanUrl = url.trim();
-        
-            // Si ya es directa, úsala
-            if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) ||
-                cleanUrl.includes('drive.google.com/thumbnail') ||
-                cleanUrl.includes('i.ibb.co') ||
-                cleanUrl.includes('i.imgur.com') ||
-                cleanUrl.includes('i.postimg.cc')) {
-                return cleanUrl;
-            }
-        
-            // pasteboard.co
-            const pasteboard = cleanUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)(\.[a-z]+)?/);
-            if (pasteboard) {
-                return `https://pasteboard.co/${pasteboard[1]}.png`;
-            }
-        
-            // imgbb
-            const imgbb = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
-            if (imgbb) {
-                return `https://i.ibb.co/${imgbb[1]}/image.png`;
-            }
-        
-            // imgur
-            const imgur = cleanUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
-            if (imgur) {
-                return `https://i.imgur.com/${imgur[1]}.jpg`;
-            }
-        
-            // postimages
-            const postimg = cleanUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
-            if (postimg) {
-                return `https://i.postimg.cc/${postimg[1]}/image.jpg`;
-            }
-        
-            return cleanUrl;
-        }
-        
-
-
-        // Función para intentar múltiples URLs de imagen
-        function tryMultipleImageUrls(originalUrl, imgElement, callback) {
-            const urls = [];
-        
-            const directUrl = convertToDirectImageUrl(originalUrl);
-            if (directUrl) urls.push(directUrl);
-        
-            // Agregar variantes por host
-            const imgbb = originalUrl.match(/ibb\.co\/([a-zA-Z0-9]+)/);
-            if (imgbb) {
-                const base = `https://i.ibb.co/${imgbb[1]}`;
-                urls.push(`${base}/image.png`, `${base}/image.jpg`, `${base}/image.webp`);
-            }
-        
-            const pasteboard = originalUrl.match(/pasteboard\.co\/([a-zA-Z0-9]+)/);
-            if (pasteboard) {
-                const base = `https://pasteboard.co/${pasteboard[1]}`;
-                urls.push(`${base}.png`, `${base}.jpg`, `${base}.webp`);
-            }
-        
-            const imgur = originalUrl.match(/imgur\.com\/(?:a\/)?([a-zA-Z0-9]+)/);
-            if (imgur) {
-                urls.push(`https://i.imgur.com/${imgur[1]}.jpg`);
-            }
-        
-            const postimg = originalUrl.match(/postimg\.cc\/([a-zA-Z0-9]+)/);
-            if (postimg) {
-                const base = `https://i.postimg.cc/${postimg[1]}`;
-                urls.push(`${base}/image.jpg`, `${base}/image.png`, `${base}/image.webp`);
-            }
-        
-            let index = 0;
-        
-            function tryNextUrl() {
-                if (index >= urls.length) {
-                    callback(false); // ninguna funcionó
-                    return;
-                }
-        
-                const testUrl = urls[index];
-                const testImg = new Image();
-                testImg.onload = () => {
-                    imgElement.src = testUrl;
-                    callback(true);
-                };
-                testImg.onerror = () => {
-                    index++;
-                    tryNextUrl();
-                };
-                testImg.src = testUrl;
-            }
-        
-            tryNextUrl();
-        }
-
-
-        
-
-        // Función para renderizar una entrada de diario con mejor manejo de imágenes
-        function renderEntry(entry, containerElement) {
-                        
-            const entryCard = document.createElement('div');
-            entryCard.className = 'entry-card';
-
-            const titleElem = document.createElement('h3');
-            titleElem.className = 'text-xl font-bold text-indigo-700 mb-2';
-            titleElem.textContent = entry.title || '(Sin título)';
-            entryCard.appendChild(titleElem);
-
-
-            const datePara = document.createElement('p');
-            datePara.className = 'text-sm text-gray-500 mb-2';
-            datePara.textContent = `Fecha: ${formatDate(entry.timestamp)}`;
-            entryCard.appendChild(datePara);
-
-            const textPara = document.createElement('p');
-            textPara.className = 'text-base text-gray-800 whitespace-pre-wrap';
-            textPara.textContent = entry.text;
-            entryCard.appendChild(textPara);
-
-            // Verificar si hay una URL de foto válida
-            if (entry.photoUrl && entry.photoUrl !== 'No hay foto' && !entry.photoUrl.startsWith('Error')) {
-                const imageContainer = document.createElement('div');
-                imageContainer.className = 'mt-4';
-                
-                const loadingIndicator = document.createElement('div');
-                loadingIndicator.innerHTML = '<span class="image-loading"></span>Cargando imagen...';
-                loadingIndicator.className = 'text-sm text-gray-500 flex items-center';
-                imageContainer.appendChild(loadingIndicator);
-                
-                const img = document.createElement('img');
-                img.className = 'mt-4 rounded-lg shadow-md hidden';
-                img.alt = 'Foto de la entrada del diario';
-                
-                // Añadir evento de clic para mostrar en modal
-                img.addEventListener('click', function() {
-                    modalImage.src = this.src;
-                    imageModal.style.display = 'block';
-                });
-                
-                imageContainer.appendChild(img);
-                entryCard.appendChild(imageContainer);
-                
-                // Intentar cargar la imagen con múltiples URLs si es necesario
-                tryMultipleImageUrls(entry.photoUrl, img, function(success) {
-                    loadingIndicator.style.display = 'none';
-                    if (success) {
-                        img.classList.remove('hidden');
-                    } else {
-                        const errorPara = document.createElement('p');
-                        errorPara.className = 'text-sm text-red-500 mt-2';
-                        errorPara.textContent = 'No se pudo cargar la imagen';
-                        imageContainer.appendChild(errorPara);
-                    }
-                });
-                
-            } else if (entry.photoUrl && entry.photoUrl.startsWith('Error')) {
-                const errorPara = document.createElement('p');
-                errorPara.className = 'text-sm text-red-500 mt-2';
-                errorPara.textContent = `Error con la foto: ${entry.photoUrl}`;
-                entryCard.appendChild(errorPara);
-            }
-
-            containerElement.appendChild(entryCard);
-        }
-
-        // Event listeners para el modal
-        closeModal.addEventListener('click', function() {
-            imageModal.style.display = 'none';
+  function searchByTitle() {
+    const keyword = document.getElementById('searchTitle').value;
+    fetch(API_DIARIO + "?action=searchByTitle&keyword=" + encodeURIComponent(keyword))
+      .then(r => r.json())
+      .then(res => {
+        const div = document.getElementById('searchResults');
+        div.innerHTML = '';
+        res.entries?.forEach(e => {
+          div.innerHTML += `<p><strong>${e.title}</strong>: ${e.text}</p>`;
         });
+      });
+  }
 
-        imageModal.addEventListener('click', function(e) {
-            if (e.target === imageModal) {
-                imageModal.style.display = 'none';
-            }
-        });
+  // MAPA
+  const map = L.map('map').setView([40.4168, -3.7038], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
 
-        // --- Funciones de Navegación Principal ---
-
-        function showMainTab(tabName) {
-            // Ocultar todas las secciones
-            mainHomeSection.classList.add('hidden');
-            mainDiarySection.classList.add('hidden');
-            mainMapsSection.classList.add('hidden');
-            mainTripsSection.classList.add('hidden');
-            mainMenusSection.classList.add('hidden');
-            mainProjectsSection.classList.add('hidden');
-            document.getElementById('mainRadioSection').classList.add('hidden'); // <-- añádelo donde ocultas todas
-
-
-            // Desactivar todos los botones
-            mainTabButtons.forEach(button => button.classList.remove('active'));
-
-            // Mostrar la sección correspondiente
-            if (tabName === 'home') {
-                mainHomeSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="home"]').classList.add('active');
-                loadLatestEntry();
-            } else if (tabName === 'diary') {
-                mainDiarySection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="diary"]').classList.add('active');
-                showDiarySubTab('write');
-            } else if (tabName === 'maps') {
-              mainMapsSection.classList.remove('hidden');
-              document.querySelector('[data-main-tab="maps"]').classList.add('active');
-              setTimeout(() => {
-                if (!mapa) iniciarMapa(); else mapa.invalidateSize();
-              }, 300);
-            } else if (tabName === 'trips') {
-                mainTripsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="trips"]').classList.add('active');
-            } else if (tabName === 'menus') {
-                mainMenusSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="menus"]').classList.add('active');
-            } else if (tabName === 'projects') {
-                mainProjectsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="projects"]').classList.add('active');
-            } else if (tabName === 'radio') {
-                document.getElementById('mainRadioSection').classList.remove('hidden');
-                document.querySelector('[data-main-tab="radio"]').classList.add('active');
-            }
-
-            hideMessage();
-        }
-
-        // Event listeners para los botones de las pestañas principales
-        mainTabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                showMainTab(button.dataset.mainTab);
-            });
-        });
-
-        
-        // --- Funciones de Sub-navegación del Diario ---
-
-        function showDiarySubTab(subTabName) {
-            // Ocultar todas las sub-secciones
-            diaryWriteEntrySection.classList.add('hidden');
-            diaryViewSearchSection.classList.add('hidden');
-
-            // Desactivar todos los botones de sub-pestaña
-            diarySubTabButtons.forEach(button => button.classList.remove('active'));
-
-            // Mostrar la sub-sección correspondiente
-            if (subTabName === 'write') {
-                diaryWriteEntrySection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
-            } else if (subTabName === 'view') {
-                diaryViewSearchSection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
-                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
-            }
-            hideMessage();
-        }
-
-        // Event listeners para los botones de las sub-pestañas del diario
-        diarySubTabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                showDiarySubTab(button.dataset.diarySubTab);
-            });
-        });
-
-        // --- Funciones del Diario ---
-
-        async function loadLatestEntry() {
-            latestEntryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última entrada del diario...</p>';
-            try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getLatest`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const result = await response.json();
-
-                if (result.status === 'success' && result.entry) {
-                    latestEntryContent.innerHTML = '';
-                    renderEntry(result.entry, latestEntryContent);
-                } else {
-                    latestEntryContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas para mostrar.'}</p>`;
-                }
-            } catch (error) {
-                console.error('Error al cargar la última entrada:', error);
-                latestEntryContent.innerHTML = '<p class="text-center text-red-500">Error al cargar la última entrada.</p>';
-            }
-        }
-
-        // Envío del formulario del diario
-        diaryForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-        
-            hideMessage();
-            buttonText.textContent = 'Guardando...';
-            loadingSpinner.style.display = 'block';
-            diaryForm.querySelector('button[type="submit"]').disabled = true;
-        
-            const title = document.getElementById('title').value.trim();
-            const entryText = text.value;
-            const externalImageUrl = externalImageUrlInput.value.trim();
-            let imageData = null;
-            let imageName = '';
-        
-            if (!title) {
-                showMessage('Por favor, pon un título a tu entrada.', 'error');
-                resetFormState();
-                return;
-            }
-        
-            if (!entryText.trim()) {
-                showMessage('Por favor, escribe algo en tu entrada del diario.', 'error');
-                resetFormState();
-                return;
-            }
-        
-            if (photoUpload.files.length > 0 && externalImageUrl !== '') {
-                showMessage('Por favor, elige SOLO UNA opción para la imagen.', 'error');
-                resetFormState();
-                return;
-            }
-        
-            if (photoUpload.files.length > 0) {
-                const file = photoUpload.files[0];
-                if (file.size > 5 * 1024 * 1024) {
-                    showMessage('La imagen es demasiado grande (máx. 5MB).', 'error');
-                    resetFormState();
-                    return;
-                }
-                imageName = file.name;
-                try {
-                    imageData = await readFileAsBase64(file);
-                } catch (error) {
-                    showMessage('Error al leer la imagen.', 'error');
-                    resetFormState();
-                    return;
-                }
-            }
-        
-            const formData = new FormData();
-               
-                formData.append('title', title);           // Campo 1: Título
-                formData.append('diaryEntry', entryText);  // Campo 2: Texto del diario
-                
-                if (externalImageUrl !== '') {
-                  formData.append('externalImageUrl', externalImageUrl);
-                } else if (imageData) {
-                  formData.append('imageData', imageData);
-                  formData.append('imageName', imageName);
-                }
-
-
-        
-            try {
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData,
-                });
-        
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-        
-                const result = await response.json();
-        
-                if (result.status === 'success') {
-                    showMessage('¡Entrada guardada con éxito!', 'success');
-                    text.value = '';
-                    photoUpload.value = '';
-                    externalImageUrlInput.value = '';
-                    document.getElementById('title').value = ''; // limpiar título
-                } else {
-                    showMessage(`Error al guardar: ${result.message || 'Error desconocido'}`, 'error');
-                }
-            } catch (error) {
-                console.error('Error al enviar la entrada:', error);
-                showMessage('Error al conectar con el servidor.', 'error');
-            } finally {
-                resetFormState();
-            }
-        });
-
-
-        // Búsqueda de entradas por fecha
-        searchEntriesBtn.addEventListener('click', async () => {
-            const startDate = startDateInput.value;
-            const endDate = endDateInput.value;
-
-            if (!startDate || !endDate) {
-                showMessage('Por favor, selecciona tanto la fecha de inicio como la de fin para buscar.', 'error');
-                return;
-            }
-
-            if (new Date(startDate) > new Date(endDate)) {
-                showMessage('La fecha de inicio no puede ser posterior a la fecha de fin.', 'error');
-                return;
-            }
-
-            searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando entradas...</p>';
-            hideMessage();
-
-            try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getEntriesByDate&startDate=${startDate}&endDate=${endDate}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const result = await response.json();
-
-                if (result.status === 'success' && result.entries && result.entries.length > 0) {
-                    searchResultsDiv.innerHTML = '';
-                    result.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    result.entries.forEach(entry => renderEntry(entry, searchResultsDiv));
-                } else {
-                    searchResultsDiv.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No se encontraron entradas para el rango de fechas seleccionado.'}</p>`;
-                }
-            } catch (error) {
-                console.error('Error al buscar entradas:', error);
-                searchResultsDiv.innerHTML = '<p class="text-center text-red-500">Error al buscar entradas. Inténtalo de nuevo.</p>';
-            }
-        });
-
-        // --- Inicialización ---
-        document.addEventListener('DOMContentLoaded', () => {
-            showMainTab('home')
-                setTimeout(() => {
-                  if (playlist.length > 0) {
-                    playNextTrack();
-                  }
-                }, 1000);
-
-                ;
-        });
-    </script>
-    <!-- Insertar al final del <body>, antes del cierre -->
-    <script>
-      const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbwXNtcVnXevJgk-fpMvqqkc4BeSbZZ_EutueaCAkakIaBK5sx7AQL-fZpN5R08uWNy3/exec";
-      let mapa, capaMarcadores, ruta, datosCargados = [];
-    
-      function iniciarMapa() {
-        mapa = L.map("mapid").setView([40.4168, -3.7038], 5);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; OpenStreetMap',
-        }).addTo(mapa);
-    
-        capaMarcadores = L.featureGroup().addTo(mapa);
-        ruta = L.polyline([], { color: 'blue' }).addTo(mapa);
-        cargarDatosMapa();
-      }
-    
-      async function cargarDatosMapa() {
-        try {
-          const res = await fetch(SERVER_DATA_URL);
-          const datos = await res.json();
-    
-          if (!Array.isArray(datos) || datos.length === 0) {
-            console.warn("No se recibieron datos válidos.");
-            document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="9" class="px-4 py-2 text-center text-gray-500">No hay datos disponibles</td></tr>';
-            return;
-          }
-    
-          datosCargados = datos;
-          procesarYMostrarDatos(datos);
-        } catch (error) {
-          console.error("Error al obtener datos:", error);
-          document.getElementById("tablaDatosMapa").innerHTML = '<tr><td colspan="9" class="px-4 py-2 text-center text-red-500">Error al obtener datos</td></tr>';
-        }
-      }
-    
-      function procesarYMostrarDatos(datos) {
-        const cuerpoTabla = document.getElementById("tablaDatosMapa");
-        cuerpoTabla.innerHTML = "";
-        capaMarcadores.clearLayers();
-        ruta.setLatLngs([]);
-        const coordenadasRuta = [];
-    
-        datos.forEach((dato) => {
-          const { Timestamp, Hour, Latitude, Longitude, Altitude, Pulse, SpO2, Steps, Temperature } = dato;
-    
-          if (!Latitude || !Longitude || !Altitude) return;
-          const lat = parseFloat(Latitude);
-          const lon = parseFloat(Longitude);
-          const alt = parseFloat(Altitude);
-          coordenadasRuta.push([lat, lon, alt]);
-    
-          const anomalía =
-            Pulse < 40 || Pulse > 120 ||
-            SpO2 < 90 || SpO2 > 100 ||
-            Temperature < 35.0 || Temperature > 37.5 ? "⚠️" : "";
-    
-          const fila = `<tr>
-            <td class="px-4 py-1">${new Date(Timestamp).toLocaleDateString()}</td>
-          
-
-            <td class="px-4 py-1">${new Date(Timestamp).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</td>
-
-            <td class="px-4 py-1">${lat.toFixed(4)}</td>
-            <td class="px-4 py-1">${lon.toFixed(4)}</td>
-            <td class="px-4 py-1">${alt.toFixed(1)}</td>
-            <td class="px-4 py-1">${Pulse}</td>
-            <td class="px-4 py-1">${SpO2}</td>
-            <td class="px-4 py-1">${Steps}</td>
-            <td class="px-4 py-1">${Temperature}</td>
-            <td class="px-4 py-1">${anomalía}</td>
-          </tr>`;
-          cuerpoTabla.insertAdjacentHTML("beforeend", fila);
-    
-          const fecha = new Date(Timestamp);
-            const hora = fecha.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-            
-            const marker = L.marker([lat, lon]).bindPopup(
-              `🕒 ${hora}<br/>🫀 Pulso: ${Pulse}<br/>🧪 SpO2: ${SpO2}<br/>🌡 Temp: ${Temperature}`
-            );
-
-          capaMarcadores.addLayer(marker);
-        });
-    
-        ruta.setLatLngs(coordenadasRuta);
-        if (coordenadasRuta.length > 0) mapa.fitBounds(ruta.getBounds());
-      }
-    
-      function filtrarDatosMapa() {
-        const desde = new Date(document.getElementById("mapStartDate").value);
-        const hasta = new Date(document.getElementById("mapEndDate").value);
-
-
-        if (!datosCargados.length || isNaN(desde) || isNaN(hasta)) return;
-    
-        const filtrados = datosCargados.filter(d => {
-          const fecha = new Date(d.Timestamp);
-          return fecha >= desde && fecha <= hasta;
-        });
-        procesarYMostrarDatos(filtrados);
-      }
-    </script>
-
-    <script>
-        function normalize(str) {
-          try {
-            return (str || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
-          } catch (e) {
-            Logger.log('❌ Error en normalizar(): ' + e.message + ' | Valor: ' + str);
-            return '';
-          }
-        }
-
-        
-        function buscarPorTitulo() {
-          console.log('🟣 buscarPorTitulo() llamada');
-        
-          const raw = document.getElementById('searchTitle').value.trim();
-          const keyword = normalize(raw);
-          console.log('🔤 Palabra clave normalizada:', keyword);
-        
-          if (!keyword) {
-            showMessage('Introduce una palabra clave para buscar.', 'error');
-            return;
-          }
-        
-          showMainTab('diary');
-          diaryWriteEntrySection.classList.add('hidden');
-          diaryViewSearchSection.classList.remove('hidden');
-          diarySubTabButtons.forEach(button => button.classList.remove('active'));
-          document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
-        
-          searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
-          hideMessage();
-        
-          const url = `${GOOGLE_APPS_SCRIPT_URL}?action=searchByTitle&keyword=${encodeURIComponent(keyword)}`;
-          console.log('🌐 Haciendo fetch a:', url);
-        
-          fetch(url)
-            .then(res => res.json())
-            .then(data => {
-              console.log('📦 Respuesta recibida:', data);
-              if (data.status === 'success' && data.entries.length > 0) {
-                searchResultsDiv.innerHTML = '';
-                data.entries.forEach(entry => {
-                  console.log('✅ Entrada recibida:', entry);
-                  searchResultsDiv.innerHTML += `
-                    <div style="border:1px solid #ccc; margin-bottom:1em; padding:1em;">
-                      <strong>${entry.title}</strong><br>
-                      <em>${entry.timestamp}</em><br>
-                      <p>${entry.text}</p>
-                      ${entry.photoUrl !== 'No hay foto' ? `<img src="${entry.photoUrl}" style="max-width:100%">` : ''}
-                    </div>`;
-                });
-              } else {
-                console.log('⚠️ No se encontraron entradas');
-                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">No se encontraron coincidencias.</p>';
-              }
-            })
-            .catch(err => {
-              console.error('❌ Error en fetch:', err);
-              showMessage('Error al buscar por título.', 'error');
-            });
-        }
-    </script>
-
-     <script>
-          let playlist = [];
-            let currentTrack = 0;
-            let repeatMode = 0; // 0: no repeat, 1: repeat one, 2: repeat all
-            let isPlaylistVisible = true;
-            let radioStarted = false;
-            
-            const radioPlayer = document.getElementById('radioPlayer');
-            const currentSong = document.getElementById('currentSong');
-            const nextSong = document.getElementById('nextSong');
-            const repeatToggle = document.getElementById('repeatToggle');
-            
-            // Visualizador
-            const canvas = document.getElementById('visualizerCanvas');
-            const ctx = canvas.getContext('2d');
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 128;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            
-            function setupVisualizer() {
-              const source = audioCtx.createMediaElementSource(radioPlayer);
-              source.connect(analyser);
-              analyser.connect(audioCtx.destination);
-              drawVisualizer();
-            }
-            
-            function drawVisualizer() {
-              requestAnimationFrame(drawVisualizer);
-              analyser.getByteFrequencyData(dataArray);
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              const barWidth = canvas.width / bufferLength;
-              for (let i = 0; i < bufferLength; i++) {
-                const value = dataArray[i];
-                const hue = 180 + i * 3;
-                ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
-                ctx.fillRect(i * barWidth, canvas.height - value, barWidth - 2, value);
-              }
-            }
-            
-            function extractName(url) {
-              return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ''));
-            }
-            
-            function playCurrentTrack() {
-              radioPlayer.src = playlist[currentTrack];
-              radioPlayer.load();
-              radioPlayer.play().catch(err => {
-                console.warn('No se pudo reproducir automáticamente:', err);
-              });
-              currentSong.innerText = extractName(playlist[currentTrack]);
-              const next = playlist[(currentTrack + 1) % playlist.length] || '';
-              nextSong.innerText = `Siguiente: 🎵 ${extractName(next)}`;
-              renderPlaylistUI();
-            }
-            
-            function playNextTrack() {
-              if (!playlist.length) return;
-              if (repeatMode !== 1) currentTrack = (currentTrack + 1) % playlist.length;
-              playCurrentTrack();
-            }
-            
-            function playPreviousTrack() {
-              currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
-              playCurrentTrack();
-            }
-            
-            function toggleRepeatMode() {
-              repeatMode = (repeatMode + 1) % 3;
-              repeatToggle.classList.remove('repeat-none', 'repeat-one', 'repeat-all');
-            
-              if (repeatMode === 0) {
-                repeatToggle.classList.add('repeat-none');
-                radioPlayer.loop = false;
-              } else if (repeatMode === 1) {
-                repeatToggle.classList.add('repeat-one');
-                radioPlayer.loop = true;
-              } else {
-                repeatToggle.classList.add('repeat-all');
-                radioPlayer.loop = false;
-              }
-            }
-            
-            function togglePlaylist() {
-              isPlaylistVisible = !isPlaylistVisible;
-              const display = isPlaylistVisible ? 'block' : 'none';
-              const label = isPlaylistVisible ? '⬆️ Ocultar lista' : '⬇️ Mostrar lista';
-            
-              document.getElementById('upcomingSongs').style.display = display;
-              document.getElementById('togglePlaylistBtnTop').innerText = label;
-              const bottomBtn = document.getElementById('togglePlaylistBtn');
-              bottomBtn.innerText = label;
-              bottomBtn.style.display = isPlaylistVisible ? 'inline-block' : 'none';
-            }
-            
-            function renderPlaylistUI() {
-              const list = document.getElementById('upcomingSongs');
-              list.innerHTML = '';
-              playlist.forEach((track, i) => {
-                const li = document.createElement('li');
-                li.textContent = `${i === currentTrack ? '▶️ ' : ''}${extractName(track)}`;
-                list.appendChild(li);
-              });
-            }
-            
-            function shuffleArray(array) {
-              for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-              }
-            }
-            
-            function shuffleAndPlay() {
-              shuffleArray(playlist);
-              currentTrack = 0;
-              playCurrentTrack();
-            }
-            
-            const tabs = document.querySelectorAll('.main-tab-button');
-            const contents = document.querySelectorAll('.main-tab-content');
-            tabs.forEach(tab => {
-              tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                contents.forEach(c => c.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-              });
-            });
-        
-            const radioPlayer = document.getElementById('radioPlayer');
-            const currentSong = document.getElementById('currentSong');
-            let playlist = [
-              { title: "Canción 1", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-              { title: "Canción 2", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
-            ];
-            let currentIndex = 0;
-        
-            function startRadio() {
-              playTrack(currentIndex);
-            }
-            
-            function playTrack(index) {
-              const song = playlist[index];
-              radioPlayer.src = song.url;
-              currentSong.textContent = "Sonando: " + song.title;
-              radioPlayer.play();
-            }
-        
-            function playNextTrack() {
-              currentIndex = (currentIndex + 1) % playlist.length;
-              playTrack(currentIndex);
-            }
-        
-            function playPreviousTrack() {
-              currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-              playTrack(currentIndex);
-            }
-
-
-        </script>
-
-
-     <script>
-          function mezclarYReproducir() {
-            fetch('music_list.json')
-              .then(response => response.json())
-              .then(data => {
-                playlist = data.map(song => song.url);
-                shuffleArray(playlist);
-                currentTrack = 0;
-                playNextTrack();
-              })
-              .catch(error => console.error('Error al mezclar canciones:', error));
-          }
-    </script>
-
-
+  fetch(API_MAPS)
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(p => {
+        if (p.Latitude && p.Longitude)
+          L.marker([+p.Latitude, +p.Longitude]).addTo(map)
+            .bindPopup("📍 Pulsaciones: " + p.Pulse + "<br>SPO2: " + p.SpO2);
+      });
+    });
+</script>
 </body>
 </html>
