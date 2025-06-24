@@ -401,17 +401,16 @@
           <div class="text-center mb-4">
             <strong>Sonando:</strong> <span id="currentSong">---</span>
           </div>
-          <div class="flex justify-center gap-2 mb-4">
-            <button onclick="prevTrack()" class="btn">⏮️</button>
-            <button onclick="nextTrack()" class="btn">⏭️</button>
-            <button onclick="toggleList()" class="btn">🎵 Ver Lista</button>
-          </div>
           <div class="flex justify-center mb-4">
-            <audio id="audio" controls class="w-full max-w-lg"></audio>
-          </div>
-          <ul id="songList" class="song-list list-disc px-6 text-left text-gray-800 hidden"></ul>
-        </div>
-
+              <audio id="audio" controls class="w-full max-w-lg"></audio>
+            </div>
+            
+            <div class="flex justify-center gap-2 mb-2">
+              <button onclick="prevTrack()" class="btn">⏮️ Anterior</button>
+              <button onclick="nextTrack()" class="btn">Siguiente ⏭️</button>
+            </div>
+            
+            <ul id="songList" class="song-list list-disc px-6 text-left text-gray-800"></ul>
 
         <div id="messageBox" class="message-box w-full mt-8"></div>
     </div>
@@ -1109,52 +1108,42 @@ const currentSongSpan = document.getElementById('currentSong');
 const audio = document.getElementById('audio');
 let songs = [];
 let currentTrack = 0;
-const PAGE_SIZE = 10;
-let currentPage = 0;
 
 const nextSongInfo = document.createElement('div');
-nextSongInfo.className = 'text-center text-sm text-gray-600';
+nextSongInfo.className = 'text-center text-sm text-gray-600 mt-1';
 currentSongSpan.parentNode.appendChild(nextSongInfo);
 
-// Cargar canciones
+// Cargar lista y preparar
 fetch('music_list.json')
   .then(res => res.json())
   .then(data => {
     songs = data;
-    renderSongList();
     playTrack(0);
+    renderSongList();
   })
   .catch(err => {
     console.error('No se pudo cargar la lista de canciones:', err);
     currentSongSpan.textContent = 'Error al cargar canciones';
   });
 
-// Mostrar lista paginada
+// Render dinámico: 5 previas + actual + 5 siguientes
 function renderSongList() {
   songListElement.innerHTML = '';
-  const start = currentPage * PAGE_SIZE;
-  const end = Math.min(start + PAGE_SIZE, songs.length);
+  const start = Math.max(currentTrack - 5, 0);
+  const end = Math.min(currentTrack + 6, songs.length);
 
   for (let i = start; i < end; i++) {
     const li = document.createElement('li');
     li.textContent = songs[i].title || `Canción ${i + 1}`;
     li.classList.add('cursor-pointer', 'hover:underline', 'py-1');
-    li.dataset.index = i;
 
-    if (i === currentTrack) li.classList.add('font-bold', 'text-indigo-600');
+    if (i === currentTrack) {
+      li.classList.add('font-bold', 'text-indigo-600');
+    }
 
     li.onclick = () => playTrack(i);
     songListElement.appendChild(li);
   }
-}
-
-function highlightCurrent() {
-  document.querySelectorAll('#songList li').forEach(li => {
-    li.classList.remove('font-bold', 'text-indigo-600');
-    if (parseInt(li.dataset.index) === currentTrack) {
-      li.classList.add('font-bold', 'text-indigo-600');
-    }
-  });
 }
 
 function playTrack(index) {
@@ -1163,14 +1152,8 @@ function playTrack(index) {
     audio.src = songs[index].url;
     currentSongSpan.textContent = songs[index].title || `Canción ${index + 1}`;
     updateNextSongText();
-    audio.play().catch(err => console.error('No se pudo reproducir:', err));
-
-    const pageNeeded = Math.floor(currentTrack / PAGE_SIZE);
-    if (pageNeeded !== currentPage) {
-      currentPage = pageNeeded;
-      renderSongList();
-    }
-    highlightCurrent();
+    audio.play().catch(err => console.error('Error al reproducir:', err));
+    renderSongList();
   }
 }
 
@@ -1189,12 +1172,11 @@ function nextTrack() {
   playTrack(currentTrack);
 }
 
-function toggleList() {
-  songListElement.classList.toggle('hidden');
-}
+// Reproducir automáticamente siguiente canción
+audio.addEventListener('ended', () => {
+  nextTrack();
+});
 </script>
-
-
 
 
 
