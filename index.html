@@ -1090,73 +1090,7 @@
         }
     </script>
 
-    <script>
-      let playlist = [];
-      let currentTrack = 0;
-      let isRepeat = false;
-      const radioPlayer = document.getElementById('radioPlayer');
-      const currentSongElement = document.getElementById('currentSong');
-    
-      function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-      }
-
-        function extractName(url) {
-          return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ""));
-        }
-    
-      function playPreviousTrack() {
-        currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
-        playCurrentTrack();
-      }
-    
-      function toggleRepeat() {
-        isRepeat = !isRepeat;
-        radioPlayer.loop = isRepeat;
-      }
-    
-      function playNextTrack() {
-          if (!playlist.length) return;
-          radioPlayer.src = playlist[currentTrack];
-          radioPlayer.load();
-          radioPlayer.play();
-          currentSongElement.innerText = extractName(playlist[currentTrack]);
-          currentTrack = (currentTrack + 1) % playlist.length;
-          renderPlaylistUI(); // Actualizar la vista de lista
-        }
-    
-      function playCurrentTrack() {
-        shuffleArray(playlist);
-        radioPlayer.src = '/Musica/' + playlist[currentTrack];
-        radioPlayer.load();
-        radioPlayer.play();
-        currentSongElement.innerText = playlist[currentTrack].replace(/\.[^/.]+$/, "");
-      }
-
-        function renderPlaylistUI() {
-          const list = document.getElementById('upcomingSongs');
-          list.innerHTML = '';
-          for (let i = 0; i < playlist.length; i++) {
-            const li = document.createElement('li');
-            li.textContent = `${i +1 === currentTrack ? '▶️ ' : ''}${extractName(playlist[i])}`;
-            list.appendChild(li);
-          }
-        }
-    
-      fetch('music_list.json')
-          .then(response => response.json())
-          .then(data => {
-            playlist = data;
-            setTimeout(playNextTrack, 500);
-            renderPlaylistUI(); // Opcional para mostrar la cola
-          })
-          .catch(error => console.error('Error al cargar lista de canciones:', error));
-    
-      radioPlayer.addEventListener('ended', playNextTrack);
-     </script>
+  
 
      <script>
           function mezclarYReproducir() {
@@ -1172,8 +1106,7 @@
           }
     </script>
 
-
-  <script>
+<script>
 const songListElement = document.getElementById('songList');
 const currentSongSpan = document.getElementById('currentSong');
 const audio = document.getElementById('audio');
@@ -1188,6 +1121,10 @@ fetch('music_list.json')
     songs = data;
     renderSongList();
     playTrack(0);
+  })
+  .catch(err => {
+    console.error('No se pudo cargar la lista de canciones:', err);
+    currentSongSpan.textContent = 'Error al cargar canciones';
   });
 
 function renderSongList() {
@@ -1195,7 +1132,7 @@ function renderSongList() {
   const max = showingAll ? songs.length : 10;
   songs.slice(0, max).forEach((song, index) => {
     const li = document.createElement('li');
-    li.textContent = song.title;
+    li.textContent = song.title || `Canción ${index + 1}`;
     li.classList.add('cursor-pointer', 'hover:underline');
     li.onclick = () => playTrack(index);
     songListElement.appendChild(li);
@@ -1207,8 +1144,8 @@ function playTrack(index) {
   if (songs[index]) {
     currentTrack = index;
     audio.src = songs[index].url;
-    currentSongSpan.textContent = songs[index].title;
-    audio.play();
+    currentSongSpan.textContent = songs[index].title || `Canción ${index + 1}`;
+    audio.play().catch(err => console.error('No se pudo reproducir:', err));
   }
 }
 
@@ -1231,6 +1168,8 @@ function expandSongList() {
   renderSongList();
 }
 </script>
+
+
 
 
 </body>
