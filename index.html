@@ -1,39 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Pagina Personal</title>
-    <!--<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!--<script src="https://cdn.tailwindcss.com"></script>
-    <!-- Insertar en el <head> de tu HTML -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Página Personal</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
 
     <style>
         /* Fuente Inter para un aspecto moderno y limpio */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Un gris claro para el fondo */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            background-image: url('mi%20bandera.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+          font-family: 'Inter', sans-serif;
+          background-color: #f3f4f6;
+          background-image: url('mi%20bandera.jpg');
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
         }
+    
         .container {
-            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
-            width: 100%;
-            background-color: #ffffff;
-            padding: 32px;
-            border-us: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-            background-color: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
+          max-width: 1000px;
+          width: 100%;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(8px);
+          border-radius: 16px;
+          padding: 30px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
         .form-label {
             font-weight: 600;
@@ -219,55 +215,16 @@
             animation: spin 1s linear infinite;
             margin-right: 8px;
         }
-
+    
         .radio-btn {
           padding: 10px 16px;
           border-radius: 6px;
-          background: linear-gradient(135deg, #f43f5e, #6366f1);
-          color: white;
-          font-weight: 600;
-          border: none;
-          cursor: pointer;
-          transition: transform 0.2s, box-shadow 0.3s;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-        .radio-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-
-        .radio-btn.active {
-          background: linear-gradient(135deg, #22c55e, #3b82f6);
-          box-shadow: 0 0 10px rgba(59,130,246,0.6);
-        }
-
-        #togglePlaylistBtn {
-          margin-top: 10px;
-          cursor: pointer;
-          font-weight: 500;
-          color: #4f46e5;
-          transition: color 0.2s;
-        }
-        #togglePlaylistBtn:hover {
-          color: #4338ca;
-        }
-
-        #togglePlaylistBtn,
-        #togglePlaylistBtnTop {
-          margin-top: 10px;
-        }
-
-
-        .radio-btn {
-          padding: 10px 16px;
-          border-radius: 6px;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          color: white;
-          font-weight: 600;
           font-size: 20px;
+          font-weight: 600;
           border: none;
           cursor: pointer;
+          color: white;
+          background: linear-gradient(135deg, #6366f1, #8b5cf6);
           transition: transform 0.2s, box-shadow 0.3s;
           box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
@@ -275,7 +232,7 @@
           transform: scale(1.05);
           box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
         }
-        
+    
         .radio-btn.repeat-none {
           background: linear-gradient(to right, #9ca3af, #6b7280);
         }
@@ -285,8 +242,7 @@
         .radio-btn.repeat-all {
           background: linear-gradient(to right, #10b981, #3b82f6);
         }
-
-        
+    
         #visualizerCanvas {
           width: 100%;
           height: 100px;
@@ -296,20 +252,27 @@
           box-shadow: 0 0 18px rgba(139, 92, 246, 0.4);
           transition: all 0.4s ease;
         }
-
-        
-        #nextSong {
-          transition: opacity 0.4s ease;
+    
+        #togglePlaylistBtn,
+        #togglePlaylistBtnTop {
+          margin-top: 10px;
         }
-
-
-
-
-
-
-
-
-        
+    
+        #nextSong {
+          font-style: italic;
+          color: #6b7280;
+          font-size: 0.9rem;
+          margin-top: 0;
+        }
+    
+        ul#upcomingSongs {
+          margin-top: 10px;
+          padding-left: 0;
+          list-style: none;
+          font-size: 14px;
+          color: #374151;
+        }
+            
     </style>
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
@@ -321,11 +284,11 @@
         </div>
     </div>
 
-    <div class="container rounded-xl shadow-xl flex flex-col">
-        <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
+    <div class="container">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera 47033535F</h1>
 
         <!-- Nueva pestaña en navegación principal -->
-        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
+        <nav class="flex justify-center gap-4 mb-6">
           <button class="main-tab-button" data-main-tab="home">Inicio</button>
           <button class="main-tab-button" data-main-tab="diary">Diario</button>
           <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
@@ -333,7 +296,7 @@
           <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
           <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
           <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
-          <button class="main-tab-button" data-main-tab="radio">Radio</button>
+          <button class="radio-btn" onclick="showTab('radio')">🎧 Ir a la Radio</button>
 
         </nav>
 
@@ -486,36 +449,31 @@
           </div>
         </div>
 
-        <div id="mainRadioSection" class="main-tab-content hidden">
+        <div id="radio" class="main-tab-content">
           <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Radio Javi</h2>
-        
-          <div class="flex flex-col items-center justify-center space-y-4">
-            <!-- Botones de control -->
-            <div class="flex flex-wrap justify-center gap-4">
+    
+          <div class="flex flex-col items-center space-y-4">
+            <div class="flex flex-wrap justify-center gap-3">
               <button class="radio-btn" onclick="startRadio()">⏻ Encender</button>
               <button class="radio-btn" onclick="shuffleAndPlay()">🔀 Aleatorio</button>
               <button class="radio-btn" onclick="playPreviousTrack()">⏮️</button>
               <button id="repeatToggle" class="radio-btn repeat-none" onclick="toggleRepeatMode()">🔁</button>
               <button class="radio-btn" onclick="playNextTrack()">⏭️</button>
             </div>
-        
-            <!-- Visualizador de audio -->
+    
             <canvas id="visualizerCanvas" width="600" height="100"></canvas>
-        
-            <!-- Reproductor de audio oculto -->
-            <audio id="radioPlayer" controls style="width: 100%; max-width: 400px;"></audio>
-        
-            <!-- Canción actual y siguiente -->
+    
+            <audio id="radioPlayer" controls style="width: 100%; max-width: 500px; margin-top: 10px;"></audio>
+    
             <p id="currentSong" class="text-indigo-700 font-semibold text-lg mt-2"></p>
             <p id="nextSong" class="text-gray-500 text-sm italic">Siguiente: 🎵</p>
-        
-            <!-- Mostrar/ocultar lista -->
+    
             <button id="togglePlaylistBtnTop" onclick="togglePlaylist()" class="radio-btn">⬇️ Mostrar lista</button>
             <ul id="upcomingSongs" class="text-gray-700 mt-2 text-sm"></ul>
             <button id="togglePlaylistBtn" onclick="togglePlaylist()" class="radio-btn" style="display: none;">⬆️ Ocultar lista</button>
-
           </div>
         </div>
+      </div>
 
 
 
@@ -1202,50 +1160,50 @@
 
      <script>
           let playlist = [];
-          let currentTrack = 0;
-          let repeatMode = 0; // 0: no repeat, 1: repeat one, 2: repeat all
-          let isPlaylistVisible = true;
-          let radioStarted = false;
-        
-          const radioPlayer = document.getElementById('radioPlayer');
-          const currentSong = document.getElementById('currentSong');
-          const nextSong = document.getElementById('nextSong');
-          const repeatToggle = document.getElementById('repeatToggle');
-        
-          // Visualizador
-          const canvas = document.getElementById('visualizerCanvas');
-          const ctx = canvas.getContext('2d');
-          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          const analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 128;
-          const bufferLength = analyser.frequencyBinCount;
-          const dataArray = new Uint8Array(bufferLength);
-        
-          function setupVisualizer() {
-            const source = audioCtx.createMediaElementSource(radioPlayer);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            drawVisualizer();
-          }
-        
-          function drawVisualizer() {
-            requestAnimationFrame(drawVisualizer);
-            analyser.getByteFrequencyData(dataArray);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const barWidth = canvas.width / bufferLength;
-            for (let i = 0; i < bufferLength; i++) {
-              const value = dataArray[i];
-              const hue = 180 + i * 3;
-              ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
-              ctx.fillRect(i * barWidth, canvas.height - value, barWidth - 2, value);
+            let currentTrack = 0;
+            let repeatMode = 0; // 0: no repeat, 1: repeat one, 2: repeat all
+            let isPlaylistVisible = true;
+            let radioStarted = false;
+            
+            const radioPlayer = document.getElementById('radioPlayer');
+            const currentSong = document.getElementById('currentSong');
+            const nextSong = document.getElementById('nextSong');
+            const repeatToggle = document.getElementById('repeatToggle');
+            
+            // Visualizador
+            const canvas = document.getElementById('visualizerCanvas');
+            const ctx = canvas.getContext('2d');
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 128;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            function setupVisualizer() {
+              const source = audioCtx.createMediaElementSource(radioPlayer);
+              source.connect(analyser);
+              analyser.connect(audioCtx.destination);
+              drawVisualizer();
             }
-          }
-        
-          function extractName(url) {
-            return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ''));
-          }
-        
-          function playCurrentTrack() {
+            
+            function drawVisualizer() {
+              requestAnimationFrame(drawVisualizer);
+              analyser.getByteFrequencyData(dataArray);
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              const barWidth = canvas.width / bufferLength;
+              for (let i = 0; i < bufferLength; i++) {
+                const value = dataArray[i];
+                const hue = 180 + i * 3;
+                ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+                ctx.fillRect(i * barWidth, canvas.height - value, barWidth - 2, value);
+              }
+            }
+            
+            function extractName(url) {
+              return decodeURIComponent(url.split('/').pop().replace(/\.[^/.]+$/, ''));
+            }
+            
+            function playCurrentTrack() {
               radioPlayer.src = playlist[currentTrack];
               radioPlayer.load();
               radioPlayer.play().catch(err => {
@@ -1256,19 +1214,18 @@
               nextSong.innerText = `Siguiente: 🎵 ${extractName(next)}`;
               renderPlaylistUI();
             }
-
-        
-          function playNextTrack() {
-            if (!playlist.length) return;
-            if (repeatMode !== 1) currentTrack = (currentTrack + 1) % playlist.length;
-            playCurrentTrack();
-          }
-        
-          function playPreviousTrack() {
-            currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
-            playCurrentTrack();
-          }
-        
+            
+            function playNextTrack() {
+              if (!playlist.length) return;
+              if (repeatMode !== 1) currentTrack = (currentTrack + 1) % playlist.length;
+              playCurrentTrack();
+            }
+            
+            function playPreviousTrack() {
+              currentTrack = currentTrack > 0 ? currentTrack - 1 : playlist.length - 1;
+              playCurrentTrack();
+            }
+            
             function toggleRepeatMode() {
               repeatMode = (repeatMode + 1) % 3;
               repeatToggle.classList.remove('repeat-none', 'repeat-one', 'repeat-all');
@@ -1284,46 +1241,43 @@
                 radioPlayer.loop = false;
               }
             }
-
-        
-          function togglePlaylist() {
+            
+            function togglePlaylist() {
               isPlaylistVisible = !isPlaylistVisible;
               const display = isPlaylistVisible ? 'block' : 'none';
               const label = isPlaylistVisible ? '⬆️ Ocultar lista' : '⬇️ Mostrar lista';
             
               document.getElementById('upcomingSongs').style.display = display;
               document.getElementById('togglePlaylistBtnTop').innerText = label;
-            
               const bottomBtn = document.getElementById('togglePlaylistBtn');
               bottomBtn.innerText = label;
               bottomBtn.style.display = isPlaylistVisible ? 'inline-block' : 'none';
             }
-
-        
-          function renderPlaylistUI() {
-            const list = document.getElementById('upcomingSongs');
-            list.innerHTML = '';
-            playlist.forEach((track, i) => {
-              const li = document.createElement('li');
-              li.textContent = `${i + 1 === currentTrack ? '▶️ ' : ''}${extractName(track)}`;
-              list.appendChild(li);
-            });
-          }
-        
-          function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [array[i], array[j]] = [array[j], array[i]];
+            
+            function renderPlaylistUI() {
+              const list = document.getElementById('upcomingSongs');
+              list.innerHTML = '';
+              playlist.forEach((track, i) => {
+                const li = document.createElement('li');
+                li.textContent = `${i === currentTrack ? '▶️ ' : ''}${extractName(track)}`;
+                list.appendChild(li);
+              });
             }
-          }
-        
-          function shuffleAndPlay() {
-            shuffleArray(playlist);
-            currentTrack = 0;
-            playCurrentTrack();
-          }
-        
-          function startRadio() {
+            
+            function shuffleArray(array) {
+              for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+              }
+            }
+            
+            function shuffleAndPlay() {
+              shuffleArray(playlist);
+              currentTrack = 0;
+              playCurrentTrack();
+            }
+            
+            function startRadio() {
               if (radioStarted) return;
               audioCtx.resume().then(() => {
                 radioStarted = true;
@@ -1340,19 +1294,23 @@
                   });
               });
             }
-
-          }
-        
-          radioPlayer.addEventListener('ended', () => {
-            if (repeatMode === 1) {
-              radioPlayer.currentTime = 0;
-              radioPlayer.play();
-            } else if (repeatMode === 2) {
-              playNextTrack();
-            } else {
-              if (currentTrack < playlist.length - 1) playNextTrack();
+            
+            radioPlayer.addEventListener('ended', () => {
+              if (repeatMode === 1) {
+                radioPlayer.currentTime = 0;
+                radioPlayer.play();
+              } else if (repeatMode === 2) {
+                playNextTrack();
+              } else {
+                if (currentTrack < playlist.length - 1) playNextTrack();
+              }
+            });
+            
+            function showTab(tabId) {
+              document.querySelectorAll('.main-tab-content').forEach(el => el.style.display = 'none');
+              document.getElementById(tabId).style.display = 'block';
             }
-          });
+
         </script>
 
 
