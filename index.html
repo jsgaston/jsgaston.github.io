@@ -1297,8 +1297,10 @@ function renderFullSelect() {
 
   fullSongSelect.replaceWith(input);
   document.body.appendChild(datalist);
-// aquí puede ir un cierre de llave si la pg no funciona
-    let isShuffling = false;
+
+}
+// ✅ Ahora afuera, en el mismo nivel:
+let isShuffling = false;
 let repeatMode = 'off'; // 'off', 'one', 'all'
 
 // 🔀 Shuffle Toggle
@@ -1327,9 +1329,6 @@ function toggleRepeat() {
     btn.classList.replace('text-white', 'text-gray-800');
   }
 }
-
-}
-
 </script>
 
 
