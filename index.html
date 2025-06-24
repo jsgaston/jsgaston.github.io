@@ -1189,7 +1189,8 @@ function renderSongList() {
 
   for (let i = start; i < end; i++) {
     const li = document.createElement('li');
-    li.textContent = songs[i].title || `Canción ${i + 1}`;
+        li.innerHTML = (i === currentTrack ? '🔊 ' : '') + (songs[i].title || `Canción ${i + 1}`);
+
     li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
 
     if (i === currentTrack) {
