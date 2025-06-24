@@ -268,6 +268,26 @@
         }
 
 
+        #visualizerCanvas {
+          width: 100%;
+          height: 100px;
+          background: radial-gradient(ellipse at center, #c7d2fe, #e0e7ff);
+          border-radius: 12px;
+          box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+          transition: all 0.4s ease;
+        }
+        
+        .radio-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
+        }
+        
+        #nextSong {
+          transition: opacity 0.4s ease;
+        }
+
+
+
 
 
 
@@ -455,23 +475,24 @@
         <button onclick="mezclarYReproducir()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">🎲 Aleatorio</button>
 
           <div class="flex flex-col items-center justify-center space-y-4">
-            <!--<img src="/images/logo_radio_002.jpg" alt="Logo Radio Anarquista" class="w-24 rounded-full shadow-md border border-gray-300">  -->
-
-            <div class="flex space-x-2">
-                <button class="radio-btn" onclick="playPreviousTrack()">⏮️ Anterior</button>
+              <div class="flex space-x-3">
+                <button class="radio-btn" onclick="playPreviousTrack()">⏮️</button>
                 <button id="repeatToggle" class="radio-btn" onclick="toggleRepeatMode()">🔁</button>
-                <button class="radio-btn" onclick="playNextTrack()">⏭️ Siguiente</button>
-
+                <button class="radio-btn" onclick="playNextTrack()">⏭️</button>
+              </div>
+            
+              <canvas id="visualizerCanvas" width="600" height="100"></canvas>
+            
+              <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
+            
+              <p id="currentSong" class="text-indigo-700 font-semibold text-lg"></p>
+              <p id="nextSong" class="text-gray-500 text-sm italic">Siguiente: 🎵</p>
+            
+              <p id="togglePlaylistBtnTop" onclick="togglePlaylist()" class="cursor-pointer text-blue-700 hover:text-blue-900 mt-2">⬇️ Mostrar lista</p>
+              <ul id="upcomingSongs" class="text-gray-700 mt-2 text-sm"></ul>
+              <p id="togglePlaylistBtn" onclick="togglePlaylist()" class="cursor-pointer text-blue-700 hover:text-blue-900">⬆️ Ocultar lista</p>
             </div>
 
-            <audio id="radioPlayer" controls autoplay class="w-full max-w-md"></audio>
-            <p id="currentSong" class="text-red-600 font-semibold"></p>
-            <ul id="upcomingSongs" class="text-gray-700 mt-4 text-sm"></ul>
-            <p id="togglePlaylistBtn" onclick="togglePlaylist()">⬇️ Mostrar lista</p>
-
-            
-
-          </div>
         </div>
 
 
@@ -981,7 +1002,14 @@
 
         // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', () => {
-            showMainTab('home');
+            showMainTab('home')
+                setTimeout(() => {
+                  if (playlist.length > 0) {
+                    playNextTrack();
+                  }
+                }, 1000);
+
+                ;
         });
     </script>
     <!-- Insertar al final del <body>, antes del cierre -->
@@ -1210,6 +1238,8 @@
           radioPlayer.src = playlist[currentTrack];
           radioPlayer.load();
           radioPlayer.play();
+          const next = playlist[(currentTrack + 1) % playlist.length] || '';
+          document.getElementById('nextSong').innerText = `Siguiente: 🎵 ${extractName(next)}`;
           currentSongElement.innerText = extractName(playlist[currentTrack]);
           currentTrack = (currentTrack + 1) % playlist.length;
           renderPlaylistUI(); // Actualizar la vista de lista
@@ -1224,6 +1254,8 @@
       }
 
         function renderPlaylistUI() {
+          const next = playlist[(currentTrack + 1) % playlist.length] || '';
+          document.getElementById('nextSong').innerText = `Siguiente: 🎵 ${extractName(next)}`;
           const list = document.getElementById('upcomingSongs');
           list.innerHTML = '';
           for (let i = 0; i < playlist.length; i++) {
@@ -1253,6 +1285,33 @@
             if (currentTrack !== 0) playNextTrack();
           }
         });
+
+        const canvas = document.getElementById('visualizerCanvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(radioPlayer);
+        const analyser = audioCtx.createAnalyser();
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        analyser.fftSize = 128;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        
+        function drawVisualizer() {
+          requestAnimationFrame(drawVisualizer);
+          analyser.getByteFrequencyData(dataArray);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+          const barWidth = canvas.width / bufferLength;
+          for (let i = 0; i < bufferLength; i++) {
+            const value = dataArray[i];
+            const hue = 180 + i * 3;
+            ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+            ctx.fillRect(i * barWidth, canvas.height - value, barWidth - 2, value);
+          }
+        }
+        drawVisualizer();
+
 
 </script>
 
