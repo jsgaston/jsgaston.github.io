@@ -41,14 +41,15 @@
       <strong>A continuación:</strong> <span id="nextSong">---</span>
     </div>
     <div class="controls">
+      <button onclick="startRadio()" style="background:#ff4081;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:16px;margin-top:10px;">▶️ Empezar Radio</button>
       <button onclick="prevTrack()">⏮️</button>
       <button onclick="nextTrack()">⏭️</button>
       <button onclick="toggleRepeat()">🔁</button>
       <button onclick="toggleRandom()">🔀</button>
-      <button onclick="toggleList()">🎵 Mostrar/Ocultar lista</button>
+      <button onclick="toggleList()">🎵 list</button>
     </div>
     <audio id="audio" controls autoplay></audio>
-    <button onclick="loadTrack(currentIndex)">▶️ Empezar Radio</button>
+    
 
     <canvas id="visualizer" width="600" height="100" style="width:100%; background:#111; display:block; margin-top:10px;"></canvas>
     <ul id="songList" class="song-list" style="display:none;"></ul>
@@ -160,7 +161,7 @@ let currentIndex = 0;
 let repeatOne = false;
 let repeatAll = false;
 let random = false;
-const audio = document.getElementById('player');
+const audio = document.getElementById('audio');
 
 fetch("music_list.json")
   .then(res => res.json())
@@ -262,6 +263,10 @@ function toggleList() {
   loadTrack(nextIndex);
 };
 
+function startRadio() {
+  loadTrack(currentIndex);
+  initVisualizer();
+}
 
 
 
