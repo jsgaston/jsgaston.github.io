@@ -526,7 +526,8 @@
   <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mis Historias</h2>
 
   <input type="text" id="storyTitle" placeholder="Título de la historia" class="form-input mb-4">
-  <div id="storyEditor" style="height: 300px;" class="mb-4"></div>
+  <div id="storyEditor" style="height: 300px;" class="mb-4 border border-gray-300 rounded-md p-4 bg-white"></div>
+
   <button class="btn" onclick="guardarHistoria()">Guardar Historia</button>
   <div id="storyMessage" class="message-box mt-4 hidden"></div>
 
@@ -845,6 +846,12 @@ function showMainTab(tabName) {
     document.getElementById('mainRadioSection').classList.remove('hidden');
     document.querySelector('[data-main-tab="radio"]').classList.add('active');
 }
+    else if (tabName === 'stories') {
+    document.getElementById('mainStoriesSection').classList.remove('hidden');
+    document.querySelector('[data-main-tab="stories"]').classList.add('active');
+    cargarHistorias(); // opcional: para cargar historias al entrar
+}
+
 
 
             hideMessage();
