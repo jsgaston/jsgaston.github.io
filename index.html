@@ -1396,7 +1396,7 @@ function uploadToDrive() {
       body: form,
     })
     .then(res => res.text())
-    .then(text => document.getElementById('resultado').textContent = text)
+    .then(text => document.getElementById('resultado').textContent = text; fileInput.value = ""; // 🔄 limpia el input después de subir)
     .catch(err => console.error(err));
   };
   reader.readAsDataURL(file);
@@ -1420,12 +1420,14 @@ dropZone.addEventListener("drop", e => {
   if (e.dataTransfer.files.length) {
     uploader.files = e.dataTransfer.files;
 
-        // 👇 Ejecuta la subida automáticamente:
-  
-    document.getElementById("resultado").textContent = "📤 Subiendo archivo...";
-uploadToDrive();
+    // 👇 Esperamos un pequeño instante para que el input tenga bien el archivo antes de subir
+    document.getElementById("resultado").textContent = "📤 Preparando archivo...";
+    setTimeout(() => {
+      uploadToDrive();
+    }, 200); // 200 ms de espera suele ser suficiente
   }
 });
+
 
 
 
