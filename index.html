@@ -1396,11 +1396,15 @@ function uploadToDrive() {
       body: form,
     })
     .then(res => res.text())
-    .then(text => document.getElementById('resultado').textContent = text; fileInput.value = ""; // 🔄 limpia el input después de subir)
+    .then(text => {
+      document.getElementById('resultado').textContent = text;
+      fileInput.value = ""; // ✅ limpia correctamente
+    })
     .catch(err => console.error(err));
   };
   reader.readAsDataURL(file);
 }
+
 
     const dropZone = document.getElementById("dropZone");
 const uploader = document.getElementById("uploader");
