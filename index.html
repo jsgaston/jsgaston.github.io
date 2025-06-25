@@ -258,6 +258,19 @@
   font-style: italic;
   margin-top: 0.3rem;
 }
+        .drop-zone {
+  border: 2px dashed #6366f1;
+  padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #4f46e5;
+}
+.drop-zone:hover {
+  background: #eef2ff;
+}
+
 
 
         
@@ -487,9 +500,13 @@
       </select>
     </div>
 
-            <input type="file" id="uploader">
+<div id="dropZone" class="drop-zone">
+  Arrastra tu canción aquí o haz clic para elegir
+  <input type="file" id="uploader" hidden>
+</div>
 <button onclick="uploadToDrive()">Subir</button>
 <p id="resultado"></p>
+
 
 
 
@@ -1380,6 +1397,27 @@ function uploadToDrive() {
   };
   reader.readAsDataURL(file);
 }
+
+    const dropZone = document.getElementById("dropZone");
+const uploader = document.getElementById("uploader");
+
+dropZone.addEventListener("click", () => uploader.click());
+
+dropZone.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropZone.style.background = "#ddd6fe";
+});
+dropZone.addEventListener("dragleave", () => {
+  dropZone.style.background = "";
+});
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.style.background = "";
+  if (e.dataTransfer.files.length) {
+    uploader.files = e.dataTransfer.files;
+  }
+});
+
 </script>
 
 
