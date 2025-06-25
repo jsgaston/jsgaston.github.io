@@ -8,7 +8,7 @@ BASE_URL = "https://raw.githubusercontent.com/jsgaston/Musica_assets_{}/main/son
 combined_songs = []
 
 # Recorremos song_list001 a song_list004
-for i in range(1, 5):  # Cambia el rango si tienes más
+for i in range(1, 6):  # Cambia el rango si tienes más
     repo_num = f"{i:03}"
     url = BASE_URL.format(repo_num, repo_num)
     try:
