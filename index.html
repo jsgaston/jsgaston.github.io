@@ -788,7 +788,12 @@
             } else if (tabName === 'projects') {
                 mainProjectsSection.classList.remove('hidden');
                 document.querySelector('[data-main-tab="projects"]').classList.add('active');
-            } else if (tabName === 'radio') {
+            else if (tabName === 'profile') {
+    document.getElementById('mainProfileSection').classList.remove('hidden');
+    document.querySelector('[data-main-tab="profile"]').classList.add('active');
+}
+
+            } else (tabName === 'radio') {
                 document.getElementById('mainRadioSection').classList.remove('hidden');
                 document.querySelector('[data-main-tab="radio"]').classList.add('active');
             }
