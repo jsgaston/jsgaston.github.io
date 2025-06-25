@@ -818,6 +818,8 @@ function showMainTab(tabName) {
     mainProjectsSection.classList.add('hidden');
     document.getElementById('mainProfileSection').classList.add('hidden'); // <-- ESTA LÍNEA ES NECESARIA
     document.getElementById('mainRadioSection').classList.add('hidden');
+    document.getElementById('mainStoriesSection').classList.add('hidden');
+
 
     // Activar la pestaña correspondiente
     mainTabButtons.forEach(button => button.classList.remove('active'));
@@ -1486,11 +1488,51 @@ dropZone.addEventListener("drop", e => {
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script>
-     const GOOGLE_APPS_SCRIPT_URL_STORIES = 'https://script.google.com/macros/s/AKfycbyperarN1iLfqJWc1C-7oULQE_E0mYQ2_UqwW0nnR3QOvQW_PKL5xCJHuIEanXMAp8b/exec'; 
+     const GOOGLE_APPS_SCRIPT_URL_STORIES = 'https://script.google.com/macros/s/AKfycbxaKiDws3HHWXcZBPIV5as941ksutiyow3WG08Vm9JcBZpi27B0VHzQ00vbiz4ItHMT/exec'; 
 
 let quill;
 document.addEventListener("DOMContentLoaded", () => {
   quill = new Quill('#storyEditor', { theme: 'snow' });
+
+    document.querySelector('#storyEditor').addEventListener('paste', async function (e) {
+  const clipboard = e.clipboardData;
+  if (!clipboard || !clipboard.items) return;
+
+  for (const item of clipboard.items) {
+    if (item.type.indexOf('image') !== -1) {
+      e.preventDefault(); // evita pegado directo
+      const file = item.getAsFile();
+      const reader = new FileReader();
+
+      reader.onload = async function (event) {
+        const base64 = event.target.result;
+
+        const form = new FormData();
+        form.append('action', 'subirImagen');
+        form.append('imagen', base64);
+
+        const res = await fetch(GOOGLE_APPS_SCRIPT_URL_STORIES, {
+          method: 'POST',
+          body: form
+        });
+
+        const data = await res.json();
+        if (data.status === 'success') {
+          const range = quill.getSelection();
+          quill.insertEmbed(range.index, 'image', data.url);
+        } else {
+          alert('Error al subir la imagen: ' + data.message);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+});
+
+
+
+    
   document.querySelector('[data-main-tab="stories"]').addEventListener('click', cargarHistorias);
 });
 
@@ -1501,10 +1543,46 @@ function mostrarMensajeHistoria(msg, tipo) {
   box.style.display = 'block';
 }
 
+function procesarVideos(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+
+  const enlaces = div.querySelectorAll('a');
+  enlaces.forEach(enlace => {
+    const url = enlace.href;
+    let embed;
+
+    if (url.includes('youtube.com/watch?v=')) {
+      const id = url.split('v=')[1].split('&')[0];
+      embed = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
+    } else if (url.includes('youtu.be/')) {
+      const id = url.split('youtu.be/')[1];
+      embed = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
+    } else if (url.includes('vimeo.com/')) {
+      const id = url.split('vimeo.com/')[1];
+      embed = `<iframe src="https://player.vimeo.com/video/${id}" width="100%" height="315" frameborder="0" allowfullscreen></iframe>`;
+    }
+
+    if (embed) {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = embed;
+      enlace.parentNode.replaceChild(wrapper, enlace);
+    }
+  });
+
+  return div.innerHTML;
+}
+
+    
+    
+
 function guardarHistoria() {
   const titulo = document.getElementById('storyTitle').value.trim();
-  const contenido = quill.root.innerHTML;
+  let contenido = quill.root.innerHTML;
+
   if (!titulo || !contenido) return mostrarMensajeHistoria("Faltan datos.", "error");
+
+  contenido = procesarVideos(contenido); // 🔄 Inserta los iframes embebidos
 
   const form = new FormData();
   form.append("action", "guardarHistoria");
@@ -1525,6 +1603,9 @@ function guardarHistoria() {
     });
 }
 
+
+    
+
 function cargarHistorias() {
   fetch(`${GOOGLE_APPS_SCRIPT_URL_STORIES}?action=listarHistorias`)
     .then(res => res.json())
@@ -1535,9 +1616,11 @@ function cargarHistorias() {
         data.historias.forEach(historia => {
           const card = document.createElement("div");
           card.className = "entry-card mb-4";
-          card.innerHTML = `<h4 class='font-bold text-indigo-600'>${historia.titulo}</h4>
-            <p class='text-sm text-gray-500'>${new Date(historia.fecha).toLocaleString()}</p>
-            <iframe src="${historia.url}" width="100%" height="300px" class="rounded-lg mt-2"></iframe>`;
+          card.innerHTML = `
+  <h4 class='font-bold text-indigo-600'>${historia.titulo}</h4>
+  <p class='text-sm text-gray-500'>${new Date(historia.fecha).toLocaleString()}</p>
+  <div class='prose max-w-none mt-2 bg-white p-4 rounded-md shadow-sm border'>${historia.contenido}</div>
+`;
           lista.appendChild(card);
         });
       } else {
