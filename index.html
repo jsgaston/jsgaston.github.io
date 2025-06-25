@@ -1354,7 +1354,7 @@ function obtenerAutorDesdeAppScript() {
   const duracion = Math.round(audio.duration || 0); // en segundos
   const duracionStr = `${Math.floor(duracion / 60)}:${String(duracion % 60).padStart(2, '0')}`;
 
-  const url = 'https://script.google.com/macros/s/AKfycbyDdDuPiN17Lhe5lPDbL3Zzi-iT2HK8xNTSLFCv7dd9K5vc32GQfBM-ryJs-Uq9ZBr2AQ/exec' +
+  const url = 'https://script.google.com/macros/s/AKfycbyo8xS0Dp8Fix7AQG_iN_G0XTVvTsrZdtmmNsaFk5xJGWQ14bHzPbrZgeYQ0Vf1yRnPLQ/exec' +
     '?query=' + encodeURIComponent(`${cleanTitle} ${duracionStr} autor de la canción`);
 
   fetch(url)
