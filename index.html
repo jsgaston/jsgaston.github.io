@@ -298,6 +298,7 @@
           <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
           <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
           <button class="main-tab-button" data-main-tab="radio">Radio</button>
+            <button class="main-tab-button" data-main-tab="stories">Stories</button>
 
         </nav>
 
@@ -518,6 +519,22 @@
 
             
   </div>
+
+
+        <!--  Sección para Historias -->
+<div id="mainStoriesSection" class="main-tab-content hidden">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mis Historias</h2>
+
+  <input type="text" id="storyTitle" placeholder="Título de la historia" class="form-input mb-4">
+  <div id="storyEditor" style="height: 300px;" class="mb-4"></div>
+  <button class="btn" onclick="guardarHistoria()">Guardar Historia</button>
+  <div id="storyMessage" class="message-box mt-4 hidden"></div>
+
+  <hr class="my-6">
+
+  <h3 class="text-xl font-semibold text-gray-700 mb-4">Historias Guardadas</h3>
+  <div id="storyList"></div>
+</div>
 
 
     <script>
@@ -1449,6 +1466,70 @@ dropZone.addEventListener("drop", e => {
 
 
 </script>
+
+        <!-- Scripts necesarios (Quill y funcionalidad) Stories -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+let quill;
+document.addEventListener("DOMContentLoaded", () => {
+  quill = new Quill('#storyEditor', { theme: 'snow' });
+  document.querySelector('[data-main-tab="stories"]').addEventListener('click', cargarHistorias);
+});
+
+function mostrarMensajeHistoria(msg, tipo) {
+  const box = document.getElementById("storyMessage");
+  box.className = `message-box ${tipo}`;
+  box.textContent = msg;
+  box.style.display = 'block';
+}
+
+function guardarHistoria() {
+  const titulo = document.getElementById('storyTitle').value.trim();
+  const contenido = quill.root.innerHTML;
+  if (!titulo || !contenido) return mostrarMensajeHistoria("Faltan datos.", "error");
+
+  const form = new FormData();
+  form.append("action", "guardarHistoria");
+  form.append("titulo", titulo);
+  form.append("contenido", contenido);
+
+  fetch(GOOGLE_APPS_SCRIPT_URL, { method: 'POST', body: form })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        mostrarMensajeHistoria("✅ Guardada", "success");
+        document.getElementById("storyTitle").value = "";
+        quill.setContents([]);
+        cargarHistorias();
+      } else {
+        mostrarMensajeHistoria("❌ Error al guardar", "error");
+      }
+    });
+}
+
+function cargarHistorias() {
+  fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=listarHistorias`)
+    .then(res => res.json())
+    .then(data => {
+      const lista = document.getElementById("storyList");
+      lista.innerHTML = "";
+      if (data.status === 'success' && data.historias.length > 0) {
+        data.historias.forEach(historia => {
+          const card = document.createElement("div");
+          card.className = "entry-card mb-4";
+          card.innerHTML = `<h4 class='font-bold text-indigo-600'>${historia.titulo}</h4>
+            <p class='text-sm text-gray-500'>${new Date(historia.fecha).toLocaleString()}</p>
+            <iframe src="${historia.url}" width="100%" height="300px" class="rounded-lg mt-2"></iframe>`;
+          lista.appendChild(card);
+        });
+      } else {
+        lista.innerHTML = "<p class='text-gray-500 text-center'>No hay historias guardadas.</p>";
+      }
+    });
+}
+</script>
+
 
 
 </body>
