@@ -1414,6 +1414,14 @@ function uploadToDrive() {
     const dropZone = document.getElementById("dropZone");
 const uploader = document.getElementById("uploader");
 
+// 👇 Aquí añades esto:
+uploader.addEventListener("change", () => {
+  if (uploader.files.length > 0) {
+    document.getElementById("resultado").textContent = "📤 Subiendo archivo...";
+    uploadToDrive();
+  }
+});
+
 dropZone.addEventListener("click", () => uploader.click());
 
 dropZone.addEventListener("dragover", e => {
@@ -1428,12 +1436,10 @@ dropZone.addEventListener("drop", e => {
   dropZone.style.background = "";
   if (e.dataTransfer.files.length) {
     uploader.files = e.dataTransfer.files;
-
-    // 👇 Esperamos un pequeño instante para que el input tenga bien el archivo antes de subir
     document.getElementById("resultado").textContent = "📤 Preparando archivo...";
     setTimeout(() => {
       uploadToDrive();
-    }, 200); // 200 ms de espera suele ser suficiente
+    }, 200);
   }
 });
 
