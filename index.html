@@ -1193,6 +1193,13 @@ const audio = document.getElementById('audio');
     let isShuffling = false;
     let repeatMode = 'off'; // 'off', 'one', 'all'
 
+    document.body.addEventListener('click', () => {
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().catch(err => console.warn('No se pudo reanudar:', err));
+  }
+}, { once: true });
+
+
     fetch('music_list.json')
       .then(res => res.json())
       .then(data => {
@@ -1247,12 +1254,20 @@ const audio = document.getElementById('audio');
       const song = songs[index];
       const next = songs[(index + 1) % songs.length];
 
-      audio.src = song.url;
-  audio.play().then(() => connectAudio()).catch(err => console.error('Error:', err));
+
+ audio.src = song.url;
+audio.play()
+  .then(() => {
+    connectAudio();
+  })
+  .catch(err => {
+    console.error('Error al reproducir:', err);
+  });
+
       currentSongSpan.textContent = `${song.title} - ${song.artist} (${song.genre})`;
       nextSongSpan.textContent = `Siguiente: ${next?.title} - ${next?.artist}`;
 
-      audio.play().catch(err => console.error('Reproducción fallida:', err));
+
       audio.onloadedmetadata = () => {
         const duracion = audio.duration;
         audio.dataset.duracion = Math.round(duracion);
@@ -1299,13 +1314,21 @@ const dataArray = new Uint8Array(bufferLength);
 let source;
 let animationId;
 
+let isAudioConnected = false;
+
 function connectAudio() {
-  if (source) source.disconnect();
-  source = audioContext.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioContext.destination);
-  visualize();
+  if (isAudioConnected) return;
+  try {
+    source = audioContext.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+    visualize();
+    isAudioConnected = true;
+  } catch (e) {
+    console.warn('Ya conectado o error:', e.message);
+  }
 }
+
 
 function visualize() {
   cancelAnimationFrame(animationId);
