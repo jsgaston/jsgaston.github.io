@@ -1240,6 +1240,11 @@ function playTrack(index) {
   currentSongSpan.textContent = song.title || `Canción ${index + 1}`;
   nextSongSpan.textContent = `Siguiente: ${next?.title || '---'}`;
   audio.play().catch(err => console.error('Reproducción fallida:', err));
+    audio.onloadedmetadata = () => {
+  const duracion = audio.duration; // segundos
+  audio.dataset.duracion = Math.round(duracion); // guardamos duración entera
+};
+
 
   renderSongList();
   fullSongSelect.selectedIndex = index + 1; // +1 por el placeholder
@@ -1340,10 +1345,20 @@ function toggleRepeat() {
   }
 }
 
-    function obtenerAutorDesdeAppScript() {
+
+    
+function obtenerAutorDesdeAppScript() {
   const title = songs[currentTrack]?.title || '';
   const cleanTitle = title.replace(/^\d+\s*/, '');
-  const urlAppScript = 'https://script.google.com/macros/s/AKfycbyDdDuPiN17Lhe5lPDbL3Zzi-iT2HK8xNTSLFCv7dd9K5vc32GQfBM-ryJs-Uq9ZBr2AQ/exec?title=' + encodeURIComponent(cleanTitle);
+
+  const duracion = audio.dataset.duracion || Math.round(audio.duration || 0); // en segundos
+  const minutos = Math.floor(duracion / 60);
+  const segundos = duracion % 60;
+  const duracionStr = `${minutos}:${segundos.toString().padStart(2, '0')}`;
+
+  const urlAppScript = 'https://script.google.com/macros/s/AKfycbzUHDMDSIhMA8FLVsD7H5fjLUf00oBlzjsimPVcR2jNDjs3SxaJPNtHdBVrdPpYQuVi1A/exec' +
+    '?title=' + encodeURIComponent(cleanTitle) +
+    '&duracion=' + encodeURIComponent(duracionStr);
 
   fetch(urlAppScript)
     .then(res => res.text())
@@ -1355,6 +1370,7 @@ function toggleRepeat() {
       alert('Error obteniendo el autor');
     });
 }
+
 
 </script>
 
