@@ -440,7 +440,9 @@
         <!-- Sección de Radio -->
         <div id="mainRadioSection" class="main-tab-content hidden">
     <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">🎧 Mi Radio Personal</h2>
-    <button onclick="obtenerAutorDesdeAppScript()" class="radio-button">🎧 Obtener Autor</button>
+    <button onclick="obtenerLetraDesdeAppScript()" class="radio-button">📜 Ver Letra</button>
+<div id="letraCancion" class="mt-4 p-3 rounded-md bg-white text-sm text-gray-800 whitespace-pre-line shadow hidden"></div>
+
 
     <!-- Canción actual -->
     <div class="song-info-box text-center mb-4">
@@ -1301,27 +1303,33 @@ const audio = document.getElementById('audio');
 
 
     
-function obtenerAutorDesdeAppScript() {
-  const rawTitle = songs[currentTrack]?.title || '';
-  const cleanTitle = rawTitle.replace(/^\d+\s*/, '');
+function obtenerLetraDesdeAppScript() {
+  const song = songs[currentTrack];
+  const title = (song?.title || '').replace(/^\\d+\\s*/, '');
+  const artist = song?.artist || '';
 
-  const duracion = Math.round(audio.duration || 0); // en segundos
-  const duracionStr = `${Math.floor(duracion / 60)}:${String(duracion % 60).padStart(2, '0')}`;
+  if (!title || !artist) {
+    alert('Faltan datos para buscar la letra.');
+    return;
+  }
 
-  const url = 'https://script.google.com/macros/s/AKfycbwrJbwOjsgcjxmboJiZAJqTGpM8R6WbtGkiGrqGwG7LVptWwvYyPQfhCC9xeoic7EpeWQ/exec' +
-    '?title=' + encodeURIComponent(cleanTitle) +
-    '&duracion=' + encodeURIComponent(duracionStr);
+  const queryUrl = 'https://script.google.com/macros/s/AKfycbxXTwmC8-KY1bYIki7EAtsgM7rCvTb0Ej4qK5oeQIXcJMM4DJEDqPCliJ47eMJpN43SJA/exec' +
+    '?title=' + encodeURIComponent(title) +
+    '&artist=' + encodeURIComponent(artist);
 
-  fetch(url)
+  fetch(queryUrl)
     .then(res => res.text())
-    .then(autor => {
-      alert('🎤 Autor detectado: ' + autor);
+    .then(lyric => {
+      const div = document.getElementById('letraCancion');
+      div.textContent = lyric;
+      div.classList.remove('hidden');
     })
     .catch(err => {
       console.error(err);
-      alert('Error buscando el autor');
+      alert('Error al buscar la letra');
     });
 }
+
 
 
 
