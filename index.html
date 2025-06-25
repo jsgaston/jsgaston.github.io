@@ -464,11 +464,8 @@
       <div class="flex justify-center w-full px-4">
         <div style="display: flex; justify-content: center; width: 100%;">
           <audio id="audio" controls style="width: 100%; max-width: 1000px; padding: 8px; background: white; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></audio>
-            </div>
+        </div>
       </div>
-
-         <canvas id="audioVisualizer" width="800" height="100" style="width: 100%; max-width: 800px; height: 100px; margin-top: 16px; background: #111; border-radius: 8px;"></canvas>
-        
       <div class="flex flex-wrap gap-4 justify-center">
         <button onclick="prevTrack()" class="radio-button">⏮️ Anterior</button>
         <button onclick="nextTrack()" class="radio-button">⏭️ Siguiente</button>
@@ -1193,13 +1190,6 @@ const audio = document.getElementById('audio');
     let isShuffling = false;
     let repeatMode = 'off'; // 'off', 'one', 'all'
 
-    document.body.addEventListener('click', () => {
-  if (audioContext.state === 'suspended') {
-    audioContext.resume().catch(err => console.warn('No se pudo reanudar:', err));
-  }
-}, { once: true });
-
-
     fetch('music_list.json')
       .then(res => res.json())
       .then(data => {
@@ -1254,20 +1244,11 @@ const audio = document.getElementById('audio');
       const song = songs[index];
       const next = songs[(index + 1) % songs.length];
 
-
- audio.src = song.url;
-audio.play()
-  .then(() => {
-    connectAudio();
-  })
-  .catch(err => {
-    console.error('Error al reproducir:', err);
-  });
-
+      audio.src = song.url;
       currentSongSpan.textContent = `${song.title} - ${song.artist} (${song.genre})`;
       nextSongSpan.textContent = `Siguiente: ${next?.title} - ${next?.artist}`;
 
-
+      audio.play().catch(err => console.error('Reproducción fallida:', err));
       audio.onloadedmetadata = () => {
         const duracion = audio.duration;
         audio.dataset.duracion = Math.round(duracion);
@@ -1301,72 +1282,6 @@ audio.play()
     }
 
     audio.addEventListener('ended', nextTrack);
-
-    const canvas = document.getElementById('audioVisualizer');
-const ctx = canvas.getContext('2d');
-
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const analyser = audioContext.createAnalyser();
-analyser.fftSize = 256;
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
-
-let source;
-let animationId;
-
-let isAudioConnected = false;
-
-function connectAudio() {
-  if (isAudioConnected) return;
-  try {
-    source = audioContext.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-    visualize();
-    isAudioConnected = true;
-  } catch (e) {
-    console.warn('Ya conectado o error:', e.message);
-  }
-}
-
-
-function visualize() {
-  cancelAnimationFrame(animationId);
-  function draw() {
-    animationId = requestAnimationFrame(draw);
-    analyser.getByteFrequencyData(dataArray);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const barWidth = (canvas.width / bufferLength) * 2.5;
-    let x = 0;
-
-    for(let i = 0; i < bufferLength; i++) {
-      const barHeight = dataArray[i] / 1.2;
-      const r = 250;
-      const g = 80 + barHeight;
-      const b = 160;
-
-      ctx.fillStyle = `rgb(${r},${g},${b})`;
-      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-      x += barWidth + 1;
-    }
-  }
-  draw();
-}
-
-// Conectar al reproducir
-audio.addEventListener('play', () => {
-  if (audioContext.state === 'suspended') audioContext.resume();
-  connectAudio();
-});
-
-    document.body.addEventListener('click', () => {
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
-}, { once: true });
-
-
 
     fullSongSelect.addEventListener('change', (e) => {
       const index = parseInt(e.target.value);
