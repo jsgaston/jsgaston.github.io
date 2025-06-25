@@ -440,6 +440,8 @@
         <!-- Sección de Radio -->
        <div id="mainRadioSection" class="main-tab-content hidden">
           <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">🎧 Mi Radio Personal</h2>
+           <button onclick="obtenerAutorDesdeAppScript()" class="radio-button">🎧 Obtener Autor</button>
+
         
           <!-- Canción actual -->
           <div class="song-info-box text-center mb-4">
@@ -1337,6 +1339,23 @@ function toggleRepeat() {
     btn.classList.replace('text-white', 'text-gray-800');
   }
 }
+
+    function obtenerAutorDesdeAppScript() {
+  const title = songs[currentTrack]?.title || '';
+  const cleanTitle = title.replace(/^\d+\s*/, '');
+  const urlAppScript = 'https://script.google.com/macros/s/AKfycbyDdDuPiN17Lhe5lPDbL3Zzi-iT2HK8xNTSLFCv7dd9K5vc32GQfBM-ryJs-Uq9ZBr2AQ/exec?title=' + encodeURIComponent(cleanTitle);
+
+  fetch(urlAppScript)
+    .then(res => res.text())
+    .then(autor => {
+      alert('🎤 Autor: ' + autor);
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error obteniendo el autor');
+    });
+}
+
 </script>
 
 
