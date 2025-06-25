@@ -750,19 +750,19 @@
 
         // --- Funciones de Navegación Principal ---
 
-        function showMainTab(tabName) {
-            // Ocultar todas las secciones
-            mainHomeSection.classList.add('hidden');
-            mainDiarySection.classList.add('hidden');
-            mainMapsSection.classList.add('hidden');
-            mainTripsSection.classList.add('hidden');
-            mainMenusSection.classList.add('hidden');
-            mainProjectsSection.classList.add('hidden');
-            document.getElementById('mainRadioSection').classList.add('hidden'); // <-- añádelo donde ocultas todas
+function showMainTab(tabName) {
+    // Ocultar todas las secciones
+    mainHomeSection.classList.add('hidden');
+    mainDiarySection.classList.add('hidden');
+    mainMapsSection.classList.add('hidden');
+    mainTripsSection.classList.add('hidden');
+    mainMenusSection.classList.add('hidden');
+    mainProjectsSection.classList.add('hidden');
+    document.getElementById('mainProfileSection').classList.add('hidden'); // <-- ESTA LÍNEA ES NECESARIA
+    document.getElementById('mainRadioSection').classList.add('hidden');
 
-
-            // Desactivar todos los botones
-            mainTabButtons.forEach(button => button.classList.remove('active'));
+    // Activar la pestaña correspondiente
+    mainTabButtons.forEach(button => button.classList.remove('active'));
 
             // Mostrar la sección correspondiente
             if (tabName === 'home') {
