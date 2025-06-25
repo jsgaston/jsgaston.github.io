@@ -1419,8 +1419,15 @@ dropZone.addEventListener("drop", e => {
   dropZone.style.background = "";
   if (e.dataTransfer.files.length) {
     uploader.files = e.dataTransfer.files;
+
+        // 👇 Ejecuta la subida automáticamente:
+  
+    document.getElementById("resultado").textContent = "📤 Subiendo archivo...";
+uploadToDrive();
   }
 });
+
+
 
 </script>
 
