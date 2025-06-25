@@ -1349,13 +1349,14 @@ function toggleRepeat() {
     
 function obtenerAutorDesdeAppScript() {
   const rawTitle = songs[currentTrack]?.title || '';
-  const cleanTitle = rawTitle.replace(/^\d+\s*/, ''); // solo quita el número inicial si lo hay
+  const cleanTitle = rawTitle.replace(/^\d+\s*/, '');
 
   const duracion = Math.round(audio.duration || 0); // en segundos
   const duracionStr = `${Math.floor(duracion / 60)}:${String(duracion % 60).padStart(2, '0')}`;
 
-  const url = 'https://script.google.com/macros/s/AKfycbyo8xS0Dp8Fix7AQG_iN_G0XTVvTsrZdtmmNsaFk5xJGWQ14bHzPbrZgeYQ0Vf1yRnPLQ/exec' +
-    '?query=' + encodeURIComponent(`${cleanTitle} ${duracionStr} autor de la canción`);
+  const url = 'https://script.google.com/macros/s/AKfycbwrJbwOjsgcjxmboJiZAJqTGpM8R6WbtGkiGrqGwG7LVptWwvYyPQfhCC9xeoic7EpeWQ/exec' +
+    '?title=' + encodeURIComponent(cleanTitle) +
+    '&duracion=' + encodeURIComponent(duracionStr);
 
   fetch(url)
     .then(res => res.text())
@@ -1367,6 +1368,7 @@ function obtenerAutorDesdeAppScript() {
       alert('Error buscando el autor');
     });
 }
+
 
 
 
