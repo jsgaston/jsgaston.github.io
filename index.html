@@ -465,9 +465,10 @@
         <div style="display: flex; justify-content: center; width: 100%;">
           <audio id="audio" controls style="width: 100%; max-width: 1000px; padding: 8px; background: white; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></audio>
             </div>
-            <canvas id="audioVisualizer" width="800" height="100" style="width: 100%; max-width: 800px; height: 100px; margin-top: 16px; background: #111; border-radius: 8px;"></canvas>
-        
       </div>
+
+         <canvas id="audioVisualizer" width="800" height="100" style="width: 100%; max-width: 800px; height: 100px; margin-top: 16px; background: #111; border-radius: 8px;"></canvas>
+        
       <div class="flex flex-wrap gap-4 justify-center">
         <button onclick="prevTrack()" class="radio-button">⏮️ Anterior</button>
         <button onclick="nextTrack()" class="radio-button">⏭️ Siguiente</button>
@@ -1247,6 +1248,7 @@ const audio = document.getElementById('audio');
       const next = songs[(index + 1) % songs.length];
 
       audio.src = song.url;
+  audio.play().then(() => connectAudio()).catch(err => console.error('Error:', err));
       currentSongSpan.textContent = `${song.title} - ${song.artist} (${song.genre})`;
       nextSongSpan.textContent = `Siguiente: ${next?.title} - ${next?.artist}`;
 
@@ -1334,6 +1336,13 @@ audio.addEventListener('play', () => {
   if (audioContext.state === 'suspended') audioContext.resume();
   connectAudio();
 });
+
+    document.body.addEventListener('click', () => {
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+}, { once: true });
+
 
 
     fullSongSelect.addEventListener('change', (e) => {
