@@ -1398,12 +1398,17 @@ function uploadToDrive() {
     .then(res => res.text())
     .then(text => {
       document.getElementById('resultado').textContent = text;
-      fileInput.value = ""; // ✅ limpia correctamente
+      fileInput.value = ""; // ✅ ahora se limpia correctamente
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+  console.error(err);
+  document.getElementById('resultado').textContent = '❌ Error al subir: ' + err.message;
+});
+
   };
   reader.readAsDataURL(file);
 }
+
 
 
     const dropZone = document.getElementById("dropZone");
