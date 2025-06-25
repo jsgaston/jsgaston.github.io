@@ -2,13 +2,12 @@ import requests
 import json
 from random import shuffle
 
-# Base de URL para los JSON en GitHub
 BASE_URL = "https://raw.githubusercontent.com/jsgaston/Musica_assets_{}/main/song_list{}.json"
 
 combined_songs = []
+seen = set()  # Aquí guardamos identificadores únicos
 
-# Recorremos song_list001 a song_list004
-for i in range(1, 6):  # Cambia el rango si tienes más
+for i in range(1, 6):
     repo_num = f"{i:03}"
     url = BASE_URL.format(repo_num, repo_num)
     try:
@@ -19,7 +18,6 @@ for i in range(1, 6):  # Cambia el rango si tienes más
 
         if isinstance(data, list):
             for song in data:
-                # Aseguramos que todos los campos estén
                 song_data = {
                     "title": song.get("title"),
                     "artist": song.get("artist"),
@@ -30,19 +28,27 @@ for i in range(1, 6):  # Cambia el rango si tienes más
                     "filename": song.get("filename"),
                     "url": song.get("url")
                 }
-                combined_songs.append(song_data)
-            print(f"✓ {len(data)} canciones añadidas")
+
+                # Creamos un ID único por canción
+                key = (song_data["title"], song_data["artist"])
+
+                if key not in seen:
+                    seen.add(key)
+                    combined_songs.append(song_data)
+
+            print(f"✓ {len(data)} canciones procesadas")
+
         else:
             print(f"⚠️ Formato inesperado en {url}")
 
     except Exception as e:
         print(f"❌ Error al descargar {url}: {e}")
 
-# Guardamos el resultado
+# Guardamos la lista sin duplicados
 if combined_songs:
     shuffle(combined_songs)
     with open("music_list.json", "w", encoding="utf-8") as f:
         json.dump(combined_songs, f, ensure_ascii=False, indent=2)
-    print(f"✅ Generado music_list.json con {len(combined_songs)} canciones")
+    print(f"✅ Generado music_list.json con {len(combined_songs)} canciones únicas")
 else:
     print("🚫 No se generó ninguna lista")
