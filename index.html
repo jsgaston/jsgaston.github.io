@@ -1348,28 +1348,26 @@ function toggleRepeat() {
 
     
 function obtenerAutorDesdeAppScript() {
-  const title = songs[currentTrack]?.title || '';
-  const cleanTitle = title.replace(/^\d+\s*/, '');
+  const rawTitle = songs[currentTrack]?.title || '';
+  const cleanTitle = rawTitle.replace(/^\d+\s*/, ''); // solo quita el número inicial si lo hay
 
-  const duracion = audio.dataset.duracion || Math.round(audio.duration || 0); // en segundos
-  const minutos = Math.floor(duracion / 60);
-  const segundos = duracion % 60;
-  const duracionStr = `${minutos}:${segundos.toString().padStart(2, '0')}`;
+  const duracion = Math.round(audio.duration || 0); // en segundos
+  const duracionStr = `${Math.floor(duracion / 60)}:${String(duracion % 60).padStart(2, '0')}`;
 
-  const urlAppScript = 'https://script.google.com/macros/s/AKfycbzUHDMDSIhMA8FLVsD7H5fjLUf00oBlzjsimPVcR2jNDjs3SxaJPNtHdBVrdPpYQuVi1A/exec' +
-    '?title=' + encodeURIComponent(cleanTitle) +
-    '&duracion=' + encodeURIComponent(duracionStr);
+  const url = 'https://script.google.com/macros/s/AKfycbyDdDuPiN17Lhe5lPDbL3Zzi-iT2HK8xNTSLFCv7dd9K5vc32GQfBM-ryJs-Uq9ZBr2AQ/exec' +
+    '?query=' + encodeURIComponent(`${cleanTitle} ${duracionStr} autor de la canción`);
 
-  fetch(urlAppScript)
+  fetch(url)
     .then(res => res.text())
     .then(autor => {
-      alert('🎤 Autor: ' + autor);
+      alert('🎤 Autor detectado: ' + autor);
     })
     .catch(err => {
       console.error(err);
-      alert('Error obteniendo el autor');
+      alert('Error buscando el autor');
     });
 }
+
 
 
 </script>
