@@ -593,6 +593,30 @@
         const modalImage = document.getElementById('modalImage');
         const closeModal = document.querySelector('.close-modal');
 
+
+
+text.addEventListener('paste', function (event) {
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for (const item of items) {
+        if (item.type.indexOf("image") !== -1) {
+            const file = item.getAsFile();
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                // ✅ Pegamos la imagen base64 en un campo oculto
+                document.getElementById('externalImageUrl').value = ''; // evitar conflicto
+                window._diaryPastedImage = evt.target.result;
+                showMessage("Imagen pegada desde el portapapeles (se subirá al guardar).", "success");
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+});
+
+
+
+
+        
+
         // --- Funciones de Utilidad ---
 
         // Función para mostrar mensajes al usuario (éxito/error)
@@ -1000,6 +1024,13 @@ function showMainTab(tabName) {
                 resetFormState();
                 return;
             }
+
+            if (photoUpload.files.length > 0 && window._diaryPastedImage) {
+    showMessage('Por favor, elige solo una opción para la imagen: archivo o pegada.', 'error');
+    resetFormState();
+    return;
+}
+
         
             if (photoUpload.files.length > 0 && externalImageUrl !== '') {
                 showMessage('Por favor, elige SOLO UNA opción para la imagen.', 'error');
@@ -1031,6 +1062,10 @@ function showMainTab(tabName) {
                 
                 if (externalImageUrl !== '') {
                   formData.append('externalImageUrl', externalImageUrl);
+                    } else if (window._diaryPastedImage) {
+  formData.append('imageData', window._diaryPastedImage);
+  formData.append('imageName', 'imagen_pegada.png');
+
                 } else if (imageData) {
                   formData.append('imageData', imageData);
                   formData.append('imageName', imageName);
@@ -1053,6 +1088,8 @@ function showMainTab(tabName) {
                 if (result.status === 'success') {
                     showMessage('¡Entrada guardada con éxito!', 'success');
                     text.value = '';
+                    window._diaryPastedImage = null;
+
                     photoUpload.value = '';
                     externalImageUrlInput.value = '';
                     document.getElementById('title').value = ''; // limpiar título
