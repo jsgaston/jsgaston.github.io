@@ -2,7 +2,7 @@ name: Actualizar lista de música combinada
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 🕒 Ejecutar todos los días a las 00:00 UTC
+    - cron: '0 * * * *'  # 🕒 Ejecuta cada hora
   workflow_dispatch:      # Permite ejecutarlo manualmente desde GitHub
   push:
     paths:
