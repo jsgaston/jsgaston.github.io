@@ -1762,28 +1762,31 @@ function guardarHistoria() {
 
     
 
-function cargarHistorias() {
-  fetch(`${GOOGLE_APPS_SCRIPT_URL_STORIES}?action=listarHistorias`)
-    .then(res => res.json())
-    .then(data => {
-      const lista = document.getElementById("storyList");
-      lista.innerHTML = "";
-      if (data.status === 'success' && data.historias.length > 0) {
-        data.historias.forEach(historia => {
-          const card = document.createElement("div");
-          card.className = "entry-card mb-4";
-          card.innerHTML = `
-  <h4 class='font-bold text-indigo-600'>${historia.titulo}</h4>
-  <p class='text-sm text-gray-500'>${new Date(historia.fecha).toLocaleString()}</p>
-  <div class='prose max-w-none mt-2 bg-white p-4 rounded-md shadow-sm border'>${historia.contenido}</div>
-`;
-          lista.appendChild(card);
-        });
-      } else {
-        lista.innerHTML = "<p class='text-gray-500 text-center'>No hay historias guardadas.</p>";
-      }
-    });
+async function cargarHistorias() {
+  const contenedor = document.getElementById('storyList');
+  contenedor.innerHTML = '<p class="text-center text-gray-500">Cargando títulos de historias...</p>';
+
+  try {
+    const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL_STORIES}?action=listarHistorias`);
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      contenedor.innerHTML = '';
+      result.historias.forEach(historia => {
+        const div = document.createElement('div');
+        div.className = 'entry-card p-2 mb-1 text-sm bg-white shadow-sm rounded-md hover:bg-indigo-50 cursor-pointer';
+        div.textContent = `📘 ${historia.titulo} — ${new Date(historia.fecha).toLocaleDateString()}`;
+        contenedor.appendChild(div);
+      });
+    } else {
+      contenedor.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay historias disponibles.'}</p>`;
+    }
+  } catch (error) {
+    console.error('Error al cargar historias:', error);
+    contenedor.innerHTML = '<p class="text-center text-red-500">Error al conectar con el servidor.</p>';
+  }
 }
+
 
 
     async function buscarHistorias() {
