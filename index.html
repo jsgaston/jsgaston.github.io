@@ -362,9 +362,25 @@
 
 
                     <div class="mb-8">
-                        <label for="externalImageUrl" class="form-label mb-2">O pegar URL de imagen (https://es.imgbb.com/  https://pasteboard.co/  https://postimages.org/  https://imgur.com/):</label>
-                        <input type="url" id="externalImageUrl" name="externalImageUrl" class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: https://ibb.co/ABC123 o https://i.imgur.com/ejemplo.jpg">
-                        <p class="text-sm text-gray-500 mt-1">Soporta ImgBB, Imgur, PostImage y URLs directas. Se procesará automáticamente.</p>
+                        <label for="externalImageUrl" class="form-label mb-2">
+  O pegar <strong>URL de imagen</strong> desde servicios como:
+</label>
+<div class="flex flex-wrap gap-2 mb-2">
+  <a href="https://es.imgbb.com/" target="_blank" class="text-blue-600 underline hover:text-blue-800">ImgBB</a>
+  <a href="https://pasteboard.co/" target="_blank" class="text-blue-600 underline hover:text-blue-800">Pasteboard</a>
+  <a href="https://postimages.org/" target="_blank" class="text-blue-600 underline hover:text-blue-800">Postimages</a>
+  <a href="https://imgur.com/" target="_blank" class="text-blue-600 underline hover:text-blue-800">Imgur</a>
+</div>
+
+<input
+  type="url"
+  id="externalImageUrl"
+  name="externalImageUrl"
+  class="form-input rounded-lg focus:ring-blue-500 focus:border-blue-500"
+  placeholder="Ej: https://ibb.co/ABC123 o https://i.imgur.com/ejemplo.jpg"
+/>
+<p class="text-sm text-gray-500 mt-1">Se procesará automáticamente si es compatible.</p>
+
                     </div>
 
                     <div id="messageBox" class="message-box w-full"></div>
