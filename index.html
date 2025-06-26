@@ -568,8 +568,35 @@
 
   <hr class="my-6">
 
-  <h3 class="text-xl font-semibold text-gray-700 mb-4">Historias Guardadas</h3>
-  <div id="storyList"></div>
+    <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Historias</h3>
+<div class="flex flex-col md:flex-row md:items-end gap-4 mb-6">
+  <div class="flex-1">
+    <label for="searchKeyword" class="form-label">Buscar por palabra clave:</label>
+    <input type="text" id="searchKeyword" class="form-input rounded-lg" placeholder="Escribe una palabra del título o contenido">
+  </div>
+  <div>
+    <label for="searchStartDate" class="form-label">Desde:</label>
+    <input type="date" id="searchStartDate" class="form-input">
+  </div>
+  <div>
+    <label for="searchEndDate" class="form-label">Hasta:</label>
+    <input type="date" id="searchEndDate" class="form-input">
+  </div>
+  <div>
+    <button onclick="buscarHistorias()" class="btn">🔍 Buscar</button>
+  </div>
+</div>
+
+<div id="searchStoryResults">
+  <p class="text-center text-gray-500">Usa el buscador para encontrar historias.</p>
+</div>
+
+<hr class="my-6">
+<h3 class="text-xl font-semibold text-gray-700 mb-4">Historias Guardadas</h3>
+<div id="storyList"></div>
+
+
+
 </div>
 
 
@@ -1757,6 +1784,48 @@ function cargarHistorias() {
       }
     });
 }
+
+
+    async function buscarHistorias() {
+  const keyword = document.getElementById('searchKeyword').value.trim();
+  const desde = document.getElementById('searchStartDate').value;
+  const hasta = document.getElementById('searchEndDate').value;
+  const contenedor = document.getElementById('searchStoryResults');
+
+  contenedor.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
+
+  const url = `${GOOGLE_APPS_SCRIPT_URL_STORIES}?action=buscarHistorias&keyword=${encodeURIComponent(keyword)}&desde=${desde}&hasta=${hasta}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      if (!data.historias.length) {
+        contenedor.innerHTML = '<p class="text-center text-gray-500">No se encontraron historias.</p>';
+        return;
+      }
+
+      contenedor.innerHTML = '';
+      data.historias.forEach(historia => {
+        const card = document.createElement('div');
+        card.className = 'entry-card mb-4';
+        card.innerHTML = `
+          <h4 class='font-bold text-indigo-600'>${historia.titulo}</h4>
+          <p class='text-sm text-gray-500'>${new Date(historia.fecha).toLocaleString()}</p>
+          <div class='prose max-w-none mt-2 bg-white p-4 rounded-md shadow-sm border'>${historia.contenido}</div>
+        `;
+        contenedor.appendChild(card);
+      });
+    } else {
+      contenedor.innerHTML = `<p class="text-center text-red-500">${data.message || 'Error al buscar.'}</p>`;
+    }
+  } catch (error) {
+    console.error('Error al buscar historias:', error);
+    contenedor.innerHTML = '<p class="text-center text-red-500">Error al conectar con el servidor.</p>';
+  }
+}
+
 
 
 
