@@ -1576,7 +1576,7 @@ const audio = document.getElementById('audio');
       songs.forEach((song, i) => {
         const option = document.createElement('option');
         option.value = i;
-        option.textContent = song.title || song.artist || `Canción ${i + 1}`;
+        option.textContent = song.title  || `Canción ${i + 1}`;
         fullSongSelect.appendChild(option);
       });
     }
