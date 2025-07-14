@@ -302,7 +302,9 @@
           <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
           <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
           <button class="main-tab-button" data-main-tab="radio">Radio</button>
+            <button class="main-tab-button" data-main-tab="time-converter">Conversor de Tiempo</button>
             <button class="main-tab-button" data-main-tab="stories">Stories</button>
+            
 
         </nav>
 
@@ -598,6 +600,67 @@
 
 
 </div>
+
+
+
+
+
+        <!-- -Seccion conversor de unidades de tiempo -->
+
+        <div id="mainTimeConverterSection" class="main-tab-content hidden">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Conversor de Unidades de Tiempo</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <label for="fromValue" class="form-label mb-2">Valor:</label>
+            <input type="number" id="fromValue" class="form-input rounded-lg" placeholder="Ingresa el valor" step="any">
+        </div>
+        
+        <div>
+            <label for="fromUnit" class="form-label mb-2">De:</label>
+            <select id="fromUnit" class="form-input rounded-lg">
+                <option value="tiradas">Tiradas</option>
+                <option value="segundos">Segundos</option>
+                <option value="dias">Días</option>
+                <option value="horas">Horas</option>
+                <option value="minutos">Minutos</option>
+            </select>
+        </div>
+        
+        <div>
+            <label for="toValue" class="form-label mb-2">Resultado:</label>
+            <input type="number" id="toValue" class="form-input rounded-lg bg-gray-100" readonly>
+        </div>
+        
+        <div>
+            <label for="toUnit" class="form-label mb-2">A:</label>
+            <select id="toUnit" class="form-input rounded-lg">
+                <option value="tiradas">Tiradas</option>
+                <option value="segundos">Segundos</option>
+                <option value="dias">Días</option>
+                <option value="horas">Horas</option>
+                <option value="minutos">Minutos</option>
+            </select>
+        </div>
+    </div>
+    
+    <button onclick="convertTime()" class="btn w-full">Convertir</button>
+    
+    <div class="mt-8 bg-gray-50 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Equivalencias:</h3>
+        <ul class="list-disc pl-5 space-y-1">
+            <li>10 tiradas = 17 segundos</li>
+            <li>1 día = 20 unidades grandes</li>
+            <li>2 días = 40 unidades</li>
+            <li>3 días = 300 unidades</li>
+            <li>4 días = 400 unidades</li>
+            <li>6 días = 60000 unidades</li>
+            <li>7 días = 1400000 unidades</li>
+        </ul>
+    </div>
+</div>
+
+        
 
 
             
@@ -966,6 +1029,11 @@ function showMainTab(tabName) {
     document.getElementById('mainStoriesSection').classList.remove('hidden');
     document.querySelector('[data-main-tab="stories"]').classList.add('active');
     cargarHistorias(); // opcional: para cargar historias al entrar
+}
+            // En la función showMainTab, añade esta línea para manejar la nueva pestaña:
+else if (tabName === 'time-converter') {
+    document.getElementById('mainTimeConverterSection').classList.remove('hidden');
+    document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
 }
 
 
@@ -1854,6 +1922,75 @@ async function cargarHistorias() {
 </script>
 
 
+        <!--     Conversor de teimpo -->
+
+<script>
+
+// Añade esta función para las conversiones:
+function convertTime() {
+    const conversionRates = {
+        tiradas: {
+            segundos: 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+            dias: 1.7 / 86400,
+            horas: 1.7 / 3600,
+            minutos: 1.7 / 60
+        },
+        segundos: {
+            tiradas: 1 / 1.7,
+            dias: 1 / 86400,
+            horas: 1 / 3600,
+            minutos: 1 / 60
+        },
+        dias: {
+            tiradas: 86400 / 1.7,
+            segundos: 86400,
+            horas: 24,
+            minutos: 1440,
+            "unidades-grandes": 20 // 1 día = 20 unidades grandes
+        },
+        horas: {
+            tiradas: 3600 / 1.7,
+            segundos: 3600,
+            dias: 1 / 24,
+            minutos: 60
+        },
+        minutos: {
+            tiradas: 60 / 1.7,
+            segundos: 60,
+            dias: 1 / 1440,
+            horas: 1 / 60
+        }
+    };
+
+    const fromValue = parseFloat(document.getElementById('fromValue').value);
+    const fromUnit = document.getElementById('fromUnit').value;
+    const toUnit = document.getElementById('toUnit').value;
+
+    if (isNaN(fromValue)) {
+        alert("Por favor ingresa un valor válido");
+        return;
+    }
+
+    if (fromUnit === toUnit) {
+        document.getElementById('toValue').value = fromValue;
+        return;
+    }
+
+    let result;
+    if (conversionRates[fromUnit] && conversionRates[fromUnit][toUnit]) {
+        result = fromValue * conversionRates[fromUnit][toUnit];
+    } else if (conversionRates[toUnit] && conversionRates[toUnit][fromUnit]) {
+        result = fromValue / conversionRates[toUnit][fromUnit];
+    } else {
+        // Conversión indirecta a través de segundos
+        const inSeconds = fromValue * conversionRates[fromUnit].segundos;
+        result = inSeconds * conversionRates.segundos[toUnit];
+    }
+
+    document.getElementById('toValue').value = result.toFixed(6);
+}
+
+</script>
 
 </body>
 </html>
