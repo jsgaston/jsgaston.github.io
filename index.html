@@ -627,7 +627,7 @@
 
                                                 <option value="dias">Días</option>
 
-                                                <option value="dias">Años</option>
+                                                <option value="años">Años</option>
             </select>
         </div>
         
@@ -639,10 +639,20 @@
         <div>
             <label for="toUnit" class="form-label mb-2">A:</label>
             <select id="toUnit" class="form-input rounded-lg">
-                <option value="tiradas"> :-_  Porciones pequeñas del sol </option>
-                <option value="segundos"> :- Porciones medianas del sol </option>
-                <option value="dias"> : Porciones grandes del sol </option>
-                <option value="horas"> o Soles</option>
+
+                <option value=" :-_ "> :-_ (Porciones pequeñas del sol) </option>
+
+                 <option value=" :- "> :- (Porciones medianas del sol) </option>
+
+                 <option value=" : "> : (Porciones grandes del sol) </option>
+
+                <option value=" soles"> o (Soles) </option>
+
+                <option value="tiradas"> Tiradas </option>
+                
+               
+               
+                
 
             </select>
         </div>
@@ -1951,6 +1961,7 @@ function convertTime() {
     const conversionRates = {
         tiradas: {
             segundos: 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+            años: 1.7 / 86400*365.25,
             dias: 1.7 / 86400,
             horas: 1.7 / 3600,
             minutos: 1.7 / 60
