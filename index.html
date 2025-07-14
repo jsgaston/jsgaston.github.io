@@ -608,113 +608,118 @@
         <!-- -Seccion conversor de unidades de tiempo -->
 
         <div id="mainTimeConverterSection" class="main-tab-content hidden">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Conversor de Unidades de Tiempo</h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-            <label for="fromValue" class="form-label mb-2">Valor:</label>
-            <input type="number" id="fromValue" class="form-input rounded-lg" placeholder="Ingresa el valor" step="any">
-        </div>
-        
-        <div>
-            <label for="fromUnit" class="form-label mb-2">De:</label>
-            <select id="fromUnit" class="form-input rounded-lg">
-                <option value="segundos">Segundos</option>
-
-                <option value="minutos">Minutos</option>
-
-                <option value="horas">Horas</option>
-
-                                                <option value="dias">Días</option>
-
-                                                <option value="años">Años</option>
-
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Conversor de Unidades de Tiempo</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label for="fromValue" class="form-label mb-2">Valor:</label>
+                                    <input type="number" id="fromValue" class="form-input rounded-lg" placeholder="Ingresa el valor" step="any">
+                                </div>
+                                
+                                <div>
+                                    <label for="fromUnit" class="form-label mb-2">De:</label>
+                                    <select id="fromUnit" class="form-input rounded-lg">
+                                        <option value="segundos">Segundos</option>
+                        
+                                        <option value="minutos">Minutos</option>
+                        
+                                        <option value="horas">Horas</option>
+                        
+                                                                        <option value="dias">Días</option>
+                        
+                                                                        <option value="años">Años</option>
+                        
+                                                        <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
+                        
+                                         <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
+                        
+                                         <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
+                        
+                                        <option value="soles"> o (Soles) </option>
+                        
+                                        <option value="tiradas"> Tiradas </option>
+                                    </select>
+                                </div>
+                
+                        </div>
+                        
+                
+                        
+                        <div>
+                            <label for="toUnit" class="form-label mb-2">A:</label>
+                            <select id="toUnit" class="form-input rounded-lg">
+                
                                 <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
-
-                 <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
-
-                 <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
-
-                <option value="soles"> o (Soles) </option>
-
-                <option value="tiradas"> Tiradas </option>
-            </select>
-        </div>
-
-        </div>
-        
-
-        
-        <div>
-            <label for="toUnit" class="form-label mb-2">A:</label>
-            <select id="toUnit" class="form-input rounded-lg">
-
-                <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
-
-                 <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
-
-                 <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
-
-                <option value="soles"> o (Soles) </option>
-
-                <option value="tiradas"> Tiradas </option>
-
-                                <option value="segundos">Segundos</option>
-
-                <option value="minutos">Minutos</option>
-
-                <option value="horas">Horas</option>
-
-                                                <option value="dias">Días</option>
-
-                                                <option value="años">Años</option>
                 
-               
-               
+                                 <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
                 
+                                 <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
+                
+                                <option value="soles"> o (Soles) </option>
+                
+                                <option value="tiradas"> Tiradas </option>
+                
+                                                <option value="segundos">Segundos</option>
+                
+                                <option value="minutos">Minutos</option>
+                
+                                <option value="horas">Horas</option>
+                
+                                                                <option value="dias">Días</option>
+                
+                                                                <option value="años">Años</option>
+                                
+                               
+                               
+                                
+                
+                            </select>
+                        </div>
+                
+                                <div>
+                                    <label for="toValue" class="form-label mb-2">Resultado:</label>
+                                    <input type="number" id="toValue" class="form-input rounded-lg bg-gray-100" readonly>
+                                </div>
+                
+                
+                        
+                    </div>
 
-            </select>
-        </div>
 
-                <div>
-            <label for="toValue" class="form-label mb-2">Resultado:</label>
-            <input type="number" id="toValue" class="form-input rounded-lg bg-gray-100" readonly>
-        </div>
-
-
-        
-    </div>
+            <button onclick="convertTime()" class="btn w-full">Convertir</button>
     
-    <button onclick="convertTime()" class="btn w-full">Convertir</button>
-    
-    <div class="mt-8 bg-gray-50 p-4 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Definición de unidad de tiempo:</h3>
-
-                <p class="text-center text-gray-600 mb-8"> Regla para contar tiempo:  </p>
-               <p class="text-center text-gray-600 mb-8">    Usas dos chapas o menedas planas de diferentes tamaños y no trucadas, la pequeña tiene que caber entre el dedo gordo y el dedo perpendicular de la mano de un bebé y la moneda grande tiene que caber entre los dedos pequeños de una mano de alguien no bebé (no crece más alto y es más alto que antes de ser bebé),  </p>
-              <p class="text-center text-gray-600 mb-8"> La altura: </p>
-              <p class="text-center text-gray-600 mb-8">      La altura minima donde al dejar esas monedas caer y las monedas puedan cambiar de lado de cara (la moneda la dejas caer plana) inicial es la altura para la medida del tiempo.</p>
-            <p class="text-center text-gray-600 mb-8">   </p>
-        <p class="text-center text-gray-600 mb-8">  Establecia la ultura, cuenta el tiempo en segundos (que es la unidad de tiempo que se usa en mi mundo, los relojes funcionan en segundos y abjao están los cambios, y se cuenta el tiempo en recoger la moneda,  levantar la moneda a esa altura y dejar caer la moneda plana, y se repite lo mismo una vez la moneda está parada lo más rápido posible, en suelo plano, de madera y lejos metales o imanes que puedan interferir</p>
-        <p class="text-center text-gray-600 mb-8">   </p>
-        <p class="text-center text-gray-600 mb-8">   Mi mejor marca fueron 10 tiradas completas (la ultima tirada se detuvo y paré el contador de tiempo) en más de 19 segundos, así que por convenio he estipulado que en menos de 17 segundos no lo podría lograr.</p>
-
-<h3 class="text-lg font-semibold mb-2">Equivalencias:</h3>
+                <div class="mt-8 bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">Definición de unidad de tiempo:</h3>
+                
+                                <p class="text-center text-gray-600 mb-8"> Regla para contar tiempo:  </p>
+                               <p class="text-center text-gray-600 mb-8">    Usas dos chapas o menedas planas de diferentes tamaños y no trucadas, la pequeña tiene que caber entre el dedo gordo y el dedo perpendicular de la mano de un bebé y la moneda grande tiene que caber entre los dedos pequeños de una mano de alguien no bebé (no crece más alto y es más alto que antes de ser bebé),  </p>
+                              <p class="text-center text-gray-600 mb-8"> La altura: </p>
+                              <p class="text-center text-gray-600 mb-8">      La altura minima donde al dejar esas monedas caer y las monedas puedan cambiar de lado de cara (la moneda la dejas caer plana) inicial es la altura para la medida del tiempo.</p>
+                            <p class="text-center text-gray-600 mb-8">   </p>
+                        <p class="text-center text-gray-600 mb-8">  Establecia la ultura, cuenta el tiempo en segundos (que es la unidad de tiempo que se usa en mi mundo, los relojes funcionan en segundos y abjao están los cambios, y se cuenta el tiempo en recoger la moneda,  levantar la moneda a esa altura y dejar caer la moneda plana, y se repite lo mismo una vez la moneda está parada lo más rápido posible, en suelo plano, de madera y lejos metales o imanes que puedan interferir</p>
+                        <p class="text-center text-gray-600 mb-8">   </p>
+                        <p class="text-center text-gray-600 mb-8">   Mi mejor marca fueron 10 tiradas completas (la ultima tirada se detuvo y paré el contador de tiempo) en más de 19 segundos, así que por convenio he estipulado que en menos de 17 segundos no lo podría lograr.</p>
+                
+                        <h3 class="text-lg font-semibold mb-2">Equivalencias:</h3>
+                        
+                        <ul class="list-disc pl-5 space-y-1">
+                            
+                
+                            <li>10 tiradas = 17 segundos</li>
+                            <li>en mi mundo 1 día en calendrio Gregoriano = 1 o (sol, un "sol" es una bola que calenta la tierra o como yo la llamo "nave" que surca el cielo)</li>
+                            <li>1 o = 20 : </li>
+                            <li>1 : = 100 :-</li>
+                            <li>1 :- = 100 :-_</li>
+                            <li> 1 día = 24 horas</li>
+                            <li>1 hora = 60 minutos</li>
+                            <li>1 minuto = 60 segundos</li>
+                            <li>1 año = 365.25 días</li>
+                        </ul>
+                    </div>
         
-        <ul class="list-disc pl-5 space-y-1">
-            
+                </div>
+                    
 
-            <li>10 tiradas = 17 segundos</li>
-            <li>en mi mundo 1 día en calendrio Gregoriano = 1 o (sol, un "sol" es una bola que calenta la tierra o como yo la llamo "nave" que surca el cielo)</li>
-            <li>1 o = 20 : </li>
-            <li>1 : = 100 :-</li>
-            <li>1 :- = 100 :-_</li>
-            <li> 1 día = 24 horas</li>
-            <li>1 hora = 60 minutos</li>
-            <li>1 minuto = 60 segundos</li>
-            <li>1 año = 365.25 días</li>
-        </ul>
-    </div>
 
 
         
