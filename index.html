@@ -629,11 +629,11 @@
 
                                                 <option value="años">Años</option>
 
-                                <option value=" :-_ "> :-_ (Porciones pequeñas del sol) </option>
+                                <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
 
-                 <option value=" :- "> :- (Porciones medianas del sol) </option>
+                 <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
 
-                 <option value=" : "> : (Porciones grandes del sol) </option>
+                 <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
 
                 <option value="soles"> o (Soles) </option>
 
@@ -647,11 +647,11 @@
             <label for="toUnit" class="form-label mb-2">A:</label>
             <select id="toUnit" class="form-input rounded-lg">
 
-                <option value=" :-_ "> :-_ (Porciones pequeñas del sol) </option>
+                <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
 
-                 <option value=" :- "> :- (Porciones medianas del sol) </option>
+                 <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
 
-                 <option value=" : "> : (Porciones grandes del sol) </option>
+                 <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
 
                 <option value="soles"> o (Soles) </option>
 
@@ -1989,7 +1989,11 @@ function convertTime() {
             años: 1.7 / (86400*365.25),
             dias: 1.7 / (60*60*24),
             horas: 1.7 / (60*60),
-            minutos: 1.7 / (60)
+            minutos: 1.7 / (60),
+            o : (86400*365.25) / 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+            Porciones_grandes_del_sol :  (60*60*24) / 1.7 ,
+            Porciones_medianas_del_sol :  (60*60) / 1.7 ,
+            Porciones_pequeñas_del_sol : 60 / 1.7
         },
         segundos: {
             tiradas: 1 / 1.7,
