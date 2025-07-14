@@ -2000,26 +2000,41 @@ function convertTime() {
             años: 1 / (86400*365.25),
             dias: 1 / (60*60*24),
             horas: 1 / (60*60),
-            minutos: 1/ (60)
+            minutos: 1/ (60),
+            soles :1.7 /  (60*60*24) , // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+            Porciones_grandes_del_sol :  1.7  /  (60*24),
+            Porciones_medianas_del_sol :  1.7 / 60,
+            Porciones_pequeñas_del_sol : 1.7
         },
         dias: {
             tiradas: 86400 / 1.7,
             segundos: 86400,
             horas: 24,
             minutos: 24*60,
-            " : ": 20 // 1 día = 20 unidades grandes
+            soles : 1, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+            Porciones_grandes_del_sol :  20 ,
+            Porciones_medianas_del_sol :  20*100 ,
+            Porciones_pequeñas_del_sol : 20*100*100
         },
         horas: {
-            tiradas: 3600 / 1.7,
-            segundos: 3600,
-            dias: 1 / 24,
-            minutos: 60
+            tiradas: 86400 / 1.7 / 24,
+            segundos: 86400 / 24,
+            horas: 24 / 24,
+            minutos: 24*60 / 24,
+            soles : 1 / 24,
+            Porciones_grandes_del_sol :  20 / 24,
+            Porciones_medianas_del_sol :  20*100 / 24,
+            Porciones_pequeñas_del_sol : 20*100*100 / 24
         },
         minutos: {
-            tiradas: 60 / 1.7,
-            segundos: 60,
-            dias: 1 / 1440,
-            horas: 1 / 60
+            tiradas: 86400 / 1.7 / 24 / 60,
+            segundos: 86400 / 24 / 60,
+            horas: 24 / 24 / 60,
+            minutos: 24*60 / 24 / 60,
+            soles : 1 / 24 / 60,
+            Porciones_grandes_del_sol :  20 / 24 / 60,
+            Porciones_medianas_del_sol :  20*100 / 24 / 60,
+            Porciones_pequeñas_del_sol : 20*100*100 / 24 / 60
         }
     };
 
