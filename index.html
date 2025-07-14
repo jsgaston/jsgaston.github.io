@@ -1547,39 +1547,44 @@ const audio = document.getElementById('audio');
         console.error('Error:', err);
       });
 
-    function renderSongList() {
-      songListElement.innerHTML = '';
-      const start = Math.max(currentTrack - 5, 0);
-      const end = Math.min(currentTrack + 6, songs.length);
+function renderSongList() {
+  songListElement.innerHTML = '';
+  const start = Math.max(currentTrack - 5, 0);
+  const end = Math.min(currentTrack + 6, songs.length);
 
-      for (let i = start; i < end; i++) {
-        const li = document.createElement('li');
-        li.innerHTML = (i === currentTrack ? '🔊 ' : '') + (songs[i].title || `Canción ${i + 1}`);
-        li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
+  for (let i = start; i < end; i++) {
+    const li = document.createElement('li');
+    // Cambiar esta línea para mostrar artista y título
+    li.innerHTML = (i === currentTrack ? '🔊 ' : '') + 
+                  (songs[i].artist ? `${songs[i].artist} - ` : '') + 
+                  (songs[i].title || `Canción ${i + 1}`);
+    
+    li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
 
-        if (i === currentTrack) {
-          li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
-        } else {
-          li.classList.add('hover:bg-gray-100');
-        }
-
-        const song = songs[i];
-        li.title = `Artista: ${song.artist}\nÁlbum: ${song.album}\nGénero: ${song.genre}\nAño: ${song.year}\nDuración: ${Math.floor(song.duration / 60)}:${String(song.duration % 60).padStart(2, '0')}`;
-
-        li.onclick = () => playTrack(i);
-        songListElement.appendChild(li);
-      }
+    if (i === currentTrack) {
+      li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
+    } else {
+      li.classList.add('hover:bg-gray-100');
     }
 
-    function renderFullSelect() {
-      fullSongSelect.innerHTML = '<option disabled selected>-- Elegir canción --</option>';
-      songs.forEach((song, i) => {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = song.title  || `Canción ${i + 1}`;
-        fullSongSelect.appendChild(option);
-      });
-    }
+    const song = songs[i];
+    li.title = `Artista: ${song.artist}\nÁlbum: ${song.album}\nGénero: ${song.genre}\nAño: ${song.year}\nDuración: ${Math.floor(song.duration / 60)}:${String(song.duration % 60).padStart(2, '0')}`;
+
+    li.onclick = () => playTrack(i);
+    songListElement.appendChild(li);
+  }
+}
+
+function renderFullSelect() {
+  fullSongSelect.innerHTML = '<option disabled selected>-- Elegir canción --</option>';
+  songs.forEach((song, i) => {
+    const option = document.createElement('option');
+    option.value = i;
+    // Cambiar esta línea para mostrar artista y título
+    option.textContent = (song.artist ? `${song.artist} - ` : '') + (song.title || `Canción ${i + 1}`);
+    fullSongSelect.appendChild(option);
+  });
+}
 
     function playTrack(index) {
       if (!songs[index]) return;
