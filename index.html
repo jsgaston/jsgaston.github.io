@@ -323,10 +323,10 @@
             </div>
 
             <hr class="my-6">
-<h3 class="text-xl font-semibold text-gray-700 mb-4">Última Historia Publicada:</h3>
-<div id="latestStoryContent" class="text-gray-700">
-    <p class="text-center text-gray-500">Cargando última historia...</p>
-</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Historia Publicada:</h3>
+            <div id="latestStoryContent" class="text-gray-700">
+                <p class="text-center text-gray-500">Cargando última historia...</p>
+            </div>
 
 
 
@@ -354,13 +354,13 @@
                     </div>
 
                     <div class="mb-4">
-  <label class="form-label mb-2">Arrastra una imagen aquí o haz clic para elegir:</label>
-  <div id="diaryDropZone" class="drop-zone">
-    Suelta tu imagen aquí o haz clic para seleccionarla
-    <input type="file" id="photoUpload" hidden accept="image/*" />
-  </div>
-  <p class="text-sm text-gray-500 mt-1">Se subirá a tu Google Drive. Tamaño máximo: 5MB.</p>
-</div>
+                  <label class="form-label mb-2">Arrastra una imagen aquí o haz clic para elegir:</label>
+                  <div id="diaryDropZone" class="drop-zone">
+                    Suelta tu imagen aquí o haz clic para seleccionarla
+                    <input type="file" id="photoUpload" hidden accept="image/*" />
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">Se subirá a tu Google Drive. Tamaño máximo: 5MB.</p>
+                </div>
 
 
                     <div class="mb-8">
@@ -559,49 +559,49 @@
 
 
         <!--  Sección para Historias -->
-<div id="mainStoriesSection" class="main-tab-content hidden">
-  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mis Historias</h2>
+        <div id="mainStoriesSection" class="main-tab-content hidden">
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mis Historias</h2>
+            
+              <input type="text" id="storyTitle" placeholder="Título de la historia" class="form-input mb-4">
+              <div id="storyEditor" style="height: 300px;" class="mb-4 border border-gray-300 rounded-md p-4 bg-white"></div>
+            
+              <button class="btn" onclick="guardarHistoria()">Guardar Historia</button>
+              <div id="storyMessage" class="message-box mt-4 hidden"></div>
+            
+              <hr class="my-6">
+            
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Historias</h3>
+            <div class="flex flex-col md:flex-row md:items-end gap-4 mb-6">
+              <div class="flex-1">
+                <label for="searchKeyword" class="form-label">Buscar por palabra clave:</label>
+                <input type="text" id="searchKeyword" class="form-input rounded-lg" placeholder="Escribe una palabra del título o contenido">
+              </div>
+              <div>
+                <label for="searchStartDate" class="form-label">Desde:</label>
+                <input type="date" id="searchStartDate" class="form-input">
+              </div>
+              <div>
+                <label for="searchEndDate" class="form-label">Hasta:</label>
+                <input type="date" id="searchEndDate" class="form-input">
+              </div>
+              <div>
+                <button onclick="buscarHistorias()" class="btn">🔍 Buscar</button>
+              </div>
+            </div>
+            
+            <div id="searchStoryResults">
+              <p class="text-center text-gray-500">Usa el buscador para encontrar historias.</p>
+            </div>
+            
+            <hr class="my-6">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Historias Guardadas</h3>
+            <div id="storyList"></div>
+        
+        
+        
+        </div>
 
-  <input type="text" id="storyTitle" placeholder="Título de la historia" class="form-input mb-4">
-  <div id="storyEditor" style="height: 300px;" class="mb-4 border border-gray-300 rounded-md p-4 bg-white"></div>
-
-  <button class="btn" onclick="guardarHistoria()">Guardar Historia</button>
-  <div id="storyMessage" class="message-box mt-4 hidden"></div>
-
-  <hr class="my-6">
-
-    <h3 class="text-xl font-semibold text-gray-700 mb-4">Buscar Historias</h3>
-<div class="flex flex-col md:flex-row md:items-end gap-4 mb-6">
-  <div class="flex-1">
-    <label for="searchKeyword" class="form-label">Buscar por palabra clave:</label>
-    <input type="text" id="searchKeyword" class="form-input rounded-lg" placeholder="Escribe una palabra del título o contenido">
-  </div>
-  <div>
-    <label for="searchStartDate" class="form-label">Desde:</label>
-    <input type="date" id="searchStartDate" class="form-input">
-  </div>
-  <div>
-    <label for="searchEndDate" class="form-label">Hasta:</label>
-    <input type="date" id="searchEndDate" class="form-input">
-  </div>
-  <div>
-    <button onclick="buscarHistorias()" class="btn">🔍 Buscar</button>
-  </div>
-</div>
-
-<div id="searchStoryResults">
-  <p class="text-center text-gray-500">Usa el buscador para encontrar historias.</p>
-</div>
-
-<hr class="my-6">
-<h3 class="text-xl font-semibold text-gray-700 mb-4">Historias Guardadas</h3>
-<div id="storyList"></div>
-
-
-
-</div>
-
-
+    </div>
 
 
 
@@ -669,10 +669,6 @@
                 
                                                                 <option value="años">Años</option>
                                 
-                               
-                               
-                                
-                
                             </select>
                         </div>
                 
