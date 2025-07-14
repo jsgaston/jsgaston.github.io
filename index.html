@@ -1045,61 +1045,56 @@ function showMainTab(tabName) {
     mainTripsSection.classList.add('hidden');
     mainMenusSection.classList.add('hidden');
     mainProjectsSection.classList.add('hidden');
-    document.getElementById('mainProfileSection').classList.add('hidden'); // <-- ESTA LÍNEA ES NECESARIA
+    document.getElementById('mainProfileSection').classList.add('hidden');
     document.getElementById('mainRadioSection').classList.add('hidden');
-    document.getElementById('mainStoriesSection').classList.add('hidden');
-
+    document.getElementById('mainStoriesSection').class.add('hidden');
+    document.getElementById('mainTimeConverterSection').classList.add('hidden'); // Añade esta línea
 
     // Activar la pestaña correspondiente
     mainTabButtons.forEach(button => button.classList.remove('active'));
 
-            // Mostrar la sección correspondiente
-            if (tabName === 'home') {
-                mainHomeSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="home"]').classList.add('active');
-                loadLatestEntry();
-                loadLatestStory();
-            } else if (tabName === 'diary') {
-                mainDiarySection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="diary"]').classList.add('active');
-                showDiarySubTab('write');
-            } else if (tabName === 'maps') {
-              mainMapsSection.classList.remove('hidden');
-              document.querySelector('[data-main-tab="maps"]').classList.add('active');
-              setTimeout(() => {
-                if (!mapa) iniciarMapa(); else mapa.invalidateSize();
-              }, 300);
-            } else if (tabName === 'trips') {
-                mainTripsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="trips"]').classList.add('active');
-            } else if (tabName === 'menus') {
-                mainMenusSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="menus"]').classList.add('active');
-            } else if (tabName === 'projects') {
-                mainProjectsSection.classList.remove('hidden');
-                document.querySelector('[data-main-tab="projects"]').classList.add('active');
-            }  else if (tabName === 'profile') {
-    document.getElementById('mainProfileSection').classList.remove('hidden');
-    document.querySelector('[data-main-tab="profile"]').classList.add('active');
-            }  else if (tabName === 'radio') {
-    document.getElementById('mainRadioSection').classList.remove('hidden');
-    document.querySelector('[data-main-tab="radio"]').classList.add('active');
-}
-    else if (tabName === 'stories') {
-    document.getElementById('mainStoriesSection').classList.remove('hidden');
-    document.querySelector('[data-main-tab="stories"]').classList.add('active');
-    cargarHistorias(); // opcional: para cargar historias al entrar
-}
-            // En la función showMainTab, añade esta línea para manejar la nueva pestaña:
-else if (tabName === 'time-converter') {
-    document.getElementById('mainTimeConverterSection').classList.remove('hidden');
-    document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
-}
+    // Mostrar la sección correspondiente
+    if (tabName === 'home') {
+        mainHomeSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="home"]').classList.add('active');
+        loadLatestEntry();
+        loadLatestStory();
+    } else if (tabName === 'diary') {
+        mainDiarySection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="diary"]').classList.add('active');
+        showDiarySubTab('write');
+    } else if (tabName === 'maps') {
+        mainMapsSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="maps"]').classList.add('active');
+        setTimeout(() => {
+            if (!mapa) iniciarMapa(); else mapa.invalidateSize();
+        }, 300);
+    } else if (tabName === 'trips') {
+        mainTripsSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="trips"]').classList.add('active');
+    } else if (tabName === 'menus') {
+        mainMenusSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="menus"]').classList.add('active');
+    } else if (tabName === 'projects') {
+        mainProjectsSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="projects"]').classList.add('active');
+    } else if (tabName === 'profile') {
+        document.getElementById('mainProfileSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="profile"]').classList.add('active');
+    } else if (tabName === 'radio') {
+        document.getElementById('mainRadioSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="radio"]').classList.add('active');
+    } else if (tabName === 'stories') {
+        document.getElementById('mainStoriesSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="stories"]').classList.add('active');
+        cargarHistorias();
+    } else if (tabName === 'time-converter') {
+        document.getElementById('mainTimeConverterSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
+    }
 
-
-
-            hideMessage();
-        }
+    hideMessage();
+}
 
         // Event listeners para los botones de las pestañas principales
         mainTabButtons.forEach(button => {
