@@ -1657,65 +1657,50 @@ const audio = document.getElementById('audio');
         console.error('Error:', err);
       });
 
-function renderSongList() {
+function renderSongList(list = songs) {
   songListElement.innerHTML = '';
-  const start = Math.max(currentTrack - 5, 0);
-  const end = Math.min(currentTrack + 6, songs.length);
-
-  for (let i = start; i < end; i++) {
+  list.forEach((song, index) => {
     const li = document.createElement('li');
-    // Cambiar esta línea para mostrar artista y título
-    li.innerHTML = (i === currentTrack ? '🔊 ' : '') + 
-                  (songs[i].artist ? `${songs[i].artist} - ` : '') + 
-                  (songs[i].title || `Canción ${i + 1}`);
-    
-    li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
-
-    if (i === currentTrack) {
-      li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
-    } else {
-      li.classList.add('hover:bg-gray-100');
-    }
-
-    const song = songs[i];
-    li.title = `Artista: ${song.artist}\nÁlbum: ${song.album}\nGénero: ${song.genre}\nAño: ${song.year}\nDuración: ${Math.floor(song.duration / 60)}:${String(song.duration % 60).padStart(2, '0')}`;
-
-    li.onclick = () => playTrack(i);
+    li.textContent = `${song.title} - ${song.artist}`;
+    li.className = 'cursor-pointer hover:underline';
+    li.addEventListener('click', () => {
+      currentSongIndex = index;
+      playTrack(currentSongIndex, list);
+    });
     songListElement.appendChild(li);
-  }
-}
-
-function renderFullSelect() {
-  fullSongSelect.innerHTML = '<option disabled selected>-- Elegir canción --</option>';
-  songs.forEach((song, i) => {
-    const option = document.createElement('option');
-    option.value = i;
-    // Cambiar esta línea para mostrar artista y título
-    option.textContent = (song.artist ? `${song.artist} - ` : '') + (song.title || `Canción ${i + 1}`);
-    fullSongSelect.appendChild(option);
   });
 }
 
-    function playTrack(index) {
-      if (!songs[index]) return;
 
-      currentTrack = index;
-      const song = songs[index];
-      const next = songs[(index + 1) % songs.length];
+function renderFullSelect(list = songs) {
+  const select = document.getElementById("fullSongSelect");
+  select.innerHTML = '<option disabled selected>-- Elegir canción --</option>';
+  list.forEach((song, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = `${song.title} - ${song.artist}`;
+    select.appendChild(option);
+  });
 
-      audio.src = song.url;
-      currentSongSpan.textContent = `${song.title} - ${song.artist} (${song.genre})`;
-      nextSongSpan.textContent = `Siguiente: ${next?.title} - ${next?.artist}`;
+  select.onchange = function () {
+    currentSongIndex = parseInt(this.value);
+    playTrack(currentSongIndex, list);
+  };
+}
 
-      audio.play().catch(err => console.error('Reproducción fallida:', err));
-      audio.onloadedmetadata = () => {
-        const duracion = audio.duration;
-        audio.dataset.duracion = Math.round(duracion);
-      };
 
-      renderSongList();
-      fullSongSelect.selectedIndex = index + 1; // +1 por el placeholder
-    }
+function playTrack(index, list = songs) {
+  const song = list[index];
+  if (!song) return;
+
+  audio.src = song.url;
+  audio.play();
+
+  currentSongSpan.textContent = `${song.title} - ${song.artist}`;
+  const nextIndex = (index + 1) % list.length;
+  nextSongSpan.textContent = `Siguiente: ${list[nextIndex].title} - ${list[nextIndex].artist}`;
+}
+
 
     function prevTrack() {
       currentTrack = (currentTrack - 1 + songs.length) % songs.length;
@@ -1822,33 +1807,55 @@ div.classList.remove('hidden');
 
 
 <script>
+
+function getTrackNumber(filename) {
+  const match = filename.match(/^(\d{1,2})/); // Extrae los dos primeros dígitos
+  return match ? parseInt(match[1]) : 9999;   // Si no hay número, lo manda al final
+}
+
+
+
+    
 // Añade estas funciones al script existente de la radio
 function ordenarPor(criterio) {
-  songs.sort((a, b) => {
-    // Para duración, orden numérico
-    if (criterio === 'duration') {
-      return a.duration - b.duration;
-    }
-    // Para otros campos, orden alfabético
-    const valA = a[criterio] || '';
-    const valB = b[criterio] || '';
-    return valA.toString().localeCompare(valB.toString());
-  });
-  
-  // Si ya estábamos mostrando una canción, mantenemos la selección
-  const currentUrl = songs[currentTrack]?.url;
-  renderSongList();
-  renderFullSelect();
-  
-  // Restauramos la canción actual si existe
-  if (currentUrl) {
-    const newIndex = songs.findIndex(song => song.url === currentUrl);
-    if (newIndex !== -1) {
-      currentTrack = newIndex;
-      playTrack(currentTrack);
-    }
+  if (!songs || songs.length === 0) return;
+
+  if (criterio === 'album') {
+    // Agrupar por álbum
+    const grouped = {};
+    songs.forEach(song => {
+      const album = song.album || 'Sin Álbum';
+      if (!grouped[album]) grouped[album] = [];
+      grouped[album].push(song);
+    });
+
+    // Ordenar primero por nombre de álbum, luego por número de pista (extraído del filename)
+    const ordered = Object.entries(grouped)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .flatMap(([_, albumSongs]) =>
+        albumSongs.sort((a, b) => getTrackNumber(a.filename) - getTrackNumber(b.filename))
+      );
+
+    currentSongIndex = 0;
+    renderSongList(ordered);
+    renderFullSelect(ordered);
+    playTrack(currentSongIndex);
+    return;
   }
+
+  // Otros criterios (artista, título, etc.)
+  songs.sort((a, b) => {
+    const valA = (a[criterio] || '').toLowerCase();
+    const valB = (b[criterio] || '').toLowerCase();
+    return valA.localeCompare(valB);
+  });
+
+  currentSongIndex = 0;
+  renderSongList(songs);
+  renderFullSelect(songs);
+  playTrack(currentSongIndex);
 }
+
 
 function mezclarCanciones() {
   // Mezcla las canciones pero mantiene la actual reproduciéndose
