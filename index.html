@@ -1165,87 +1165,44 @@ function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
 
 
 // Actualiza la función showMainTab para incluir la nueva sección
-function showMainTab(tabId) {
-    // Ocultar todas las secciones de contenido principal
-    const allMainTabContents = document.querySelectorAll('.main-tab-content');
-    allMainTabContents.forEach(content => {
-        content.classList.add('hidden');
-    });
+function showMainTab(tabName) {
+            // Oculta todas las secciones de contenido principal
+            document.querySelectorAll('.main-tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
 
-    // Desactivar todos los botones de pestaña principal
-    const allMainTabButtons = document.querySelectorAll('.main-tab-button');
-    allMainTabButtons.forEach(button => {
-        button.classList.remove('active');
-    });
+            // Desactiva todos los botones de la pestaña principal
+            document.querySelectorAll('.main-tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
 
-    // Mostrar la sección de contenido de la pestaña seleccionada y ejecutar lógica específica
-    let selectedTabContent;
-    switch (tabId) {
-        case 'home':
-            selectedTabContent = mainHomeSection;
-            break;
-        case 'diary':
-            selectedTabContent = mainDiarySection;
-            break;
-        case 'maps':
-            selectedTabContent = mainMapsSection;
-            if (typeof initMap === 'function') {
-                initMap(); // Inicializar el mapa si la función existe
+            // Muestra la sección de contenido de la pestaña seleccionada
+            const selectedSection = document.getElementById(`main${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Section`);
+            if (selectedSection) {
+                selectedSection.classList.remove('hidden');
             }
-            break;
-        case 'trips':
-            selectedTabContent = mainTripsSection;
-            break;
-        case 'menus':
-            selectedTabContent = mainMenusSection;
-            break;
-        case 'projects':
-            selectedTabContent = mainProjectsSection;
-            break;
-        case 'profile':
-            selectedTabContent = mainProfileSection;
-            break;
-        case 'radio':
-            selectedTabContent = mainRadioSection;
-            if (typeof loadAndPlaySong === 'function') {
-                loadAndPlaySong(); // Cargar y reproducir la canción
-            }
-            break;
-        case 'time-converter':
-            selectedTabContent = mainTimeConverterSection;
-            break;
-        case 'stories':
-            selectedTabContent = mainStoriesSection;
-            // Inicializar el editor Quill si no está ya inicializado
-            if (typeof Quill !== 'undefined' && !window.storyQuill) {
-                window.storyQuill = new Quill('#storyEditor', {
-                    theme: 'snow'
-                });
-            }
-            if (typeof cargarHistoriasGuardadas === 'function') {
-                cargarHistoriasGuardadas(); // Cargar las historias
-            }
-            break;
-        case 'date-calculator': // Lógica para la nueva pestaña
-            selectedTabContent = mainDateCalculatorSection;
-            setDateCalculatorInitialValues(); // Establecer los valores iniciales de las fechas
-            break;
-        default:
-            console.warn('Pestaña no reconocida:', tabId);
-            return;
-    }
 
-    if (selectedTabContent) {
-        selectedTabContent.classList.remove('hidden');
-    }
+            // Activa el botón de la pestaña seleccionada
+            const activeButton = document.querySelector(`.main-tab-button[data-main-tab="${tabName}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
 
-    // Activar el botón de la pestaña seleccionada
-    const selectedTabButton = document.querySelector(`.main-tab-button[data-main-tab="${tabId}"]`);
-    if (selectedTabButton) {
-        selectedTabButton.classList.add('active');
-    }
-}
+            // Cargar contenido específico de la pestaña si es necesario
+            if (tabName === 'home') {
+                loadLatestDiaryEntry(); // Carga la última entrada del diario al ir a Inicio
+                loadLatestStory(); // Carga la última historia al ir a Inicio
+            } else if (tabName === 'diary') {
+                // Asegura que la sub-pestaña 'write' esté activa por defecto al ir al diario
+                showDiarySubTab('write');
+            }
+            // Puedes añadir más lógica para otras pestañas aquí
+        }
 
+        // Llama a showMainTab al cargar la página para mostrar la pestaña 'home' por defecto
+        document.addEventListener('DOMContentLoaded', () => {
+            showMainTab('home');
+        });
 // Asegúrate de que el evento click para la nueva pestaña esté inicializado
 mainTabButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -1483,25 +1440,38 @@ function calculateDateDifference() {
         
         // --- Funciones de Sub-navegación del Diario ---
 
-        function showDiarySubTab(subTabName) {
-            // Ocultar todas las sub-secciones
-            diaryWriteEntrySection.classList.add('hidden');
-            diaryViewSearchSection.classList.add('hidden');
+function showDiarySubTab(tabName) {
+            // Oculta todas las secciones de contenido de la sub-pestaña del diario
+            document.querySelectorAll('.diary-sub-tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
 
-            // Desactivar todos los botones de sub-pestaña
-            diarySubTabButtons.forEach(button => button.classList.remove('active'));
+            // Desactiva todos los botones de la sub-pestaña del diario
+            document.querySelectorAll('.diary-sub-tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
 
-            // Mostrar la sub-sección correspondiente
-            if (subTabName === 'write') {
-                diaryWriteEntrySection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
-            } else if (subTabName === 'view') {
-                diaryViewSearchSection.classList.remove('hidden');
-                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
-                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
+            // Muestra la sección de contenido de la sub-pestaña seleccionada
+            const selectedSection = document.getElementById(`diary${tabName.charAt(0).toUpperCase() + tabName.slice(1)}EntrySection`);
+            // Note: I'm assuming 'diaryWriteEntrySection' and 'diaryViewSearchSection'
+            // If your IDs are different, adjust them here.
+            if (tabName === 'write') {
+                document.getElementById('diaryWriteEntrySection').classList.remove('hidden');
+            } else if (tabName === 'view') {
+                document.getElementById('diaryViewSearchSection').classList.remove('hidden');
             }
-            hideMessage();
+            
+            // Activa el botón de la sub-pestaña seleccionada
+            const activeButton = document.querySelector(`.diary-sub-tab-button[data-diary-sub-tab="${tabName}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
         }
+
+        // Asegúrate de que los botones de la sub-pestaña tengan el onclick correcto:
+        // En tu HTML, para los botones de sub-pestaña del diario, asegúrate de que tengan:
+        // <button class="diary-sub-tab-button active" data-diary-sub-tab="write" onclick="showDiarySubTab('write')">Escribir Entrada</button>
+        // <button class="diary-sub-tab-button" data-diary-sub-tab="view" onclick="showDiarySubTab('view')">Ver/Buscar Entradas</button>
 
         // Event listeners para los botones de las sub-pestañas del diario
         diarySubTabButtons.forEach(button => {
