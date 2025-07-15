@@ -275,57 +275,6 @@
 }
 
 
-         /* Añade esto al final de tu sección de estilos */
-  .radio-button.active {
-    background: linear-gradient(to right, #4f46e5, #7c3aed) !important;
-    color: white !important;
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  .filter-button {
-    margin: 4px;
-    padding: 8px 12px;
-    border-radius: 20px;
-    background: #e5e7eb;
-    color: #4b5563;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .filter-button.active {
-    background: #4f46e5;
-    color: white;
-  }
-
-  .active-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .active-filter-tag {
-    background: #4f46e5;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .active-filter-tag button {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-  }
-
-
 
 
         
@@ -582,11 +531,11 @@
 
     <!-- Añade esto en la sección de radio, después del reproductor -->
 <div class="flex flex-wrap gap-3 justify-center mb-6">
-  <button onclick="ordenarPor('artist')" class="radio-button" id="sortArtistBtn">Ordenar por Artista</button>
-  <button onclick="ordenarPor('title')" class="radio-button" id="sortTitleBtn">Ordenar por Título</button>
-  <button onclick="ordenarPor('album')" class="radio-button" id="sortAlbumBtn">Ordenar por Álbum</button>
-  <button onclick="ordenarPor('genre')" class="radio-button" id="sortGenreBtn">Ordenar por Género</button>
-  <button onclick="ordenarPor('duration')" class="radio-button" id="sortDurationBtn">Ordenar por Duración</button>
+  <button onclick="ordenarPor('artist')" class="radio-button">Ordenar por Artista</button>
+  <button onclick="ordenarPor('title')" class="radio-button">Ordenar por Título</button>
+  <button onclick="ordenarPor('album')" class="radio-button">Ordenar por Álbum</button>
+  <button onclick="ordenarPor('genre')" class="radio-button">Ordenar por Género</button>
+  <button onclick="ordenarPor('duration')" class="radio-button">Ordenar por Duración</button>
   <button onclick="mezclarCanciones()" class="radio-button">Mezclar Aleatorio</button>
 </div>
 
@@ -603,8 +552,6 @@
     <option value="">Todos los artistas</option>
   </select>
 </div>
-
-            <div id="activeFiltersContainer" class="active-filters"></div>
 
 
             
@@ -1890,139 +1837,18 @@ function filtrarPorArtista() {
   renderFilteredList(filtered);
 }
 
-// Variables globales para los filtros
-let activeFilters = {
-  genre: null,
-  artist: null,
-  sortBy: null,
-  sortOrder: 'asc'
-};
-
-// Función para aplicar todos los filtros
-function applyFilters() {
-  let filteredSongs = [...songs];
-  
-  // Aplicar filtros de género y artista
-  if (activeFilters.genre) {
-    filteredSongs = filteredSongs.filter(song => song.genre === activeFilters.genre);
-  }
-  
-  if (activeFilters.artist) {
-    filteredSongs = filteredSongs.filter(song => song.artist === activeFilters.artist);
-  }
-  
-  // Aplicar ordenación
-  if (activeFilters.sortBy) {
-    filteredSongs.sort((a, b) => {
-      let valA = a[activeFilters.sortBy] || '';
-      let valB = b[activeFilters.sortBy] || '';
-      
-      // Orden especial para duración
-      if (activeFilters.sortBy === 'duration') {
-        valA = a.duration;
-        valB = b.duration;
-      }
-      
-      if (valA < valB) return activeFilters.sortOrder === 'asc' ? -1 : 1;
-      if (valA > valB) return activeFilters.sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
-  
-  renderFilteredList(filteredSongs);
-  updateActiveFiltersDisplay();
-}
-
-// Función para alternar filtros
-function toggleFilter(type, value) {
-  if (activeFilters[type] === value) {
-    activeFilters[type] = null; // Quitar filtro si ya está activo
-  } else {
-    activeFilters[type] = value; // Aplicar filtro
-  }
-  
-  applyFilters();
-}
-
-// Función para alternar ordenación
-function toggleSort(criteria) {
-  if (activeFilters.sortBy === criteria) {
-    // Cambiar el orden si ya está ordenando por este criterio
-    activeFilters.sortOrder = activeFilters.sortOrder === 'asc' ? 'desc' : 'asc';
-  } else {
-    // Ordenar por nuevo criterio (orden ascendente por defecto)
-    activeFilters.sortBy = criteria;
-    activeFilters.sortOrder = 'asc';
-  }
-  
-  applyFilters();
-}
-
-// Función para actualizar la visualización de filtros activos
-function updateActiveFiltersDisplay() {
-  const container = document.getElementById('activeFiltersContainer');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  // Mostrar filtros activos
-  if (activeFilters.genre) {
-    const tag = document.createElement('div');
-    tag.className = 'active-filter-tag';
-    tag.innerHTML = `Género: ${activeFilters.genre} <button onclick="toggleFilter('genre', '${activeFilters.genre}')">×</button>`;
-    container.appendChild(tag);
-  }
-  
-  if (activeFilters.artist) {
-    const tag = document.createElement('div');
-    tag.className = 'active-filter-tag';
-    tag.innerHTML = `Artista: ${activeFilters.artist} <button onclick="toggleFilter('artist', '${activeFilters.artist}')">×</button>`;
-    container.appendChild(tag);
-  }
-  
-  if (activeFilters.sortBy) {
-    const tag = document.createElement('div');
-    tag.className = 'active-filter-tag';
-    tag.innerHTML = `Orden: ${activeFilters.sortBy} (${activeFilters.sortOrder}) <button onclick="toggleSort('${activeFilters.sortBy}')">×</button>`;
-    container.appendChild(tag);
-  }
-}
-
-// Modificar las funciones existentes para usar el nuevo sistema
-function ordenarPor(criterio) {
-  toggleSort(criterio);
-}
-
-function filtrarPorGenero() {
-  const genero = document.getElementById('filterGenre').value;
-  toggleFilter('genre', genero || null);
-}
-
-function filtrarPorArtista() {
-  const artista = document.getElementById('filterArtist').value;
-  toggleFilter('artist', artista || null);
-}
-
-// Actualizar la función renderFilteredList para mantener la canción actual
 function renderFilteredList(filteredSongs) {
   songListElement.innerHTML = '';
   
-  const currentUrl = songs[currentTrack]?.url;
-  let newCurrentIndex = 0;
-  
   filteredSongs.forEach((song, i) => {
-    if (song.url === currentUrl) {
-      newCurrentIndex = i;
-    }
-    
     const li = document.createElement('li');
-    li.innerHTML = (song.url === currentUrl ? '🔊 ' : '') + 
+    li.innerHTML = (songs[currentTrack]?.url === song.url ? '🔊 ' : '') + 
                   (song.artist ? `${song.artist} - ` : '') + 
                   (song.title || `Canción ${i + 1}`);
     
     li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
     
-    if (song.url === currentUrl) {
+    if (songs[currentTrack]?.url === song.url) {
       li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
     } else {
       li.classList.add('hover:bg-gray-100');
@@ -2038,15 +1864,6 @@ function renderFilteredList(filteredSongs) {
     };
     songListElement.appendChild(li);
   });
-  
-  // Actualizar el índice actual si la canción actual está en la lista filtrada
-  if (filteredSongs.some(song => song.url === currentUrl)) {
-    currentTrack = newCurrentIndex;
-  }
-  
-  // Actualizar los selects para que muestren solo las canciones filtradas
-  renderFullSelect(filteredSongs);
-}
 }
 
 
