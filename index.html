@@ -1642,7 +1642,7 @@ const audio = document.getElementById('audio');
     let songs = [];
     let currentTrack = 0;
     let isShuffling = false;
-    let repeatMode = 'off'; // 'off', 'one', 'all'
+    let repeatMode = 0; // 'off', 'one', 'all'
 
     fetch('music_list.json')
       .then(res => res.json())
@@ -1722,24 +1722,65 @@ function renderFullSelect() {
       playTrack(currentTrack);
     }
 
-    function nextTrack() {
-      if (repeatMode === 'one') {
-        playTrack(currentTrack);
-      } else if (isShuffling) {
-        let next;
-        do {
-          next = Math.floor(Math.random() * songs.length);
-        } while (songs.length > 1 && next === currentTrack);
-        playTrack(next);
-      } else {
-        if (currentTrack + 1 < songs.length) {
-          playTrack(currentTrack + 1);
-        } else if (repeatMode === 'all') {
-          playTrack(0);
+
+
+
+
+    
+// Modifica tu función nextTrack() existente
+function nextTrack() {
+    let nextIndex = currentTrackIndex;
+
+    if (repeatMode === 2) { // Repetir canción actual
+        if (audio) {
+            audio.currentTime = 0; // Reinicia la canción
+            audio.play();
         }
-      }
+        return; // No avanza al siguiente índice
     }
 
+    if (repeatMode === 3) { // Repetir álbum
+        const currentAlbum = songs[currentTrackIndex].album;
+        const songsInCurrentAlbum = songs.filter(song => song.album === currentAlbum);
+
+        // Encuentra el índice de la canción actual dentro del array filtrado del álbum
+        const currentIndexInAlbum = songsInCurrentAlbum.findIndex(song =>
+            song.title === songs[currentTrackIndex].title && // Asume que título y artista juntos son únicos
+            song.artist === songs[currentTrackIndex].artist
+        );
+
+        if (currentIndexInAlbum !== -1 && currentIndexInAlbum < songsInCurrentAlbum.length - 1) {
+            // Si no es la última canción del álbum, ve a la siguiente canción del álbum
+            const nextSongInAlbum = songsInCurrentAlbum[currentIndexInAlbum + 1];
+            nextIndex = songs.indexOf(nextSongInAlbum);
+        } else {
+            // Si es la última canción del álbum o no se encontró, vuelve a la primera canción del álbum
+            const firstSongInAlbum = songsInCurrentAlbum[0];
+            nextIndex = songs.indexOf(firstSongInAlbum);
+        }
+    } else { // Sin repetición o Repetir todo
+        nextIndex = (currentTrackIndex + 1) % songs.length;
+
+        // Si no hay repetición y llegamos al final de la lista, detenemos la reproducción
+        if (repeatMode === 0 && nextIndex === 0 && currentTrackIndex === songs.length - 1) {
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            return;
+        }
+    }
+
+    // Actualiza el índice de la canción actual y carga la nueva canción
+    currentTrackIndex = nextIndex;
+    if (loadTrack) {
+        loadTrack(currentTrackIndex);
+    }
+}
+
+
+
+    
     audio.addEventListener('ended', nextTrack);
 
     fullSongSelect.addEventListener('change', (e) => {
@@ -1768,23 +1809,34 @@ document.addEventListener('DOMContentLoaded', () => {
   shuffleBtn.innerHTML = '🔀 Shuffle OFF';
 });
 
-    function toggleRepeat() {
-      const btn = document.getElementById('repeatBtn');
-      if (repeatMode === 'off') {
-        repeatMode = 'all';
-        btn.innerText = '🔁 Repeat All';
-        btn.classList.replace('bg-gray-300', 'bg-indigo-500');
-        btn.classList.replace('text-gray-800', 'text-white');
-      } else if (repeatMode === 'all') {
-        repeatMode = 'one';
-        btn.innerText = '🔂 Repeat One';
-      } else {
-        repeatMode = 'off';
-        btn.innerText = '❌ Repeat Off';
-        btn.classList.replace('bg-indigo-500', 'bg-gray-300');
-        btn.classList.replace('text-white', 'text-gray-800');
-      }
+    // Encuentra el botón de repetición por su ID (asegúrate de que este ID exista en tu HTML)
+const repeatBtn = document.getElementById('repeatBtn');
+
+// Modifica tu función toggleRepeat() existente
+function toggleRepeat() {
+    repeatMode = (repeatMode + 1) % 4; // Cicla entre 0, 1, 2, 3
+
+    if (repeatMode === 0) {
+        repeatBtn.textContent = '🔁 Repetir'; // O puedes usar un ícono, como 'No Loop'
+        repeatBtn.classList.remove('active');
+        if (audio) audio.loop = false; // Desactiva el loop nativo del audio
+    } else if (repeatMode === 1) {
+        repeatBtn.textContent = '🔁 Repetir Todo'; // Ícono para Repetir Todo
+        repeatBtn.classList.add('active');
+        if (audio) audio.loop = false; // El loop completo se maneja en nextTrack
+    } else if (repeatMode === 2) {
+        repeatBtn.textContent = '🔂 Repetir Una'; // Ícono para Repetir Una Canción
+        repeatBtn.classList.add('active');
+        if (audio) audio.loop = true; // Activa el loop nativo del audio para una canción
+    } else if (repeatMode === 3) {
+        repeatBtn.textContent = '💿 Repetir Álbum'; // Nuevo ícono para Repetir Álbum
+        repeatBtn.classList.add('active');
+        if (audio) audio.loop = false; // El loop del álbum se maneja en nextTrack
     }
+    // Asegúrate de que toggleActiveClass es una función que maneja la clase 'active' para el botón
+    // Si no tienes esta función, puedes simplificarlo a solo agregar/quitar 'active' directamente.
+    // Ejemplo: repeatBtn.classList.toggle('active', repeatMode !== 0);
+}
 
 
     
