@@ -1662,8 +1662,8 @@ function renderSongList(list = songs) {
   list.forEach((song, index) => {
     const li = document.createElement('li');
 
-    const isPlaying = index === currentSongIndex;
-    li.textContent = `${isPlaying ? '🔊 ' : ''}${song.title} - ${song.artist}`;
+    const isPlaying = song.url === audio.src;
+    li.innerHTML = `${isPlaying ? '🔊 ' : ''}${song.title} - ${song.artist}`;
     li.className = 'cursor-pointer hover:underline';
 
     if (isPlaying) {
@@ -1673,13 +1673,13 @@ function renderSongList(list = songs) {
 
     li.addEventListener('click', () => {
       currentSongIndex = index;
-      playTrack(currentSongIndex, list);
-      renderSongList(list); // actualiza el icono activo
+      playTrack(index, list);
     });
 
     songListElement.appendChild(li);
   });
 }
+
 
 
 
@@ -1700,6 +1700,8 @@ function renderFullSelect(list = songs) {
 }
 
 
+
+    
 function playTrack(index, list = songs) {
   const song = list[index];
   if (!song) return;
@@ -1712,8 +1714,11 @@ function playTrack(index, list = songs) {
   nextSongSpan.textContent = `Siguiente: ${list[nextIndex].title} - ${list[nextIndex].artist}`;
 
   currentSongIndex = index;
-  renderSongList(list); // actualiza iconos al cambiar canción
+
+  renderSongList(list);
+  renderFullSelect(list);
 }
+
 
 
 
@@ -1723,22 +1728,12 @@ function playTrack(index, list = songs) {
       playTrack(currentTrack);
     }
 
-    function nextTrack() {
-      if (repeatMode === 'one') {
-        playTrack(currentTrack);
-      } else if (isShuffling) {
-        let next;
-        do {
-          next = Math.floor(Math.random() * songs.length);
-        } while (songs.length > 1 && next === currentTrack);
-        playTrack(next);
-      } else {
-        if (currentTrack + 1 < songs.length) {
-          playTrack(currentTrack + 1);
-        } else if (repeatMode === 'all') {
-          playTrack(0);
-        }
-      }
+function nextTrack() {
+  const list = songs;
+  currentSongIndex = (currentSongIndex + 1) % list.length;
+  playTrack(currentSongIndex, list);
+}
+
     }
 
     audio.addEventListener('ended', nextTrack);
