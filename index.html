@@ -318,8 +318,6 @@
           <button class="main-tab-button" data-main-tab="radio">Radio</button>
             <button class="main-tab-button" data-main-tab="time-converter">Conversor de Tiempo</button>
             <button class="main-tab-button" data-main-tab="stories">Stories</button>
-            <button class="main-tab-button" data-main-tab="date-calculator">Calculadora de Fechas</button>
-
             
 
         </nav>
@@ -758,35 +756,6 @@
 
 
 
-
-
-        <div id="mainDateCalculatorSection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Calculadora de Diferencia de Fechas</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label for="date1" class="form-label mb-2">Fecha de Inicio:</label>
-                    <input type="date" id="date1" class="form-input rounded-lg">
-                </div>
-                <div>
-                    <label for="date2" class="form-label mb-2">Fecha Fin (Fecha Actual por defecto):</label>
-                    <input type="date" id="date2" class="form-input rounded-lg">
-                </div>
-            </div>
-            
-            <button onclick="calculateDateDifference()" class="btn w-full mb-6">Calcular Diferencia</button>
-            
-            <div id="dateDifferenceResults" class="bg-gray-50 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold mb-2">Resultados:</h3>
-                <div id="resultsContent" class="text-gray-700 space-y-2">
-                    </div>
-            </div>
-        </div>
-
-
-
-
-
       
 
                     
@@ -804,8 +773,6 @@
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykJTypKfvu-NyjwspsAGIxjYqEz0vGfBq-Si5wx4HFgG-5wEIXRD4159yIOVuaVHw8cg/exec'; 
 
         // Elementos del DOM para la navegación principal
-
-        // Asegúrate de que estas constantes estén declaradas una sola vez en tu script
         const mainTabButtons = document.querySelectorAll('.main-tab-button');
         const mainHomeSection = document.getElementById('mainHomeSection');
         const mainDiarySection = document.getElementById('mainDiarySection');
@@ -813,12 +780,6 @@
         const mainTripsSection = document.getElementById('mainTripsSection');
         const mainMenusSection = document.getElementById('mainMenusSection');
         const mainProjectsSection = document.getElementById('mainProjectsSection');
-        const mainProfileSection = document.getElementById('mainProfileSection');
-        const mainRadioSection = document.getElementById('mainRadioSection');
-        const mainTimeConverterSection = document.getElementById('mainTimeConverterSection');
-        const mainStoriesSection = document.getElementById('mainStoriesSection');
-        const mainDateCalculatorSection = document.getElementById('mainDateCalculatorSection'); // Nueva sección
-
 
         // Elementos del DOM para la sub-navegación del Diario
         const diarySubTabButtons = document.querySelectorAll('.diary-sub-tab-button');
@@ -1162,316 +1123,94 @@ function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
 
         // --- Funciones de Navegación Principal ---
 
-
-
-// Actualiza la función showMainTab para incluir la nueva sección
 function showMainTab(tabName) {
-            // Oculta todas las secciones de contenido principal
-            document.querySelectorAll('.main-tab-content').forEach(section => {
-                section.classList.add('hidden');
+    // Ocultar todas las secciones
+    mainHomeSection.classList.add('hidden');
+    mainDiarySection.classList.add('hidden');
+    mainMapsSection.classList.add('hidden');
+    mainTripsSection.classList.add('hidden');
+    mainMenusSection.classList.add('hidden');
+    mainProjectsSection.classList.add('hidden');
+    document.getElementById('mainProfileSection').classList.add('hidden');
+    document.getElementById('mainRadioSection').classList.add('hidden');
+    document.getElementById('mainStoriesSection').classList.add('hidden');
+    document.getElementById('mainTimeConverterSection').classList.add('hidden'); // Añade esta línea
+
+    // Activar la pestaña correspondiente
+    mainTabButtons.forEach(button => button.classList.remove('active'));
+
+    // Mostrar la sección correspondiente
+    if (tabName === 'home') {
+        mainHomeSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="home"]').classList.add('active');
+        loadLatestEntry();
+        loadLatestStory();
+    } else if (tabName === 'diary') {
+        mainDiarySection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="diary"]').classList.add('active');
+        showDiarySubTab('write');
+    } else if (tabName === 'maps') {
+        mainMapsSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="maps"]').classList.add('active');
+        setTimeout(() => {
+            if (!mapa) iniciarMapa(); else mapa.invalidateSize();
+        }, 300);
+    } else if (tabName === 'trips') {
+        mainTripsSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="trips"]').classList.add('active');
+    } else if (tabName === 'menus') {
+        mainMenusSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="menus"]').classList.add('active');
+    } else if (tabName === 'projects') {
+        mainProjectsSection.classList.remove('hidden');
+        document.querySelector('[data-main-tab="projects"]').classList.add('active');
+    } else if (tabName === 'profile') {
+        document.getElementById('mainProfileSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="profile"]').classList.add('active');
+    } else if (tabName === 'radio') {
+        document.getElementById('mainRadioSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="radio"]').classList.add('active');
+    } else if (tabName === 'stories') {
+        document.getElementById('mainStoriesSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="stories"]').classList.add('active');
+        cargarHistorias();
+    } else if (tabName === 'time-converter') {
+        document.getElementById('mainTimeConverterSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
+    }
+
+    hideMessage();
+}
+
+        // Event listeners para los botones de las pestañas principales
+        mainTabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showMainTab(button.dataset.mainTab);
             });
-
-            // Desactiva todos los botones de la pestaña principal
-            document.querySelectorAll('.main-tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-
-            // Muestra la sección de contenido de la pestaña seleccionada
-            const selectedSection = document.getElementById(`main${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Section`);
-            if (selectedSection) {
-                selectedSection.classList.remove('hidden');
-            }
-
-            // Activa el botón de la pestaña seleccionada
-            const activeButton = document.querySelector(`.main-tab-button[data-main-tab="${tabName}"]`);
-            if (activeButton) {
-                activeButton.classList.add('active');
-            }
-
-            // Cargar contenido específico de la pestaña si es necesario
-            if (tabName === 'home') {
-                loadLatestDiaryEntry(); // Carga la última entrada del diario al ir a Inicio
-                loadLatestStory(); // Carga la última historia al ir a Inicio
-            } else if (tabName === 'diary') {
-                // Asegura que la sub-pestaña 'write' esté activa por defecto al ir al diario
-                showDiarySubTab('write');
-            }
-            // Puedes añadir más lógica para otras pestañas aquí
-        }
-
-        // Llama a showMainTab al cargar la página para mostrar la pestaña 'home' por defecto
-        document.addEventListener('DOMContentLoaded', () => {
-            showMainTab('home');
         });
-// Asegúrate de que el evento click para la nueva pestaña esté inicializado
-mainTabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        showMainTab(button.dataset.mainTab);
-    });
-});
 
-
-
-
-
-        
-
-// Calcular y mostrar resultados
-    let resultsHtml = `
-        <p><strong>Diferencia en Días:</strong> ${days.toFixed(2)} días</p>
-        <p><strong>Diferencia en Años:</strong> ${(days * conversionRates.dias.años).toFixed(2)} años</p>
-        <p><strong>Diferencia en Horas:</strong> ${(days * conversionRates.dias.horas).toFixed(2)} horas</p>
-        <p><strong>Diferencia en Minutos:</strong> ${(days * conversionRates.dias.minutos).toFixed(2)} minutos</p>
-        <p><strong>Diferencia en Segundos:</strong> ${(days * conversionRates.dias.segundos).toFixed(2)} segundos</p>
-        <p><strong>Diferencia en Tiradas:</strong> ${(days * conversionRates.dias.tiradas).toFixed(2)} tiradas</p>
-        <p><strong>Diferencia en Soles:</strong> ${(days * conversionRates.dias.soles).toFixed(2)} soles</p>
-        <p><strong>Diferencia en Porciones Grandes del Sol:</strong> ${(days * conversionRates.dias.Porciones_grandes_del_sol).toFixed(2)} : (Porciones grandes del sol)</p>
-        <p><strong>Diferencia en Porciones Medianas del Sol:</strong> ${(days * conversionRates.dias.Porciones_medianas_del_sol).toFixed(2)} :- (Porciones medianas del sol)</p>
-        <p><strong>Diferencia en Porciones Pequeñas del Sol:</strong> ${(days * conversionRates.dias.Porciones_pequeñas_del_sol).toFixed(2)} :-_ (Porciones pequeñas del sol)</p>
-    `;
-
-    resultsContent.innerHTML = resultsHtml;
-}
-
-    
-
-
-
-
-
-        // Función para establecer los valores iniciales de las fechas en la calculadora
-function setDateCalculatorInitialValues() {
-    const date1Input = document.getElementById('date1');
-    const date2Input = document.getElementById('date2');
-
-    // Establecer 6 de diciembre de 1982
-    date1Input.value = '1982-12-06';
-
-    // Establecer la fecha actual
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = (today.getMonth() + 1).toString().padStart(2, '0');
-    const day = today.getDate().toString().padStart(2, '0');
-    date2Input.value = `${year}-${month}-${day}`;
-}
-
-// Función para calcular la diferencia entre dos fechas y convertirla
-function calculateDateDifference() {
-    const date1Input = document.getElementById('date1');
-    const date2Input = document.getElementById('date2');
-    const resultsContent = document.getElementById('resultsContent');
-
-    const date1 = new Date(date1Input.value);
-    const date2 = new Date(date2Input.value);
-
-    if (isNaN(date1.getTime()) || isNaN(date2.getTime())) {
-        resultsContent.innerHTML = '<p class="text-red-600">Por favor, ingresa fechas válidas.</p>';
-        return;
-    }
-
-    // Calcular la diferencia en milisegundos
-    const timeDiffMs = Math.abs(date2.getTime() - date1.getTime());
-
-    // Convertir a días (base para otras unidades)
-    const days = timeDiffMs / (1000 * 60 * 60 * 24);
-
-    // Calcular y mostrar resultados usando las tasas de conversión desde 'dias'
-    let resultsHtml = `
-        <p><strong>Diferencia en Días:</strong> ${days.toFixed(2)} días</p>
-        <p><strong>Diferencia en Años:</strong> ${(days * conversionRates.dias.años).toFixed(2)} años</p>
-        <p><strong>Diferencia en Horas:</strong> ${(days * conversionRates.dias.horas).toFixed(2)} horas</p>
-        <p><strong>Diferencia en Minutos:</strong> ${(days * conversionRates.dias.minutos).toFixed(2)} minutos</p>
-        <p><strong>Diferencia en Segundos:</strong> ${(days * conversionRates.dias.segundos).toFixed(2)} segundos</p>
-        <p><strong>Diferencia en Tiradas:</strong> ${(days * conversionRates.dias.tiradas).toFixed(2)} tiradas</p>
-        <p><strong>Diferencia en Soles:</strong> ${(days * conversionRates.dias.soles).toFixed(2)} soles</p>
-        <p><strong>Diferencia en Porciones Grandes del Sol:</strong> ${(days * conversionRates.dias.Porciones_grandes_del_sol).toFixed(2)} : (Porciones grandes del sol)</p>
-        <p><strong>Diferencia en Porciones Medianas del Sol:</strong> ${(days * conversionRates.dias.Porciones_medianas_del_sol).toFixed(2)} :- (Porciones medianas del sol)</p>
-        <p><strong>Diferencia en Porciones Pequeñas del Sol:</strong> ${(days * conversionRates.dias.Porciones_pequeñas_del_sol).toFixed(2)} :-_ (Porciones pequeñas del sol)</p>
-    `;
-
-    resultsContent.innerHTML = resultsHtml;
-}
-
-// Añadir event listeners a los botones de navegación principal
-document.addEventListener('DOMContentLoaded', () => {
-    mainTabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabId = button.dataset.mainTab;
-            showMainTab(tabId);
-        });
-    });
-
-    // Mostrar la pestaña "Inicio" por defecto al cargar la página
-    showMainTab('home');
-});
-
-
-
-
-
-        
-
-
-// Función para calcular la diferencia entre dos fechas y convertirla
-function calculateDateDifference() {
-    const date1Input = document.getElementById('date1');
-    const date2Input = document.getElementById('date2');
-    const resultsContent = document.getElementById('resultsContent');
-
-    const date1 = new Date(date1Input.value);
-    const date2 = new Date(date2Input.value);
-
-    if (isNaN(date1.getTime()) || isNaN(date2.getTime())) {
-        resultsContent.innerHTML = '<p class="text-red-600">Por favor, ingresa fechas válidas.</p>';
-        return;
-    }
-
-    // Calcular la diferencia en milisegundos
-    const timeDiffMs = Math.abs(date2.getTime() - date1.getTime());
-
-    // Convertir a días (base para otras unidades)
-    const days = timeDiffMs / (1000 * 60 * 60 * 24);
-
-    // Obtener las tasas de conversión existentes (asegúrate de que estas estén definidas en tu script principal)
-    // Se asume que 'conversionRates' es una variable global o accesible.
-    const conversionRates = {
-    tiradas: {
-        segundos: 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        años: 1.7 / (86400 * 365.25),
-        dias: 1.7 / (60 * 60 * 24),
-        horas: 1.7 / (60 * 60),
-        minutos: 1.7 / (60),
-        soles: (60 * 60 * 24) / 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        Porciones_grandes_del_sol: (60 * 24) / 1.7,
-        Porciones_medianas_del_sol: (60) / 1.7,
-        Porciones_pequeñas_del_sol: 1 / 1.7
-    },
-    segundos: {
-        tiradas: 1 / 1.7,
-        años: 1 / (86400 * 365.25),
-        dias: 1 / (60 * 60 * 24),
-        horas: 1 / (60 * 60),
-        minutos: 1 / (60),
-        soles: 1.7 / (60 * 60 * 24), // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        Porciones_grandes_del_sol: 1.7 / (60 * 24),
-        Porciones_medianas_del_sol: 1.7 / 60,
-        Porciones_pequeñas_del_sol: 1.7
-    },
-    dias: {
-        tiradas: (24 * 60 * 60) / 1.7, // Segundos en un día / segundos por tirada
-        años: 1 / 365.25,
-        horas: 24,
-        minutos: 24 * 60,
-        segundos: 24 * 60 * 60,
-        soles: 1, // 1 sol = 1 día
-        Porciones_grandes_del_sol: 20, // 1 día (sol) = 20 Porciones grandes
-        Porciones_medianas_del_sol: 20 * 100, // 1 Porción grande = 100 Porciones medianas
-        Porciones_pequeñas_del_sol: 20 * 100 * 100 // 1 Porción mediana = 100 Porciones pequeñas
-    },
-    horas: {
-        tiradas: 1 * 60 * 60 / 1.7,
-        años: 1 * 60 * 60 / (86400 * 365.25),
-        dias: 1 * 60 * 60 / (60 * 60 * 24),
-        horas: 1, // Corregido: horas a horas es 1
-        minutos: 60,
-        soles: 1.7 * 60 * 60 / (60 * 60 * 24), // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        Porciones_grandes_del_sol: 1.7 * 60 * 60 / (60 * 24),
-        Porciones_medianas_del_sol: 1.7 * 60 * 60 / 60,
-        Porciones_pequeñas_del_sol: 1.7 * 60 * 60
-    },
-    minutos: {
-        tiradas: 1 * 60 / 1.7,
-        años: 1 * 60 / (86400 * 365.25),
-        dias: 1 * 60 / (60 * 60 * 24),
-        horas: 1 / 60, // Corregido: minutos a horas es 1/60
-        minutos: 1,
-        soles: 1.7 * 60 / (60 * 60 * 24), // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        Porciones_grandes_del_sol: 1.7 * 60 / (60 * 24),
-        Porciones_medianas_del_sol: 1.7 * 60 / 60,
-        Porciones_pequeñas_del_sol: 1.7 * 60
-    },
-    soles: {
-        segundos: 1.7 * 60 * 60 * 24, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        años: 1 / 365.25, // 1 sol = 1 día, 1 día = 1/365.25 años
-        dias: 1,
-        horas: 24, // 1 sol = 24 horas
-        minutos: 24 * 60, // 1 sol = 1440 minutos
-        soles: 1, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        Porciones_grandes_del_sol: 20,
-        Porciones_medianas_del_sol: 20 * 100,
-        Porciones_pequeñas_del_sol: 20 * 100 * 100
-    },
-    Porciones_grandes_del_sol: {
-        tiradas: (1 / 20) * (24 * 60 * 60) / 1.7, // (1/20) días en segundos / 1.7 segundos por tirada
-        años: (1 / 20) / 365.25, // 1/20 días en años
-        dias: 1 / 20,
-        horas: (1 / 20) * 24,
-        minutos: (1 / 20) * 24 * 60,
-        soles: 1 / 20, // 1 Porción grande = 1/20 Soles
-        Porciones_grandes_del_sol: 1,
-        Porciones_medianas_del_sol: 100,
-        Porciones_pequeñas_del_sol: 100 * 100
-    },
-    Porciones_medianas_del_sol: {
-        tiradas: (1 / 2000) * (24 * 60 * 60) / 1.7, // (1/2000) días en segundos / 1.7 segundos por tirada
-        años: (1 / 2000) / 365.25,
-        dias: 1 / 2000,
-        horas: (1 / 2000) * 24,
-        minutos: (1 / 2000) * 24 * 60,
-        soles: 1 / (20 * 100), // 1 Porción mediana = 1/100 Porción grande = 1/(20*100) Soles
-        Porciones_grandes_del_sol: 1 / 100,
-        Porciones_medianas_del_sol: 1,
-        Porciones_pequeñas_del_sol: 100
-    },
-    Porciones_pequeñas_del_sol: {
-        tiradas: (1 / 200000) * (24 * 60 * 60) / 1.7, // (1/200000) días en segundos / 1.7 segundos por tirada
-        años: (1 / 200000) / 365.25,
-        dias: 1 / 200000,
-        horas: (1 / 200000) * 24,
-        minutos: (1 / 200000) * 24 * 60,
-        soles: 1 / (20 * 100 * 100), // 1 Porción pequeña = 1/100 Porción mediana = 1/(20*100*100) Soles
-        Porciones_grandes_del_sol: 1 / (100 * 100),
-        Porciones_medianas_del_sol: 1 / 100,
-        Porciones_pequeñas_del_sol: 1
-    }
-};
-
-    
         
         // --- Funciones de Sub-navegación del Diario ---
 
-function showDiarySubTab(tabName) {
-            // Oculta todas las secciones de contenido de la sub-pestaña del diario
-            document.querySelectorAll('.diary-sub-tab-content').forEach(section => {
-                section.classList.add('hidden');
-            });
+        function showDiarySubTab(subTabName) {
+            // Ocultar todas las sub-secciones
+            diaryWriteEntrySection.classList.add('hidden');
+            diaryViewSearchSection.classList.add('hidden');
 
-            // Desactiva todos los botones de la sub-pestaña del diario
-            document.querySelectorAll('.diary-sub-tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
+            // Desactivar todos los botones de sub-pestaña
+            diarySubTabButtons.forEach(button => button.classList.remove('active'));
 
-            // Muestra la sección de contenido de la sub-pestaña seleccionada
-            const selectedSection = document.getElementById(`diary${tabName.charAt(0).toUpperCase() + tabName.slice(1)}EntrySection`);
-            // Note: I'm assuming 'diaryWriteEntrySection' and 'diaryViewSearchSection'
-            // If your IDs are different, adjust them here.
-            if (tabName === 'write') {
-                document.getElementById('diaryWriteEntrySection').classList.remove('hidden');
-            } else if (tabName === 'view') {
-                document.getElementById('diaryViewSearchSection').classList.remove('hidden');
+            // Mostrar la sub-sección correspondiente
+            if (subTabName === 'write') {
+                diaryWriteEntrySection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="write"]').classList.add('active');
+            } else if (subTabName === 'view') {
+                diaryViewSearchSection.classList.remove('hidden');
+                document.querySelector('[data-diary-sub-tab="view"]').classList.add('active');
+                searchResultsDiv.innerHTML = '<p class="text-center text-gray-500">Usa el filtro de fechas para buscar entradas.</p>';
             }
-            
-            // Activa el botón de la sub-pestaña seleccionada
-            const activeButton = document.querySelector(`.diary-sub-tab-button[data-diary-sub-tab="${tabName}"]`);
-            if (activeButton) {
-                activeButton.classList.add('active');
-            }
+            hideMessage();
         }
-
-        // Asegúrate de que los botones de la sub-pestaña tengan el onclick correcto:
-        // En tu HTML, para los botones de sub-pestaña del diario, asegúrate de que tengan:
-        // <button class="diary-sub-tab-button active" data-diary-sub-tab="write" onclick="showDiarySubTab('write')">Escribir Entrada</button>
-        // <button class="diary-sub-tab-button" data-diary-sub-tab="view" onclick="showDiarySubTab('view')">Ver/Buscar Entradas</button>
 
         // Event listeners para los botones de las sub-pestañas del diario
         diarySubTabButtons.forEach(button => {
