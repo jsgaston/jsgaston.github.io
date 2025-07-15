@@ -1633,16 +1633,41 @@ fetch('music_list.json')
     </script>
 
 <script>
-const audio = document.getElementById('audio');
-    const songListElement = document.getElementById('songList');
-    const currentSongSpan = document.getElementById('currentSong');
-    const nextSongSpan = document.getElementById('nextSong');
-    const fullSongSelect = document.getElementById('fullSongSelect');
+Mil disculpas por el error. Asumí que la función initRadio() existía basándome en un patrón común para inicializar reproductores de audio. Si no tienes esa función, entonces la lógica de inicialización para filteredSongs debe estar en otro lugar, o no se está realizando explícitamente.
 
-    let songs = [];
-    let currentTrack = 0;
-    let isShuffling = false;
-    let repeatMode = 'off'; // 'off', 'one', 'all'
+Dado que no tienes initRadio(), la línea filteredSongs = [...songs]; y currentIndex = -1; debería colocarse justo después de la declaración de las variables globales de la radio, o en el primer punto donde sabes que las canciones se cargan y están disponibles.
+
+Aquí está el código corregido, eliminando la referencia a initRadio() y asegurando que filteredSongs se inicialice correctamente al principio del script de la radio:
+
+JavaScript
+
+<script>
+    // ... (Mantén tu código existente hasta aquí) ...
+
+    // Radio
+    const audio = document.getElementById('audio');
+    const currentSongElement = document.getElementById('currentSong');
+    const nextSongElement = document.getElementById('nextSong');
+    const songListElement = document.getElementById('songList');
+    const filterGenreSelect = document.getElementById('filterGenre');
+    const filterArtistSelect = document.getElementById('filterArtist');
+    const fullSongSelect = document.getElementById('fullSongSelect');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const repeatBtn = document.getElementById('repeatBtn');
+
+    let songs = []; // Array para guardar todas las canciones
+    let filteredSongs = []; // Array para guardar canciones filtradas/ordenadas/mezcladas
+    let currentIndex = -1; // Índice de la canción actual en filteredSongs
+    let isShuffle = false;
+    let isRepeat = false;
+
+    // *** INICIALIZACIÓN DE filteredSongs Y currentIndex AQUÍ ***
+    // Esto se ejecutará tan pronto como el script se cargue
+    // Asegúrate de que 'songs' esté poblado antes de que se ejecute esta parte si no lo está.
+    // Si 'songs' se carga asíncronamente (por ejemplo, desde una API), esta inicialización
+    // deberá moverse al callback de carga de esas canciones.
+    filteredSongs = [...songs]; // Inicializa filteredSongs con todas las canciones al principio
+    currentIndex = -1; // No hay canción sonando al inicio
 
     fetch('music_list.json')
       .then(res => res.json())
@@ -1702,35 +1727,113 @@ function playTrack(index, list = songs) {
 }
 
 
-    function prevTrack() {
-      currentTrack = (currentTrack - 1 + songs.length) % songs.length;
-      playTrack(currentTrack);
+    function loadSong(song) {
+        audio.src = song.url;
+        currentSongElement.textContent = `${song.title} - ${song.artist}`;
+        updateNextSongDisplay();
+        populateFullSongSelect(); // Actualizar el selector de canciones completas
     }
+
+    function playSong(index) {
+        if (index >= 0 && index < filteredSongs.length) {
+            currentIndex = index;
+            loadSong(filteredSongs[currentIndex]);
+            audio.play();
+            updateSongListHighlight();
+            updateControlButtonsState(); // Actualizar el estado de los botones
+        } else {
+            // Si el índice está fuera de los límites, detener la reproducción y reiniciar
+            audio.pause();
+            audio.src = ''; // Limpiar la fuente
+            currentSongElement.textContent = '---';
+            nextSongElement.textContent = 'Siguiente: ---';
+            currentIndex = -1; // Reiniciar índice
+            updateSongListHighlight();
+            console.log("No hay más canciones en la lista actual.");
+        }
+    }
+
 
     function nextTrack() {
-      if (repeatMode === 'one') {
-        playTrack(currentTrack);
-      } else if (isShuffling) {
-        let next;
-        do {
-          next = Math.floor(Math.random() * songs.length);
-        } while (songs.length > 1 && next === currentTrack);
-        playTrack(next);
-      } else {
-        if (currentTrack + 1 < songs.length) {
-          playTrack(currentTrack + 1);
-        } else if (repeatMode === 'all') {
-          playTrack(0);
+        if (filteredSongs.length === 0) return;
+
+        if (isRepeat) {
+            playSong(currentIndex); // Repetir la canción actual
+        } else if (isShuffle) {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * filteredSongs.length);
+            } while (newIndex === currentIndex && filteredSongs.length > 1); // Evitar la misma canción si hay más de 1
+            playSong(newIndex);
+        } else {
+            currentIndex = (currentIndex + 1) % filteredSongs.length;
+            playSong(currentIndex);
         }
-      }
     }
 
-    audio.addEventListener('ended', nextTrack);
+    function prevTrack() {
+        if (filteredSongs.length === 0) return;
 
-    fullSongSelect.addEventListener('change', (e) => {
-      const index = parseInt(e.target.value);
-      if (!isNaN(index)) playTrack(index);
-    });
+        if (isRepeat) {
+            playSong(currentIndex); // Repetir la canción actual
+        } else if (isShuffle) {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * filteredSongs.length);
+            } while (newIndex === currentIndex && filteredSongs.length > 1); // Evitar la misma canción si hay más de 1
+            playSong(newIndex);
+        } else {
+            currentIndex = (currentIndex - 1 + filteredSongs.length) % filteredSongs.length;
+            playSong(currentIndex);
+        }
+    }
+
+    // --- Nueva Función Crucial para Sincronizar el Índice ---
+// --- Nueva Función Crucial para Sincronizar el Índice ---
+    function updateCurrentIndexAfterListChange() {
+        if (audio.paused && currentIndex === -1) {
+            // No hay canción sonando o el reproductor está reiniciado.
+            // Asegúrate de que la interfaz refleje que no hay canción.
+            currentSongElement.textContent = '---';
+            nextSongElement.textContent = 'Siguiente: ---';
+            updateSongListHighlight();
+            return;
+        }
+
+        const currentPlayingSongUrl = audio.src;
+        let foundIndex = -1;
+
+        if (currentPlayingSongUrl) {
+            // Intentar encontrar la canción que estaba sonando en la nueva lista filteredSongs
+            for (let i = 0; i < filteredSongs.length; i++) {
+                // Compara la URL para asegurar que es la misma canción
+                if (filteredSongs[i].url === currentPlayingSongUrl) {
+                    foundIndex = i;
+                    break;
+                }
+            }
+        }
+
+        if (foundIndex !== -1) {
+            // Si la canción actual sigue en la lista, continuar desde su nuevo índice
+            currentIndex = foundIndex;
+            loadSong(filteredSongs[currentIndex]); // Recargar para actualizar metadatos si es necesario
+            audio.play(); // Asegurarse de que siga reproduciéndose
+        } else if (filteredSongs.length > 0) {
+            // Si la canción actual fue filtrada o no había ninguna sonando,
+            // empezar desde el principio de la nueva lista.
+            currentIndex = 0;
+            playSong(currentIndex); // Empezar a reproducir la primera canción
+        } else {
+            // No hay canciones en la lista filtrada
+            audio.pause();
+            audio.src = '';
+            currentSongElement.textContent = '---';
+            nextSongElement.textContent = 'Siguiente: ---';
+            currentIndex = -1;
+            updateSongListHighlight();
+        }
+    }
 
 function toggleShuffle() {
   isShuffling = !isShuffling;
@@ -1817,89 +1920,97 @@ function getTrackNumber(filename) {
 
     
 // Añade estas funciones al script existente de la radio
-function ordenarPor(criterio) {
-  if (!songs || songs.length === 0) return;
 
-  if (criterio === 'album') {
-    // Agrupar por álbum
-    const grouped = {};
-    songs.forEach(song => {
-      const album = song.album || 'Sin Álbum';
-      if (!grouped[album]) grouped[album] = [];
-      grouped[album].push(song);
-    });
+    function ordenarPor(criterio) {
+        // Asegurarse de que estamos ordenando la lista actual, no la original 'songs'
+        let tempSongs = [...filteredSongs]; // Trabaja en una copia
 
-    // Ordenar primero por nombre de álbum, luego por número de pista (extraído del filename)
-    const ordered = Object.entries(grouped)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .flatMap(([_, albumSongs]) =>
-        albumSongs.sort((a, b) => getTrackNumber(a.filename) - getTrackNumber(b.filename))
-      );
-
-    currentSongIndex = 0;
-    renderSongList(ordered);
-    renderFullSelect(ordered);
-    playTrack(currentSongIndex);
-    return;
-  }
-
-  // Otros criterios (artista, título, etc.)
-  songs.sort((a, b) => {
-    const valA = (a[criterio] || '').toLowerCase();
-    const valB = (b[criterio] || '').toLowerCase();
-    return valA.localeCompare(valB);
-  });
-
-  currentSongIndex = 0;
-  renderSongList(songs);
-  renderFullSelect(songs);
-  playTrack(currentSongIndex);
-}
-
-
-function mezclarCanciones() {
-  // Mezcla las canciones pero mantiene la actual reproduciéndose
-  const currentUrl = songs[currentTrack]?.url;
-  
-  // Algoritmo de Fisher-Yates para mezclar
-  for (let i = songs.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [songs[i], songs[j]] = [songs[j], songs[i]];
-  }
-  
-  renderSongList();
-  renderFullSelect();
-  
-  // Encuentra y reproduce la canción que estaba sonando
-  if (currentUrl) {
-    const newIndex = songs.findIndex(song => song.url === currentUrl);
-    if (newIndex !== -1) {
-      currentTrack = newIndex;
+        tempSongs.sort((a, b) => {
+            if (criterio === 'artist') return a.artist.localeCompare(b.artist);
+            if (criterio === 'title') return a.title.localeCompare(b.title);
+            if (criterio === 'album') return a.album.localeCompare(b.album);
+            if (criterio === 'genre') return a.genre.localeCompare(b.genre);
+            if (criterio === 'duration') return a.duration - b.duration; // Asumiendo que duración es un número
+            return 0;
+        });
+        filteredSongs = tempSongs; // Actualiza la lista real de filteredSongs
+        isShuffle = false; // La ordenación debería resetear el modo aleatorio
+        shuffleBtn.classList.remove('active');
+        populateSongList();
+        populateFullSongSelect();
+        updateCurrentIndexAfterListChange(); // <--- LLAMADA CLAVE
     }
-  }
-}
 
-function filtrarPorGenero() {
-  const genero = document.getElementById('filterGenre').value;
-  if (!genero) {
-    renderSongList();
-    return;
-  }
-  
-  const filtered = songs.filter(song => song.genre === genero);
-  renderFilteredList(filtered);
-}
+    function mezclarCanciones() {
+        // Antes de mezclar, guarda la canción actual si hay alguna
+        const currentPlayingSong = currentIndex !== -1 && filteredSongs.length > 0 ? filteredSongs[currentIndex] : null;
 
-function filtrarPorArtista() {
-  const artista = document.getElementById('filterArtist').value;
-  if (!artista) {
-    renderSongList();
-    return;
-  }
-  
-  const filtered = songs.filter(song => song.artist === artista);
-  renderFilteredList(filtered);
-}
+        // Algoritmo Fisher-Yates para mezclar
+        for (let i = filteredSongs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [filteredSongs[i], filteredSongs[j]] = [filteredSongs[j], filteredSongs[i]];
+        }
+
+        isShuffle = true; // Activa el modo aleatorio
+        shuffleBtn.classList.add('active'); // Muestra visualmente que está activo
+        
+        populateSongList();
+        populateFullSongSelect();
+
+        // Después de mezclar, intenta encontrar la canción que estaba sonando en la nueva lista mezclada
+        let newIndex = -1;
+        if (currentPlayingSong) {
+            newIndex = filteredSongs.findIndex(song => song.url === currentPlayingSong.url);
+        }
+        
+        if (newIndex !== -1) {
+            currentIndex = newIndex;
+            loadSong(filteredSongs[currentIndex]); // Recarga para actualizar metadatos si es necesario
+            audio.play(); // Continúa reproduciendo desde su nueva posición aleatoria
+        } else if (filteredSongs.length > 0) {
+            // Si la canción actual no se encontró (no debería pasar con mezclar, a menos que la lista sea muy pequeña)
+            // o no había canción sonando, empieza desde el principio de la lista mezclada.
+            currentIndex = 0;
+            playSong(currentIndex);
+        } else {
+            // No hay canciones en la lista
+            audio.pause();
+            audio.src = '';
+            currentSongElement.textContent = '---';
+            nextSongElement.textContent = 'Siguiente: ---';
+            currentIndex = -1;
+            updateSongListHighlight();
+        }
+    }
+
+
+    function filtrarPorGenero() {
+        const selectedGenre = filterGenreSelect.value;
+        if (selectedGenre) {
+            filteredSongs = songs.filter(song => song.genre === selectedGenre);
+        } else {
+            filteredSongs = [...songs]; // Todas las canciones si no hay filtro
+        }
+        isShuffle = false; // El filtrado debería resetear el modo aleatorio
+        shuffleBtn.classList.remove('active');
+        populateSongList();
+        populateFullSongSelect();
+        updateCurrentIndexAfterListChange(); // <--- LLAMADA CLAVE
+    }
+
+    function filtrarPorArtista() {
+        const selectedArtist = filterArtistSelect.value;
+        if (selectedArtist) {
+            filteredSongs = songs.filter(song => song.artist === selectedArtist);
+        } else {
+            filteredSongs = [...songs];
+        }
+        isShuffle = false; // El filtrado debería resetear el modo aleatorio
+        shuffleBtn.classList.remove('active');
+        populateSongList();
+        populateFullSongSelect();
+        updateCurrentIndexAfterListChange(); // <--- LLAMADA CLAVE
+    }
 
 function renderFilteredList(filteredSongs) {
   songListElement.innerHTML = '';
