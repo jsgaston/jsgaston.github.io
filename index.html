@@ -540,9 +540,6 @@
             <button onclick="ordenarPor('genre'); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Ordenar por Género</button>
             <button onclick="ordenarPor('duration'); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Ordenar por Duración</button>
             <button onclick="mezclarCanciones(); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Mezclar Aleatorio</button>
-            <button id="toggleRepeatDisc" class="btn bg-blue-500 hover:bg-blue-600 px-4 py-2 text-sm">
-    <i class="fas fa-compact-disc"></i> Repetir Disco
-</button>
         </div>
     </div>
 
@@ -1596,113 +1593,7 @@ function showMainTab(tabName) {
         }
     </script>
 
-
-<script>
-
-let currentSongIndex = 0;
-let isPlaying = false;
-let isShuffle = false;
-let repeatMode = 'off'; // 'off', 'all', 'one'
-let repeatDiscMode = false; // Nuevo estado para repetir disco
-
-const audio = document.getElementById('audio');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const prevTrackBtn = document.getElementById('prevTrack');
-const nextTrackBtn = document.getElementById('nextTrack');
-const toggleShuffleBtn = document.getElementById('toggleShuffle');
-const toggleRepeatBtn = document.getElementById('toggleRepeat');
-const toggleRepeatDiscBtn = document.getElementById('toggleRepeatDisc'); // Nuevo botón
-const progressBar = document.getElementById('progressBar');
-const songProgress = document.getElementById('songProgress');
-const songInfo = document.getElementById('songInfo');
-const albumArt = document.getElementById('albumArt');
-const songListElement = document.getElementById('songList');
-const fullSongSelect = document.getElementById('fullSongSelect');
-
-// Asumiendo que ya tienes estas funciones básicas definidas
-function loadSong(song) {
-    audio.src = song.url;
-    updateSongInfo(song);
-    // updateFullSongSelect(); // Asegúrate de que esto actualice el selector si cambian las canciones
-    // También asegúrate de cargar la imagen del álbum si tienes esa funcionalidad.
-}
-
-function playSong() {
-    isPlaying = true;
-    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
-    audio.play();
-}
-
-function pauseSong() {
-    isPlaying = false;
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Reproducir';
-    audio.pause();
-}
-
-function updateSongInfo(song) {
-    if (songInfo) {
-        songInfo.innerHTML = `
-            <strong>${song.title}</strong><br>
-            <span>${song.artist} - ${song.album}</span>
-        `;
-    }
-    if (albumArt) {
-        // Asumiendo que tienes una forma de obtener la carátula del álbum,
-        // por ahora, podríamos usar una imagen por defecto o la primera letra del álbum/artista.
-        albumArt.src = `https://via.placeholder.com/150?text=${song.album.charAt(0)}`;
-        albumArt.alt = `Carátula de ${song.album}`;
-    }
-}
-
-function updateProgress(e) {
-    const { duration, currentTime } = e.srcElement;
-    const progressPercent = (currentTime / duration) * 100;
-    songProgress.style.width = `${progressPercent}%`;
-}
-
-function setProgressBar(e) {
-    const width = this.clientWidth;
-    const clickX = e.offsetX;
-    const duration = audio.duration;
-    audio.currentTime = (clickX / width) * duration;
-}
-
-// Función para parsear el número de pista del filename
-function getTrackNumberFromFilename(filename) {
-    const match = filename.match(/^(\d{2})\s/);
-    return match ? parseInt(match[1], 10) : 999; // Retorna un número alto si no se encuentra para que vaya al final
-}
-
-
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+  
 
      <script>
 // Modifica la función que carga las canciones para inicializar los filtros
@@ -1831,326 +1722,69 @@ function renderFullSelect() {
       playTrack(currentTrack);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-    
-
-// --- MODIFICACIONES EN nextTrack y prevTrack ---
-function nextTrack() {
-    if (repeatDiscMode) {
-        const currentAlbum = songs[currentSongIndex].album;
-        const albumSongs = songs
-            .filter(song => song.album === currentAlbum)
-            .sort((a, b) => getTrackNumberFromFilename(a.filename) - getTrackNumberFromFilename(b.filename));
-
-        const currentAlbumIndex = albumSongs.findIndex(song => song.url === songs[currentSongIndex].url);
-
-        let nextAlbumSongIndex = currentAlbumIndex + 1;
-        if (nextAlbumSongIndex >= albumSongs.length) {
-            nextAlbumSongIndex = 0; // Vuelve al principio del disco
+    function nextTrack() {
+      if (repeatMode === 'one') {
+        playTrack(currentTrack);
+      } else if (isShuffling) {
+        let next;
+        do {
+          next = Math.floor(Math.random() * songs.length);
+        } while (songs.length > 1 && next === currentTrack);
+        playTrack(next);
+      } else {
+        if (currentTrack + 1 < songs.length) {
+          playTrack(currentTrack + 1);
+        } else if (repeatMode === 'all') {
+          playTrack(0);
         }
-
-        const nextSong = albumSongs[nextAlbumSongIndex];
-        currentSongIndex = songs.findIndex(song => song.url === nextSong.url); // Encuentra el índice global
-        loadSong(songs[currentSongIndex]);
-        playSong();
-
-    } else if (repeatMode === 'one') {
-        // Si repetir una canción, simplemente vuelve a cargar la misma.
-        loadSong(songs[currentSongIndex]);
-        playSong();
-    } else {
-        // Lógica existente para siguiente canción (shuffle o no-shuffle/repeat all)
-        if (isShuffle) {
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * songs.length);
-            } while (newIndex === currentSongIndex); // Evita la misma canción si es posible
-            currentSongIndex = newIndex;
-        } else {
-            currentSongIndex++;
-            if (currentSongIndex >= songs.length) {
-                if (repeatMode === 'all') {
-                    currentSongIndex = 0; // Vuelve al principio de la lista
-                } else {
-                    // Si no hay modo de repetición y se acaba la lista, pausar.
-                    currentSongIndex = 0; // O mantener el último, depende de la UX deseada
-                    loadSong(songs[currentSongIndex]);
-                    pauseSong();
-                    return;
-                }
-            }
-        }
-        loadSong(songs[currentSongIndex]);
-        playSong();
-    }
-}
-
-function prevTrack() {
-    if (repeatDiscMode) {
-        const currentAlbum = songs[currentSongIndex].album;
-        const albumSongs = songs
-            .filter(song => song.album === currentAlbum)
-            .sort((a, b) => getTrackNumberFromFilename(a.filename) - getTrackNumberFromFilename(b.filename));
-
-        const currentAlbumIndex = albumSongs.findIndex(song => song.url === songs[currentSongIndex].url);
-
-        let prevAlbumSongIndex = currentAlbumIndex - 1;
-        if (prevAlbumSongIndex < 0) {
-            prevAlbumSongIndex = albumSongs.length - 1; // Vuelve al final del disco
-        }
-
-        const prevSong = albumSongs[prevAlbumSongIndex];
-        currentSongIndex = songs.findIndex(song => song.url === prevSong.url); // Encuentra el índice global
-        loadSong(songs[currentSongIndex]);
-        playSong();
-
-    } else if (repeatMode === 'one') {
-        // Si repetir una canción, simplemente vuelve a cargar la misma.
-        loadSong(songs[currentSongIndex]);
-        playSong();
-    } else {
-        // Lógica existente para canción anterior
-        if (isShuffle) {
-            // En modo aleatorio, la canción anterior podría ser otra aleatoria
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * songs.length);
-            } while (newIndex === currentSongIndex);
-            currentSongIndex = newIndex;
-        } else {
-            currentSongIndex--;
-            if (currentSongIndex < 0) {
-                currentSongIndex = songs.length - 1; // Vuelve al final de la lista
-            }
-        }
-        loadSong(songs[currentSongIndex]);
-        playSong();
-    }
-}
-
-
-// --- NUEVA FUNCIÓN: toggleRepeatDisc ---
-// --- NUEVA FUNCIÓN: toggleRepeatDisc ---
-function toggleRepeatDisc() {
-    repeatDiscMode = !repeatDiscMode;
-    if (repeatDiscMode) {
-        // Si activamos repetir disco, desactivamos los otros modos de repetición
-        repeatMode = 'off';
-        isShuffle = false; // El modo disco implica un orden, así que desactivamos shuffle
-        toggleRepeatBtn.classList.remove('active'); // O ajusta la clase según tu CSS
-        toggleRepeatBtn.innerHTML = '<i class="fas fa-redo"></i> Repetir'; // Reset del texto/icono
-        toggleShuffleBtn.classList.remove('active'); // O ajusta la clase según tu CSS
-        toggleShuffleBtn.innerHTML = '<i class="fas fa-random"></i> Aleatorio'; // Reset del texto/icono
-        toggleRepeatDiscBtn.classList.add('active'); // Marca el botón como activo
-    } else {
-        toggleRepeatDiscBtn.classList.remove('active'); // Desactiva el botón
-    }
-    updateButtonStates(); // Llama a una función para actualizar el estado visual de todos los botones
-}
-
-// --- MODIFICACIÓN: toggleRepeat (asegurarse que sea mutuamente excluyente) ---
-// Modifica tu función toggleRepeat existente para que tenga en cuenta repeatDiscMode
-function toggleRepeat() {
-    if (repeatDiscMode) {
-        repeatDiscMode = false; // Desactiva repetir disco si se activa otro modo de repetición
-        toggleRepeatDiscBtn.classList.remove('active');
+      }
     }
 
-    if (repeatMode === 'off') {
-        repeatMode = 'all';
-        toggleRepeatBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Repetir Lista';
-        toggleRepeatBtn.classList.add('active');
-    } else if (repeatMode === 'all') {
-        repeatMode = 'one';
-        toggleRepeatBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Repetir Uno';
-        toggleRepeatBtn.classList.add('active');
-    } else { // repeatMode === 'one'
-        repeatMode = 'off';
-        toggleRepeatBtn.innerHTML = '<i class="fas fa-redo"></i> Repetir';
-        toggleRepeatBtn.classList.remove('active');
-    }
-    updateButtonStates();
-}
+    audio.addEventListener('ended', nextTrack);
 
-// --- MODIFICACIÓN: toggleShuffle (asegurarse que sea mutuamente excluyente) ---
-// Modifica tu función toggleShuffle existente para que tenga en cuenta repeatDiscMode
-function toggleShuffle() {
-    isShuffle = !isShuffle;
-    if (isShuffle) {
-        if (repeatDiscMode) {
-            repeatDiscMode = false; // Desactiva repetir disco si se activa aleatorio
-            toggleRepeatDiscBtn.classList.remove('active');
-        }
-        if (repeatMode !== 'off') { // Si shuffle se activa, los modos de repetición "all" o "one" no tienen sentido
-            repeatMode = 'off';
-            toggleRepeatBtn.classList.remove('active');
-            toggleRepeatBtn.innerHTML = '<i class="fas fa-redo"></i> Repetir';
-        }
-        toggleShuffleBtn.classList.add('active');
-        toggleShuffleBtn.innerHTML = '<i class="fas fa-random"></i> Aleatorio (Activo)';
-    } else {
-        toggleShuffleBtn.classList.remove('active');
-        toggleShuffleBtn.innerHTML = '<i class="fas fa-random"></i> Aleatorio';
-    }
-    updateButtonStates();
-}
-
-
-// --- Función para actualizar el estado visual de todos los botones (si tienes clases 'active') ---
-// Esto es importante para que el usuario vea qué modo de repetición está activo.
-function updateButtonStates() {
-    // Actualizar shuffle button
-    if (isShuffle) {
-        toggleShuffleBtn.classList.add('active');
-        toggleShuffleBtn.innerHTML = '<i class="fas fa-random"></i> Aleatorio (Activo)';
-    } else {
-        toggleShuffleBtn.classList.remove('active');
-        toggleShuffleBtn.innerHTML = '<i class="fas fa-random"></i> Aleatorio';
-    }
-
-    // Actualizar repeat button
-    if (repeatMode === 'all') {
-        toggleRepeatBtn.classList.add('active');
-        toggleRepeatBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Repetir Lista';
-    } else if (repeatMode === 'one') {
-        toggleRepeatBtn.classList.add('active');
-        toggleRepeatBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Repetir Uno';
-    } else {
-        toggleRepeatBtn.classList.remove('active');
-        toggleRepeatBtn.innerHTML = '<i class="fas fa-redo"></i> Repetir';
-    }
-
-    // Actualizar repeat disc button
-    if (repeatDiscMode) {
-        toggleRepeatDiscBtn.classList.add('active');
-    } else {
-        toggleRepeatDiscBtn.classList.remove('active');
-    }
-}
-
-
-
-
-
-
-// --- Event Listeners (Asegúrate de que existan o añádelos) ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Carga la primera canción al iniciar
-    if (songs.length > 0) {
-        loadSong(songs[currentSongIndex]);
-        updateButtonStates(); // Asegura que los botones se inicialicen correctamente
-    }
-
-    // Añadir listeners a los botones de control
-    playPauseBtn.addEventListener('click', () => {
-        if (isPlaying) {
-            pauseSong();
-        } else {
-            playSong();
-        }
+    fullSongSelect.addEventListener('change', (e) => {
+      const index = parseInt(e.target.value);
+      if (!isNaN(index)) playTrack(index);
     });
 
-    prevTrackBtn.addEventListener('click', prevTrack);
-    nextTrackBtn.addEventListener('click', nextTrack);
+function toggleShuffle() {
+  isShuffling = !isShuffling;
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  
+  if (isShuffling) {
+    shuffleBtn.innerHTML = '🔀 Shuffle ON';
+    shuffleBtn.classList.add('bg-indigo-500', 'text-white');
+    shuffleBtn.classList.remove('bg-gray-300', 'text-gray-800');
+  } else {
+    shuffleBtn.innerHTML = '🔀 Shuffle OFF'; 
+    shuffleBtn.classList.remove('bg-indigo-500', 'text-white');
+    shuffleBtn.classList.add('bg-gray-300', 'text-gray-800');
+  }
+}
 
-    toggleShuffleBtn.addEventListener('click', toggleShuffle);
-    toggleRepeatBtn.addEventListener('click', toggleRepeat);
-    toggleRepeatDiscBtn.addEventListener('click', toggleRepeatDisc); // Nuevo listener para el botón de repetir disco
-
-    audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('ended', nextTrack); // Cuando la canción termina, ir a la siguiente
-
-    progressBar.addEventListener('click', setProgressBar);
-
-    // Si tienes un selector de canciones completo
-    if (fullSongSelect) {
-        fullSongSelect.addEventListener('change', (e) => {
-            const selectedUrl = e.target.value;
-            currentSongIndex = songs.findIndex(song => song.url === selectedUrl);
-            loadSong(songs[currentSongIndex]);
-            playSong();
-        });
-    }
-
-    // Inicializar el selector de canciones
-    // function updateFullSongSelect() { // Asegúrate de tener una función como esta
-    //     fullSongSelect.innerHTML = '';
-    //     songs.forEach((song, index) => {
-    //         const option = document.createElement('option');
-    //         option.value = song.url;
-    //         option.textContent = `${song.title} - ${song.artist}`;
-    //         if (index === currentSongIndex) {
-    //             option.selected = true;
-    //         }
-    //         fullSongSelect.appendChild(option);
-    //     });
-    // }
-    // updateFullSongSelect(); // Llama a la función para poblar el selector al inicio
+// Inicializar el estado del botón al cargar
+document.addEventListener('DOMContentLoaded', () => {
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  shuffleBtn.innerHTML = '🔀 Shuffle OFF';
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+    function toggleRepeat() {
+      const btn = document.getElementById('repeatBtn');
+      if (repeatMode === 'off') {
+        repeatMode = 'all';
+        btn.innerText = '🔁 Repeat All';
+        btn.classList.replace('bg-gray-300', 'bg-indigo-500');
+        btn.classList.replace('text-gray-800', 'text-white');
+      } else if (repeatMode === 'all') {
+        repeatMode = 'one';
+        btn.innerText = '🔂 Repeat One';
+      } else {
+        repeatMode = 'off';
+        btn.innerText = '❌ Repeat Off';
+        btn.classList.replace('bg-indigo-500', 'bg-gray-300');
+        btn.classList.replace('text-white', 'text-gray-800');
+      }
+    }
 
 
     
