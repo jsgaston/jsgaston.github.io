@@ -1660,6 +1660,8 @@ const audio = document.getElementById('audio');
 // Función auxiliar para extraer el número de pista del nombre del archivo (filename)
 // Función auxiliar para extraer el número de pista del nombre del archivo.
 // Asegúrate de que esta función esté presente en tu script.
+// Función auxiliar para extraer el número de pista del nombre del archivo.
+// Asegúrate de que esta función esté presente en tu script.
 function extractTrackNumber(filename) {
     if (!filename) return null;
     const match = filename.match(/^(\d{1,2})\s/);
@@ -1840,6 +1842,13 @@ div.classList.remove('hidden');
 <script>
 // Añade estas funciones al script existente de la radio
 // Modificación de la función principal de ordenación
+// Modificación de la función principal de ordenación
+// Asume que 'currentSortOrder', 'currentSortCriterion' y 'displayedSongs'
+// están definidos globalmente o en el scope adecuado.
+// 'displayedSongs' es el array de canciones que se está mostrando y ordenando.
+let currentSortOrder = 'asc'; // Variable para almacenar el orden actual ('asc' para ascendente, 'desc' para descendente)
+let currentSortCriterion = ''; // Variable para almacenar el criterio de ordenación actual
+
 function ordenarPor(criterio) {
     // Si el criterio es el mismo, invertimos el orden (ascendente/descendente)
     if (currentSortCriterion === criterio) {
@@ -1892,8 +1901,9 @@ function ordenarPor(criterio) {
         return currentSortOrder === 'asc' ? comparison : -comparison;
     });
 
-    // Vuelve a renderizar la lista de canciones con el nuevo orden
-    renderSongList();
+    // **LA CORRECCIÓN CLAVE:**
+    // Llama a renderSongList pasando 'displayedSongs' para que se renderice la lista ordenada
+    renderSongList(displayedSongs); 
 }
 
 
