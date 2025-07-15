@@ -1154,11 +1154,12 @@ function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
 
         // --- Funciones de Navegación Principal ---
 
-// Añade el nuevo elemento DOM para la sección de la calculadora de fechas
-const mainDateCalculatorSection = document.getElementById('mainDateCalculatorSection');
+
 
 // Actualiza la función showMainTab para incluir la nueva sección
 function showMainTab(tabId) {
+    // Añade el nuevo elemento DOM para la sección de la calculadora de fechas
+    const mainDateCalculatorSection = document.getElementById('mainDateCalculatorSection');
     // Oculta todas las secciones principales
     mainHomeSection.classList.add('hidden');
     mainDiarySection.classList.add('hidden');
