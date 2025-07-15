@@ -1661,26 +1661,15 @@ function renderSongList(list = songs) {
   songListElement.innerHTML = '';
   list.forEach((song, index) => {
     const li = document.createElement('li');
-
-    const isPlaying = song.url === audio.src;
-    li.innerHTML = `${isPlaying ? '🔊 ' : ''}${song.title} - ${song.artist}`;
+    li.textContent = `${song.title} - ${song.artist}`;
     li.className = 'cursor-pointer hover:underline';
-
-    if (isPlaying) {
-      li.style.fontWeight = 'bold';
-      li.style.color = '#4f46e5';
-    }
-
     li.addEventListener('click', () => {
       currentSongIndex = index;
-      playTrack(index, list);
+      playTrack(currentSongIndex, list);
     });
-
     songListElement.appendChild(li);
   });
 }
-
-
 
 
 function renderFullSelect(list = songs) {
@@ -1700,8 +1689,6 @@ function renderFullSelect(list = songs) {
 }
 
 
-
-    
 function playTrack(index, list = songs) {
   const song = list[index];
   if (!song) return;
@@ -1712,15 +1699,7 @@ function playTrack(index, list = songs) {
   currentSongSpan.textContent = `${song.title} - ${song.artist}`;
   const nextIndex = (index + 1) % list.length;
   nextSongSpan.textContent = `Siguiente: ${list[nextIndex].title} - ${list[nextIndex].artist}`;
-
-  currentSongIndex = index;
-
-  renderSongList(list);
-  renderFullSelect(list);
 }
-
-
-
 
 
     function prevTrack() {
@@ -1728,12 +1707,22 @@ function playTrack(index, list = songs) {
       playTrack(currentTrack);
     }
 
-function nextTrack() {
-  const list = songs;
-  currentSongIndex = (currentSongIndex + 1) % list.length;
-  playTrack(currentSongIndex, list);
-}
-
+    function nextTrack() {
+      if (repeatMode === 'one') {
+        playTrack(currentTrack);
+      } else if (isShuffling) {
+        let next;
+        do {
+          next = Math.floor(Math.random() * songs.length);
+        } while (songs.length > 1 && next === currentTrack);
+        playTrack(next);
+      } else {
+        if (currentTrack + 1 < songs.length) {
+          playTrack(currentTrack + 1);
+        } else if (repeatMode === 'all') {
+          playTrack(0);
+        }
+      }
     }
 
     audio.addEventListener('ended', nextTrack);
