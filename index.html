@@ -804,6 +804,8 @@
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykJTypKfvu-NyjwspsAGIxjYqEz0vGfBq-Si5wx4HFgG-5wEIXRD4159yIOVuaVHw8cg/exec'; 
 
         // Elementos del DOM para la navegación principal
+
+        // Asegúrate de que estas constantes estén declaradas una sola vez en tu script
         const mainTabButtons = document.querySelectorAll('.main-tab-button');
         const mainHomeSection = document.getElementById('mainHomeSection');
         const mainDiarySection = document.getElementById('mainDiarySection');
@@ -811,6 +813,12 @@
         const mainTripsSection = document.getElementById('mainTripsSection');
         const mainMenusSection = document.getElementById('mainMenusSection');
         const mainProjectsSection = document.getElementById('mainProjectsSection');
+        const mainProfileSection = document.getElementById('mainProfileSection');
+        const mainRadioSection = document.getElementById('mainRadioSection');
+        const mainTimeConverterSection = document.getElementById('mainTimeConverterSection');
+        const mainStoriesSection = document.getElementById('mainStoriesSection');
+        const mainDateCalculatorSection = document.getElementById('mainDateCalculatorSection'); // Nueva sección
+
 
         // Elementos del DOM para la sub-navegación del Diario
         const diarySubTabButtons = document.querySelectorAll('.diary-sub-tab-button');
@@ -1158,67 +1166,84 @@ function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
 
 // Actualiza la función showMainTab para incluir la nueva sección
 function showMainTab(tabId) {
-    // Añade el nuevo elemento DOM para la sección de la calculadora de fechas
-    const mainDateCalculatorSection = document.getElementById('mainDateCalculatorSection');
-    // Oculta todas las secciones principales
-    mainHomeSection.classList.add('hidden');
-    mainDiarySection.classList.add('hidden');
-    mainMapsSection.classList.add('hidden');
-    mainTripsSection.classList.add('hidden');
-    mainMenusSection.classList.add('hidden');
-    mainProjectsSection.classList.add('hidden');
-    mainProfileSection.classList.add('hidden');
-    mainRadioSection.classList.add('hidden');
-    mainTimeConverterSection.classList.add('hidden');
-    mainStoriesSection.classList.add('hidden');
-    mainDateCalculatorSection.classList.add('hidden'); // Agrega esta línea para ocultar la nueva sección
+    // Ocultar todas las secciones de contenido principal
+    const allMainTabContents = document.querySelectorAll('.main-tab-content');
+    allMainTabContents.forEach(content => {
+        content.classList.add('hidden');
+    });
 
-    // Desactiva todos los botones de la pestaña principal
-    mainTabButtons.forEach(button => {
+    // Desactivar todos los botones de pestaña principal
+    const allMainTabButtons = document.querySelectorAll('.main-tab-button');
+    allMainTabButtons.forEach(button => {
         button.classList.remove('active');
     });
 
-    // Mostrar la sección correspondiente
-        // Muestra la sección y activa el botón correspondiente
-    if (tabId === 'home') {
-        mainHomeSection.classList.remove('hidden');
-    } else if (tabId === 'diary') {
-        mainDiarySection.classList.remove('hidden');
-    } else if (tabId === 'maps') {
-        mainMapsSection.classList.remove('hidden');
-        // Inicializar el mapa si no está ya inicializado
-        if (typeof initMap === 'function') {
-            initMap();
-        }
-    } else if (tabId === 'trips') {
-        mainTripsSection.classList.remove('hidden');
-    } else if (tabId === 'menus') {
-        mainMenusSection.classList.remove('hidden');
-    } else if (tabId === 'projects') {
-        mainProjectsSection.classList.remove('hidden');
-    } else if (tabId === 'profile') { // Sección de Perfil
-        mainProfileSection.classList.remove('hidden');
-    } else if (tabId === 'radio') { // Sección de Radio
-        mainRadioSection.classList.remove('hidden');
-        loadAndPlaySong(); // Cargar y reproducir la canción al abrir la pestaña de radio
-    } else if (tabId === 'time-converter') { // Sección de Conversor de Tiempo
-        mainTimeConverterSection.classList.remove('hidden');
-    } else if (tabId === 'stories') { // Sección de Historias
-        mainStoriesSection.classList.remove('hidden');
-        // Inicializar el editor Quill si no está ya inicializado
-        if (!window.storyQuill) {
-            window.storyQuill = new Quill('#storyEditor', {
-                theme: 'snow'
-            });
-        }
-        cargarHistoriasGuardadas(); // Cargar las historias al abrir la pestaña
-    } else if (tabId === 'date-calculator') { // Nueva sección de Calculadora de Fechas
-        mainDateCalculatorSection.classList.remove('hidden');
-        setDateCalculatorInitialValues(); // Establecer los valores iniciales de las fechas
+    // Mostrar la sección de contenido de la pestaña seleccionada y ejecutar lógica específica
+    let selectedTabContent;
+    switch (tabId) {
+        case 'home':
+            selectedTabContent = mainHomeSection;
+            break;
+        case 'diary':
+            selectedTabContent = mainDiarySection;
+            break;
+        case 'maps':
+            selectedTabContent = mainMapsSection;
+            if (typeof initMap === 'function') {
+                initMap(); // Inicializar el mapa si la función existe
+            }
+            break;
+        case 'trips':
+            selectedTabContent = mainTripsSection;
+            break;
+        case 'menus':
+            selectedTabContent = mainMenusSection;
+            break;
+        case 'projects':
+            selectedTabContent = mainProjectsSection;
+            break;
+        case 'profile':
+            selectedTabContent = mainProfileSection;
+            break;
+        case 'radio':
+            selectedTabContent = mainRadioSection;
+            if (typeof loadAndPlaySong === 'function') {
+                loadAndPlaySong(); // Cargar y reproducir la canción
+            }
+            break;
+        case 'time-converter':
+            selectedTabContent = mainTimeConverterSection;
+            break;
+        case 'stories':
+            selectedTabContent = mainStoriesSection;
+            // Inicializar el editor Quill si no está ya inicializado
+            if (typeof Quill !== 'undefined' && !window.storyQuill) {
+                window.storyQuill = new Quill('#storyEditor', {
+                    theme: 'snow'
+                });
+            }
+            if (typeof cargarHistoriasGuardadas === 'function') {
+                cargarHistoriasGuardadas(); // Cargar las historias
+            }
+            break;
+        case 'date-calculator': // Lógica para la nueva pestaña
+            selectedTabContent = mainDateCalculatorSection;
+            setDateCalculatorInitialValues(); // Establecer los valores iniciales de las fechas
+            break;
+        default:
+            console.warn('Pestaña no reconocida:', tabId);
+            return;
     }
 
+    if (selectedTabContent) {
+        selectedTabContent.classList.remove('hidden');
+    }
 
-    document.querySelector(`.main-tab-button[data-main-tab="${tabId}"]`).classList.add('active');
+    // Activar el botón de la pestaña seleccionada
+    const selectedTabButton = document.querySelector(`.main-tab-button[data-main-tab="${tabId}"]`);
+    if (selectedTabButton) {
+        selectedTabButton.classList.add('active');
+    }
 }
 
 // Asegúrate de que el evento click para la nueva pestaña esté inicializado
@@ -1229,6 +1254,10 @@ mainTabButtons.forEach(button => {
 });
 
 
+
+
+
+        
 
 // Calcular y mostrar resultados
     let resultsHtml = `
@@ -1250,6 +1279,80 @@ mainTabButtons.forEach(button => {
     
 
 
+
+
+
+        // Función para establecer los valores iniciales de las fechas en la calculadora
+function setDateCalculatorInitialValues() {
+    const date1Input = document.getElementById('date1');
+    const date2Input = document.getElementById('date2');
+
+    // Establecer 6 de diciembre de 1982
+    date1Input.value = '1982-12-06';
+
+    // Establecer la fecha actual
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    date2Input.value = `${year}-${month}-${day}`;
+}
+
+// Función para calcular la diferencia entre dos fechas y convertirla
+function calculateDateDifference() {
+    const date1Input = document.getElementById('date1');
+    const date2Input = document.getElementById('date2');
+    const resultsContent = document.getElementById('resultsContent');
+
+    const date1 = new Date(date1Input.value);
+    const date2 = new Date(date2Input.value);
+
+    if (isNaN(date1.getTime()) || isNaN(date2.getTime())) {
+        resultsContent.innerHTML = '<p class="text-red-600">Por favor, ingresa fechas válidas.</p>';
+        return;
+    }
+
+    // Calcular la diferencia en milisegundos
+    const timeDiffMs = Math.abs(date2.getTime() - date1.getTime());
+
+    // Convertir a días (base para otras unidades)
+    const days = timeDiffMs / (1000 * 60 * 60 * 24);
+
+    // Calcular y mostrar resultados usando las tasas de conversión desde 'dias'
+    let resultsHtml = `
+        <p><strong>Diferencia en Días:</strong> ${days.toFixed(2)} días</p>
+        <p><strong>Diferencia en Años:</strong> ${(days * conversionRates.dias.años).toFixed(2)} años</p>
+        <p><strong>Diferencia en Horas:</strong> ${(days * conversionRates.dias.horas).toFixed(2)} horas</p>
+        <p><strong>Diferencia en Minutos:</strong> ${(days * conversionRates.dias.minutos).toFixed(2)} minutos</p>
+        <p><strong>Diferencia en Segundos:</strong> ${(days * conversionRates.dias.segundos).toFixed(2)} segundos</p>
+        <p><strong>Diferencia en Tiradas:</strong> ${(days * conversionRates.dias.tiradas).toFixed(2)} tiradas</p>
+        <p><strong>Diferencia en Soles:</strong> ${(days * conversionRates.dias.soles).toFixed(2)} soles</p>
+        <p><strong>Diferencia en Porciones Grandes del Sol:</strong> ${(days * conversionRates.dias.Porciones_grandes_del_sol).toFixed(2)} : (Porciones grandes del sol)</p>
+        <p><strong>Diferencia en Porciones Medianas del Sol:</strong> ${(days * conversionRates.dias.Porciones_medianas_del_sol).toFixed(2)} :- (Porciones medianas del sol)</p>
+        <p><strong>Diferencia en Porciones Pequeñas del Sol:</strong> ${(days * conversionRates.dias.Porciones_pequeñas_del_sol).toFixed(2)} :-_ (Porciones pequeñas del sol)</p>
+    `;
+
+    resultsContent.innerHTML = resultsHtml;
+}
+
+// Añadir event listeners a los botones de navegación principal
+document.addEventListener('DOMContentLoaded', () => {
+    mainTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.dataset.mainTab;
+            showMainTab(tabId);
+        });
+    });
+
+    // Mostrar la pestaña "Inicio" por defecto al cargar la página
+    showMainTab('home');
+});
+
+
+
+
+
+        
 
 
 // Función para calcular la diferencia entre dos fechas y convertirla
@@ -1275,28 +1378,106 @@ function calculateDateDifference() {
     // Obtener las tasas de conversión existentes (asegúrate de que estas estén definidas en tu script principal)
     // Se asume que 'conversionRates' es una variable global o accesible.
     const conversionRates = {
-        tiradas: {
-            segundos: 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-        },
-        segundos: {
-            tiradas: 1 / 1.7,
-            años: 1 / (86400 * 365.25),
-            dias: 1 / (60 * 60 * 24),
-            horas: 1 / (60 * 60),
-            minutos: 1 / (60),
-        },
-        dias: {
-            tiradas: (24 * 60 * 60) / 1.7, // 1 día en segundos / 1.7 segundos por tirada
-            años: 1 / 365.25,
-            horas: 24,
-            minutos: 24 * 60,
-            segundos: 24 * 60 * 60,
-            soles: 1, // 1 sol = 1 día (basado en soles.dias=1)
-            Porciones_grandes_del_sol: 20, // 1 sol = 20 Porciones grandes
-            Porciones_medianas_del_sol: 20 * 100, // 1 Porcion grande = 100 Porciones medianas
-            Porciones_pequeñas_del_sol: 20 * 100 * 100 // 1 Porcion mediana = 100 Porciones pequeñas
-        }
-    };
+    tiradas: {
+        segundos: 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+        años: 1.7 / (86400 * 365.25),
+        dias: 1.7 / (60 * 60 * 24),
+        horas: 1.7 / (60 * 60),
+        minutos: 1.7 / (60),
+        soles: (60 * 60 * 24) / 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+        Porciones_grandes_del_sol: (60 * 24) / 1.7,
+        Porciones_medianas_del_sol: (60) / 1.7,
+        Porciones_pequeñas_del_sol: 1 / 1.7
+    },
+    segundos: {
+        tiradas: 1 / 1.7,
+        años: 1 / (86400 * 365.25),
+        dias: 1 / (60 * 60 * 24),
+        horas: 1 / (60 * 60),
+        minutos: 1 / (60),
+        soles: 1.7 / (60 * 60 * 24), // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+        Porciones_grandes_del_sol: 1.7 / (60 * 24),
+        Porciones_medianas_del_sol: 1.7 / 60,
+        Porciones_pequeñas_del_sol: 1.7
+    },
+    dias: {
+        tiradas: (24 * 60 * 60) / 1.7, // Segundos en un día / segundos por tirada
+        años: 1 / 365.25,
+        horas: 24,
+        minutos: 24 * 60,
+        segundos: 24 * 60 * 60,
+        soles: 1, // 1 sol = 1 día
+        Porciones_grandes_del_sol: 20, // 1 día (sol) = 20 Porciones grandes
+        Porciones_medianas_del_sol: 20 * 100, // 1 Porción grande = 100 Porciones medianas
+        Porciones_pequeñas_del_sol: 20 * 100 * 100 // 1 Porción mediana = 100 Porciones pequeñas
+    },
+    horas: {
+        tiradas: 1 * 60 * 60 / 1.7,
+        años: 1 * 60 * 60 / (86400 * 365.25),
+        dias: 1 * 60 * 60 / (60 * 60 * 24),
+        horas: 1, // Corregido: horas a horas es 1
+        minutos: 60,
+        soles: 1.7 * 60 * 60 / (60 * 60 * 24), // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+        Porciones_grandes_del_sol: 1.7 * 60 * 60 / (60 * 24),
+        Porciones_medianas_del_sol: 1.7 * 60 * 60 / 60,
+        Porciones_pequeñas_del_sol: 1.7 * 60 * 60
+    },
+    minutos: {
+        tiradas: 1 * 60 / 1.7,
+        años: 1 * 60 / (86400 * 365.25),
+        dias: 1 * 60 / (60 * 60 * 24),
+        horas: 1 / 60, // Corregido: minutos a horas es 1/60
+        minutos: 1,
+        soles: 1.7 * 60 / (60 * 60 * 24), // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+        Porciones_grandes_del_sol: 1.7 * 60 / (60 * 24),
+        Porciones_medianas_del_sol: 1.7 * 60 / 60,
+        Porciones_pequeñas_del_sol: 1.7 * 60
+    },
+    soles: {
+        segundos: 1.7 * 60 * 60 * 24, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+        años: 1 / 365.25, // 1 sol = 1 día, 1 día = 1/365.25 años
+        dias: 1,
+        horas: 24, // 1 sol = 24 horas
+        minutos: 24 * 60, // 1 sol = 1440 minutos
+        soles: 1, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
+        Porciones_grandes_del_sol: 20,
+        Porciones_medianas_del_sol: 20 * 100,
+        Porciones_pequeñas_del_sol: 20 * 100 * 100
+    },
+    Porciones_grandes_del_sol: {
+        tiradas: (1 / 20) * (24 * 60 * 60) / 1.7, // (1/20) días en segundos / 1.7 segundos por tirada
+        años: (1 / 20) / 365.25, // 1/20 días en años
+        dias: 1 / 20,
+        horas: (1 / 20) * 24,
+        minutos: (1 / 20) * 24 * 60,
+        soles: 1 / 20, // 1 Porción grande = 1/20 Soles
+        Porciones_grandes_del_sol: 1,
+        Porciones_medianas_del_sol: 100,
+        Porciones_pequeñas_del_sol: 100 * 100
+    },
+    Porciones_medianas_del_sol: {
+        tiradas: (1 / 2000) * (24 * 60 * 60) / 1.7, // (1/2000) días en segundos / 1.7 segundos por tirada
+        años: (1 / 2000) / 365.25,
+        dias: 1 / 2000,
+        horas: (1 / 2000) * 24,
+        minutos: (1 / 2000) * 24 * 60,
+        soles: 1 / (20 * 100), // 1 Porción mediana = 1/100 Porción grande = 1/(20*100) Soles
+        Porciones_grandes_del_sol: 1 / 100,
+        Porciones_medianas_del_sol: 1,
+        Porciones_pequeñas_del_sol: 100
+    },
+    Porciones_pequeñas_del_sol: {
+        tiradas: (1 / 200000) * (24 * 60 * 60) / 1.7, // (1/200000) días en segundos / 1.7 segundos por tirada
+        años: (1 / 200000) / 365.25,
+        dias: 1 / 200000,
+        horas: (1 / 200000) * 24,
+        minutos: (1 / 200000) * 24 * 60,
+        soles: 1 / (20 * 100 * 100), // 1 Porción pequeña = 1/100 Porción mediana = 1/(20*100*100) Soles
+        Porciones_grandes_del_sol: 1 / (100 * 100),
+        Porciones_medianas_del_sol: 1 / 100,
+        Porciones_pequeñas_del_sol: 1
+    }
+};
 
     
         
