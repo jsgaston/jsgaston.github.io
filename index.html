@@ -235,6 +235,20 @@
   background: linear-gradient(to right, #4f46e5, #7c3aed);
 }
 
+        /* Nuevo estilo para el estado activo/presionado de los botones de radio */
+.radio-button.active {
+  background: linear-gradient(to right, #4338ca, #6d28d9); /* Un morado más oscuro */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3); /* Efecto hundido */
+  transform: translateY(0); /* Asegura que no se eleve */
+  color: white; /* Asegura que el texto permanezca blanco */
+}
+
+/* Modificación para el hover cuando el botón está activo, para mantener el efecto hundido */
+.radio-button.active:hover {
+  background: linear-gradient(to right, #4338ca, #6d28d9); /* Mantiene el color oscuro */
+  transform: translateY(0); /* Evita que se eleve */
+}
+
 .song-info-box {
   background-color: #f3f4f6;
   border: 2px solid #6366f1;
@@ -489,95 +503,94 @@
           </div>
         </div>
 
+
+
+
+        
         <!-- Sección de Radio -->
-        <div id="mainRadioSection" class="main-tab-content hidden">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">🎧 Mi Radio</h2>
-                <button onclick="obtenerLetraDesdeAppScript()" class="radio-button">📜 Ver Letra</button>
-            <div id="letraCancion" class="mt-4 p-3 rounded-md bg-white text-sm text-gray-800 whitespace-pre-line shadow hidden relative">
-              <button onclick="document.getElementById('letraCancion').classList.add('hidden')" 
-                      class="absolute top-2 right-2 bg-red-500 text-white rounded-full px-3 py-1 text-xs hover:bg-red-600">
-                ✖ Cerrar
-              </button>
-              <div id="letraTexto"></div>
-            </div>
-                        <p class="text-center text-gray-500 mt-4"></p>
+       <div id="mainRadioSection" class="main-tab-content hidden">
+    <h2 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">🎧 Mi Radio Personal</h2>
 
-
-
-    <!-- Canción actual -->
-    <div class="song-info-box text-center mb-4">
-      <div class="song-info-title">🎵 Sonando ahora:</div>
-      <div id="currentSong" class="song-info-content">---</div>
-      <div id="nextSong" class="song-info-next">Siguiente: ---</div>
+    <div class="song-info-box text-center mb-6">
+        <div class="song-info-title">🎵 Sonando ahora:</div>
+        <div id="currentSong" class="song-info-content">---</div>
+        <div id="nextSong" class="song-info-next">Siguiente: ---</div>
     </div>
 
-    <!-- Reproductor + botones -->
-    <div class="flex flex-col items-center gap-3 my-8">
-      <div class="flex justify-center w-full px-4">
-        <div style="display: flex; justify-content: center; width: 100%;">
-          <audio id="audio" controls style="width: 100%; max-width: 1000px; padding: 8px; background: white; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"></audio>
+    <div class="flex justify-center w-full px-4 mb-8">
+        <audio id="audio" controls class="w-full max-w-2xl p-2 bg-white rounded-xl shadow-lg"></audio>
+    </div>
+
+    <div class="bg-indigo-50 p-6 rounded-xl shadow-md mb-8">
+        <h3 class="text-xl font-bold text-indigo-800 mb-4 text-center">Controles de Reproducción</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center">
+            <button onclick="prevTrack(); toggleActiveClass(this, false)" class="radio-button">⏮️ Anterior</button>
+            <button onclick="nextTrack(); toggleActiveClass(this, false)" class="radio-button">⏭️ Siguiente</button>
+            <button id="shuffleBtn" onclick="toggleShuffle(); toggleActiveClass(this, true)" class="radio-button">🔀 Shuffle</button>
+            <button id="repeatBtn" onclick="toggleRepeat(); toggleActiveClass(this, true)" class="radio-button">🔁 Repeat</button>
         </div>
-      </div>
-         <p class="text-center text-gray-500 mt-4"></p>
-      <div class="flex flex-wrap gap-4 justify-center">
-        <button onclick="prevTrack()" class="radio-button">⏮️ Anterior</button>
-        <button onclick="nextTrack()" class="radio-button">⏭️ Siguiente</button>
-        <button id="shuffleBtn" onclick="toggleShuffle()" class="radio-button bg-gray-300 text-gray-800">🔀 Shuffle</button>
-        <button id="repeatBtn" onclick="toggleRepeat()" class="radio-button bg-gray-300 text-gray-800">🔁 Repeat</button>
-      </div>
     </div>
 
+    <div class="bg-blue-50 p-6 rounded-xl shadow-md mb-8">
+        <h3 class="text-xl font-bold text-blue-800 mb-4 text-center">Opciones de Ordenación</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center">
+            <button onclick="ordenarPor('artist'); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Ordenar por Artista</button>
+            <button onclick="ordenarPor('title'); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Ordenar por Título</button>
+            <button onclick="ordenarPor('album'); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Ordenar por Álbum</button>
+            <button onclick="ordenarPor('genre'); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Ordenar por Género</button>
+            <button onclick="ordenarPor('duration'); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Ordenar por Duración</button>
+            <button onclick="mezclarCanciones(); toggleActiveClass(this, false, 'sort-button')" class="radio-button sort-button">Mezclar Aleatorio</button>
+        </div>
+    </div>
 
+    <div class="bg-green-50 p-6 rounded-xl shadow-md mb-8">
+        <h3 class="text-xl font-bold text-green-800 mb-4 text-center">Filtros</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="filterGenre" class="form-label mb-2">Filtrar por género:</label>
+                <select id="filterGenre" class="form-input rounded-lg px-4 py-2" onchange="filtrarPorGenero()">
+                    <option value="">Todos los géneros</option>
+                </select>
+            </div>
+            <div>
+                <label for="filterArtist" class="form-label mb-2">Filtrar por artista:</label>
+                <select id="filterArtist" class="form-input rounded-lg px-4 py-2" onchange="filtrarPorArtista()">
+                    <option value="">Todos los artistas</option>
+                </select>
+            </div>
+        </div>
+    </div>
 
-    <!-- Añade esto en la sección de radio, después del reproductor -->
-<div class="flex flex-wrap gap-3 justify-center mb-6">
-  <button onclick="ordenarPor('artist')" class="radio-button">Ordenar por Artista</button>
-  <button onclick="ordenarPor('title')" class="radio-button">Ordenar por Título</button>
-  <button onclick="ordenarPor('album')" class="radio-button">Ordenar por Álbum</button>
-  <button onclick="ordenarPor('genre')" class="radio-button">Ordenar por Género</button>
-  <button onclick="ordenarPor('duration')" class="radio-button">Ordenar por Duración</button>
-  <button onclick="mezclarCanciones()" class="radio-button">Mezclar Aleatorio</button>
-</div>
-
-<div class="mb-4">
-  <label for="filterGenre" class="form-label mb-2">Filtrar por género:</label>
-  <select id="filterGenre" class="form-input rounded-lg" onchange="filtrarPorGenero()">
-    <option value="">Todos los géneros</option>
-  </select>
-</div>
-
-<div class="mb-4">
-  <label for="filterArtist" class="form-label mb-2">Filtrar por artista:</label>
-  <select id="filterArtist" class="form-input rounded-lg" onchange="filtrarPorArtista()">
-    <option value="">Todos los artistas</option>
-  </select>
-</div>
-
-
-            
-
-    <!-- Lista visible -->
-    <ul id="songList" class="list-disc px-6 text-left text-gray-800 space-y-1 mb-6"></ul>
-
-    <!-- Lista desplegable completa -->
     <div class="text-center mb-6">
-      <label for="fullSongSelect" class="block mb-1 font-medium text-gray-700">Seleccionar canción de la lista completa:</label>
-      <select id="fullSongSelect" class="form-input w-full max-w-md mx-auto rounded-md border border-gray-300">
-        <option disabled selected>-- Elegir canción --</option>
-      </select>
+        <button onclick="obtenerLetraDesdeAppScript()" class="radio-button">📜 Ver Letra</button>
+    </div>
+    
+    <div id="letraCancion" class="mt-4 p-5 rounded-xl bg-white text-base text-gray-800 whitespace-pre-line shadow-lg hidden relative border border-gray-200">
+        <button onclick="document.getElementById('letraCancion').classList.add('hidden')" 
+                class="absolute top-3 right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg hover:bg-red-600 focus:outline-none">
+          &times;
+        </button>
+        <div id="letraTexto" class="max-h-96 overflow-y-auto pr-2"></div>
     </div>
 
-  <p class="text-center text-gray-500 mt-4"></p>
+    <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Lista de Canciones</h3>
+        <ul id="songList" class="list-disc px-6 text-left text-gray-800 space-y-2 max-h-80 overflow-y-auto"></ul>
+    </div>
 
-<div id="dropZone" class="drop-zone">
-  Arrastra tu canción aquí o haz clic para elegir
-  <input type="file" id="uploader" hidden accept="audio/*">
-</div>
+    <div class="bg-white p-6 rounded-xl shadow-md mb-8 text-center">
+        <label for="fullSongSelect" class="block mb-3 font-semibold text-gray-700 text-lg">Seleccionar canción de la lista completa:</label>
+        <select id="fullSongSelect" class="form-input w-full max-w-md mx-auto rounded-md border border-gray-300 px-4 py-2">
+            <option disabled selected>-- Elegir canción --</option>
+        </select>
+    </div>
 
-<p id="resultado"></p>
+    <div id="dropZone" class="drop-zone border-2 border-dashed border-purple-400 bg-purple-50 hover:bg-purple-100 p-8 rounded-xl text-purple-700 transition-all cursor-pointer mb-8">
+        Arrastra tu canción aquí o haz clic para elegir
+        <input type="file" id="uploader" hidden accept="audio/*">
+    </div>
 
-
-
+    <p id="resultado" class="text-center text-gray-600"></p>
 </div>
 
 
@@ -872,6 +885,50 @@ diaryDropZone.addEventListener("drop", e => {
             loadingSpinner.style.display = 'none';
             diaryForm.querySelector('button[type="submit"]').disabled = false;
         }
+
+
+
+        /**
+ * Toggles an 'active' class on a button and manages active state for groups.
+ * @param {HTMLElement} buttonElement The button element to toggle.
+ * @param {boolean} isToggle Whether the button acts as a simple toggle (like shuffle/repeat) or part of a mutually exclusive group (like sort options).
+ * @param {string} [groupClass] Optional. A class to identify buttons in a mutually exclusive group (e.g., 'sort-button').
+ */
+function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
+    if (isToggle) {
+        // For toggle buttons (like shuffle/repeat), just switch active state
+        buttonElement.classList.toggle('active');
+    } else {
+        // For mutually exclusive groups (like sort options)
+        if (groupClass) {
+            // Deactivate all other buttons in the same group
+            document.querySelectorAll(`.${groupClass}`).forEach(btn => {
+                if (btn !== buttonElement) {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        // Toggle active state for the clicked button
+        buttonElement.classList.toggle('active');
+    }
+}
+
+// Initial setup: You might want to call this function on page load if certain buttons
+// should be active by default, for example, if shuffle is initially on:
+// document.addEventListener('DOMContentLoaded', () => {
+//     const shuffleBtn = document.getElementById('shuffleBtn');
+//     if (shuffleBtn && someGlobalShuffleStateIsTrue) { // Replace 'someGlobalShuffleStateIsTrue' with your actual logic
+//         shuffleBtn.classList.add('active');
+//     }
+// });
+
+
+
+
+
+
+
+        
 
         // Función para formatear la fecha
         function formatDate(dateString) {
