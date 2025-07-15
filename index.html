@@ -1810,33 +1810,138 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
     // Encuentra el botón de repetición por su ID (asegúrate de que este ID exista en tu HTML)
+// Asegúrate de que esta variable 'repeatMode' esté declarada una sola vez
+// y sea accesible en el ámbito donde se usan 'toggleRepeat' y 'nextTrack'.
+// Valores para repeatMode:
+// 0: Sin repetición
+// 1: Repetir toda la lista
+// 2: Repetir la canción actual
+// 3: Repetir el álbum actual
+let repeatMode = 0; // Estado inicial, por ejemplo, sin repetición
+
+// Asume que 'repeatBtn' y 'nextBtn' son los IDs de tus botones en el HTML.
+// Es importante que estos elementos existan en tu DOM.
 const repeatBtn = document.getElementById('repeatBtn');
 
-// Modifica tu función toggleRepeat() existente
+
+// const nextBtn = document.getElementById('nextBtn'); // Puedes necesitar esto si nextTrack no se llama por el evento 'ended' del audio.
+
+// --- Función toggleRepeat() ---
+// Actualiza el modo de repetición y la visual del botón.
 function toggleRepeat() {
     repeatMode = (repeatMode + 1) % 4; // Cicla entre 0, 1, 2, 3
 
     if (repeatMode === 0) {
-        repeatBtn.textContent = '🔁 Repetir'; // O puedes usar un ícono, como 'No Loop'
+        repeatBtn.textContent = '🔁 Repetir'; // Puedes cambiar el texto o usar un icono
         repeatBtn.classList.remove('active');
-        if (audio) audio.loop = false; // Desactiva el loop nativo del audio
+        if (audio) audio.loop = false; // Asegura que el loop nativo del audio esté desactivado
     } else if (repeatMode === 1) {
-        repeatBtn.textContent = '🔁 Repetir Todo'; // Ícono para Repetir Todo
+        repeatBtn.textContent = '🔁 Repetir Todo';
         repeatBtn.classList.add('active');
         if (audio) audio.loop = false; // El loop completo se maneja en nextTrack
     } else if (repeatMode === 2) {
-        repeatBtn.textContent = '🔂 Repetir Una'; // Ícono para Repetir Una Canción
+        repeatBtn.textContent = '🔂 Repetir Una';
         repeatBtn.classList.add('active');
-        if (audio) audio.loop = true; // Activa el loop nativo del audio para una canción
+        if (audio) audio.loop = true; // El loop nativo es útil para una canción
     } else if (repeatMode === 3) {
-        repeatBtn.textContent = '💿 Repetir Álbum'; // Nuevo ícono para Repetir Álbum
+        repeatBtn.textContent = '💿 Repetir Álbum'; // Nuevo icono/texto para Repetir Álbum
         repeatBtn.classList.add('active');
         if (audio) audio.loop = false; // El loop del álbum se maneja en nextTrack
     }
-    // Asegúrate de que toggleActiveClass es una función que maneja la clase 'active' para el botón
-    // Si no tienes esta función, puedes simplificarlo a solo agregar/quitar 'active' directamente.
-    // Ejemplo: repeatBtn.classList.toggle('active', repeatMode !== 0);
+    // Si tienes una función 'toggleActiveClass' o similar, ajústala aquí.
+    // Por ejemplo: if (typeof toggleActiveClass === 'function') toggleActiveClass(repeatBtn, true);
 }
+
+// --- Función nextTrack() ---
+// Maneja el avance a la siguiente canción basándose en el modo de repetición.
+function nextTrack() {
+    let nextIndex = currentTrackIndex;
+
+    if (repeatMode === 2) { // Repetir canción actual (Repeat One)
+        if (audio) {
+            audio.currentTime = 0; // Reinicia la canción desde el principio
+            audio.play();
+        }
+        return; // No avanzamos al siguiente índice en la lista general
+    }
+
+    if (repeatMode === 3) { // Repetir álbum (Repeat Album)
+        const currentAlbum = songs[currentTrackIndex].album;
+        // Filtra todas las canciones que pertenecen al álbum actual
+        let songsInCurrentAlbum = songs.filter(song => song.album === currentAlbum);
+
+        // Ordena estas canciones por el número de pista extraído del 'filename'.
+        // Esto es CRUCIAL para que el orden del disco se respete.
+        songsInCurrentAlbum.sort((a, b) => {
+            const getTrackNumber = (filename) => {
+                // Extrae el número del inicio del filename (ej. "01", "12")
+                const match = filename.match(/^(\d+)/);
+                return match ? parseInt(match[1], 10) : 0; // Devuelve 0 si no encuentra número
+            };
+            return getTrackNumber(a.filename) - getTrackNumber(b.filename);
+        });
+
+        // Encuentra el índice de la canción actual dentro del array ordenado por álbum
+        const currentIndexInAlbum = songsInCurrentAlbum.findIndex(song =>
+            // Usamos 'url' como identificador único para mayor robustez
+            song.url === songs[currentTrackIndex].url
+        );
+
+        if (currentIndexInAlbum !== -1) {
+            // Calcula el siguiente índice dentro del array del álbum (con loop)
+            let nextIndexInAlbum = (currentIndexInAlbum + 1) % songsInCurrentAlbum.length;
+            const nextSongObject = songsInCurrentAlbum[nextIndexInAlbum];
+
+            // Encuentra el índice global de la siguiente canción en el array 'songs' original
+            nextIndex = songs.findIndex(song => song.url === nextSongObject.url);
+        } else {
+            // Si por alguna razón la canción actual no se encuentra en su álbum filtrado/ordenado,
+            // podemos establecer una lógica de fallback, por ejemplo, pasar a la siguiente canción global
+            // o simplemente detener la reproducción. Por ahora, forzamos al siguiente índice general.
+            nextIndex = (currentTrackIndex + 1) % songs.length;
+            console.warn("Canción actual no encontrada en el álbum filtrado. Avanzando a la siguiente canción general.");
+        }
+    } else { // Sin repetición (No Repeat) o Repetir todo (Repeat All)
+        nextIndex = (currentTrackIndex + 1) % songs.length;
+
+        if (repeatMode === 0 && nextIndex === 0 && currentTrackIndex === songs.length - 1) {
+            // Si estamos en el modo "sin repetición" y la última canción ha terminado,
+            // pausa la reproducción y resetea el tiempo.
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            return; // Detiene el flujo para no cargar la primera canción de nuevo
+        }
+    }
+
+    // Actualiza el índice de la canción actual
+    currentTrackIndex = nextIndex;
+    // Carga y reproduce la nueva canción. Asegúrate de que 'loadTrack' exista y use 'song.url' para la fuente.
+    if (loadTrack) {
+        loadTrack(currentTrackIndex);
+    }
+}
+
+// --- Ejemplo de cómo debería ser tu función loadTrack() (si aún no la tienes así) ---
+// Es vital que 'loadTrack' use la 'url' de la canción.
+/*
+function loadTrack(index) {
+    if (index < 0 || index >= songs.length) {
+        console.error("Índice de canción fuera de rango.");
+        return;
+    }
+    const song = songs[index];
+    if (audio) {
+        audio.src = song.url; // Asegúrate de que tu elemento de audio carga la URL
+        audio.play();
+        // Actualiza el display del título, artista, etc.
+        // document.getElementById('songTitle').textContent = song.title;
+        // document.getElementById('songArtist').textContent = song.artist;
+        // ... otros elementos de UI
+    }
+}
+*/
 
 
     
