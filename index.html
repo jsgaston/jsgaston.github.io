@@ -1868,7 +1868,7 @@ function ordenarPor(criterio) {
         } else if (criterio === 'duration') {
             // Comprobación de tipo para duración
             const durA = (typeof a[criterio] === 'number') ? a[criterio] : 0;
-            const durB = (typeof b[criterio] === 'number') ? b[briterio] : 0; // Se corrigió un posible error aquí si 'briterio' no era una variable
+            const durB = (typeof b[criterio] === 'number') ? b[criterio] : 0; // Se corrigió un posible error aquí si 'briterio' no era una variable
             comparison = durA - durB;
         } else if (criterio === 'album') {
             // Comprobaciones de tipo y existencia para álbum
