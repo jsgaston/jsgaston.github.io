@@ -1658,10 +1658,11 @@ const audio = document.getElementById('audio');
       });
 
 // Función auxiliar para extraer el número de pista del nombre del archivo (filename)
+// Función auxiliar para extraer el número de pista del nombre del archivo.
+// Asegúrate de que esta función esté presente en tu script.
 function extractTrackNumber(filename) {
-    // Busca uno o dos dígitos al inicio del string, seguidos de un espacio
+    if (!filename) return null;
     const match = filename.match(/^(\d{1,2})\s/);
-    // Si encuentra una coincidencia, devuelve el número parseado a entero, de lo contrario, null
     return match ? parseInt(match[1], 10) : null;
 }
 
@@ -1838,32 +1839,63 @@ div.classList.remove('hidden');
 
 <script>
 // Añade estas funciones al script existente de la radio
+// Modificación de la función principal de ordenación
 function ordenarPor(criterio) {
-  songs.sort((a, b) => {
-    // Para duración, orden numérico
-    if (criterio === 'duration') {
-      return a.duration - b.duration;
+    // Si el criterio es el mismo, invertimos el orden (ascendente/descendente)
+    if (currentSortCriterion === criterio) {
+        currentSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+    } else {
+        // Si es un nuevo criterio, el orden por defecto es ascendente
+        currentSortOrder = 'asc'; 
     }
-    // Para otros campos, orden alfabético
-    const valA = a[criterio] || '';
-    const valB = b[criterio] || '';
-    return valA.toString().localeCompare(valB.toString());
-  });
-  
-  // Si ya estábamos mostrando una canción, mantenemos la selección
-  const currentUrl = songs[currentTrack]?.url;
-  renderSongList();
-  renderFullSelect();
-  
-  // Restauramos la canción actual si existe
-  if (currentUrl) {
-    const newIndex = songs.findIndex(song => song.url === currentUrl);
-    if (newIndex !== -1) {
-      currentTrack = newIndex;
-      playTrack(currentTrack);
-    }
-  }
+    currentSortCriterion = criterio; // Actualiza el criterio de ordenación actual
+
+    // Lógica de ordenación para el array 'displayedSongs'
+    displayedSongs.sort((a, b) => {
+        let comparison = 0; // Variable para almacenar el resultado de la comparación
+
+        if (criterio === 'title' || criterio === 'artist' || criterio === 'genre') {
+            // Ordenación alfabética para título, artista y género
+            const valA = a[criterio] ? a[criterio].toLowerCase() : '';
+            const valB = b[criterio] ? b[criterio].toLowerCase() : '';
+            comparison = valA.localeCompare(valB);
+        } else if (criterio === 'duration') {
+            // Ordenación numérica para duración
+            comparison = (a[criterio] || 0) - (b[criterio] || 0);
+        } else if (criterio === 'album') {
+            // **Ordenación por Álbum (principal) y luego por Número de Pista (secundaria)**
+            const albumA = a.album ? a.album.toLowerCase() : '';
+            const albumB = b.album ? b.album.toLowerCase() : '';
+            
+            // Primera comparación: por nombre de álbum
+            comparison = albumA.localeCompare(albumB);
+
+            // Si los álbumes son los mismos, entonces se ordena por número de pista
+            if (comparison === 0) {
+                const trackA = extractTrackNumber(a.filename);
+                const trackB = extractTrackNumber(b.filename);
+
+                // Manejo de casos donde los números de pista pueden ser nulos o no existir
+                if (trackA === null && trackB === null) {
+                    comparison = 0; // Si ninguno tiene número de pista, su orden relativo no cambia
+                } else if (trackA === null) {
+                    comparison = 1; // Las canciones sin número de pista van al final
+                } else if (trackB === null) {
+                    comparison = -1; // Las canciones sin número de pista van al final
+                } else {
+                    comparison = trackA - trackB; // Ordena por número de pista de forma ascendente
+                }
+            }
+        }
+
+        // Aplica el orden ascendente o descendente final
+        return currentSortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    // Vuelve a renderizar la lista de canciones con el nuevo orden
+    renderSongList();
 }
+
 
 function mezclarCanciones() {
   // Mezcla las canciones pero mantiene la actual reproduciéndose
