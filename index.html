@@ -527,6 +527,35 @@
       </div>
     </div>
 
+
+
+    <!-- Añade esto en la sección de radio, después del reproductor -->
+<div class="flex flex-wrap gap-3 justify-center mb-6">
+  <button onclick="ordenarPor('artist')" class="radio-button">Ordenar por Artista</button>
+  <button onclick="ordenarPor('title')" class="radio-button">Ordenar por Título</button>
+  <button onclick="ordenarPor('album')" class="radio-button">Ordenar por Álbum</button>
+  <button onclick="ordenarPor('genre')" class="radio-button">Ordenar por Género</button>
+  <button onclick="ordenarPor('duration')" class="radio-button">Ordenar por Duración</button>
+  <button onclick="mezclarCanciones()" class="radio-button">Mezclar Aleatorio</button>
+</div>
+
+<div class="mb-4">
+  <label for="filterGenre" class="form-label mb-2">Filtrar por género:</label>
+  <select id="filterGenre" class="form-input rounded-lg" onchange="filtrarPorGenero()">
+    <option value="">Todos los géneros</option>
+  </select>
+</div>
+
+<div class="mb-4">
+  <label for="filterArtist" class="form-label mb-2">Filtrar por artista:</label>
+  <select id="filterArtist" class="form-input rounded-lg" onchange="filtrarPorArtista()">
+    <option value="">Todos los artistas</option>
+  </select>
+</div>
+
+
+            
+
     <!-- Lista visible -->
     <ul id="songList" class="list-disc px-6 text-left text-gray-800 space-y-1 mb-6"></ul>
 
@@ -1510,17 +1539,40 @@ function showMainTab(tabName) {
   
 
      <script>
-          function mezclarYReproducir() {
-            fetch('music_list.json')
-              .then(response => response.json())
-              .then(data => {
-                playlist = data.map(song => song.url);
-                shuffleArray(playlist);
-                currentTrack = 0;
-                playNextTrack();
-              })
-              .catch(error => console.error('Error al mezclar canciones:', error));
-          }
+// Modifica la función que carga las canciones para inicializar los filtros
+fetch('music_list.json')
+  .then(res => res.json())
+  .then(data => {
+    songs = data;
+    
+    // Inicializar filtro de géneros
+    const generos = [...new Set(data.map(song => song.genre).filter(Boolean))];
+    const filterGenre = document.getElementById('filterGenre');
+    generos.forEach(genero => {
+      const option = document.createElement('option');
+      option.value = genero;
+      option.textContent = genero;
+      filterGenre.appendChild(option);
+    });
+    
+    // Inicializar filtro de artistas
+    const artistas = [...new Set(data.map(song => song.artist).filter(Boolean))];
+    const filterArtist = document.getElementById('filterArtist');
+    artistas.forEach(artista => {
+      const option = document.createElement('option');
+      option.value = artista;
+      option.textContent = artista;
+      filterArtist.appendChild(option);
+    });
+    
+    renderSongList();
+    renderFullSelect();
+    playTrack(0);
+  })
+  .catch(err => {
+    currentSongSpan.textContent = 'Error al cargar canciones';
+    console.error('Error:', err);
+  });
     </script>
 
 <script>
@@ -1709,6 +1761,134 @@ div.classList.remove('hidden');
 }
 
 </script>
+
+
+
+<script>
+// Añade estas funciones al script existente de la radio
+function ordenarPor(criterio) {
+  songs.sort((a, b) => {
+    // Para duración, orden numérico
+    if (criterio === 'duration') {
+      return a.duration - b.duration;
+    }
+    // Para otros campos, orden alfabético
+    const valA = a[criterio] || '';
+    const valB = b[criterio] || '';
+    return valA.toString().localeCompare(valB.toString());
+  });
+  
+  // Si ya estábamos mostrando una canción, mantenemos la selección
+  const currentUrl = songs[currentTrack]?.url;
+  renderSongList();
+  renderFullSelect();
+  
+  // Restauramos la canción actual si existe
+  if (currentUrl) {
+    const newIndex = songs.findIndex(song => song.url === currentUrl);
+    if (newIndex !== -1) {
+      currentTrack = newIndex;
+      playTrack(currentTrack);
+    }
+  }
+}
+
+function mezclarCanciones() {
+  // Mezcla las canciones pero mantiene la actual reproduciéndose
+  const currentUrl = songs[currentTrack]?.url;
+  
+  // Algoritmo de Fisher-Yates para mezclar
+  for (let i = songs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [songs[i], songs[j]] = [songs[j], songs[i]];
+  }
+  
+  renderSongList();
+  renderFullSelect();
+  
+  // Encuentra y reproduce la canción que estaba sonando
+  if (currentUrl) {
+    const newIndex = songs.findIndex(song => song.url === currentUrl);
+    if (newIndex !== -1) {
+      currentTrack = newIndex;
+    }
+  }
+}
+
+function filtrarPorGenero() {
+  const genero = document.getElementById('filterGenre').value;
+  if (!genero) {
+    renderSongList();
+    return;
+  }
+  
+  const filtered = songs.filter(song => song.genre === genero);
+  renderFilteredList(filtered);
+}
+
+function filtrarPorArtista() {
+  const artista = document.getElementById('filterArtist').value;
+  if (!artista) {
+    renderSongList();
+    return;
+  }
+  
+  const filtered = songs.filter(song => song.artist === artista);
+  renderFilteredList(filtered);
+}
+
+function renderFilteredList(filteredSongs) {
+  songListElement.innerHTML = '';
+  
+  filteredSongs.forEach((song, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = (songs[currentTrack]?.url === song.url ? '🔊 ' : '') + 
+                  (song.artist ? `${song.artist} - ` : '') + 
+                  (song.title || `Canción ${i + 1}`);
+    
+    li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
+    
+    if (songs[currentTrack]?.url === song.url) {
+      li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
+    } else {
+      li.classList.add('hover:bg-gray-100');
+    }
+    
+    li.title = `Artista: ${song.artist}\nÁlbum: ${song.album}\nGénero: ${song.genre}\nAño: ${song.year}\nDuración: ${Math.floor(song.duration / 60)}:${String(song.duration % 60).padStart(2, '0')}`;
+    li.onclick = () => {
+      const originalIndex = songs.findIndex(s => s.url === song.url);
+      if (originalIndex !== -1) {
+        currentTrack = originalIndex;
+        playTrack(currentTrack);
+      }
+    };
+    songListElement.appendChild(li);
+  });
+}
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 <script>
 function uploadToDrive() {
