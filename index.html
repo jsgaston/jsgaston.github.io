@@ -1657,32 +1657,47 @@ const audio = document.getElementById('audio');
         console.error('Error:', err);
       });
 
-function renderSongList() {
-  songListElement.innerHTML = '';
-  const start = Math.max(currentTrack - 5, 0);
-  const end = Math.min(currentTrack + 6, songs.length);
+// Función auxiliar para extraer el número de pista del nombre del archivo (filename)
+function extractTrackNumber(filename) {
+    // Busca uno o dos dígitos al inicio del string, seguidos de un espacio
+    const match = filename.match(/^(\d{1,2})\s/);
+    // Si encuentra una coincidencia, devuelve el número parseado a entero, de lo contrario, null
+    return match ? parseInt(match[1], 10) : null;
+}
 
-  for (let i = start; i < end; i++) {
-    const li = document.createElement('li');
-    // Cambiar esta línea para mostrar artista y título
-    li.innerHTML = (i === currentTrack ? '🔊 ' : '') + 
-                  (songs[i].artist ? `${songs[i].artist} - ` : '') + 
-                  (songs[i].title || `Canción ${i + 1}`);
-    
-    li.classList.add('cursor-pointer', 'py-1', 'px-2', 'rounded-md');
+// Modifica o reemplaza tu función renderSongList existente con esta versión
+function renderSongList(songsToRender = songs) { // Asume que 'songs' es tu array global de canciones
+    const songListElement = document.getElementById('songList');
+    songListElement.innerHTML = ''; // Limpia la lista existente
 
-    if (i === currentTrack) {
-      li.classList.add('bg-indigo-100', 'text-indigo-700', 'border', 'border-indigo-400', 'font-bold');
-    } else {
-      li.classList.add('hover:bg-gray-100');
+    // Asegúrate de que songsToRender sea un array y contenga elementos
+    if (!songsToRender || songsToRender.length === 0) {
+        songListElement.innerHTML = '<li class="text-center text-gray-500">No hay canciones para mostrar.</li>';
+        return;
     }
 
-    const song = songs[i];
-    li.title = `Artista: ${song.artist}\nÁlbum: ${song.album}\nGénero: ${song.genre}\nAño: ${song.year}\nDuración: ${Math.floor(song.duration / 60)}:${String(song.duration % 60).padStart(2, '0')}`;
+    songsToRender.forEach(song => {
+        const listItem = document.createElement('li');
+        
+        // Extrae el número de pista usando la nueva función
+        const trackNumber = extractTrackNumber(song.filename);
+        const trackPrefix = trackNumber !== null ? `${trackNumber}. ` : ''; // Añade ". " si se encuentra el número
 
-    li.onclick = () => playTrack(i);
-    songListElement.appendChild(li);
-  }
+        // Construye el contenido del elemento de la lista con la nueva información
+        listItem.innerHTML = `
+            <div class="py-1">
+                <strong>${trackPrefix}${song.title}</strong> - ${song.artist}
+                <br>
+                <small class="text-gray-600">Álbum: ${song.album}</small>
+            </div>
+        `;
+        
+        listItem.style.cursor = 'pointer'; // Indica que el elemento es clickeable
+        // Asume que tienes una función playTrack(song) definida en tu script
+        listItem.onclick = () => playTrack(song); 
+        
+        songListElement.appendChild(listItem);
+    });
 }
 
 function renderFullSelect() {
