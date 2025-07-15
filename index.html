@@ -1638,13 +1638,26 @@ function renderFullSelect() {
       if (!isNaN(index)) playTrack(index);
     });
 
-    function toggleShuffle() {
-      isShuffling = !isShuffling;
-      const shuffleBtn = document.getElementById('shuffleBtn');
-      shuffleBtn.classList.toggle('bg-indigo-500', isShuffling);
-      shuffleBtn.classList.toggle('text-white', isShuffling);
+function toggleShuffle() {
+  isShuffling = !isShuffling;
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  
+  if (isShuffling) {
+    shuffleBtn.innerHTML = '🔀 Shuffle ON';
+    shuffleBtn.classList.add('bg-indigo-500', 'text-white');
+    shuffleBtn.classList.remove('bg-gray-300', 'text-gray-800');
+  } else {
+    shuffleBtn.innerHTML = '🔀 Shuffle OFF'; 
+    shuffleBtn.classList.remove('bg-indigo-500', 'text-white');
+    shuffleBtn.classList.add('bg-gray-300', 'text-gray-800');
+  }
+}
 
-    }
+// Inicializar el estado del botón al cargar
+document.addEventListener('DOMContentLoaded', () => {
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  shuffleBtn.innerHTML = '🔀 Shuffle OFF';
+});
 
     function toggleRepeat() {
       const btn = document.getElementById('repeatBtn');
