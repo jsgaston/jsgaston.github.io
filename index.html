@@ -1661,15 +1661,26 @@ function renderSongList(list = songs) {
   songListElement.innerHTML = '';
   list.forEach((song, index) => {
     const li = document.createElement('li');
-    li.textContent = `${song.title} - ${song.artist}`;
+
+    const isPlaying = index === currentSongIndex;
+    li.textContent = `${isPlaying ? '🔊 ' : ''}${song.title} - ${song.artist}`;
     li.className = 'cursor-pointer hover:underline';
+
+    if (isPlaying) {
+      li.style.fontWeight = 'bold';
+      li.style.color = '#4f46e5';
+    }
+
     li.addEventListener('click', () => {
       currentSongIndex = index;
       playTrack(currentSongIndex, list);
+      renderSongList(list); // actualiza el icono activo
     });
+
     songListElement.appendChild(li);
   });
 }
+
 
 
 function renderFullSelect(list = songs) {
@@ -1699,7 +1710,11 @@ function playTrack(index, list = songs) {
   currentSongSpan.textContent = `${song.title} - ${song.artist}`;
   const nextIndex = (index + 1) % list.length;
   nextSongSpan.textContent = `Siguiente: ${list[nextIndex].title} - ${list[nextIndex].artist}`;
+
+  currentSongIndex = index;
+  renderSongList(list); // actualiza iconos al cambiar canción
 }
+
 
 
     function prevTrack() {
