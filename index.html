@@ -1531,26 +1531,20 @@ function updateElapsedTime() {
   }
 
   const msElapsed = endDate - startDate;
-
-  if (msElapsed < 0) {
-    document.getElementById("elapsedDaysText").textContent = "La fecha inicial es posterior a la final.";
-    return;
-  }
-
   const totalSeconds = Math.floor(msElapsed / 1000);
-  const totalMinutes = Math.floor(msElapsed / 60000);
-  const totalHours = Math.floor(msElapsed / 3600000);
-  const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
 
-  // Valores visuales básicos
+  // Cálculos base
+  const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((msElapsed / (1000 * 60)) % 60);
+
+  // Mostrar tiempo básico
   document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = totalHours.toLocaleString();
-  document.getElementById("elapsedMinutes").textContent = totalMinutes.toLocaleString();
+  document.getElementById("elapsedHours").textContent = Math.floor(msElapsed / (1000 * 60 * 60)).toLocaleString();
+  document.getElementById("elapsedMinutes").textContent = Math.floor(msElapsed / (1000 * 60)).toLocaleString();
   document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
 
-  // Añadir si quieres mostrar estos valores en el HTML:
+  // Conversiones especiales
   let extra = document.getElementById("extraTimeUnits");
   if (!extra) {
     extra = document.createElement("div");
@@ -1559,13 +1553,12 @@ function updateElapsedTime() {
     document.getElementById("mainTimeElapsedSection").appendChild(extra);
   }
 
-  // Usando las nuevas equivalencias
   extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds * (10/17)).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas del sol):</strong> ${(totalSeconds * (10/17)).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :- (Porciones medianas del sol):</strong> ${(totalSeconds * (10/1700)).toLocaleString(undefined, {maximumFractionDigits: 5})}</div>
-    <div><strong>Total en : (Porciones grandes del sol):</strong> ${(totalSeconds * (10/170000)).toLocaleString(undefined, {maximumFractionDigits: 8})}</div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds * (10/340000)).toLocaleString(undefined, {maximumFractionDigits: 10})}</div>
+    <div><strong>Total en tiradas:</strong> ${(totalSeconds / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds / 86400).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
   `;
 }
 
