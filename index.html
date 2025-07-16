@@ -287,10 +287,11 @@
         body > script:not([src]) {
   display: none;
 }
-            .number-image {
-        height: 1em;
+.visual-numbers {
+    height: 1em;
         vertical-align: middle;
-    }
+}
+
 
 
 
@@ -797,17 +798,32 @@
 
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
 
+    <div class="visual-numbers">
+ 
+
   <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
     <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
     <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span> h </div>
+          <div class="visual-number">
+        <span id="visual-hours"></span> h
+    </div>
     <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
+          <div class="visual-number">
+        <span id="visual-minutes"></span> m
+    </div>
     <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
+                <div class="visual-number">
+        <span id="visual-seconds"></span> m
+    </div>
   </div>
 
-    <div>
-    <strong>Total en h (horas):</strong> 
-    <span id="hours-number">373.523</span> h
+
+    
+    <!-- Continúa con los demás campos... -->
 </div>
+
+
+    
 
     
 </div>
@@ -2387,29 +2403,25 @@ async function cargarHistorias() {
 
 
 <script>
-function displayNumberAsImages(number, elementId) {
-    const numberStr = Math.floor(number).toString(); // Elimina decimales
+function createVisualNumber(number, elementId) {
+    const numStr = Math.floor(number).toString();
     const container = document.getElementById(elementId);
-    container.innerHTML = ''; // Limpia el contenido anterior
     
-    for (let i = 0; i < numberStr.length; i++) {
-        const digit = numberStr[i];
+    for (let digit of numStr) {
         const img = document.createElement('img');
         img.src = `UniversalSistemNumbers/${digit}.jpg`;
         img.alt = digit;
-        img.className = 'number-image';
+        img.className = 'digit-img';
         container.appendChild(img);
     }
 }
 
-// Llama a esta función para cada resultado cuando la página cargue
-window.onload = function() {
-    displayNumberAsImages(373523, 'hours-number');
-    displayNumberAsImages(22411414, 'minutes-number');
-    displayNumberAsImages(1344684840, 'seconds-number');
-    displayNumberAsImages(790991082, 'tiradas-number');
-    // Continúa con los demás resultados...
-};
+document.addEventListener('DOMContentLoaded', function() {
+    createVisualNumber(373523, 'visual-hours');
+    createVisualNumber(22411414, 'visual-minutes');
+    createVisualNumber(1344684840, 'visual-seconds');
+    // Añade las demás llamadas para cada resultado
+});
 </script>
 
     
