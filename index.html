@@ -2730,7 +2730,10 @@ function convertTime() {
     const fromUnit = document.getElementById('fromUnit').value;
     const toUnit = document.getElementById('toUnit').value;
     const calculationDetails = document.getElementById('calculationDetails');
+    const visualRepresentation = document.getElementById('visualRepresentation');
+
     calculationDetails.innerHTML = ''; // Limpiar detalles anteriores
+    visualRepresentation.innerHTML = ''; // Limpiar representaciones anteriores
 
     if (isNaN(fromValue)) {
         alert("Por favor ingresa un valor válido");
@@ -2740,34 +2743,76 @@ function convertTime() {
     if (fromUnit === toUnit) {
         document.getElementById('toValue').value = fromValue;
         calculationDetails.innerHTML = `<p>${fromValue} ${fromUnit} es igual a ${fromValue} ${toUnit}. No se necesita conversión.</p>`;
+        // También mostrar en la representación visual si no hay conversión
+        visualRepresentation.innerHTML = `<p>${fromValue} ${fromUnit} = ${fromValue} ${toUnit}</p>`;
         return;
     }
 
     let result;
     let intermediateValueInSeconds;
+    let detailsHtml = '';
 
-    // Convertir el valor de origen a segundos como un paso intermedio para mostrar la cadena de cálculo
+    // Paso 1: Convertir el valor de origen a segundos
     if (fromUnit !== 'segundos') {
         intermediateValueInSeconds = fromValue * units[fromUnit]['segundos'];
-        calculationDetails.innerHTML += `<p>${fromValue} ${fromUnit} * ${units[fromUnit]['segundos']} segundos/${fromUnit} = ${intermediateValueInSeconds} segundos</p>`;
+        detailsHtml += `<p>1. Conversión a segundos: ${fromValue} ${fromUnit} &times; ${units[fromUnit]['segundos']} segundos/${fromUnit} = ${intermediateValueInSeconds.toFixed(6)} segundos</p>`;
     } else {
         intermediateValueInSeconds = fromValue;
-        calculationDetails.innerHTML += `<p>Valor inicial: ${fromValue} segundos</p>`;
+        detailsHtml += `<p>1. Valor inicial (ya en segundos): ${fromValue} segundos</p>`;
     }
 
-
-    // Convertir de segundos a la unidad de destino
+    // Paso 2: Convertir de segundos a la unidad de destino
     if (toUnit !== 'segundos') {
         result = intermediateValueInSeconds * units['segundos'][toUnit];
-        calculationDetails.innerHTML += `<p>${intermediateValueInSeconds} segundos * ${units['segundos'][toUnit]} ${toUnit}/segundo = ${result} ${toUnit}</p>`;
+        detailsHtml += `<p>2. Conversión a ${toUnit}: ${intermediateValueInSeconds.toFixed(6)} segundos &times; ${units['segundos'][toUnit]} ${toUnit}/segundo = ${result.toFixed(6)} ${toUnit}</p>`;
     } else {
         result = intermediateValueInSeconds;
     }
 
-    document.getElementById('toValue').value = result.toFixed(6); // Limita a 6 decimales para mejor visualización
-    calculationDetails.innerHTML += `<p>Resultado final: ${fromValue} ${fromUnit} es igual a ${result.toFixed(6)} ${toUnit}</p>`;
-}
+    // Redondeo especial para "años"
+    if (toUnit === 'años') {
+        result = Math.floor(result); // Redondear hacia abajo para años
+        detailsHtml += `<p>3. Redondeo para años: ${result} años (redondeado al número entero menor)</p>`;
+    }
 
+    document.getElementById('toValue').value = result.toFixed(6); // Limita a 6 decimales para mejor visualización (a menos que sea años redondeados)
+    calculationDetails.innerHTML = detailsHtml + `<p>Resultado final: ${fromValue} ${fromUnit} es igual a ${result.toFixed(6)} ${toUnit}</p>`;
+
+
+    // --- Representación visual de los resultados ---
+    // Esta sección generará los valores para todas las unidades que te interesan.
+    // Asumimos que quieres ver el equivalente del 'fromValue' original en todas estas unidades.
+    let visualHtml = '<h3>Representación visual de los resultados</h3>';
+    visualHtml += '<p>Los siguientes valores representan la conversión del valor original a las diferentes unidades:</p>';
+
+    // Calcular y mostrar para cada unidad, incluyendo ':_','-:',':','o' (días), y 'años'
+    const unitsToShow = ['segundos', 'minutos', 'horas', 'dias', 'años', 'tiradas', ':-_', ':-', ':'];
+
+    unitsToShow.forEach(unit => {
+        let convertedValue;
+        if (unit === fromUnit) {
+            convertedValue = fromValue;
+        } else {
+            // Convertir de la unidad de origen a segundos, luego de segundos a la unidad actual
+            let valueInSeconds = fromValue * units[fromUnit]['segundos'];
+            convertedValue = valueInSeconds * units['segundos'][unit];
+        }
+
+        let displayValue;
+        if (unit === 'años') {
+            displayValue = Math.floor(convertedValue); // Redondear años al número entero menor
+        } else {
+            displayValue = convertedValue.toFixed(6); // Otros valores a 6 decimales
+        }
+
+        visualHtml += `<p>${fromValue} ${fromUnit} = ${displayValue} ${unit}</p>`;
+    });
+
+    visualRepresentation.innerHTML = visualHtml;
+
+    // Finalmente, añadir la imagen del encabezado
+    visualRepresentation.innerHTML += `<img src="UniversalSistemNumbers/cabeza de pagina.jpg" alt="Encabezado del Sistema Universal de Números" style="max-width:100%; height:auto; margin-top: 20px;">`;
+}
 </script>
 
 </body>
