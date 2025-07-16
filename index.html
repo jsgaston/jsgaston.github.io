@@ -608,28 +608,7 @@
 <div id="mainTimeConverterSection" class="main-tab-content hidden">
    
     
-    <div>
-        <label for="toUnit" class="form-label mb-2">A:</label>
-        <select id="toUnit" class="form-input rounded-lg">
-            <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
-            <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
-            <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
-            <option value="soles"> o (Soles) </option>
-            <option value="tiradas"> Tiradas </option>
-            <option value="segundos">Segundos</option>
-            <option value="minutos">Minutos</option>
-            <option value="horas">Horas</option>
-            <option value="dias">Días</option>
-            <option value="años">Años</option>
-        </select>
-    </div>
-    
-    <div>
-        <label for="toValue" class="form-label mb-2">Resultado:</label>
-        <input type="number" id="toValue" class="form-input rounded-lg bg-gray-100" readonly>
-    </div>
 
-    <button onclick="convertTime()" class="btn w-full">Convertir</button>
 
     <div class="mt-8 bg-gray-50 p-4 rounded-lg">
         <h3 class="text-lg font-semibold mb-2">Definición de unidad de tiempo:</h3>
@@ -655,6 +634,31 @@
             <li>1 año = 365.25 días</li>
         </ul>
     </div>
+
+    <div>
+        <label for="toUnit" class="form-label mb-2">A:</label>
+        <select id="toUnit" class="form-input rounded-lg">
+            <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
+            <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
+            <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
+            <option value="soles"> o (Soles) </option>
+            <option value="tiradas"> Tiradas </option>
+            <option value="segundos">Segundos</option>
+            <option value="minutos">Minutos</option>
+            <option value="horas">Horas</option>
+            <option value="dias">Días</option>
+            <option value="años">Años</option>
+        </select>
+    </div>
+    
+    <div>
+        <label for="toValue" class="form-label mb-2">Resultado:</label>
+        <input type="number" id="toValue" class="form-input rounded-lg bg-gray-100" readonly>
+    </div>
+
+    <button onclick="convertTime()" class="btn w-full">Convertir</button>
+
+    
 
      <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Conversor de Unidades de Tiempo</h2>
     
