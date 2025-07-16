@@ -606,30 +606,7 @@
 
         <!-- -Seccion conversor de unidades de tiempo -->
 <div id="mainTimeConverterSection" class="main-tab-content hidden">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Conversor de Unidades de Tiempo</h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-            <label for="fromValue" class="form-label mb-2">Valor:</label>
-            <input type="number" id="fromValue" class="form-input rounded-lg" placeholder="Ingresa el valor" step="any">
-        </div>
-        
-        <div>
-            <label for="fromUnit" class="form-label mb-2">De:</label>
-            <select id="fromUnit" class="form-input rounded-lg">
-                <option value="segundos">Segundos</option>
-                <option value="minutos">Minutos</option>
-                <option value="horas">Horas</option>
-                <option value="dias">Días</option>
-                <option value="años">Años</option>
-                <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
-                <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
-                <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
-                <option value="soles"> o (Soles) </option>
-                <option value="tiradas"> Tiradas </option>
-            </select>
-        </div>
-    </div>
+   
     
     <div>
         <label for="toUnit" class="form-label mb-2">A:</label>
@@ -668,6 +645,7 @@
                         <h3 class="text-lg font-semibold mb-2">Equivalencias:</h3>
         <ul class="list-disc pl-5 space-y-1">
             <li>10 tiradas = 17 segundos</li>
+            <li>1 tiradas = 1 :-_</li>
             <li>1 o = 20 : </li>
             <li>1 : = 100 :-</li>
             <li>1 :- = 100 :-_</li>
@@ -677,6 +655,35 @@
             <li>1 año = 365.25 días</li>
         </ul>
     </div>
+
+     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Conversor de Unidades de Tiempo</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <label for="fromValue" class="form-label mb-2">Valor:</label>
+            <input type="number" id="fromValue" class="form-input rounded-lg" placeholder="Ingresa el valor" step="any">
+        </div>
+        
+        <div>
+            <label for="fromUnit" class="form-label mb-2">De:</label>
+            <select id="fromUnit" class="form-input rounded-lg">
+                <option value="segundos">Segundos</option>
+                <option value="minutos">Minutos</option>
+                <option value="horas">Horas</option>
+                <option value="dias">Días</option>
+                <option value="años">Años</option>
+                <option value="Porciones_pequeñas_del_sol"> :-_ (Porciones pequeñas del sol) </option>
+                <option value="Porciones_medianas_del_sol"> :- (Porciones medianas del sol) </option>
+                <option value="Porciones_grandes_del_sol"> : (Porciones grandes del sol) </option>
+                <option value="soles"> o (Soles) </option>
+                <option value="tiradas"> Tiradas </option>
+            </select>
+        </div>
+    </div>
+
+
+
+    
 </div> <!-- Este es el </div> que cierra mainTimeConverterSection -->
 
 
