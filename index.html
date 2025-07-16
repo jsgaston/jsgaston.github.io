@@ -351,6 +351,160 @@
 
 
 
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Un gris claro para el fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: url('mi%20bandera.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo ligeramente transparente */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 100%;
+            max-width: 800px; /* Ancho máximo para el contenedor principal */
+            display: flex;
+            flex-direction: column; /* Organiza los elementos verticalmente */
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+        .converter-box {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px; /* Espacio entre el conversor y los detalles */
+            width: 100%;
+            max-width: 500px;
+            text-align: left;
+        }
+        .converter-box label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        .converter-box input[type="number"],
+        .converter-box select {
+            width: calc(100% - 20px); /* Ajuste para padding */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box; /* Incluye padding y border en el ancho */
+        }
+        .converter-box button {
+            background-color: #007bff; /* Un azul vibrante */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        .converter-box button:hover {
+            background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+        }
+        .output-section {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .output-section label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .output-section input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            font-size: 1.1em;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* Estilos para el cuadro de detalles de cálculo */
+        .calculation-details-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px; /* Igual que el converter-box para consistencia */
+            margin-top: 20px; /* Espacio entre el conversor y los detalles */
+            text-align: left;
+            word-wrap: break-word; /* Para asegurar que el texto largo se ajuste */
+        }
+
+        .calculation-details-box h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .calculation-details-box p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        /* Nuevo estilo para la representación visual */
+        .visual-representation-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .visual-representation-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .visual-representation-box p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+
+
 
 
 
@@ -866,6 +1020,63 @@
     
     <!-- Continúa con los demás campos... -->
 </div>
+
+
+
+<div class="container">
+        <h1>Conversor de Tiempo</h1>
+
+        <div class="converter-box">
+            <label for="fromValue">Valor a convertir:</label>
+            <input type="number" id="fromValue" value="1">
+
+            <label for="fromUnit">De unidad:</label>
+            <select id="fromUnit">
+                <option value="segundos">Segundos</option>
+                <option value="minutos">Minutos</option>
+                <option value="horas">Horas</option>
+                <option value="dias">Días ("o")</option>
+                <option value="años">Años</option>
+                <option value="tiradas">Tiradas</option>
+                <option value=":-_">:-_</option>
+                <option value=":-">:-</option>
+                <option value=":">:</option>
+            </select>
+
+            <label for="toUnit">A unidad:</label>
+            <select id="toUnit">
+                <option value="segundos">Segundos</option>
+                <option value="minutos">Minutos</option>
+                <option value="horas">Horas</option>
+                <option value="dias">Días ("o")</option>
+                <option value="años">Años</option>
+                <option value="tiradas">Tiradas</option>
+                <option value=":-_">:-_</option>
+                <option value=":-">:-</option>
+                <option value=":">:</option>
+            </select>
+
+            <button onclick="convertirTiempo()">Convertir</button>
+
+            <div class="output-section">
+                <label for="toValue">Resultado:</label>
+                <input type="text" id="toValue" readonly>
+            </div>
+        </div>
+
+        <div class="calculation-details-box" id="calculationDetails">
+            <h2>Detalles del Cálculo</h2>
+            </div>
+
+        <div class="visual-representation-box" id="visualRepresentation">
+            </div>
+
+    </div>
+
+    
+
+
+    
 
 
 
