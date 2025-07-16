@@ -2363,108 +2363,144 @@ async function cargarHistorias() {
 // Añade esta función para las conversiones:
 function convertTime() {
     const conversionRates = {
-        tiradas: {
-            segundos: 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            años: 1.7 / (86400*365.25),
-            dias: 1.7 / (60*60*24),
-            horas: 1.7 / (60*60),
-            minutos: 1.7 / (60),
-            soles : (60*60*24) / 1.7, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol :  (60*24) / 1.7 ,
-            Porciones_medianas_del_sol :  (60) / 1.7 ,
-            Porciones_pequeñas_del_sol : 1 / 1.7
-        },
-        segundos: {
-            tiradas: 1 / 1.7,
-            años: 1 / (86400*365.25),
-            dias: 1 / (60*60*24),
-            horas: 1 / (60*60),
-            minutos: 1/ (60),
-            soles :1.7 /  (60*60*24) , // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol :  1.7  /  (60*24),
-            Porciones_medianas_del_sol :  1.7 / 60,
-            Porciones_pequeñas_del_sol : 1.7
-        },
-        dias: {
-            tiradas: 1*60*60 / 1.7,
-            años: 1*60*60 / (86400*365.25),
-            dias: 1*60*60 / (60*60*24),
-            horas: 1*60*60/ (60*60),
-            minutos: 1*60,
-            soles :20 , // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol :  1.7*60*60*24  /  (60*24),
-            Porciones_medianas_del_sol :  1.7*60*60*24 / 60,
-            Porciones_pequeñas_del_sol : 1.7*60*60*24
-        },
-        horas: {
-            tiradas: 1*60*60 / 1.7,
-            años: 1*60*60 / (86400*365.25),
-            dias: 1*60*60 / (60*60*24),
-            horas: 1*60*60/ (60*60),
-            minutos: 1*60,
-            soles :1.7*60*60 /  (60*60*24) , // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol :  1.7*60*60  /  (60*24),
-            Porciones_medianas_del_sol :  1.7*60*60 / 60,
-            Porciones_pequeñas_del_sol : 1.7*60*60
-        },
-        minutos: {
-            tiradas: 1*60 / 1.7,
-            años: 1*60 / (86400*365.25),
-            dias: 1*60 / (60*60*24),
-            horas: 1*60/ (60*60),
-            minutos: 1,
-            soles :1.7*60 /  (60*60*24) , // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol :  1.7*60  /  (60*24),
-            Porciones_medianas_del_sol :  1.7*60 / 60,
-            Porciones_pequeñas_del_sol : 1.7*60
-        },
+    // Conversions from 'segundos'
+    segundos: {
+        // As established: 1 tirada = 1.7 segundos. So, 1 segundo = 1/1.7 tiradas.
+        tiradas: 1 / 1.7,
+        // If 1 Porcion_pequeña_del_sol = 1.7 segundos, then 1 segundo = 1/1.7 Porciones_pequeñas_del_sol
+        Porciones_pequeñas_del_sol: 1 / 1.7,
+        // Time conversions (assuming standard values)
+        minutos: 1 / 60,
+        horas: 1 / (60 * 60),
+        dias: 1 / (60 * 60 * 24),
+        años: 1 / (60 * 60 * 24 * 365.25), // Using 365.25 for a more accurate year
+        
+        // Conversions to other 'sol' units from 'segundos'
+        // If 1 Porcion_pequeña_del_sol = 1.7 segundos, and assuming:
+        // 1 Porcion_mediana_del_sol = 100 Porciones_pequeñas_del_sol
+        // 1 Porcion_grande_del_sol = 100 Porciones_medianas_del_sol (100*100 Porciones_pequeñas_del_sol)
+        // 1 sol = 20 Porciones_grandes_del_sol (20*100*100 Porciones_pequeñas_del_sol)
 
+        // So, 1 Porcion_mediana_del_sol = 100 * 1.7 segundos = 170 segundos
+        Porciones_medianas_del_sol: 1 / (100 * 1.7), // 1 segundo = 1/(100*1.7) Porciones_medianas_del_sol
+        // 1 Porcion_grande_del_sol = 100 * 100 * 1.7 segundos = 17000 segundos
+        Porciones_grandes_del_sol: 1 / (100 * 100 * 1.7), // 1 segundo = 1/(100*100*1.7) Porciones_grandes_del_sol
+        // 1 sol = 20 * 100 * 100 * 1.7 segundos = 340000 segundos
+        soles: 1 / (20 * 100 * 100 * 1.7) // 1 segundo = 1/(20*100*100*1.7) soles
+    },
 
-        soles: {
-            segundos: 1.7 * 60*60*24, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            años: (365.25),
-            dias: 1,
-            horas: 1.7 * (24),
-            minutos: 1.7 * (60*24),
-            soles : 1, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol :  20 ,
-            Porciones_medianas_del_sol :  100*20 ,
-            Porciones_pequeñas_del_sol : 100*100*20
-        },
-        Porciones_grandes_del_sol: {
-            tiradas: 100*100 / 1.7,
-            años: 1.7*100*100 / (86400*365.25),
-            dias: 1.7*100*100*20 / (60*60*24),
-            horas: 1.7*100*100*20 / (60*60),
-            minutos: 1.7 / (60),
-            soles :1 /  20 , // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol :  1,
-            Porciones_medianas_del_sol :  100,
-            Porciones_pequeñas_del_sol : 100*100
-        },
-        Porciones_medianas_del_sol: {
-            tiradas: 100 / 1.7,
-            años: 1.7*100 / (86400*365.25),
-            dias: 1.7*100 / (60*60*24),
-            horas: 1.7*100 / (60*60),
-            minutos: 1.7*100 / (60),
-            soles :1 /  20*100, // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol : 1/ 100,
-            Porciones_medianas_del_sol :  1,
-            Porciones_pequeñas_del_sol : 100
-        },
-        Porciones_pequeñas_del_sol: {
-            tiradas: 1 / 1.7,
-            años: 1.7*1 / (86400*365.25),
-            dias: 1.7*1 / (60*60*24),
-            horas: 1.7*1 / (60*60),
-            minutos: 1.7*1 / (60),
-            soles :1 /  20*100*100 , // 10 tiradas = 17 segundos → 1 tirada = 1.7 segundos
-            Porciones_grandes_del_sol : 1/ 100*100,
-            Porciones_medianas_del_sol : 1/ 100,
-            Porciones_pequeñas_del_sol : 1
-        }
-    };
+    // Conversions from 'tiradas'
+    tiradas: {
+        segundos: 1.7,
+        Porciones_pequeñas_del_sol: 1, // 1 tirada = 1 Porcion_pequeña_del_sol
+        Porciones_medianas_del_sol: 1 / 100, // 1 tirada = 1/100 Porciones_medianas_del_sol
+        Porciones_grandes_del_sol: 1 / (100 * 100), // 1 tirada = 1/(100*100) Porciones_grandes_del_sol
+        soles: 1 / (20 * 100 * 100), // 1 tirada = 1/(20*100*100) soles
+        // And for time units, convert tiradas to seconds first, then seconds to other time units
+        minutos: 1.7 / 60,
+        horas: 1.7 / (60 * 60),
+        dias: 1.7 / (60 * 60 * 24),
+        años: 1.7 / (60 * 60 * 24 * 365.25)
+    },
+
+    // Conversions from 'Porciones_pequeñas_del_sol'
+    Porciones_pequeñas_del_sol: {
+        segundos: 1.7,
+        tiradas: 1, // 1 Porcion_pequeña_del_sol = 1 tirada
+        Porciones_medianas_del_sol: 1 / 100,
+        Porciones_grandes_del_sol: 1 / (100 * 100),
+        soles: 1 / (20 * 100 * 100),
+        minutos: 1.7 / 60,
+        horas: 1.7 / (60 * 60),
+        dias: 1.7 / (60 * 60 * 24),
+        años: 1.7 / (60 * 60 * 24 * 365.25)
+    },
+
+    // Conversions from 'Porciones_medianas_del_sol'
+    Porciones_medianas_del_sol: {
+        segundos: 100 * 1.7,
+        tiradas: 100,
+        Porciones_pequeñas_del_sol: 100,
+        Porciones_grandes_del_sol: 1 / 100,
+        soles: 1 / (20 * 100),
+        minutos: (100 * 1.7) / 60,
+        horas: (100 * 1.7) / (60 * 60),
+        dias: (100 * 1.7) / (60 * 60 * 24),
+        años: (100 * 1.7) / (60 * 60 * 24 * 365.25)
+    },
+
+    // Conversions from 'Porciones_grandes_del_sol'
+    Porciones_grandes_del_sol: {
+        segundos: 100 * 100 * 1.7,
+        tiradas: 100 * 100,
+        Porciones_pequeñas_del_sol: 100 * 100,
+        Porciones_medianas_del_sol: 100,
+        soles: 1 / 20,
+        minutos: (100 * 100 * 1.7) / 60,
+        horas: (100 * 100 * 1.7) / (60 * 60),
+        dias: (100 * 100 * 1.7) / (60 * 60 * 24),
+        años: (100 * 100 * 1.7) / (60 * 60 * 24 * 365.25)
+    },
+
+    // Conversions from 'soles'
+    soles: {
+        segundos: 20 * 100 * 100 * 1.7,
+        tiradas: 20 * 100 * 100,
+        Porciones_pequeñas_del_sol: 20 * 100 * 100,
+        Porciones_medianas_del_sol: 20 * 100,
+        Porciones_grandes_del_sol: 20,
+        minutos: (20 * 100 * 100 * 1.7) / 60,
+        horas: (20 * 100 * 100 * 1.7) / (60 * 60),
+        dias: (20 * 100 * 100 * 1.7) / (60 * 60 * 24),
+        años: (20 * 100 * 100 * 1.7) / (60 * 60 * 24 * 365.25)
+    },
+
+    // Standard time unit conversions (example, you'll need to fill these out for completeness)
+    minutos: {
+        segundos: 60,
+        horas: 1 / 60,
+        dias: 1 / (60 * 24),
+        años: 1 / (60 * 24 * 365.25),
+        tiradas: 60 / 1.7, // Convert to seconds first, then to tiradas
+        Porciones_pequeñas_del_sol: 60 / 1.7,
+        Porciones_medianas_del_sol: 60 / (100 * 1.7),
+        Porciones_grandes_del_sol: 60 / (100 * 100 * 1.7),
+        soles: 60 / (20 * 100 * 100 * 1.7)
+    },
+    horas: {
+        segundos: 60 * 60,
+        minutos: 60,
+        dias: 1 / 24,
+        años: 1 / (24 * 365.25),
+        tiradas: (60 * 60) / 1.7,
+        Porciones_pequeñas_del_sol: (60 * 60) / 1.7,
+        Porciones_medianas_del_sol: (60 * 60) / (100 * 1.7),
+        Porciones_grandes_del_sol: (60 * 60) / (100 * 100 * 1.7),
+        soles: (60 * 60) / (20 * 100 * 100 * 1.7)
+    },
+    dias: {
+        segundos: 60 * 60 * 24,
+        minutos: 60 * 24,
+        horas: 24,
+        años: 1 / 365.25,
+        tiradas: (60 * 60 * 24) / 1.7,
+        Porciones_pequeñas_del_sol: (60 * 60 * 24) / 1.7,
+        Porciones_medianas_del_sol: (60 * 60 * 24) / (100 * 1.7),
+        Porciones_grandes_del_sol: (60 * 60 * 24) / (100 * 100 * 1.7),
+        soles: (60 * 60 * 24) / (20 * 100 * 100 * 1.7)
+    },
+    años: {
+        segundos: 60 * 60 * 24 * 365.25,
+        minutos: 60 * 24 * 365.25,
+        horas: 24 * 365.25,
+        dias: 365.25,
+        tiradas: (60 * 60 * 24 * 365.25) / 1.7,
+        Porciones_pequeñas_del_sol: (60 * 60 * 24 * 365.25) / 1.7,
+        Porciones_medianas_del_sol: (60 * 60 * 24 * 365.25) / (100 * 1.7),
+        Porciones_grandes_del_sol: (60 * 60 * 24 * 365.25) / (100 * 100 * 1.7),
+        soles: (60 * 60 * 24 * 365.25) / (20 * 100 * 100 * 1.7)
+    }
+};
 
     const fromValue = parseFloat(document.getElementById('fromValue').value);
     const fromUnit = document.getElementById('fromUnit').value;
