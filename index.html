@@ -287,10 +287,42 @@
         body > script:not([src]) {
   display: none;
 }
-.visual-numbers {
-    height: 1em;
+
+    .visual-number-container {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    .visual-number-item {
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: white;
+        border-radius: 5px;
+        border-left: 4px solid #4f46e5;
+    }
+    .visual-number-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #4f46e5;
+    }
+    .visual-number-value {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+    .digit-img {
+        height: 24px;
         vertical-align: middle;
-}
+        image-rendering: crisp-edges;
+    }
+    .unit {
+        margin-left: 5px;
+        font-weight: bold;
+    }
+
+
 
 
 
@@ -804,23 +836,86 @@
   <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
     <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
     <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span> h </div>
-          <div class="visual-number">
-        <span id="visual-hours"></span> h
-    </div>
+ 
     <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
-          <div class="visual-number">
-        <span id="visual-minutes"></span> m
-    </div>
+
     <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
-                <div class="visual-number">
-        <span id="visual-seconds"></span> m
-    </div>
+
   </div>
 
 
     
     <!-- Continúa con los demás campos... -->
 </div>
+
+
+    <div class="visual-number-container">
+    <h3>Representación Visual de los Resultados</h3>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en horas (h):</div>
+        <div class="visual-number-value">
+            <span id="visual-hours"></span>
+            <span class="unit">h</span>
+        </div>
+    </div>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en minutos (m):</div>
+        <div class="visual-number-value">
+            <span id="visual-minutes"></span>
+            <span class="unit">m</span>
+        </div>
+    </div>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en segundos (s):</div>
+        <div class="visual-number-value">
+            <span id="visual-seconds"></span>
+            <span class="unit">s</span>
+        </div>
+    </div>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en tiradas:</div>
+        <div class="visual-number-value">
+            <span id="visual-tiradas"></span>
+        </div>
+    </div>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en :-_ (Porciones pequeñas):</div>
+        <div class="visual-number-value">
+            <span id="visual-small-portions"></span>
+            <span class="unit">:-_</span>
+        </div>
+    </div>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en :- (Porciones medianas):</div>
+        <div class="visual-number-value">
+            <span id="visual-medium-portions"></span>
+            <span class="unit">:-</span>
+        </div>
+    </div>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en : (Porciones grandes):</div>
+        <div class="visual-number-value">
+            <span id="visual-large-portions"></span>
+            <span class="unit">:</span>
+        </div>
+    </div>
+    
+    <div class="visual-number-item">
+        <div class="visual-number-label">Total en o (Soles):</div>
+        <div class="visual-number-value">
+            <span id="visual-soles"></span>
+            <span class="unit">o</span>
+        </div>
+    </div>
+</div>
+
 
 
     
@@ -2423,6 +2518,71 @@ document.addEventListener('DOMContentLoaded', function() {
     // Añade las demás llamadas para cada resultado
 });
 </script>
+
+
+
+
+
+<script>
+function createNumberWithImages(number, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    // Eliminar decimales y separadores de miles
+    const numberStr = Math.floor(number).toString();
+    
+    for (let digit of numberStr) {
+        const img = document.createElement('img');
+        img.src = `UniversalSistemNumbers/${digit}.jpg`;
+        img.alt = digit;
+        img.className = 'digit-img';
+        container.appendChild(img);
+    }
+}
+
+function updateVisualNumbers() {
+    // Obtener los valores numéricos de los resultados
+    const hours = parseInt(document.getElementById('elapsedHours').textContent.replace(/\D/g, ''));
+    const minutes = parseInt(document.getElementById('elapsedMinutes').textContent.replace(/\D/g, ''));
+    const seconds = parseInt(document.getElementById('elapsedSeconds').textContent.replace(/\D/g, ''));
+    
+    // Obtener los valores de las conversiones especiales
+    const extraDiv = document.getElementById('extraTimeUnits');
+    if (extraDiv) {
+        const tiradas = parseFloat(extraDiv.textContent.match(/tiradas: ([0-9,.]+)/)[1].replace(',', ''));
+        const smallPortions = parseFloat(extraDiv.textContent.match(/pequeñas\): ([0-9,.]+)/)[1].replace(',', ''));
+        const mediumPortions = parseFloat(extraDiv.textContent.match(/medianas\): ([0-9,.]+)/)[1].replace(',', ''));
+        const largePortions = parseFloat(extraDiv.textContent.match(/grandes\): ([0-9,.]+)/)[1].replace(',', ''));
+        const soles = parseFloat(extraDiv.textContent.match(/Soles\): ([0-9,.]+)/)[1].replace(',', ''));
+        
+        // Crear las representaciones visuales
+        createNumberWithImages(hours, 'visual-hours');
+        createNumberWithImages(minutes, 'visual-minutes');
+        createNumberWithImages(seconds, 'visual-seconds');
+        createNumberWithImages(tiradas, 'visual-tiradas');
+        createNumberWithImages(smallPortions, 'visual-small-portions');
+        createNumberWithImages(mediumPortions, 'visual-medium-portions');
+        createNumberWithImages(largePortions, 'visual-large-portions');
+        createNumberWithImages(soles, 'visual-soles');
+    }
+}
+
+// Modificar la función updateElapsedTime para llamar a updateVisualNumbers
+function updateElapsedTime() {
+    // ... (código existente) ...
+    
+    // Al final de la función, después de actualizar los números
+    updateVisualNumbers();
+}
+
+// Llamar a updateVisualNumbers cuando la página cargue
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar un momento para asegurar que los números están cargados
+    setTimeout(updateVisualNumbers, 500);
+});
+</script>
+
+    
 
     
 
