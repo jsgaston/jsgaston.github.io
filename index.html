@@ -902,17 +902,17 @@ diaryDropZone.addEventListener("drop", e => {
 
 
 
-        const conversionesTiempoEspecial = {
+const conversionesTiempoEspecial = {
     segundos: {
-        tiradas: 1 / 1.7,
+        tiradas: 10 / 17,
         años: 1 / (86400 * 365.25),
         dias: 1 / (60 * 60 * 24),
         horas: 1 / (60 * 60),
         minutos: 1 / 60,
-        soles: 1.7 / (60 * 60 * 24),
-        Porciones_grandes_del_sol: 1.7 / (60 * 24),
-        Porciones_medianas_del_sol: 1.7 / 60,
-        Porciones_pequeñas_del_sol: 1.7
+        "o": 1 / (60 * 60 * 24), // 1 o = 1 día = 86400 segundos
+        ":-_": 1 / 0.432,        // 1 :-_ = 0.432 segundos
+        ":-": 1 / (0.432 * 100), // 1 :- = 100 :-_ = 43.2 segundos
+        ":": 1 / (0.432 * 100 * 100) // 1 : = 100 :- = 4320 segundos
     }
 };
 
@@ -2384,122 +2384,119 @@ async function cargarHistorias() {
 
 <script>
 
-// Añade esta función para las conversiones:
 function convertTime() {
-    // Reemplaza el objeto conversionRates completo con este:
-const conversionRates = {
-    segundos: {
-        tiradas: 10 / 17,         // 10 tiradas = 17 segundos => 1 segundo = 10/17 tiradas
-        ":-_": 10 / 17,           // 1 tirada = 1 :-_ => igual que tiradas
-        ":-": 10 / (17 * 100),    // 1 :- = 100 :-_ => 1 segundo = 10/(17*100) :-
-        ":": 10 / (17 * 100 * 100), // 1 : = 100 :- => 1 segundo = 10/(17*100*100) :
-        "o": 10 / (17 * 100 * 100 * 20), // 1 o = 20 : => 1 segundo = 10/(17*100*100*20) o
-        minutos: 1 / 60,
-        horas: 1 / (60 * 60),
-        dias: 1 / (60 * 60 * 24),
-        años: 1 / (60 * 60 * 24 * 365.25)
-    },
-    tiradas: {
-        segundos: 1.7,            // 10 tiradas = 17 segundos => 1 tirada = 1.7 segundos
-        ":-_": 1,                 // 1 tirada = 1 :-_
-        ":-": 1 / 100,            // 1 :- = 100 :-_
-        ":": 1 / (100 * 100),     // 1 : = 100 :-
-        "o": 1 / (100 * 100 * 20), // 1 o = 20 :
-        minutos: 1.7 / 60,
-        horas: 1.7 / (60 * 60),
-        dias: 1.7 / (60 * 60 * 24),
-        años: 1.7 / (60 * 60 * 24 * 365.25)
-    },
-    ":-_": { // Porciones pequeñas del sol
-        segundos: 1.7,            // igual que tiradas
-        tiradas: 1,               // 1 :-_ = 1 tirada
-        ":-": 1 / 100,            // 1 :- = 100 :-_
-        ":": 1 / (100 * 100),     // 1 : = 100 :-
-        "o": 1 / (100 * 100 * 20), // 1 o = 20 :
-        minutos: 1.7 / 60,
-        horas: 1.7 / (60 * 60),
-        dias: 1.7 / (60 * 60 * 24),
-        años: 1.7 / (60 * 60 * 24 * 365.25)
-    },
-    ":-": { // Porciones medianas del sol
-        segundos: 170,            // 1 :- = 100 :-_ = 100 * 1.7 segundos
-        tiradas: 100,             // 1 :- = 100 tiradas
-        ":-_": 100,               // 1 :- = 100 :-_
-        ":": 1 / 100,             // 1 : = 100 :-
-        "o": 1 / (100 * 20),      // 1 o = 20 :
-        minutos: 170 / 60,
-        horas: 170 / (60 * 60),
-        dias: 170 / (60 * 60 * 24),
-        años: 170 / (60 * 60 * 24 * 365.25)
-    },
-    ":": { // Porciones grandes del sol
-        segundos: 17000,          // 1 : = 100 :- = 100 * 170 segundos
-        tiradas: 100 * 100,       // 1 : = 100 * 100 tiradas
-        ":-_": 100 * 100,         // 1 : = 100 * 100 :-_
-        ":-": 100,                // 1 : = 100 :-
-        "o": 1 / 20,              // 1 o = 20 :
-        minutos: 17000 / 60,
-        horas: 17000 / (60 * 60),
-        dias: 17000 / (60 * 60 * 24),
-        años: 17000 / (60 * 60 * 24 * 365.25)
-    },
-    "o": { // Soles
-        segundos: 340000,         // 1 o = 20 : = 20 * 17000 segundos
-        tiradas: 20 * 100 * 100,  // 1 o = 20 * 100 * 100 tiradas
-        ":-_": 20 * 100 * 100,    // 1 o = 20 * 100 * 100 :-_
-        ":-": 20 * 100,           // 1 o = 20 * 100 :-
-        ":": 20,                  // 1 o = 20 :
-        minutos: 340000 / 60,
-        horas: 340000 / (60 * 60),
-        dias: 340000 / (60 * 60 * 24), // Esto debería dar ~3.935 días (verificación: 340000/86400 ≈ 3.935)
-        años: 340000 / (60 * 60 * 24 * 365.25)
-    },
-    minutos: {
-        segundos: 60,
-        tiradas: 60 / 1.7,
-        ":-_": 60 / 1.7,
-        ":-": 60 / 170,
-        ":": 60 / 17000,
-        "o": 60 / 340000,
-        horas: 1 / 60,
-        dias: 1 / (60 * 24),
-        años: 1 / (60 * 24 * 365.25)
-    },
-    horas: {
-        segundos: 60 * 60,
-        tiradas: (60 * 60) / 1.7,
-        ":-_": (60 * 60) / 1.7,
-        ":-": (60 * 60) / 170,
-        ":": (60 * 60) / 17000,
-        "o": (60 * 60) / 340000,
-        minutos: 60,
-        dias: 1 / 24,
-        años: 1 / (24 * 365.25)
-    },
-    dias: {
-        segundos: 60 * 60 * 24,
-        tiradas: (60 * 60 * 24) / 1.7,
-        ":-_": (60 * 60 * 24) / 1.7,
-        ":-": (60 * 60 * 24) / 170,
-        ":": (60 * 60 * 24) / 17000,
-        "o": (60 * 60 * 24) / 340000, // Esto debería dar ~0.254 o (verificación: 86400/340000 ≈ 0.254)
-        minutos: 60 * 24,
-        horas: 24,
-        años: 1 / 365.25
-    },
-    años: {
-        segundos: 60 * 60 * 24 * 365.25,
-        tiradas: (60 * 60 * 24 * 365.25) / 1.7,
-        ":-_": (60 * 60 * 24 * 365.25) / 1.7,
-        ":-": (60 * 60 * 24 * 365.25) / 170,
-        ":": (60 * 60 * 24 * 365.25) / 17000,
-        "o": (60 * 60 * 24 * 365.25) / 340000, // Esto debería dar ~92.78 o (verificación: 31557600/340000 ≈ 92.78)
-        minutos: 60 * 24 * 365.25,
-        horas: 24 * 365.25,
-        dias: 365.25
-    }
-};
-
+    const conversionRates = {
+        segundos: {
+            tiradas: 10 / 17,         // 10 tiradas = 17 segundos
+            ":-_": 1 / 0.432,         // 1 :-_ = 0.432 segundos
+            ":-": 1 / (0.432 * 100),  // 1 :- = 100 :-_ = 43.2 segundos
+            ":": 1 / (0.432 * 100 * 100), // 1 : = 100 :- = 4320 segundos
+            "o": 1 / (60 * 60 * 24),   // 1 o = 1 día = 86400 segundos
+            minutos: 1 / 60,
+            horas: 1 / (60 * 60),
+            dias: 1 / (60 * 60 * 24),
+            años: 1 / (60 * 60 * 24 * 365.25)
+        },
+        tiradas: {
+            segundos: 1.7,            // 1 tirada = 1.7 segundos (17/10)
+            ":-_": 1.7 / 0.432,       // 1 tirada = 1.7/0.432 :-_
+            ":-": 1.7 / (0.432 * 100), // 1 tirada = 1.7/43.2 :-
+            ":": 1.7 / (0.432 * 100 * 100), // 1 tirada = 1.7/4320 :
+            "o": 1.7 / 86400,         // 1 tirada = 1.7/86400 o
+            minutos: 1.7 / 60,
+            horas: 1.7 / (60 * 60),
+            dias: 1.7 / (60 * 60 * 24),
+            años: 1.7 / (60 * 60 * 24 * 365.25)
+        },
+        ":-_": { // Porciones pequeñas del sol
+            segundos: 0.432,          // 1 :-_ = 0.432 segundos
+            tiradas: 0.432 / 1.7,     // 1 :-_ = 0.432/1.7 tiradas
+            ":-": 1 / 100,           // 1 :- = 100 :-_
+            ":": 1 / (100 * 100),     // 1 : = 100 :-
+            "o": 0.432 / 86400,      // 1 :-_ = 0.432/86400 o
+            minutos: 0.432 / 60,
+            horas: 0.432 / (60 * 60),
+            dias: 0.432 / (60 * 60 * 24),
+            años: 0.432 / (60 * 60 * 24 * 365.25)
+        },
+        ":-": { // Porciones medianas del sol
+            segundos: 43.2,           // 1 :- = 100 :-_ = 43.2 segundos
+            tiradas: 43.2 / 1.7,      // 1 :- = 43.2/1.7 tiradas
+            ":-_": 100,               // 1 :- = 100 :-_
+            ":": 1 / 100,             // 1 : = 100 :-
+            "o": 43.2 / 86400,       // 1 :- = 43.2/86400 o
+            minutos: 43.2 / 60,
+            horas: 43.2 / (60 * 60),
+            dias: 43.2 / (60 * 60 * 24),
+            años: 43.2 / (60 * 60 * 24 * 365.25)
+        },
+        ":": { // Porciones grandes del sol
+            segundos: 4320,           // 1 : = 100 :- = 4320 segundos
+            tiradas: 4320 / 1.7,      // 1 : = 4320/1.7 tiradas
+            ":-_": 100 * 100,        // 1 : = 100 * 100 :-_
+            ":-": 100,               // 1 : = 100 :-
+            "o": 1 / 20,             // 1 o = 20 :
+            minutos: 4320 / 60,
+            horas: 4320 / (60 * 60),
+            dias: 4320 / (60 * 60 * 24),
+            años: 4320 / (60 * 60 * 24 * 365.25)
+        },
+        "o": { // Soles
+            segundos: 86400,          // 1 o = 1 día = 86400 segundos
+            tiradas: 86400 / 1.7,     // 1 o = 86400/1.7 tiradas
+            ":-_": 86400 / 0.432,     // 1 o = 86400/0.432 :-_
+            ":-": 86400 / 43.2,       // 1 o = 86400/43.2 :-
+            ":": 20,                  // 1 o = 20 :
+            minutos: 86400 / 60,
+            horas: 24,
+            dias: 1,
+            años: 1 / 365.25
+        },
+        minutos: {
+            segundos: 60,
+            tiradas: 60 / 1.7,
+            ":-_": 60 / 0.432,
+            ":-": 60 / 43.2,
+            ":": 60 / 4320,
+            "o": 60 / 86400,
+            horas: 1 / 60,
+            dias: 1 / (60 * 24),
+            años: 1 / (60 * 24 * 365.25)
+        },
+        horas: {
+            segundos: 60 * 60,
+            tiradas: (60 * 60) / 1.7,
+            ":-_": (60 * 60) / 0.432,
+            ":-": (60 * 60) / 43.2,
+            ":": (60 * 60) / 4320,
+            "o": (60 * 60) / 86400,
+            minutos: 60,
+            dias: 1 / 24,
+            años: 1 / (24 * 365.25)
+        },
+        dias: {
+            segundos: 60 * 60 * 24,
+            tiradas: (60 * 60 * 24) / 1.7,
+            ":-_": (60 * 60 * 24) / 0.432,
+            ":-": (60 * 60 * 24) / 43.2,
+            ":": (60 * 60 * 24) / 4320,
+            "o": 1,
+            minutos: 60 * 24,
+            horas: 24,
+            años: 1 / 365.25
+        },
+        años: {
+            segundos: 60 * 60 * 24 * 365.25,
+            tiradas: (60 * 60 * 24 * 365.25) / 1.7,
+            ":-_": (60 * 60 * 24 * 365.25) / 0.432,
+            ":-": (60 * 60 * 24 * 365.25) / 43.2,
+            ":": (60 * 60 * 24 * 365.25) / 4320,
+            "o": 365.25,
+            minutos: 60 * 24 * 365.25,
+            horas: 24 * 365.25,
+            dias: 365.25
+        }
+    };
     
     const fromValue = parseFloat(document.getElementById('fromValue').value);
     const fromUnit = document.getElementById('fromUnit').value;
