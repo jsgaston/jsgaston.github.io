@@ -756,10 +756,30 @@
 
 
 
-        <div id="mainTimeElapsedSection" class="main-tab-content hidden">
-  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tiempo Transcurrido desde el 6 de diciembre de 1982</h2>
-  <div class="text-center text-lg text-gray-700" id="elapsedTimeDisplay">Calculando...</div>
+<div id="mainTimeElapsedSection" class="main-tab-content hidden">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tiempo Transcurrido</h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <label for="startElapsed" class="form-label mb-2">Desde:</label>
+      <input type="datetime-local" id="startElapsed" class="form-input rounded-lg" value="1982-12-06T00:00">
+    </div>
+    <div>
+      <label for="endElapsed" class="form-label mb-2">Hasta:</label>
+      <input type="datetime-local" id="endElapsed" class="form-input rounded-lg" />
+    </div>
+  </div>
+
+  <button onclick="updateElapsedTime()" class="btn w-full mb-6">Calcular</button>
+
+  <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
+    <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
+    <div><strong>Total en horas:</strong> <span id="elapsedHours">...</span> horas</div>
+    <div><strong>Total en minutos:</strong> <span id="elapsedMinutes">...</span> minutos</div>
+    <div><strong>Total en segundos:</strong> <span id="elapsedSeconds">...</span> segundos</div>
+  </div>
 </div>
+
 
 
 
@@ -1190,7 +1210,13 @@ function showMainTab(tabName) {
     } else if (tabName === 'time-elapsed') {
     document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
     document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
-    updateElapsedTime(); // actualiza al abrir
+    // Prellenar fecha final si está vacía
+    const endInput = document.getElementById("endElapsed");
+    if (!endInput.value) {
+        const now = new Date();
+        endInput.value = now.toISOString().slice(0,16);
+    }
+    updateElapsedTime();
 }
 
 
@@ -1447,19 +1473,37 @@ function showMainTab(tabName) {
 
 <script>
 function updateElapsedTime() {
-  const startDate = new Date("1982-12-06T00:00:00Z");
-  const now = new Date();
+  const startInput = document.getElementById("startElapsed").value;
+  const endInput = document.getElementById("endElapsed").value;
 
-  const msElapsed = now - startDate;
+  const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
+  const endDate = endInput ? new Date(endInput) : new Date();
 
+  if (isNaN(startDate) || isNaN(endDate)) {
+    document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
+    return;
+  }
+
+  const msElapsed = endDate - startDate;
+
+  if (msElapsed < 0) {
+    document.getElementById("elapsedDaysText").textContent = "La fecha inicial es posterior a la final.";
+    return;
+  }
+
+  const totalSeconds = Math.floor(msElapsed / 1000);
   const totalMinutes = Math.floor(msElapsed / (1000 * 60));
-  const days = Math.floor(totalMinutes / (60 * 24));
+  const totalHours = Math.floor(msElapsed / (1000 * 60 * 60));
+  const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24));
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
   const minutes = totalMinutes % 60;
 
-  document.getElementById("elapsedTimeDisplay").textContent = 
-    `${days} días, ${hours} horas y ${minutes} minutos.`;
+  document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
+  document.getElementById("elapsedHours").textContent = totalHours.toLocaleString();
+  document.getElementById("elapsedMinutes").textContent = totalMinutes.toLocaleString();
+  document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
 }
+
 </script>
 
 
