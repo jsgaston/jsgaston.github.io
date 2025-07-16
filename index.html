@@ -881,6 +881,23 @@ diaryDropZone.addEventListener("drop", e => {
 
 
 
+        const conversionesTiempoEspecial = {
+    segundos: {
+        tiradas: 1 / 1.7,
+        años: 1 / (86400 * 365.25),
+        dias: 1 / (60 * 60 * 24),
+        horas: 1 / (60 * 60),
+        minutos: 1 / 60,
+        soles: 1.7 / (60 * 60 * 24),
+        Porciones_grandes_del_sol: 1.7 / (60 * 24),
+        Porciones_medianas_del_sol: 1.7 / 60,
+        Porciones_pequeñas_del_sol: 1.7
+    }
+};
+
+
+
+
         
 
         // --- Funciones de Utilidad ---
@@ -1492,17 +1509,39 @@ function updateElapsedTime() {
   }
 
   const totalSeconds = Math.floor(msElapsed / 1000);
-  const totalMinutes = Math.floor(msElapsed / (1000 * 60));
-  const totalHours = Math.floor(msElapsed / (1000 * 60 * 60));
+  const totalMinutes = Math.floor(msElapsed / 60000);
+  const totalHours = Math.floor(msElapsed / 3600000);
   const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24));
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
   const minutes = totalMinutes % 60;
 
+  // Valores visuales básicos
   document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedHours").textContent = totalHours.toLocaleString();
   document.getElementById("elapsedMinutes").textContent = totalMinutes.toLocaleString();
   document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
+
+  // Añadir si quieres mostrar estos valores en el HTML:
+  const container = document.getElementById("mainTimeElapsedSection");
+  let extra = document.getElementById("extraTimeUnits");
+  if (!extra) {
+    extra = document.createElement("div");
+    extra.id = "extraTimeUnits";
+    extra.className = "mt-6 p-4 bg-white rounded-lg shadow space-y-2 text-center text-gray-700";
+    container.appendChild(extra);
+  }
+
+  const c = conversionesTiempoEspecial.segundos;
+
+  extra.innerHTML = `
+    <div><strong>Total en tiradas:</strong> ${(totalSeconds * c.tiradas).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en soles (o):</strong> ${(totalSeconds * c.soles).toLocaleString(undefined, {maximumFractionDigits: 5})}</div>
+    <div><strong>Total en porciones grandes del sol (:):</strong> ${(totalSeconds * c.Porciones_grandes_del_sol).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en porciones medianas del sol (:-):</strong> ${(totalSeconds * c.Porciones_medianas_del_sol).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en porciones pequeñas del sol (:-_):</strong> ${(totalSeconds * c.Porciones_pequeñas_del_sol).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+  `;
 }
+
 
 </script>
 
