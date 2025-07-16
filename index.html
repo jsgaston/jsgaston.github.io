@@ -1244,29 +1244,29 @@ function showMainTab(tabName) {
         document.getElementById('mainTimeConverterSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
     } else if (tabName === 'time-elapsed') {
-    document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
-    document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
-    // Prellenar fecha final si está vacía
-    const endInput = document.getElementById("endElapsed");
-        if (!endInput.value) {
-            const now = new Date();
-            // Ajustar 2 horas para horario de verano en España (UTC+2)
-            const madridTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-            endInput.value = madridTime.toISOString().slice(0,16);
-        }
-            updateElapsedTime();
-        }
-        
-        
-            hideMessage();
-        }
-
-        // Event listeners para los botones de las pestañas principales
-        mainTabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                showMainTab(button.dataset.mainTab);
+        document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
+        // Prellenar fecha final si está vacía
+        const endInput = document.getElementById("endElapsed");
+            if (!endInput.value) {
+                const now = new Date();
+                // Ajustar 2 horas para horario de verano en España (UTC+2)
+                const madridTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+                endInput.value = madridTime.toISOString().slice(0,16);
+            }
+                updateElapsedTime();
+            }
+            
+            
+                hideMessage();
+            }
+    
+            // Event listeners para los botones de las pestañas principales
+            mainTabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showMainTab(button.dataset.mainTab);
+                });
             });
-        });
 
         
         // --- Funciones de Sub-navegación del Diario ---
