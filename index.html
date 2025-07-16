@@ -322,6 +322,33 @@
         font-weight: bold;
     }
 
+        .calculation-details-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px; /* Igual que el converter-box para consistencia */
+            margin-top: 20px; /* Espacio entre el conversor y los detalles */
+            text-align: left;
+            word-wrap: break-word; /* Para asegurar que el texto largo se ajuste */
+        }
+
+        .calculation-details-box h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .calculation-details-box p {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: #555;
+            font-size: 0.9em;
+        }
+
 
 
 
@@ -847,6 +874,10 @@
     
     <!-- Continúa con los demás campos... -->
 </div>
+
+    <div class="calculation-details-box" id="calculationDetails">
+            <h2>Detalles del Cálculo</h2>
+            </div>
 
 
     <div class="visual-number-container">
@@ -2708,6 +2739,8 @@ function convertTime() {
     const fromValue = parseFloat(document.getElementById('fromValue').value);
     const fromUnit = document.getElementById('fromUnit').value;
     const toUnit = document.getElementById('toUnit').value;
+    const calculationDetails = document.getElementById('calculationDetails');
+    calculationDetails.innerHTML = ''; // Limpiar detalles anteriores
 
     if (isNaN(fromValue)) {
         alert("Por favor ingresa un valor válido");
@@ -2716,21 +2749,33 @@ function convertTime() {
 
     if (fromUnit === toUnit) {
         document.getElementById('toValue').value = fromValue;
+        calculationDetails.innerHTML = `<p>${fromValue} ${fromUnit} es igual a ${fromValue} ${toUnit}. No se necesita conversión.</p>`;
         return;
     }
 
     let result;
-    if (conversionRates[fromUnit] && conversionRates[fromUnit][toUnit]) {
-        result = fromValue * conversionRates[fromUnit][toUnit];
-    } else if (conversionRates[toUnit] && conversionRates[toUnit][fromUnit]) {
-        result = fromValue / conversionRates[toUnit][fromUnit];
+    let intermediateValueInSeconds;
+
+    // Convertir el valor de origen a segundos como un paso intermedio para mostrar la cadena de cálculo
+    if (fromUnit !== 'segundos') {
+        intermediateValueInSeconds = fromValue * units[fromUnit]['segundos'];
+        calculationDetails.innerHTML += `<p>${fromValue} ${fromUnit} * ${units[fromUnit]['segundos']} segundos/${fromUnit} = ${intermediateValueInSeconds} segundos</p>`;
     } else {
-        // Conversión indirecta a través de segundos
-        const inSeconds = fromValue * conversionRates[fromUnit].segundos;
-        result = inSeconds * conversionRates.segundos[toUnit];
+        intermediateValueInSeconds = fromValue;
+        calculationDetails.innerHTML += `<p>Valor inicial: ${fromValue} segundos</p>`;
     }
 
-    document.getElementById('toValue').value = result.toFixed(6);
+
+    // Convertir de segundos a la unidad de destino
+    if (toUnit !== 'segundos') {
+        result = intermediateValueInSeconds * units['segundos'][toUnit];
+        calculationDetails.innerHTML += `<p>${intermediateValueInSeconds} segundos * ${units['segundos'][toUnit]} ${toUnit}/segundo = ${result} ${toUnit}</p>`;
+    } else {
+        result = intermediateValueInSeconds;
+    }
+
+    document.getElementById('toValue').value = result.toFixed(6); // Limita a 6 decimales para mejor visualización
+    calculationDetails.innerHTML += `<p>Resultado final: ${fromValue} ${fromUnit} es igual a ${result.toFixed(6)} ${toUnit}</p>`;
 }
 
 </script>
