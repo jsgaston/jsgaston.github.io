@@ -854,60 +854,58 @@
             <li>1 año = 365.25 días</li>
         </ul>
     </div>
-
-
-
     
-
-     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Conversor de Unidades de Tiempo</h2>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-            <label for="fromValue" class="form-label mb-2">Valor:</label>
-            <input type="number" id="fromValue" class="form-input rounded-lg" placeholder="Ingresa el valor" step="any">
+<div class="container">
+        <h1>Conversor de Tiempo</h1>
+
+        <div class="converter-box">
+            <label for="fromValue">Valor a convertir:</label>
+            <input type="number" id="fromValue" value="1">
+
+            <label for="fromUnit">De unidad:</label>
+            <select id="fromUnit">
+                <option value="segundos">Segundos</option>
+                <option value="minutos">Minutos</option>
+                <option value="horas">Horas</option>
+                <option value="dias">Días ("o")</option>
+                <option value="años">Años</option>
+                <option value="tiradas">Tiradas</option>
+                <option value=":-_">:-_</option>
+                <option value=":-">:-</option>
+                <option value=":">:</option>
+            </select>
+
+            <label for="toUnit">A unidad:</label>
+            <select id="toUnit">
+                <option value="segundos">Segundos</option>
+                <option value="minutos">Minutos</option>
+                <option value="horas">Horas</option>
+                <option value="dias">Días ("o")</option>
+                <option value="años">Años</option>
+                <option value="tiradas">Tiradas</option>
+                <option value=":-_">:-_</option>
+                <option value=":-">:-</option>
+                <option value=":">:</option>
+            </select>
+
+            <button onclick="convertirTiempo()">Convertir</button>
+
+            <div class="output-section">
+                <label for="toValue">Resultado:</label>
+                <input type="text" id="toValue" readonly>
+            </div>
         </div>
-        
-        <div>
-            <label for="fromUnit" class="form-label mb-2">De:</label>
-            <select id="fromUnit" class="form-input rounded-lg">
-    <option value="segundos">Segundos</option>
-    <option value="minutos">Minutos</option>
-    <option value="horas">Horas</option>
-    <option value="dias">Días</option>
-    <option value="años">Años</option>
-    <option value=":-_">:-_ (Porciones pequeñas del sol)</option>
-    <option value=":-">:- (Porciones medianas del sol)</option>
-    <option value=":">: (Porciones grandes del sol)</option>
-    <option value="o">o (Soles)</option>
-    <option value="tiradas">Tiradas</option>
-</select>
-        </div>
+
+        <div class="calculation-details-box" id="calculationDetails">
+            <h2>Detalles del Cálculo</h2>
+            </div>
+
+        <div class="visual-representation-box" id="visualRepresentation">
+            </div>
+
     </div>
 
-
-
-        <div>
-        <label for="toUnit" class="form-label mb-2">A:</label>
-       <select id="toUnit" class="form-input rounded-lg">
-    <option value=":-_">:-_ (Porciones pequeñas del sol)</option>
-    <option value=":-">:- (Porciones medianas del sol)</option>
-    <option value=":">: (Porciones grandes del sol)</option>
-    <option value="o">o (Soles)</option>
-    <option value="tiradas">Tiradas</option>
-    <option value="segundos">Segundos</option>
-    <option value="minutos">Minutos</option>
-    <option value="horas">Horas</option>
-    <option value="dias">Días</option>
-    <option value="años">Años</option>
-</select>
-    </div>
-    
-    <div>
-        <label for="toValue" class="form-label mb-2">Resultado:</label>
-        <input type="number" id="toValue" class="form-input rounded-lg bg-gray-100" readonly>
-    </div>
-
-    <button onclick="convertTime()" class="btn w-full">Convertir</button>
 
 
 
@@ -1022,56 +1020,6 @@
 </div>
 
 
-
-<div class="container">
-        <h1>Conversor de Tiempo</h1>
-
-        <div class="converter-box">
-            <label for="fromValue">Valor a convertir:</label>
-            <input type="number" id="fromValue" value="1">
-
-            <label for="fromUnit">De unidad:</label>
-            <select id="fromUnit">
-                <option value="segundos">Segundos</option>
-                <option value="minutos">Minutos</option>
-                <option value="horas">Horas</option>
-                <option value="dias">Días ("o")</option>
-                <option value="años">Años</option>
-                <option value="tiradas">Tiradas</option>
-                <option value=":-_">:-_</option>
-                <option value=":-">:-</option>
-                <option value=":">:</option>
-            </select>
-
-            <label for="toUnit">A unidad:</label>
-            <select id="toUnit">
-                <option value="segundos">Segundos</option>
-                <option value="minutos">Minutos</option>
-                <option value="horas">Horas</option>
-                <option value="dias">Días ("o")</option>
-                <option value="años">Años</option>
-                <option value="tiradas">Tiradas</option>
-                <option value=":-_">:-_</option>
-                <option value=":-">:-</option>
-                <option value=":">:</option>
-            </select>
-
-            <button onclick="convertirTiempo()">Convertir</button>
-
-            <div class="output-section">
-                <label for="toValue">Resultado:</label>
-                <input type="text" id="toValue" readonly>
-            </div>
-        </div>
-
-        <div class="calculation-details-box" id="calculationDetails">
-            <h2>Detalles del Cálculo</h2>
-            </div>
-
-        <div class="visual-representation-box" id="visualRepresentation">
-            </div>
-
-    </div>
 
     
 
