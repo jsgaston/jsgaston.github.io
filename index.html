@@ -287,6 +287,10 @@
         body > script:not([src]) {
   display: none;
 }
+            .number-image {
+        height: 1em;
+        vertical-align: middle;
+    }
 
 
 
@@ -799,6 +803,13 @@
     <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
     <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
   </div>
+
+    <div>
+    <strong>Total en h (horas):</strong> 
+    <span id="hours-number">373.523</span> h
+</div>
+
+    
 </div>
 
 
@@ -2371,6 +2382,37 @@ async function cargarHistorias() {
 
     
 </script>
+
+
+
+
+<script>
+function displayNumberAsImages(number, elementId) {
+    const numberStr = Math.floor(number).toString(); // Elimina decimales
+    const container = document.getElementById(elementId);
+    container.innerHTML = ''; // Limpia el contenido anterior
+    
+    for (let i = 0; i < numberStr.length; i++) {
+        const digit = numberStr[i];
+        const img = document.createElement('img');
+        img.src = `UniversalSistemNumbers/${digit}.jpg`;
+        img.alt = digit;
+        img.className = 'number-image';
+        container.appendChild(img);
+    }
+}
+
+// Llama a esta función para cada resultado cuando la página cargue
+window.onload = function() {
+    displayNumberAsImages(373523, 'hours-number');
+    displayNumberAsImages(22411414, 'minutes-number');
+    displayNumberAsImages(1344684840, 'seconds-number');
+    displayNumberAsImages(790991082, 'tiradas-number');
+    // Continúa con los demás resultados...
+};
+</script>
+
+    
 
 
         <!--     Conversor de teimpo -->
