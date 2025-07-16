@@ -317,6 +317,8 @@
           <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
           <button class="main-tab-button" data-main-tab="radio">Radio</button>
             <button class="main-tab-button" data-main-tab="time-converter">Conversor de Tiempo</button>
+             <button class="main-tab-button" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
+
             <button class="main-tab-button" data-main-tab="stories">Stories</button>
             
 
@@ -754,6 +756,14 @@
 
 
 
+        <div id="mainTimeElapsedSection" class="main-tab-content hidden">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tiempo Transcurrido desde el 6 de diciembre de 1982</h2>
+  <div class="text-center text-lg text-gray-700" id="elapsedTimeDisplay">Calculando...</div>
+</div>
+
+
+
+
 
 
       
@@ -1177,7 +1187,12 @@ function showMainTab(tabName) {
     } else if (tabName === 'time-converter') {
         document.getElementById('mainTimeConverterSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
-    }
+    } else if (tabName === 'time-elapsed') {
+    document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
+    document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
+    updateElapsedTime(); // actualiza al abrir
+}
+
 
     hideMessage();
 }
@@ -1428,6 +1443,29 @@ function showMainTab(tabName) {
             showMainTab('home');
         });
     </script>
+
+
+<script>
+function updateElapsedTime() {
+  const startDate = new Date("1982-12-06T00:00:00Z");
+  const now = new Date();
+
+  const msElapsed = now - startDate;
+
+  const totalMinutes = Math.floor(msElapsed / (1000 * 60));
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+
+  document.getElementById("elapsedTimeDisplay").textContent = 
+    `${days} días, ${hours} horas y ${minutes} minutos.`;
+}
+</script>
+
+
+
+
+    
     <!-- Insertar al final del <body>, antes del cierre -->
     <script>
       const SERVER_DATA_URL = "https://script.google.com/macros/s/AKfycbwXNtcVnXevJgk-fpMvqqkc4BeSbZZ_EutueaCAkakIaBK5sx7AQL-fZpN5R08uWNy3/exec";
