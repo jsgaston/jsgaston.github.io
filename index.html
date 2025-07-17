@@ -811,17 +811,18 @@
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Traductor de Números a Símbolos</h2>
     
     <div class="mb-4">
-        <img id="languageHeader" src="UniversalSistemNumbers/cabeza de página.jpg" alt="Encabezado del lenguaje" class="mx-auto max-w-full h-auto mb-4 rounded-lg shadow-md" style="max-height: 60px;">
+        <img id="languageHeader" src="UniversalSistemNumbers/cabeza de página.jpg" alt="Encabezado del lenguaje" 
+             class="mx-auto max-w-full h-auto mb-4 rounded-lg shadow-md" style="max-height: 60px;">
     </div>
     
     <div class="mb-6">
-        <label for="numberInput" class="form-label mb-2">Número a traducir (sin decimales):</label>
+        <label for="numberInput" class="form-label mb-2">Número a traducir:</label>
         <input type="text" id="numberInput" class="form-input rounded-lg" placeholder="Ej: 12345" oninput="sanitizeNumberInput(this)">
     </div>
     
     <button onclick="translateNumber()" class="btn w-full mb-6">Traducir</button>
     
-    <div id="symbolsResult" class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-lg min-h-20 items-center">
+    <div id="symbolsResult" class="flex flex-wrap justify-center gap-1 p-4 bg-gray-50 rounded-lg min-h-20 overflow-x-auto">
         <p class="text-center text-gray-500 w-full">Ingresa un número para ver su representación en símbolos</p>
     </div>
 </div>
@@ -2572,19 +2573,15 @@ function convertTime() {
 
 
 <script>
-// Función para sanitizar el input (solo permite números enteros)
 function sanitizeNumberInput(input) {
-    // Eliminar cualquier caracter que no sea dígito
     input.value = input.value.replace(/[^\d]/g, '');
 }
 
-// Función mejorada para traducir números
 function translateNumber() {
     const input = document.getElementById('numberInput');
     const number = input.value.trim();
     const resultDiv = document.getElementById('symbolsResult');
     
-    // Limpiar resultados anteriores
     resultDiv.innerHTML = '';
     
     if (!number) {
@@ -2592,30 +2589,34 @@ function translateNumber() {
         return;
     }
     
-    // Mostrar cada dígito como imagen en línea
+    // Contenedor flexible horizontal para los símbolos
+    const symbolsContainer = document.createElement('div');
+    symbolsContainer.className = 'flex flex-nowrap items-center gap-1';
+    
     for (const digit of number) {
         const imgContainer = document.createElement('div');
-        imgContainer.className = 'flex items-center justify-center';
+        imgContainer.className = 'flex-shrink-0'; // Evita que se reduzcan
         
         const img = document.createElement('img');
         img.src = `UniversalSistemNumbers/${digit}.jpg`;
         img.alt = `Símbolo del número ${digit}`;
-        img.className = 'w-16 h-16 object-contain'; // Tamaño más pequeño (64x64px)
-        img.loading = 'lazy'; // Carga diferida para mejor rendimiento
+        img.className = 'w-12 h-12 object-contain'; // Tamaño fijo para todos
+        img.style.minWidth = '48px'; // Tamaño mínimo garantizado
+        img.style.minHeight = '48px';
         
         img.onerror = function() {
-            // Si falla la imagen, mostrar el dígito como texto en un recuadro
             const fallback = document.createElement('div');
-            fallback.className = 'w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-700 text-2xl font-bold rounded';
+            fallback.className = 'w-12 h-12 flex items-center justify-center bg-gray-200 text-gray-700 text-xl font-bold rounded';
             fallback.textContent = digit;
             imgContainer.replaceChild(fallback, img);
         };
         
         imgContainer.appendChild(img);
-        resultDiv.appendChild(imgContainer);
+        symbolsContainer.appendChild(imgContainer);
     }
     
-    // Si no se mostró nada (todas las imágenes fallaron)
+    resultDiv.appendChild(symbolsContainer);
+    
     if (resultDiv.children.length === 0) {
         resultDiv.innerHTML = '<p class="text-center text-red-500 w-full">No se encontraron símbolos para mostrar</p>';
     }
