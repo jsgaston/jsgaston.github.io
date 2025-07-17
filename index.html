@@ -774,6 +774,36 @@
 
 
 
+<div id="mainTimeElapsedSection" class="main-tab-content hidden">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tiempo Transcurrido</h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <label for="startElapsed" class="form-label mb-2">Desde:</label>
+      <input type="datetime-local" id="startElapsed" class="form-input rounded-lg" value="1982-12-06T00:00">
+    </div>
+    <div>
+      <label for="endElapsed" class="form-label mb-2">Hasta:</label>
+      <input type="datetime-local" id="endElapsed" class="form-input rounded-lg" />
+    </div>
+  </div>
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
+
+  <button onclick="updateElapsedTime()" class="btn w-full mb-6">Calcular</button>
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
+
+  <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
+    <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
+    <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span> h </div>
+    <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
+    <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
+  </div>
+</div>
+
+
+
 
 
         <!-- Sección Traductor de Números -->
@@ -808,36 +838,6 @@
 
 
         
-
-
-
-<div id="mainTimeElapsedSection" class="main-tab-content hidden">
-  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tiempo Transcurrido</h2>
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div>
-      <label for="startElapsed" class="form-label mb-2">Desde:</label>
-      <input type="datetime-local" id="startElapsed" class="form-input rounded-lg" value="1982-12-06T00:00">
-    </div>
-    <div>
-      <label for="endElapsed" class="form-label mb-2">Hasta:</label>
-      <input type="datetime-local" id="endElapsed" class="form-input rounded-lg" />
-    </div>
-  </div>
-
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
-
-  <button onclick="updateElapsedTime()" class="btn w-full mb-6">Calcular</button>
-
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
-
-  <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
-    <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
-    <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span> h </div>
-    <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
-    <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
-  </div>
-</div>
 
 
 
@@ -1290,6 +1290,9 @@ function showMainTab(tabName) {
     } else if (tabName === 'time-converter') {
         document.getElementById('mainTimeConverterSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
+    } else if (tabName === 'number-symbols') {
+        document.getElementById('mainTimeConverterSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
     } else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
