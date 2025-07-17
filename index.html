@@ -806,12 +806,12 @@
 
 
 
-        <!-- Sección Traductor de Números -->
+<!-- Sección Traductor de Números -->
 <div id="mainNumberSymbolsSection" class="main-tab-content hidden">
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Traductor de Números a Símbolos</h2>
     
     <div class="mb-4">
-        <img id="languageHeader" src="UniversalSistemNumbers/cabeza de página.jpg" alt="Encabezado del lenguaje" class="mx-auto max-w-full h-auto mb-4 rounded-lg shadow-md">
+        <img id="languageHeader" src="UniversalSistemNumbers/cabeza de página.jpg" alt="Encabezado del lenguaje" class="mx-auto max-w-full h-auto mb-4 rounded-lg shadow-md" style="max-height: 60px;">
     </div>
     
     <div class="mb-6">
@@ -821,7 +821,7 @@
     
     <button onclick="translateNumber()" class="btn w-full mb-6">Traducir</button>
     
-    <div id="symbolsResult" class="flex flex-wrap justify-center gap-4 p-4 bg-gray-50 rounded-lg min-h-20">
+    <div id="symbolsResult" class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-lg min-h-20 items-center">
         <p class="text-center text-gray-500 w-full">Ingresa un número para ver su representación en símbolos</p>
     </div>
 </div>
@@ -2571,10 +2571,7 @@ function convertTime() {
 
 
 
-
-    <script>
-
-
+<script>
 // Función para sanitizar el input (solo permite números enteros)
 function sanitizeNumberInput(input) {
     // Eliminar cualquier caracter que no sea dígito
@@ -2595,32 +2592,26 @@ function translateNumber() {
         return;
     }
     
-    // Mostrar cada dígito como imagen con tamaño fijo
+    // Mostrar cada dígito como imagen en línea
     for (const digit of number) {
         const imgContainer = document.createElement('div');
-        imgContainer.className = 'flex flex-col items-center';
+        imgContainer.className = 'flex items-center justify-center';
         
         const img = document.createElement('img');
         img.src = `UniversalSistemNumbers/${digit}.jpg`;
         img.alt = `Símbolo del número ${digit}`;
-        img.className = 'w-24 h-24 object-contain'; // Tamaño fijo de 96x96px
+        img.className = 'w-16 h-16 object-contain'; // Tamaño más pequeño (64x64px)
         img.loading = 'lazy'; // Carga diferida para mejor rendimiento
         
-        // Elemento de texto debajo de la imagen
-        const digitText = document.createElement('span');
-        digitText.textContent = digit;
-        digitText.className = 'text-sm text-gray-600 mt-1';
-        
         img.onerror = function() {
-            // Si falla la imagen, mostrar el dígito como texto en un recuadro grande
+            // Si falla la imagen, mostrar el dígito como texto en un recuadro
             const fallback = document.createElement('div');
-            fallback.className = 'w-24 h-24 flex items-center justify-center bg-gray-200 text-gray-700 text-4xl font-bold rounded';
+            fallback.className = 'w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-700 text-2xl font-bold rounded';
             fallback.textContent = digit;
             imgContainer.replaceChild(fallback, img);
         };
         
         imgContainer.appendChild(img);
-        imgContainer.appendChild(digitText);
         resultDiv.appendChild(imgContainer);
     }
     
@@ -2629,7 +2620,6 @@ function translateNumber() {
         resultDiv.innerHTML = '<p class="text-center text-red-500 w-full">No se encontraron símbolos para mostrar</p>';
     }
 }
-        
 </script>
 
     
