@@ -807,23 +807,18 @@
 
 
         <!-- Sección Traductor de Números -->
-<!-- Sección Traductor de Números -->
 <div id="mainNumberSymbolsSection" class="main-tab-content hidden">
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Traductor de Números a Símbolos</h2>
     
-    <div class="mb-4">
-        <img id="languageHeader" src="UniversalSistemNumbers/cabeza de página.jpg" alt="Encabezado del lenguaje" class="mx-auto max-w-full h-auto mb-4 rounded-lg shadow-md">
-    </div>
-    
     <div class="mb-6">
         <label for="numberInput" class="form-label mb-2">Número a traducir:</label>
-        <input type="text" id="numberInput" class="form-input rounded-lg" placeholder="Ej: 12345" oninput="formatNumber(this)">
+        <input type="text" id="numberInput" class="form-input rounded-lg" placeholder="Ej: 12345">
     </div>
     
     <button onclick="translateNumber()" class="btn w-full mb-6">Traducir</button>
     
-    <div id="symbolsResult" class="flex flex-wrap justify-center gap-4 p-4 bg-gray-50 rounded-lg min-h-20">
-        <p class="text-center text-gray-500 w-full">Ingresa un número para ver su representación en símbolos</p>
+    <div id="symbolsResult" class="flex flex-wrap justify-center gap-4 p-4 bg-gray-50 rounded-lg">
+        <p class="text-center text-gray-500">Ingresa un número para ver su representación en símbolos</p>
     </div>
 </div>
 
@@ -1296,10 +1291,9 @@ function showMainTab(tabName) {
     } else if (tabName === 'time-converter') {
         document.getElementById('mainTimeConverterSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
-else if (tabName === 'number-symbols') {
-    document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
-    document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
-}
+    } else if (tabName === 'number-symbols') {
+        document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
     } else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
@@ -2577,62 +2571,41 @@ function convertTime() {
     <script>
 
 
-
-        // Formatear número (eliminar comas y puntos)
-function formatNumber(input) {
-    input.value = input.value.replace(/[.,]/g, '');
-}
-
-// Función mejorada para traducir números
 function translateNumber() {
-    const input = document.getElementById('numberInput');
-    const number = input.value.trim();
+    const input = document.getElementById('numberInput').value.trim();
     const resultDiv = document.getElementById('symbolsResult');
     
-    // Limpiar resultados anteriores
-    resultDiv.innerHTML = '';
-    
-    if (!number) {
-        resultDiv.innerHTML = '<p class="text-center text-red-500 w-full">Por favor ingresa un número</p>';
+    if (!input) {
+        resultDiv.innerHTML = '<p class="text-center text-red-500">Por favor ingresa un número</p>';
         return;
     }
     
     // Validar que solo contenga dígitos
-    if (!/^\d+$/.test(number)) {
-        resultDiv.innerHTML = '<p class="text-center text-red-500 w-full">Solo se permiten números (0-9)</p>';
+    if (!/^\d+$/.test(input)) {
+        resultDiv.innerHTML = '<p class="text-center text-red-500">Solo se permiten números (0-9)</p>';
         return;
     }
     
-    // Mostrar cada dígito como imagen
-    for (const digit of number) {
-        const imgContainer = document.createElement('div');
-        imgContainer.className = 'flex flex-col items-center';
-        
+    resultDiv.innerHTML = '';
+    
+    // Crear imágenes para cada dígito
+    for (const digit of input) {
         const img = document.createElement('img');
         img.src = `UniversalSistemNumbers/${digit}.jpg`;
-        img.alt = `Símbolo del número ${digit}`;
+        img.alt = `Símbolo para el número ${digit}`;
         img.className = 'w-16 h-16 object-contain';
         img.onerror = function() {
-            // Si falla la imagen, mostrar el dígito como texto
-            this.replaceWith(createFallbackDigit(digit));
+            this.src = ''; // Eliminar src si la imagen no se carga
+            this.alt = `Símbolo no disponible para ${digit}`;
+            this.className = 'w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-500';
+            this.textContent = digit;
         };
-        
-        imgContainer.appendChild(img);
-        resultDiv.appendChild(imgContainer);
+        resultDiv.appendChild(img);
     }
     
-    // Si no se mostró nada (todas las imágenes fallaron)
     if (resultDiv.children.length === 0) {
-        resultDiv.innerHTML = '<p class="text-center text-red-500 w-full">No se encontraron símbolos para mostrar</p>';
+        resultDiv.innerHTML = '<p class="text-center text-red-500">No se encontraron símbolos para mostrar</p>';
     }
-}
-
-// Crear elemento de fallback para dígitos sin imagen
-function createFallbackDigit(digit) {
-    const span = document.createElement('span');
-    span.textContent = digit;
-    span.className = 'w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-700 font-bold rounded';
-    return span;
 }
 </script>
 
