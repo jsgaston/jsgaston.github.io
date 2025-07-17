@@ -318,6 +318,7 @@
           <button class="main-tab-button" data-main-tab="radio">Radio</button>
             <button class="main-tab-button" data-main-tab="time-converter">Conversor de Tiempo</button>
              <button class="main-tab-button" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
+            <button class="main-tab-button" data-main-tab="number-symbols">Traductor de Números</button>
 
             <button class="main-tab-button" data-main-tab="stories">Stories</button>
             
@@ -770,6 +771,43 @@
         
         
         </div>
+
+
+
+
+
+        <!-- Sección Traductor de Números -->
+<div id="mainNumberSymbolsSection" class="main-tab-content hidden">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Traductor de Números a Símbolos</h2>
+    
+    <div class="mb-6">
+        <label for="numberInput" class="form-label mb-2">Número a traducir:</label>
+        <input type="text" id="numberInput" class="form-input rounded-lg" placeholder="Ej: 12345">
+    </div>
+    
+    <button onclick="translateNumber()" class="btn w-full mb-6">Traducir</button>
+    
+    <div id="symbolsResult" class="flex flex-wrap justify-center gap-4 p-4 bg-gray-50 rounded-lg">
+        <p class="text-center text-gray-500">Ingresa un número para ver su representación en símbolos</p>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
 
 
@@ -2520,6 +2558,64 @@ function convertTime() {
 }
 
 </script>
+
+
+
+
+
+
+    <script>
+// Añade esta función al showMainTab para manejar la nueva pestaña
+function showMainTab(tabName) {
+    // ... (código existente)
+    document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
+    // ... (código existente)
+    
+    else if (tabName === 'number-symbols') {
+        document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
+    }
+}
+
+function translateNumber() {
+    const input = document.getElementById('numberInput').value.trim();
+    const resultDiv = document.getElementById('symbolsResult');
+    
+    if (!input) {
+        resultDiv.innerHTML = '<p class="text-center text-red-500">Por favor ingresa un número</p>';
+        return;
+    }
+    
+    // Validar que solo contenga dígitos
+    if (!/^\d+$/.test(input)) {
+        resultDiv.innerHTML = '<p class="text-center text-red-500">Solo se permiten números (0-9)</p>';
+        return;
+    }
+    
+    resultDiv.innerHTML = '';
+    
+    // Crear imágenes para cada dígito
+    for (const digit of input) {
+        const img = document.createElement('img');
+        img.src = `UniversalSistemNumbers/${digit}.jpg`;
+        img.alt = `Símbolo para el número ${digit}`;
+        img.className = 'w-16 h-16 object-contain';
+        img.onerror = function() {
+            this.src = ''; // Eliminar src si la imagen no se carga
+            this.alt = `Símbolo no disponible para ${digit}`;
+            this.className = 'w-16 h-16 flex items-center justify-center bg-gray-200 text-gray-500';
+            this.textContent = digit;
+        };
+        resultDiv.appendChild(img);
+    }
+    
+    if (resultDiv.children.length === 0) {
+        resultDiv.innerHTML = '<p class="text-center text-red-500">No se encontraron símbolos para mostrar</p>';
+    }
+}
+</script>
+
+    
 
 </body>
 </html>
