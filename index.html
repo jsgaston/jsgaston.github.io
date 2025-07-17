@@ -309,7 +309,7 @@
         <!-- Nueva pestaña en navegación principal -->
         <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
           <button class="main-tab-button" data-main-tab="home">Inicio</button>
-          <button class="main-tab-button" data-main-tab="diary">Diario</button>
+          <button class="main-tab-button" data-main-tab="diary">Anotaciones</button>
           <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
           <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
           <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
@@ -329,13 +329,13 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
             <p class="text-center text-gray-600 mb-8">Explora las pestañas de arriba.</p>
             
-            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Entrada del Diario:</h3>
+            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última entrada anotaciones:</h3>
             <div id="latestEntryContent" class="text-gray-700">
-                <p class="text-center text-gray-500">Cargando última entrada del diario...</p>
+                <p class="text-center text-gray-500">Cargando última entrada de las anotaciones...</p>
             </div>
             <div class="flex justify-center mt-8">
                 <button onclick="showMainTab('diary'); showDiarySubTab('write')" class="btn py-3 px-6 rounded-lg text-lg">
-                    <span>Ir al Diario</span>
+                    <span>Ir al anotaciones</span>
                 </button>
             </div>
 
@@ -348,7 +348,7 @@
         </div>
 
         <div id="mainDiarySection" class="main-tab-content hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mi Diario Digital</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Notas Rápidas</h2>
             
             <nav class="flex border-b border-gray-200 mb-6">
                 <button class="diary-sub-tab-button active" data-diary-sub-tab="write">Escribir Entrada</button>
@@ -816,7 +816,7 @@
     </div>
     
     <div class="mb-6">
-        <label for="numberInput" class="form-label mb-2">Número a traducir:</label>
+        <label for="numberInput" class="form-label mb-2">Número a traducir (Sólo parte entera):</label>
         <input type="text" id="numberInput" class="form-input rounded-lg" placeholder="Ej: 12345" oninput="sanitizeNumberInput(this)">
     </div>
     
