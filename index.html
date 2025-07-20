@@ -2424,20 +2424,7 @@ async function cargarHistorias() {
 
 <script>
 
-// Modifica la función convertTime() para usar solo la parte entera
 function convertTime() {
-    // Obtener el valor y sanitizarlo
-    const fromValueInput = document.getElementById('fromValue');
-    sanitizeNumberInput(fromValueInput); // Asegura que solo tenga dígitos
-    const fromValue = parseInt(fromValueInput.value) || 0; // Usa parseInt para parte entera
-    
-    const fromUnit = document.getElementById('fromUnit').value;
-    const toUnit = document.getElementById('toUnit').value;
-
-    if (fromValueInput.value === '') {
-        alert("Por favor ingresa un valor válido");
-        return;
-    }
     const conversionRates = {
         segundos: {
             tiradas: 10 / 17,         // 10 tiradas = 17 segundos
@@ -2565,29 +2552,19 @@ function convertTime() {
         return;
     }
 
-
-    if (fromUnit === toUnit) {
-        document.getElementById('toValue').value = fromValue;
-        return;
-    }
-
     let result;
     if (conversionRates[fromUnit] && conversionRates[fromUnit][toUnit]) {
         result = fromValue * conversionRates[fromUnit][toUnit];
     } else if (conversionRates[toUnit] && conversionRates[toUnit][fromUnit]) {
         result = fromValue / conversionRates[toUnit][fromUnit];
     } else {
+        // Conversión indirecta a través de segundos
         const inSeconds = fromValue * conversionRates[fromUnit].segundos;
         result = inSeconds * conversionRates.segundos[toUnit];
     }
 
     document.getElementById('toValue').value = result.toFixed(6);
 }
-
-// Añade el event listener para el input
-document.getElementById('fromValue').addEventListener('input', function() {
-    sanitizeNumberInput(this);
-});
 
 </script>
 
