@@ -2427,19 +2427,19 @@ async function cargarHistorias() {
 function convertTime() {
     const conversionRates = {
         segundos: {
-            tiradas: 10 / 17,
+            tiradas: 1 / 1.7, // 1 segundo = 0.5882352941 tiradas
             ":-_": 1 / 0.432,
-            ":-": 1 / (0.432 * 100),
-            ":": 1 / (0.432 * 100 * 100),
-            "o": 1 / (60 * 60 * 24), // 1 day = 86400 seconds, 1 'o' = 1 day
+            ":-": 1 / (0.432 * 100), // From image: :-_ is 1/100 of :-. So :- is 100 * :-_ seconds.
+            ":": 1 / (0.432 * 100 * 100), // From image: :- is 1/100 of :. So : is 100 * :- seconds.
+            "o": 1 / 86400, // 1 'o' = 86400 seconds (from image)
             minutos: 1 / 60,
             horas: 1 / (60 * 60),
             dias: 1 / (60 * 60 * 24),
             años: 1 / (60 * 60 * 24 * 365.25)
         },
         tiradas: {
-            segundos: 1.7,
-            ":-_": 1.7 / 0.432,
+            segundos: 1.7, // 1 tirada = 1.7 segundos
+            ":-_": 1.7 / 0.432, // 1 tirada = (1.7 segundos) / (0.432 segundos/:-_)
             ":-": 1.7 / (0.432 * 100),
             ":": 1.7 / (0.432 * 100 * 100),
             "o": 1.7 / 86400,
@@ -2448,51 +2448,51 @@ function convertTime() {
             dias: 1.7 / (60 * 60 * 24),
             años: 1.7 / (60 * 60 * 24 * 365.25)
         },
-        ":-_": { // Porciones pequeñas del sol
+        ":-_": { // Porciones pequeñas del sol (Based on image: 1 :-_ = 0.432 sec)
             segundos: 0.432,
-            tiradas: 0.432 / 1.7,
-            ":-": 1 / 100,
-            ":": 1 / (100 * 100),
+            tiradas: 0.432 / 1.7, // 1 :-_ = (0.432 segundos) / (1.7 segundos/tirada)
+            ":-": 1 / 100, // From image: :-_ to :- is 1/100
+            ":": 1 / (100 * 100), // From image: :-_ to : is 1/(100*100)
             "o": 0.432 / 86400,
             minutos: 0.432 / 60,
             horas: 0.432 / (60 * 60),
             dias: 0.432 / (60 * 60 * 24),
             años: 0.432 / (60 * 60 * 24 * 365.25)
         },
-        ":-": { // Porciones medianas del sol
+        ":-": { // Porciones medianas del sol (Based on image: 1 :- = 100 :-_ = 100 * 0.432 = 43.2 sec)
             segundos: 43.2,
             tiradas: 43.2 / 1.7,
-            ":-_": 100,
-            ":": 1 / 100,
+            ":-_": 100, // From image: :- to :-_ is 100
+            ":": 1 / 100, // From image: :- to : is 1/100
             "o": 43.2 / 86400,
             minutos: 43.2 / 60,
             horas: 43.2 / (60 * 60),
             dias: 43.2 / (60 * 60 * 24),
             años: 43.2 / (60 * 60 * 24 * 365.25)
         },
-        ":": { // Porciones grandes del sol
+        ":": { // Porciones grandes del sol (Based on image: 1 : = 100 :- = 100 * 43.2 = 4320 sec)
             segundos: 4320,
             tiradas: 4320 / 1.7,
             ":-_": 100 * 100,
             ":-": 100,
-            "o": 1 / 20, // 1 'o' = 20 ':'
+            "o": 1 / 20, // From image: 1 'o' = 20 ':'
             minutos: 4320 / 60,
             horas: 4320 / (60 * 60),
             dias: 4320 / (60 * 60 * 24),
             años: 4320 / (60 * 60 * 24 * 365.25)
         },
         "o": { // Soles
-            segundos: 86400,
+            segundos: 86400, // From image: 1 'o' = 86400 segundos
             tiradas: 86400 / 1.7,
             ":-_": 86400 / 0.432,
             ":-": 86400 / 43.2,
-            ":": 20,
+            ":": 20, // From image: 1 'o' = 20 ':'
             minutos: 86400 / 60,
-            horas: 24,
-            dias: 1,
+            horas: 24, // From image: 1 dia = 24 h
+            dias: 1, // From image: 1 'o' = 1 dia
             años: 1 / 365.25
         },
-        minutos: {
+        minutos: { // Standard time units, ensuring consistency with 'o' and 'h'
             segundos: 60,
             tiradas: 60 / 1.7,
             ":-_": 60 / 0.432,
@@ -2503,7 +2503,7 @@ function convertTime() {
             dias: 1 / (60 * 24),
             años: 1 / (60 * 24 * 365.25)
         },
-        horas: {
+        horas: { // Standard time units, ensuring consistency with 'o' and 'dia'
             segundos: 60 * 60,
             tiradas: (60 * 60) / 1.7,
             ":-_": (60 * 60) / 0.432,
@@ -2511,21 +2511,21 @@ function convertTime() {
             ":": (60 * 60) / 4320,
             "o": (60 * 60) / 86400,
             minutos: 60,
-            dias: 1 / 24,
+            dias: 1 / 24, // From image: 1 dia = 24 h
             años: 1 / (24 * 365.25)
         },
-        dias: {
+        dias: { // Standard time units, ensuring consistency with 'o'
             segundos: 60 * 60 * 24,
             tiradas: (60 * 60 * 24) / 1.7,
             ":-_": (60 * 60 * 24) / 0.432,
             ":-": (60 * 60 * 24) / 43.2,
             ":": (60 * 60 * 24) / 4320,
-            "o": 1,
+            "o": 1, // From image: 1 dia = 1 'o'
             minutos: 60 * 24,
             horas: 24,
             años: 1 / 365.25
         },
-        años: {
+        años: { // Standard time units
             segundos: 60 * 60 * 24 * 365.25,
             tiradas: (60 * 60 * 24 * 365.25) / 1.7,
             ":-_": (60 * 60 * 24 * 365.25) / 0.432,
