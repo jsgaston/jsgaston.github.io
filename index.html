@@ -1566,48 +1566,50 @@ function showMainTab(tabName) {
 
 <script>
 function updateElapsedTime() {
-  const startInput = document.getElementById("startElapsed").value;
-  const endInput = document.getElementById("endElapsed").value;
+    const startInput = document.getElementById("startElapsed").value;
+    const endInput = document.getElementById("endElapsed").value;
 
-  const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
-  const endDate = endInput ? new Date(endInput) : new Date();
+    const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
+    const endDate = endInput ? new Date(endInput) : new Date();
 
-  if (isNaN(startDate) || isNaN(endDate)) {
-    document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
-    return;
-  }
+    if (isNaN(startDate) || isNaN(endDate)) {
+        document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
+        return;
+    }
 
-  const msElapsed = endDate - startDate;
-  const totalSeconds = Math.floor(msElapsed / 1000);
+    const msElapsed = endDate - startDate;
+    const totalSeconds = Math.floor(msElapsed / 1000);
 
-  // Cálculos base
-  const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((msElapsed / (1000 * 60)) % 60);
+    // Cálculos base
+    const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((msElapsed / (1000 * 60)) % 60);
 
-  // Mostrar tiempo básico
-  document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = Math.floor(msElapsed / (1000 * 60 * 60)).toLocaleString();
-  document.getElementById("elapsedMinutes").textContent = Math.floor(msElapsed / (1000 * 60)).toLocaleString();
-  document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
+    // Mostrar tiempo básico
+    document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
+    document.getElementById("elapsedHours").textContent = Math.floor(msElapsed / (1000 * 60 * 60)).toLocaleString();
+    document.getElementById("elapsedMinutes").textContent = Math.floor(msElapsed / (1000 * 60)).toLocaleString();
+    document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
 
-  // Conversiones especiales
-  let extra = document.getElementById("extraTimeUnits");
-  if (!extra) {
-    extra = document.createElement("div");
-    extra.id = "extraTimeUnits";
-    extra.className = "mt-6 p-4 bg-white rounded-lg shadow space-y-2 text-center text-gray-700";
-    document.getElementById("mainTimeElapsedSection").appendChild(extra);
-  }
+    // Conversiones especiales usando el objeto conversionRates
+    let extra = document.getElementById("extraTimeUnits");
+    if (!extra) {
+        extra = document.createElement("div");
+        extra.id = "extraTimeUnits";
+        extra.className = "mt-6 p-4 bg-white rounded-lg shadow space-y-2 text-center text-gray-700";
+        document.getElementById("mainTimeElapsedSection").appendChild(extra);
+    }
 
-  extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds / 86400).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
-  `;
+    // Use the rates from conversionRates.segundos
+    extra.innerHTML = `
+        <div><strong>Total en tiradas:</strong> ${(totalSeconds * conversionRates.segundos.tiradas).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+        <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds * conversionRates.segundos[":-_"]).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+        <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds * conversionRates.segundos[":-"]).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+        <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds * conversionRates.segundos[":"]).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+        <div><strong>Total en o (Soles):</strong> ${(totalSeconds * conversionRates.segundos.o).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    `;
 }
+
 
 </script>
 
@@ -2538,32 +2540,23 @@ function convertTime() {
         }
     };
     
-    const fromValue = parseFloat(document.getElementById('fromValue').value);
-    const fromUnit = document.getElementById('fromUnit').value;
-    const toUnit = document.getElementById('toUnit').value;
+    const inputValue = parseFloat(document.getElementById("convertValue").value);
+    const fromUnit = document.getElementById("convertFrom").value;
+    const toUnit = document.getElementById("convertTo").value;
+    const resultElement = document.getElementById("conversionResult");
 
-    if (isNaN(fromValue)) {
-        alert("Por favor ingresa un valor válido");
+    if (isNaN(inputValue)) {
+        resultElement.textContent = "Por favor, introduce un valor numérico válido.";
         return;
     }
 
-    if (fromUnit === toUnit) {
-        document.getElementById('toValue').value = fromValue;
+    if (!conversionRates[fromUnit] || !conversionRates[fromUnit][toUnit]) {
+        resultElement.textContent = "Conversión no definida. Revisa las unidades.";
         return;
     }
 
-    let result;
-    if (conversionRates[fromUnit] && conversionRates[fromUnit][toUnit]) {
-        result = fromValue * conversionRates[fromUnit][toUnit];
-    } else if (conversionRates[toUnit] && conversionRates[toUnit][fromUnit]) {
-        result = fromValue / conversionRates[toUnit][fromUnit];
-    } else {
-        // Conversión indirecta a través de segundos
-        const inSeconds = fromValue * conversionRates[fromUnit].segundos;
-        result = inSeconds * conversionRates.segundos[toUnit];
-    }
-
-    document.getElementById('toValue').value = result.toFixed(6);
+    const convertedValue = inputValue * conversionRates[fromUnit][toUnit];
+    resultElement.textContent = `${inputValue} ${fromUnit} son ${convertedValue.toLocaleString(undefined, {maximumFractionDigits: 4})} ${toUnit}`;
 }
 
 </script>
