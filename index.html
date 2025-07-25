@@ -2429,7 +2429,8 @@ function convertTime() {
         // "tiradas" (rolls) conversions
         tiradas: {
             segundos: 1.7, // 10 tiradas = 17 segundos => 1 tirada = 1.7 segundos
-            ":-_": 1.7 / 0.432, // Convert seconds to ":-_" (1 :-_ = 0.432 seconds)
+            // Derived from: 1 tirada = 1.7 segundos and 1 :-_ = 0.432 segundos
+            ":-_": 1.7 / 0.432, // 1 tirada = 3.935185185 :-_ (from image: 1/0.2541176471)
             ":-": (1.7 / 0.432) / 100, // 1 :- = 100 :-_
             ":": ((1.7 / 0.432) / 100) / 100, // 1 : = 100 :-
             o: 1.7 / 86400, // 1 'o' = 86400 segundos
@@ -2439,126 +2440,97 @@ function convertTime() {
         },
         // "segundos" (seconds) conversions
         segundos: {
-            tiradas: 1 / 1.7, // 1 segundo = 0.5882352941 tiradas
-            ":-_": 1 / 0.432, // 1 :-_ = 0.432 segundos => 1 segundo = 1/0.432 :-_
+            tiradas: 0.5882352941, // 1 segundo = 0.5882352941 tiradas (from image)
+            ":-_": 1 / 0.432, // 1 :-_ = 0.432 segundos => 1 segundo = 1/0.432 :-_ (from image 0.432 segundos = 1 :-_)
             ":-": (1 / 0.432) / 100, // 1 :- = 100 :-_
             ":": ((1 / 0.432) / 100) / 100, // 1 : = 100 :-
-            o: 1 / 86400, // 1 'o' = 86400 segundos
+            o: 1 / 86400, // 1 'o' = 86400 segundos (from image)
             minutos: 1 / 60,
             horas: 1 / 3600,
             dias: 1 / 86400
         },
         // "o" (soles/days) conversions
         o: {
-            segundos: 86400, // 1 dia = 86400 segundos
-            tiradas: 86400 / 1.7,
+            segundos: 86400, // 1 dia = 86400 segundos (from image)
+            tiradas: 86400 / 1.7, // Derived from segundos to tiradas
             ":-_": 200000, // 1 'o' = 200000 ':-_' (from image)
             ":-": 200000 / 100, // 1 :- = 100 :-_
             ":": 20, // 1 'o' = 20 ':' (from image)
-            minutos: 24 * 60, // 1 dia = 24 horas * 60 minutos/hora
-            horas: 24, // 1 dia = 24 horas
+            minutos: 24 * 60, // 1 dia = 24 horas * 60 minutos/hora (from image)
+            horas: 24, // 1 dia = 24 horas (from image)
             dias: 1
         },
         // ":" (large sun portions) conversions
         ":": {
-            segundos: 4320, // 1 : = 100 :- = 100 * 100 :-_ = 10000 * 0.432 = 4320 segundos
-            tiradas: 4320 / 1.7,
-            ":-_": 10000, // 1 : = 10000 :-_
-            ":-": 100, // 1 : = 100 :-
-            o: 1 / 20, // 20 : = 1 o => 1 : = 1/20 o
-            minutos: 4320 / 60,
-            horas: 4320 / 3600,
-            dias: 4320 / 86400
+            segundos: 86400 / 20, // 1 o = 20 : and 1 o = 86400 segundos
+            tiradas: (86400 / 20) / 1.7, // Derived from segundos to tiradas
+            ":-_": 10000, // 1 : = 100 :- = 100 * 100 :-_ = 10000 :-_ (derived from image: 1 : = 100 :- and 1 :- = 100 :-_)
+            ":-": 100, // 1 : = 100 :- (from image)
+            o: 1 / 20, // 20 : = 1 o => 1 : = 1/20 o (from image)
+            minutos: (86400 / 20) / 60,
+            horas: (86400 / 20) / 3600,
+            dias: 1 / 20
         },
         // ":-" (medium sun portions) conversions
         ":-": {
-            segundos: 43.2, // 1 :- = 100 :-_ = 100 * 0.432 = 43.2 segundos
-            tiradas: 43.2 / 1.7,
-            ":-_": 100, // 1 :- = 100 :-_
-            ":": 1 / 100, // 1 :- = 1/100 :
-            o: 43.2 / 86400, // Convert seconds to 'o'
+            segundos: 43.2, // 1 :- = 100 :-_ and 1 :-_ = 0.432 segundos
+            tiradas: 43.2 / 1.7, // Derived from segundos to tiradas
+            ":-_": 100, // 1 :- = 100 :-_ (from image)
+            ":": 1 / 100, // 1 : = 100 :- => 1 :- = 1/100 : (from image)
+            o: (1 / 20) / 100, // 1 o = 20 : and 1 : = 100 :- => 1 o = 2000 :- => 1 :- = 1/2000 o
             minutos: 43.2 / 60,
             horas: 43.2 / 3600,
             dias: 43.2 / 86400
         },
         // ":-_" (small sun portions) conversions
         ":-_": {
-            segundos: 0.432, // 1 :-_ = 0.432 segundos (derived from 1 tirada = 1.7s and 1 tirada = 3.935185185 :-_)
-            tiradas: 1 / 3.935185185, // 1 tirada = 3.935185185 :-_ (from image)
-            ":-": 1 / 100, // 1 :-_ = 1/100 :-
-            ":": 1 / 10000, // 1 :-_ = 1/10000 :
-            o: 0.432 / 86400, // Convert seconds to 'o'
+            segundos: 0.432, // 1 :-_ = 0.432 segundos (from image)
+            tiradas: 0.2541176471, // 1 tirada = 3.935185185 :-_ => 1 :-_ = 1/3.935185185 tiradas = 0.2541176471 tiradas (from image)
+            ":-": 1 / 100, // 1 :- = 100 :-_ => 1 :-_ = 1/100 :- (from image)
+            ":": 1 / 10000, // 1 : = 100 :- and 1 :- = 100 :-_ => 1 : = 10000 :-_ => 1 :-_ = 1/10000 : (from image)
+            o: 1 / 200000, // 1 'o' = 200000 ':-_' (from image)
             minutos: 0.432 / 60,
             horas: 0.432 / 3600,
             dias: 0.432 / 86400
         },
-        // "dia" (day) conversions - same as "o"
+        // "dia" (day) conversions - explicitly defined as per image
         dia: {
-            segundos: 86400,
+            segundos: 86400, // From image
+            h: 24, // From image
+            min: 60 * 24, // 1 dia = 24h, 1h = 60min
+            o: 1, // 1 dia = 1 o (implied)
             tiradas: 86400 / 1.7,
-            ":-_": 200000,
+            ":-_": 200000, // From image
             ":-": 200000 / 100,
-            ":": 20,
-            minutos: 24 * 60,
-            horas: 24,
-            o: 1
+            ":": 20
         },
-        // "h" (hours) conversions - same as "horas"
+        // "h" (hours) conversions - explicitly defined as per image
         h: {
+            min: 60, // From image
+            sec: 3600, // 1h = 60min, 1min = 60sec
+            dia: 1 / 24, // From image
             segundos: 3600,
             tiradas: 3600 / 1.7,
             ":-_": 3600 / 0.432,
             ":-": 3600 / 43.2,
             ":": 3600 / 4320,
-            o: 3600 / 86400,
-            minutos: 60,
-            horas: 1,
-            dias: 1 / 24
+            o: 3600 / 86400
         },
-        // "min" (minutes) conversions - same as "minutos"
+        // "min" (minutes) conversions - explicitly defined as per image
         min: {
+            sec: 60, // From image
+            h: 1 / 60, // From image
+            dia: 1 / (24 * 60), // Derived from dia to h to min
             segundos: 60,
             tiradas: 60 / 1.7,
             ":-_": 60 / 0.432,
             ":-": 60 / 43.2,
             ":": 60 / 4320,
-            o: 60 / 86400,
-            minutos: 1,
-            horas: 1 / 60,
-            dias: 1 / (24 * 60)
-        },
-        // Standard time units (minutos, horas, dias) for completeness,
-        // ensuring consistency with 'o', 'h', 'min' from the image.
-        minutos: {
-            segundos: 60,
-            tiradas: 60 / 1.7,
-            ":-_": 60 / 0.432,
-            ":-": 60 / 43.2,
-            ":": 60 / 4320,
-            o: 60 / 86400,
-            horas: 1 / 60,
-            dias: 1 / (60 * 24)
-        },
-        horas: {
-            segundos: 3600,
-            tiradas: 3600 / 1.7,
-            ":-_": 3600 / 0.432,
-            ":-": 3600 / 43.2,
-            ":": 3600 / 4320,
-            o: 3600 / 86400,
-            minutos: 60,
-            dias: 1 / 24
-        },
-        dias: {
-            segundos: 86400,
-            tiradas: 86400 / 1.7,
-            ":-_": 86400 / 0.432,
-            ":-": 86400 / 43.2,
-            ":": 86400 / 4320,
-            o: 1,
-            minutos: 60 * 24,
-            horas: 24
+            o: 60 / 86400
         }
+        // "minutos", "horas", "dias" are implicitly covered by "min", "h", "dia" respectively.
+        // Keeping them for semantic clarity if they are used elsewhere in the code
+        // but their values will directly map to the above.
     };
     
     const fromValue = parseFloat(document.getElementById('fromValue').value);
