@@ -1287,7 +1287,9 @@ function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
         });
 
         // --- Funciones de Navegación Principal ---
-
+    const mainTabButtons = document.querySelectorAll('.main-tab-button');
+    const mainTabContents = document.querySelectorAll('.main-tab-content');
+        
 function showMainTab(tabName) {
     // Ocultar todas las secciones
     mainHomeSection.classList.add('hidden');
@@ -1302,6 +1304,38 @@ function showMainTab(tabName) {
     document.getElementById('mainTimeConverterSection').classList.add('hidden');
     document.getElementById('mainTimeElapsedSection').classList.add('hidden');
     document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
+
+
+    mainTabContents.forEach(content => {
+            if (content.id === `main${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Section`) {
+                content.classList.remove('hidden');
+            } else {
+                content.classList.add('hidden');
+            }
+        });
+
+        mainTabButtons.forEach(button => {
+            if (button.dataset.mainTab === tabId) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+
+        // Specific logic for the graph tab
+        if (tabId === 'graph') {
+            // Ensure the graph is drawn or updated when its tab is made visible
+            drawGraph(parseFloat(variableSlider.value));
+        }
+    }
+
+    // Add event listeners for main tab buttons if not already present
+    mainTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            showMainTab(button.dataset.mainTab);
+        });
+    });
+
     
     // Eliminar el div extra si existe
     const extraTimeUnits = document.getElementById('extraTimeUnits');
@@ -2625,12 +2659,11 @@ function convertTime() {
 </script>
 
 
-
-    
 <script>
+    
     // Obtener el contexto del lienzo para la gráfica
     const ctx = document.getElementById('mathGraph').getContext('2d');
-    const variableRange = document.getElementById('variableRange');
+    const variableSlider = document.getElementById('variableSlider'); // Corrected ID from variableRange to variableSlider
     const variableValueSpan = document.getElementById('variableValue');
 
     let chart; // Variable para almacenar la instancia de la gráfica
@@ -2655,6 +2688,7 @@ function convertTime() {
         if (chart) {
             // Si la gráfica ya existe, actualiza sus datos
             chart.data.datasets[0].data = dataPoints;
+            chart.options.plugins.title.text = `Gráfica de x = y² - ${variable}/2`; // Update title
             chart.update();
         } else {
             // Si no existe, crea una nueva gráfica
@@ -2698,6 +2732,13 @@ function convertTime() {
                         }
                     },
                     plugins: {
+                        title: { // Add title plugin option
+                            display: true,
+                            text: `Gráfica de x = y² - ${variable}/2`,
+                            font: {
+                                size: 18
+                            }
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -2712,13 +2753,16 @@ function convertTime() {
     }
 
     // Event listener para el deslizador de la variable
-    variableRange.addEventListener('input', (event) => {
+    variableSlider.addEventListener('input', (event) => { // Corrected ID from variableRange to variableSlider
         const currentVariable = parseFloat(event.target.value);
         drawGraph(currentVariable);
     });
 
     // Dibujar la gráfica inicial con el valor por defecto de la variable
-    drawGraph(parseFloat(variableRange.value));
+    // Asegurarse de que el script se ejecuta después de que el DOM esté cargado
+    document.addEventListener('DOMContentLoaded', () => {
+        drawGraph(parseFloat(variableSlider.value));
+    });
 </script>
 
 
@@ -2811,16 +2855,7 @@ function convertTime() {
             updateGraph(currentVariable);
         }
 
-        // Modificar la función showMainTab para incluir la nueva pestaña
-        function showMainTab(tabName) {
-            // ... (mantener todo el código existente) ...
-            else if (tabName === 'graph') {
-                document.getElementById('mainGraphSection').classList.remove('hidden');
-                document.querySelector('[data-main-tab="graph"]').classList.add('active');
-                setTimeout(initGraphSection, 100); // Pequeño retraso para asegurar la renderización
-            }
-            // ... (mantener el resto de la función) ...
-        }
+       
     </script>
 
 
