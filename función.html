@@ -241,7 +241,7 @@
             const data = [];
             // Generate points only for positive y values
             // Adjusted y range to go higher for a larger visible curve
-            for (let y = 0; y <= 50; y += 0.05) { // Start y from 0 for positive values
+            for (let y = 0; y <= 500; y += 0.05) { // Start y from 0 for positive values
                 const x = Math.pow(y, 2) - (variable / 2);
                 data.push({x: x, y: y});
             }
@@ -385,7 +385,7 @@
                                 }
                             },
                             min: 0, // Only show positive y values
-                            max: 50 // Adjusted for visible curve
+                            max: 500 // Adjusted for visible curve
                         }
                     },
                     animation: {
