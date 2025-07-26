@@ -170,15 +170,15 @@
         let chart = null;
         let isAnimating = false;
         
-function generateGraphData(variable) {
-    const data = [];
-    // Generar puntos más densos para una curva suave, solo para y > 0
-    for (let y = 0.05; y <= 8; y += 0.05) { // Cambiar de y = -8 a y = 0.05
-        const x = Math.pow(y, 2) - (variable / 2);
-        data.push({x: x, y: y});
-    }
-    return data;
-}
+        function generateGraphData(variable) {
+            const data = [];
+            // Generar puntos más densos para una curva suave
+            for (let y = -8; y <= 8; y += 0.05) {
+                const x = Math.pow(y, 2) - (variable / 2);
+                data.push({x: x, y: y});
+            }
+            return data;
+        }
         
         function updateGraph(variable) {
             const roundedVariable = Math.round(variable * 10) / 10;
@@ -204,38 +204,22 @@ function generateGraphData(variable) {
             gradient.addColorStop(0, '#667eea');
             gradient.addColorStop(1, '#764ba2');
             
-    chart = new Chart(ctx, {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                label: `x = y² - ${variable.toFixed(1)}/2`,
-                data: data,
-                // Quita borderColor para evitar una línea separada si quieres que el relleno sea el color principal
-                // borderColor: gradient,
-                borderWidth: 0, // Establecer a 0 para que el borde no duplique el color del relleno
-                pointRadius: 0,
-                showLine: true,
-                fill: true, // Habilitar el relleno
-                tension: 0.1,
-                backgroundColor: function(context) {
-                    const value = context.parsed.x;
-                    if (value < 0) {
-                        return 'rgba(255, 0, 0, 0.5)'; // Rojo para x negativo
-                    } else {
-                        return 'rgba(0, 0, 255, 0.5)'; // Azul para x positivo
-                    }
+            chart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: `x = y² - ${variable.toFixed(1)}/2`,
+                        data: data,
+                        borderColor: gradient,
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        showLine: true,
+                        fill: false,
+                        tension: 0.1
+                    }]
                 },
-                borderColor: function(context) {
-                    const value = context.parsed.x;
-                    if (value < 0) {
-                        return 'rgba(255, 0, 0, 0.8)'; // Rojo más intenso para el borde
-                    } else {
-                        return 'rgba(0, 0, 255, 0.8)'; // Azul más intenso para el borde
-                    }
-                }
-            }]
-        },
-        options: {
+                options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: {
@@ -289,11 +273,8 @@ function generateGraphData(variable) {
                                 font: {
                                     weight: '600'
                                 }
-                            },
-                        //                            min: -15, // Puedes ajustar los límites para ver mejor la curva
-                    //max: 100
-
-                },
+                            }
+                        },
                         y: {
                             type: 'linear',
                             title: {
@@ -314,15 +295,12 @@ function generateGraphData(variable) {
                                 font: {
                                     weight: '600'
                                 }
-                            },
-                        //                min: 0, // Establece el mínimo en 0 para y
-                    //max: 100 // O el máximo que desees para el eje y
+                            }
                         }
                     },
                     animation: {
                         duration: 0 // Desactivar animación por defecto para mejor rendimiento
                     }
-
                 }
             });
         }
