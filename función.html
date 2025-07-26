@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gráfica de x = y² - variable/2</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -141,52 +142,85 @@
 <body>
     <div class="container">
         <h1 class="title">🌊 La Función Mundo Azul</h1>
-        
+
         <div class="controls">
             <div class="control-group">
                 <label class="control-label">Variable:</label>
-                <input type="range" id="variableSlider" class="slider" 
+                <input type="range" id="variableSlider" class="slider"
                        min="0" max="100" step="0.1" value="0">
                 <div class="value-display" id="variableValue">0.0</div>
             </div>
         </div>
-        
+
         <div class="equation-display" id="equationDisplay">
             x = y² - 0.0/2
         </div>
-        
+
         <div class="graph-container">
             <canvas id="mathChart"></canvas>
         </div>
-        
+
         <div class="info-panel">
             <p><strong>🎯 Instrucciones:</strong> Mueve el deslizador para cambiar el valor de la variable y observar cómo se transforma la parábola horizontal.</p>
+            <p><strong>Zoom:</strong> Usa la rueda del ratón para hacer zoom. Arrastra para mover la gráfica.</p>
             <button class="button" onclick="resetGraph()">🔄 Reiniciar</button>
             <button class="button" onclick="animateVariable()">✨ Animación</button>
+            <button class="button" onclick="resetZoom()">🔍 Reiniciar Zoom</button>
         </div>
     </div>
 
     <script>
         let chart = null;
         let isAnimating = false;
-        
+
+        // Custom plugin for Chart.js to draw background regions
+        const backgroundRegionsPlugin = {
+            id: 'backgroundRegions',
+            beforeDraw(chart, args, options) {
+                const {ctx, chartArea: {left, top, right, bottom}, scales: {x, y}} = chart;
+
+                ctx.save();
+
+                // Draw red region: y > 0 and x < 0
+                // We need to translate chart coordinates to canvas pixels
+                const xZeroPixel = x.getPixelForValue(0);
+                const yZeroPixel = y.getPixelForValue(0);
+
+                // Red region: y > 0 (from yZeroPixel up to top) and x < 0 (from left to xZeroPixel)
+                if (xZeroPixel > left && yZeroPixel > top) { // Ensure the origin is within the visible chart area
+                    ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Red with transparency
+                    ctx.fillRect(left, top, xZeroPixel - left, yZeroPixel - top);
+                }
+
+                // Blue region: y > 0 and x > 0
+                // Blue region: y > 0 (from yZeroPixel up to top) and x > 0 (from xZeroPixel to right)
+                if (xZeroPixel < right && yZeroPixel > top) { // Ensure the origin is within the visible chart area
+                    ctx.fillStyle = 'rgba(0, 0, 255, 0.2)'; // Blue with transparency
+                    ctx.fillRect(xZeroPixel, top, right - xZeroPixel, yZeroPixel - top);
+                }
+
+                ctx.restore();
+            }
+        };
+
         function generateGraphData(variable) {
             const data = [];
             // Generar puntos más densos para una curva suave
-            for (let y = 0; y <= 100; y += 0.05) {
+            // Adjust y range to better suit typical viewing, and allow for zooming
+            for (let y = -50; y <= 50; y += 0.05) { // Increased range for y to show more of the parabola
                 const x = Math.pow(y, 2) - (variable / 2);
                 data.push({x: x, y: y});
             }
             return data;
         }
-        
+
         function updateGraph(variable) {
             const roundedVariable = Math.round(variable * 10) / 10;
             document.getElementById('variableValue').textContent = roundedVariable.toFixed(1);
             document.getElementById('equationDisplay').textContent = `x = y² - ${roundedVariable.toFixed(1)}/2`;
-            
+
             const data = generateGraphData(variable);
-            
+
             if (chart) {
                 chart.data.datasets[0].data = data;
                 chart.data.datasets[0].label = `x = y² - ${roundedVariable.toFixed(1)}/2`;
@@ -195,15 +229,15 @@
                 createChart(data, roundedVariable);
             }
         }
-        
+
         function createChart(data, variable) {
             const ctx = document.getElementById('mathChart').getContext('2d');
-            
+
             // Crear gradiente para la línea
             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
             gradient.addColorStop(0, '#667eea');
             gradient.addColorStop(1, '#764ba2');
-            
+
             chart = new Chart(ctx, {
                 type: 'scatter',
                 data: {
@@ -249,7 +283,25 @@
                                     return `x: ${context.parsed.x.toFixed(2)}, y: ${context.parsed.y.toFixed(2)}`;
                                 }
                             }
-                        }
+                        },
+                        // Zoom plugin configuration
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'xy', // Enable panning in both x and y directions
+                                modifierKey: 'shift', // Only pan when shift key is pressed (or remove for always)
+                            },
+                            zoom: {
+                                wheel: {
+                                    enabled: true, // Enable zooming with mouse wheel
+                                },
+                                pinch: {
+                                    enabled: true // Enable zooming with pinch gestures on touch devices
+                                },
+                                mode: 'xy', // Enable zooming in both x and y directions
+                            }
+                        },
+                        backgroundRegions: {} // Enable our custom plugin
                     },
                     scales: {
                         x: {
@@ -273,7 +325,10 @@
                                 font: {
                                     weight: '600'
                                 }
-                            }
+                            },
+                            // Initial scale range for better visibility
+                            min: -100,
+                            max: 100
                         },
                         y: {
                             type: 'linear',
@@ -295,62 +350,74 @@
                                 font: {
                                     weight: '600'
                                 }
-                            }
+                            },
+                            // Initial scale range for better visibility
+                            min: -50,
+                            max: 50
                         }
                     },
                     animation: {
                         duration: 0 // Desactivar animación por defecto para mejor rendimiento
                     }
-                }
+                },
+                plugins: [backgroundRegionsPlugin, ChartZoom] // Register the custom plugin and zoom plugin
             });
         }
-        
+
         function resetGraph() {
             const slider = document.getElementById('variableSlider');
             slider.value = 0;
             updateGraph(0);
+            resetZoom(); // Also reset zoom when graph is reset
         }
-        
+
+        function resetZoom() {
+            if (chart) {
+                chart.resetZoom();
+            }
+        }
+
         function animateVariable() {
             if (isAnimating) return;
-            
+
             isAnimating = true;
             const slider = document.getElementById('variableSlider');
             let direction = 1;
             let currentValue = 0;
-            
+
             const animate = () => {
                 currentValue += direction * 0.2;
-                
+
                 if (currentValue >= 100) {
                     direction = -1;
-                    currentValue = 10;
+                    currentValue = 10; // Start moving back from a slightly higher value to avoid infinite loop near 0
                 } else if (currentValue <= 0) {
                     direction = 1;
                     currentValue = 0;
                 }
-                
+
                 slider.value = currentValue;
                 updateGraph(currentValue);
-                
-                if (Math.abs(currentValue) < 0.1 && direction === 1) {
+
+                // Stop animation when it reaches close to 0 and is moving upwards
+                if (currentValue < 0.2 && direction === 1) { // Check for a small threshold near 0
                     isAnimating = false;
                     return;
                 }
-                
+
                 setTimeout(animate, 50);
             };
-            
+
             animate();
         }
-        
+
         // Event listeners
         document.getElementById('variableSlider').addEventListener('input', function(e) {
             if (!isAnimating) {
                 updateGraph(parseFloat(e.target.value));
             }
         });
-        
+
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
             updateGraph(0);
