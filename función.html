@@ -146,7 +146,7 @@
             <div class="control-group">
                 <label class="control-label">Variable:</label>
                 <input type="range" id="variableSlider" class="slider" 
-                       min="-10" max="10" step="0.1" value="0">
+                       min="0" max="100" step="0.1" value="0">
                 <div class="value-display" id="variableValue">0.0</div>
             </div>
         </div>
@@ -173,7 +173,7 @@
         function generateGraphData(variable) {
             const data = [];
             // Generar puntos más densos para una curva suave
-            for (let y = -8; y <= 8; y += 0.05) {
+            for (let y = -8; y <= 100; y += 0.05) {
                 const x = Math.pow(y, 2) - (variable / 2);
                 data.push({x: x, y: y});
             }
