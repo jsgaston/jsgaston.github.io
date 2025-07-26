@@ -173,7 +173,7 @@
         function generateGraphData(variable) {
             const data = [];
             // Generar puntos más densos para una curva suave
-            for (let y = -8; y <= 100; y += 0.05) {
+            for (let y = 0; y <= 100; y += 0.05) {
                 const x = Math.pow(y, 2) - (variable / 2);
                 data.push({x: x, y: y});
             }
