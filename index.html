@@ -1342,6 +1342,8 @@ function showMainTab(tabName) {
     } else if (tabName === 'number-symbols') {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
+    } else if (tabId === 'graph') {
+            document.getElementById('mainGraphSection').classList.remove('hidden');
     } else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
@@ -1352,8 +1354,7 @@ function showMainTab(tabName) {
             // Ajustar 2 horas para horario de verano en España (UTC+2)
             const madridTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
             endInput.value = madridTime.toISOString().slice(0,16);
-        } else if (tabId === 'graph') {
-            document.getElementById('mainGraphSection').classList.remove('hidden');
+        
         }
         updateElapsedTime();
     }
