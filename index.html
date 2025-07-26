@@ -1350,7 +1350,14 @@ function showMainTab(tabName) {
     } else if (tabName === 'time-converter') {
         document.getElementById('mainTimeConverterSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-converter"]').classList.add('active');
-    } else if (tabName === 'number-symbols') {
+    }             else if (tabName === 'graph') {
+                document.getElementById('mainGraphSection').classList.remove('hidden');
+                document.querySelector('[data-main-tab="graph"]').classList.add('active');
+                setTimeout(initGraphSection, 100); // Pequeño retraso para asegurar la renderización
+            }
+    
+    
+    else if (tabName === 'number-symbols') {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
     } else if (tabName === 'time-elapsed') {
