@@ -322,12 +322,12 @@
             const animate = () => {
                 currentValue += direction * 0.2;
                 
-                if (currentValue >= 10) {
+                if (currentValue >= 100) {
                     direction = -1;
                     currentValue = 10;
-                } else if (currentValue <= -10) {
+                } else if (currentValue <= 0) {
                     direction = 1;
-                    currentValue = -10;
+                    currentValue = 0;
                 }
                 
                 slider.value = currentValue;
