@@ -1309,12 +1309,14 @@ function showMainTab(tabName) {
     } else if (tabName === 'number-symbols') {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
-    } else if (tabName === 'time-elapsed') {
-        document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
-        document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active'); 
     } else if (tabId === 'graph') {
             document.getElementById('mainGraphSection').classList.remove('hidden');
         }
+    
+    } else if (tabName === 'time-elapsed') {
+        document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active'); 
+    
         // Prellenar fecha final si está vacía
         const endInput = document.getElementById("endElapsed");
         if (!endInput.value) {
