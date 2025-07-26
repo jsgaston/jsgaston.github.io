@@ -207,7 +207,7 @@
             const data = [];
             // Generar puntos más densos para una curva suave
             // Adjust y range to better suit typical viewing, and allow for zooming
-            for (let y = -50; y <= 50; y += 0.05) { // Increased range for y to show more of the parabola
+            for (let y = 0; y <= 1000000; y += 0.05) { // Increased range for y to show more of the parabola
                 const x = Math.pow(y, 2) - (variable / 2);
                 data.push({x: x, y: y});
             }
