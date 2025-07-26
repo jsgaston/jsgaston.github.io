@@ -173,41 +173,75 @@
         let chart = null;
         let isAnimating = false;
 
-        // Custom plugin for Chart.js to draw background regions
-        const backgroundRegionsPlugin = {
-            id: 'backgroundRegions',
-            beforeDraw(chart, args, options) {
-                const {ctx, chartArea: {left, top, right, bottom}, scales: {x, y}} = chart;
-
+        // Custom plugin for Chart.js to draw background regions between function and x-axis
+        const fillFunctionAreaPlugin = {
+            id: 'fillFunctionArea',
+            beforeDatasetsDraw(chart, args, options) {
+                const {ctx, chartArea, scales: {x, y}} = chart;
                 ctx.save();
 
-                // Draw red region: y > 0 and x < 0
-                // We need to translate chart coordinates to canvas pixels
-                const xZeroPixel = x.getPixelForValue(0);
-                const yZeroPixel = y.getPixelForValue(0);
+                const dataset = chart.data.datasets[0];
+                const meta = chart.getDatasetMeta(0);
 
-                // Red region: y > 0 (from yZeroPixel up to top) and x < 0 (from left to xZeroPixel)
-                if (xZeroPixel > left && yZeroPixel > top) { // Ensure the origin is within the visible chart area
-                    ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Red with transparency
-                    ctx.fillRect(left, top, xZeroPixel - left, yZeroPixel - top);
+                if (!meta.data || meta.data.length === 0) {
+                    ctx.restore();
+                    return;
                 }
 
-                // Blue region: y > 0 and x > 0
-                // Blue region: y > 0 (from yZeroPixel up to top) and x > 0 (from xZeroPixel to right)
-                if (xZeroPixel < right && yZeroPixel > top) { // Ensure the origin is within the visible chart area
-                    ctx.fillStyle = 'rgba(0, 0, 255, 0.2)'; // Blue with transparency
-                    ctx.fillRect(xZeroPixel, top, right - xZeroPixel, yZeroPixel - top);
+                let currentPathColor = '';
+
+                // Start drawing paths
+                ctx.beginPath();
+                ctx.moveTo(meta.data[0].x, y.getPixelForValue(0)); // Start from the x-axis at the first point's x
+
+                for (let i = 0; i < meta.data.length; i++) {
+                    const point = meta.data[i];
+                    const dataX = dataset.data[i].x; // Get the actual data x-value
+                    const dataY = dataset.data[i].y; // Get the actual data y-value
+
+                    // Only fill for y >= 0
+                    if (dataY >= 0) {
+                        const newPathColor = dataX < 0 ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 255, 0.2)';
+
+                        if (currentPathColor !== newPathColor && i > 0) {
+                            // If color changes, close the current path and start a new one
+                            ctx.lineTo(point.x, y.getPixelForValue(0)); // Go to x-axis at current point's x
+                            ctx.closePath();
+                            ctx.fillStyle = currentPathColor;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(point.x, y.getPixelForValue(0)); // Start new path from x-axis
+                        }
+                        currentPathColor = newPathColor;
+                        ctx.lineTo(point.x, point.y); // Draw to the curve point
+                    } else if (currentPathColor !== '' && i > 0) { // If y becomes negative, close current path
+                        ctx.lineTo(meta.data[i-1].x, y.getPixelForValue(0)); // Go to x-axis at previous valid x
+                        ctx.closePath();
+                        ctx.fillStyle = currentPathColor;
+                        ctx.fill();
+                        ctx.beginPath(); // Start a new path, implicitly for the next positive y segment
+                        currentPathColor = ''; // Reset color
+                    }
+                }
+
+                // Close and fill the last path segment if there was one
+                if (currentPathColor !== '') {
+                    ctx.lineTo(meta.data[meta.data.length - 1].x, y.getPixelForValue(0)); // Go to x-axis at last point's x
+                    ctx.closePath();
+                    ctx.fillStyle = currentPathColor;
+                    ctx.fill();
                 }
 
                 ctx.restore();
             }
         };
 
+
         function generateGraphData(variable) {
             const data = [];
-            // Generar puntos más densos para una curva suave
-            // Adjust y range to better suit typical viewing, and allow for zooming
-            for (let y = 0; y <= 1000000; y += 0.05) { // Increased range for y to show more of the parabola
+            // Generate points only for positive y values
+            // Adjusted y range to go higher for a larger visible curve
+            for (let y = 0; y <= 50; y += 0.05) { // Start y from 0 for positive values
                 const x = Math.pow(y, 2) - (variable / 2);
                 data.push({x: x, y: y});
             }
@@ -224,7 +258,7 @@
             if (chart) {
                 chart.data.datasets[0].data = data;
                 chart.data.datasets[0].label = `x = y² - ${roundedVariable.toFixed(1)}/2`;
-                chart.update('none'); // Sin animación para mejor rendimiento
+                chart.update('none'); // No animation for better performance
             } else {
                 createChart(data, roundedVariable);
             }
@@ -233,7 +267,7 @@
         function createChart(data, variable) {
             const ctx = document.getElementById('mathChart').getContext('2d');
 
-            // Crear gradiente para la línea
+            // Create gradient for the line
             const gradient = ctx.createLinearGradient(0, 0, 0, 400);
             gradient.addColorStop(0, '#667eea');
             gradient.addColorStop(1, '#764ba2');
@@ -246,10 +280,10 @@
                         data: data,
                         borderColor: gradient,
                         backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 3,
+                        borderWidth: 5, // Increased line thickness
                         pointRadius: 0,
                         showLine: true,
-                        fill: false,
+                        fill: false, // Important: do not use Chart.js built-in fill
                         tension: 0.1
                     }]
                 },
@@ -301,7 +335,7 @@
                                 mode: 'xy', // Enable zooming in both x and y directions
                             }
                         },
-                        backgroundRegions: {} // Enable our custom plugin
+                        fillFunctionArea: {} // Enable our custom fill plugin
                     },
                     scales: {
                         x: {
@@ -326,8 +360,7 @@
                                     weight: '600'
                                 }
                             },
-                            // Initial scale range for better visibility
-                            min: -100,
+                            min: -100, // Adjusted for typical parabola range
                             max: 100
                         },
                         y: {
@@ -351,16 +384,15 @@
                                     weight: '600'
                                 }
                             },
-                            // Initial scale range for better visibility
-                            min: -50,
-                            max: 50
+                            min: 0, // Only show positive y values
+                            max: 50 // Adjusted for visible curve
                         }
                     },
                     animation: {
-                        duration: 0 // Desactivar animación por defecto para mejor rendimiento
+                        duration: 0 // Deactivate animation for better performance
                     }
                 },
-                plugins: [backgroundRegionsPlugin, ChartZoom] // Register the custom plugin and zoom plugin
+                plugins: [fillFunctionAreaPlugin, ChartZoom] // Register the custom plugin and zoom plugin
             });
         }
 
@@ -383,24 +415,23 @@
             isAnimating = true;
             const slider = document.getElementById('variableSlider');
             let direction = 1;
-            let currentValue = 0;
+            let currentValue = parseFloat(slider.value); // Start animation from current slider value
 
             const animate = () => {
                 currentValue += direction * 0.2;
 
                 if (currentValue >= 100) {
                     direction = -1;
-                    currentValue = 10; // Start moving back from a slightly higher value to avoid infinite loop near 0
+                    currentValue = 100; // Cap at max
                 } else if (currentValue <= 0) {
                     direction = 1;
-                    currentValue = 0;
+                    currentValue = 0; // Cap at min
                 }
 
                 slider.value = currentValue;
                 updateGraph(currentValue);
 
-                // Stop animation when it reaches close to 0 and is moving upwards
-                if (currentValue < 0.2 && direction === 1) { // Check for a small threshold near 0
+                if (currentValue === 0 && direction === 1) { // Stop when it reaches 0 and moving up
                     isAnimating = false;
                     return;
                 }
@@ -418,7 +449,7 @@
             }
         });
 
-        // Inicializar
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             updateGraph(0);
         });
