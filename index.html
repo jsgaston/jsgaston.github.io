@@ -368,13 +368,13 @@
             padding-bottom: 50px; /* Space for indicators */
         }
 
-        .wheel-container {
+.wheel-container {
             position: relative;
-            width: 250px; /* Ancho del contenedor del carrusel */
-            height: 250px; /* Alto del contenedor del carrusel */
+            width: 300px; /* Aumentado para más espacio */
+            height: 300px; /* Aumentado para más espacio */
             margin: 0 auto;
-            perspective: 1000px; /* Profundidad de la perspectiva 3D */
-            transform-style: preserve-3d; /* Permite que los elementos hijos mantengan su 3D */
+            perspective: 1500px; /* Profundidad de la perspectiva 3D aumentada */
+            transform-style: preserve-3d;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -390,12 +390,12 @@
 
         .wheel-item {
             position: absolute;
-            width: 150px; /* Ancho de cada elemento del carrusel */
-            height: 150px; /* Alto de cada elemento del carrusel */
+            width: 160px; /* Ancho de cada elemento del carrusel */
+            height: 160px; /* Alto de cada elemento del carrusel */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2em;
+            font-size: 1.3em;
             background-color: #f0f0f0;
             border: 2px solid #ddd;
             border-radius: 10px;
@@ -3087,7 +3087,7 @@ function convertTime() {
             this.currentIndex = 0;
             this.rotation = 0;
             this.itemAngle = 360 / this.wheelItems.length;
-            this.radius = 120; // Radio de la rueda en px
+            this.radius = 150; // Radio de la rueda en px
             this.leafletMap = null; // Inicializa la propiedad del mapa
 
             this._initWheel();
