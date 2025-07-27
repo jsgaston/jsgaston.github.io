@@ -1346,18 +1346,15 @@ function showMainTab(tabName) {
     } else if (tabName === 'number-symbols') {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
-    } else if (tabName === 'graph') {
-            // Regenerar dinámicamente la sección
-            const section = document.createElement("div");
-            section.id = "mainGraphSection";
-            section.className = "main-tab-content";
-            section.innerHTML = `
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gráfica de la Función Mundo Azul</h2>
-                <iframe src="funcion.html" style="width:100%; height:600px; border:none; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" allowfullscreen></iframe>
-            `;
-            document.querySelector(".container").appendChild(section);
-            document.querySelector('[data-main-tab="graph"]').classList.add('active');
-        }
+    const graphSection = document.getElementById('mainGraphSection');
+    if (tabName !== 'graph') {
+      const iframe = graphSection.querySelector('iframe');
+      if (iframe) iframe.src = ''; // Vacía el iframe al salir
+    } else {
+      const iframe = graphSection.querySelector('iframe');
+      if (iframe && iframe.src === '') iframe.src = 'funcion.html'; // recarga si estaba vaciado
+    }
+
 
      else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
