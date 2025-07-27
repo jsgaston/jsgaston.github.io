@@ -2857,18 +2857,18 @@ function convertTime() {
 
 
 <script>
-// Reemplazar el script existente de la ruleta con este:
+// Variables globales
 const wheel = document.getElementById('wheel');
 const items = document.querySelectorAll('.wheel-item');
 const hoverLeft = document.querySelector('.hover-left');
 const hoverRight = document.querySelector('.hover-right');
 let currentAngle = 0;
-const angleIncrement = 30;
+const angleIncrement = 30; // 360° / 12 items
 let isAnimating = false;
 let hoverInterval;
 let activeTab = 'home'; // Pestaña activa por defecto
 
-// Función para rotar la rueda y cambiar pestaña
+// Función para rotar la rueda
 function rotateWheel(angle, updateTab = true) {
     if (isAnimating) return;
     
@@ -2882,21 +2882,20 @@ function rotateWheel(angle, updateTab = true) {
     }, 600);
 }
 
-// Actualizar el item activo y cambiar pestaña si es necesario
+// Actualizar el item activo y cambiar pestaña
 function updateActiveItem(updateTab = true) {
-    const activeIndex = Math.round((360 - (currentAngle % 360)) / angleIncrement) % items.length;
+    // Calcular el índice activo (ajustado para la perspectiva 3D)
+    let activeIndex = Math.round((360 - (currentAngle % 360)) / angleIncrement % items.length;
+    activeIndex = (activeIndex + items.length) % items.length; // Asegurar positivo
+    
     items.forEach((item, index) => {
+        // Actualizar clase active
         item.classList.toggle('active', index === activeIndex);
         
-        // Ocultar elementos que están atrás
+        // Efectos visuales para elementos en la parte trasera
         const itemAngle = (currentAngle + (index * angleIncrement)) % 360;
-        if (itemAngle > 90 && itemAngle < 270) {
-            item.style.opacity = '0.5';
-            item.style.pointerEvents = 'none';
-        } else {
-            item.style.opacity = '1';
-            item.style.pointerEvents = 'auto';
-        }
+        item.style.opacity = (itemAngle > 90 && itemAngle < 270) ? '0.5' : '1';
+        item.style.pointerEvents = (itemAngle > 90 && itemAngle < 270) ? 'none' : 'auto';
         
         // Cambiar pestaña si es el elemento activo
         if (index === activeIndex && updateTab) {
@@ -2909,7 +2908,7 @@ function updateActiveItem(updateTab = true) {
     });
 }
 
-// Navegación por hover continuo
+// Navegación por hover continuo (solo gira, no cambia pestañas)
 hoverLeft.addEventListener('mouseenter', () => {
     clearInterval(hoverInterval);
     hoverInterval = setInterval(() => {
@@ -2947,8 +2946,37 @@ items.forEach(item => {
     });
 });
 
-// Inicialización
-rotateWheel(0);
+// Inicialización - alinear con la pestaña activa inicial
+function initializeWheel() {
+    const activeTabElement = document.querySelector('.wheel-item.active');
+    if (activeTabElement) {
+        const index = Array.from(items).indexOf(activeTabElement);
+        currentAngle = 360 - (index * angleIncrement);
+        wheel.style.transform = `translateX(-50%) rotateX(20deg) rotateY(${currentAngle}deg)`;
+        updateActiveItem(false); // Solo actualizar visual, no cambiar pestaña
+    }
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    initializeWheel();
+    
+    // También inicializar cuando se cambie manualmente de pestaña
+    document.querySelectorAll('[data-main-tab]').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.dataset.mainTab;
+            activeTab = tabName;
+            
+            // Encontrar el índice del botón correspondiente
+            const button = document.querySelector(`.wheel-item[data-main-tab="${tabName}"]`);
+            if (button) {
+                const index = Array.from(items).indexOf(button);
+                const targetAngle = 360 - (index * angleIncrement);
+                rotateWheel(targetAngle, false); // No actualizar pestaña (ya estamos ahí)
+            }
+        });
+    });
+});
 </script>
 
     
