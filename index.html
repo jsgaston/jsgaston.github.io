@@ -298,11 +298,15 @@
   margin-right: 8px; /* Espacio entre pestañas */
   flex-shrink: 0; /* Evita que se compriman */
 }
-      
-        #mainGraphSection iframe {
-    display: block;
-    position: relative;
-    z-index: 1;
+
+        #mainGraphSection {
+  overflow: hidden;
+}
+
+#mainGraphSection iframe {
+  display: block;
+  position: relative;
+  z-index: 1;
 }
 /* Oculta cualquier iframe dentro de secciones ocultas */
 .main-tab-content.hidden iframe {
@@ -310,6 +314,7 @@
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none;
+      z-index: -1000 !important;
 }
 
 
@@ -873,7 +878,7 @@
  <!-- Añadir esta nueva sección al final, antes del cierre del div container -->
 <div id="mainGraphSection" class="main-tab-content hidden">
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Gráfica de la Función Mundo Azul</h2>
-    <iframe src="funcion.html" style="width:100%; height:600px; border:none; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" allowfullscreen></iframe>
+    <div id="graphIframeContainer"></div>
 </div>
 
 
@@ -1282,7 +1287,9 @@ function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
         });
 
         // --- Funciones de Navegación Principal ---
-
+let graphIframeSrc = 'funcion.html';
+let graphIframe = null;
+        
 function showMainTab(tabName) {
     // Ocultar todas las secciones
     mainHomeSection.classList.add('hidden');
@@ -1350,8 +1357,21 @@ function showMainTab(tabName) {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
     } else if (tabName === 'graph') {
-        document.getElementById('mainGraphSection').classList.remove('hidden');
-        document.querySelector('[data-main-tab="graph"]').classList.add('active');
+            document.getElementById('mainGraphSection').classList.remove('hidden');
+                document.querySelector('[data-main-tab="graph"]').classList.add('active');
+                
+                // Cargar el iframe solo si no se ha cargado antes
+                if (!graphIframeLoaded) {
+                    loadGraphIframe();
+                }
+                
+                // Mostrar el contenedor
+                document.getElementById('graphIframeContainer').classList.add('active');
+             else {
+                // Ocultar el contenedor cuando no está activo
+                document.getElementById('graphIframeContainer')?.classList.remove('active');
+            }
+    
     } else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
@@ -1375,6 +1395,26 @@ function showMainTab(tabName) {
                     showMainTab(button.dataset.mainTab);
                 });
             });
+
+
+        function loadGraphIframe() {
+            const container = document.getElementById('graphIframeContainer');
+            if (!container) return;
+            
+            // Crear el iframe
+            graphIframe = document.createElement('iframe');
+            graphIframe.src = 'funcion.html';
+            graphIframe.allowFullscreen = true;
+            
+            // Agregar al contenedor
+            container.appendChild(graphIframe);
+            graphIframeLoaded = true;
+            
+            // Manejar errores
+            graphIframe.addEventListener('error', () => {
+                container.innerHTML = '<p class="text-center p-4 text-red-500">Error al cargar la gráfica</p>';
+            });
+        }
 
         
         // --- Funciones de Sub-navegación del Diario ---
