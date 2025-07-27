@@ -2058,81 +2058,36 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-const GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps = "https://script.google.com/macros/s/AKfycbxbVVxTjLE6lVay84ZT0zjPKjPsCnNtyNO6zu75YEtBs_um08AYPfZ7tALwvNk-g9F5Kg/exec";
 
-// Esta función DEBE ser llamada por tu código de radio
-    // cada vez que la canción cambie, para actualizar el span #currentSong.
-    function updateCurrentSong(title, artist) {
-        const currentSongSpan = document.getElementById('currentSong');
-        if (currentSongSpan) {
-            currentSongSpan.textContent = `${title} - ${artist}`;
-            console.log('Canción actual actualizada en HTML:', currentSongSpan.textContent);
-        }
-    }
+    
+function obtenerLetraDesdeAppScript() {
+  const song = songs[currentTrack];
+  const title = (song?.title || '').replace(/^\\d+\\s*/, '');
+  const artist = song?.artist || '';
 
-    function obtenerLetraDesdeAppScript() {
-        const currentSongSpan = document.getElementById('currentSong');
-        const currentSongText = currentSongSpan ? currentSongSpan.textContent : '---';
+  if (!title || !artist) {
+    alert('Faltan datos para buscar la letra.');
+    return;
+  }
 
-        console.log('1. Texto actual de la canción (currentSongText):', currentSongText);
+  const queryUrl = 'https://script.google.com/macros/s/AKfycbxXTwmC8-KY1bYIki7EAtsgM7rCvTb0Ej4qK5oeQIXcJMM4DJEDqPCliJ47eMJpN43SJA/exec' +
+    '?title=' + encodeURIComponent(title) +
+    '&artist=' + encodeURIComponent(artist);
 
-        if (!currentSongText || currentSongText === '---' || currentSongText.trim() === '') {
-            document.getElementById('letraTexto').textContent = 'No hay canción seleccionada para buscar la letra.';
-            document.getElementById('letraCancion').classList.remove('hidden');
-            return;
-        }
+  fetch(queryUrl)
+    .then(res => res.text())
+    .then(lyric => {
+      const div = document.getElementById('letraCancion');
+const letraTexto = document.getElementById('letraTexto');
+letraTexto.textContent = lyric;
+div.classList.remove('hidden');
 
-        const parts = currentSongText.split(' - ');
-        const title = parts[0] ? parts[0].trim() : '';
-        const artist = parts[1] ? parts[1].trim() : '';
-
-        console.log('2. Título extraído para búsqueda:', title);
-        console.log('3. Artista extraído para búsqueda:', artist);
-
-        if (!title || !artist) {
-            document.getElementById('letraTexto').textContent = 'No se pudo determinar el título o artista de la canción actual. Asegúrate de que el formato es "Título - Artista".';
-            document.getElementById('letraCancion').classList.remove('hidden');
-            return;
-        }
-
-        const url = `${GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps}?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`;
-        console.log('4. URL de la petición al Apps Script:', url);
-
-        document.getElementById('letraTexto').innerHTML = 'Buscando letra...';
-        document.getElementById('letraCancion').classList.remove('hidden');
-
-        fetch(url)
-            .then(response => {
-                console.log('5. Respuesta bruta del Apps Script (Response object):', response);
-                return response.text();
-            })
-            .then(data => {
-                console.log('6. Datos recibidos del Apps Script (texto):', data);
-
-                if (data.startsWith("SEARCH_LINKS:")) {
-                    const jsonString = data.substring("SEARCH_LINKS:".length);
-                    try {
-                        const links = JSON.parse(jsonString);
-                        let linksHtml = 'Letra no encontrada en la base de datos principal. Prueba a buscar en estas páginas:<br>';
-                        links.forEach(link => {
-                            linksHtml += `<a href="${link.url}" target="_blank" class="text-blue-600 underline hover:text-blue-800 block">${link.name}</a>`;
-                        });
-                        document.getElementById('letraTexto').innerHTML = linksHtml;
-                    } catch (e) {
-                        console.error('Error al parsear enlaces de búsqueda:', e);
-                        document.getElementById('letraTexto').textContent = 'Error al procesar los enlaces de búsqueda.';
-                    }
-                } else if (data && data.trim() !== '') { // Si no es un prefijo de enlace, asume que son las letras directas
-                    document.getElementById('letraTexto').textContent = data;
-                } else {
-                    document.getElementById('letraTexto').textContent = 'Letra no encontrada para ' + currentSongText + '.';
-                }
-            })
-            .catch(error => {
-                console.error('7. Error en la petición fetch:', error);
-                document.getElementById('letraTexto').textContent = 'Error al cargar la letra. Por favor, revisa la consola del navegador para más detalles.';
-            });
-    }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error al buscar la letra');
+    });
+}
 
 </script>
 
