@@ -372,10 +372,11 @@
             position: relative;
             width: 75vw; /* 75% del ancho del viewport */
             height: 75vw; /* Mantiene una relación de aspecto cuadrada */
-            max-width: 500px; /* Limita el tamaño máximo para pantallas muy grandes */
-            max-height: 500px; /* Limita el tamaño máximo para pantallas muy grandes */
+            /* Eliminamos max-width y max-height para que siempre ocupe el 75vw,
+               puedes reintroducirlos con valores más altos si la rueda es demasiado grande
+               en monitores muy anchos, por ejemplo: max-width: 700px; max-height: 700px; */
             margin: 0 auto;
-            perspective: 2000px; /* Aumentado para menos compresión en tamaños grandes */
+            perspective: 2500px; /* Aumentado para un efecto 3D más suave y menos compresión */
             transform-style: preserve-3d;
             display: flex;
             justify-content: center;
@@ -392,8 +393,8 @@
 
 .wheel-item {
             position: absolute;
-            width: 40%; /* Un porcentaje del tamaño de .wheel-container */
-            height: 40%; /* Un porcentaje del tamaño de .wheel-container */
+            width: 45%; /* Aumentado ligeramente para que ocupen más espacio en el contenedor */
+            height: 45%; /* Aumentado ligeramente */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -407,9 +408,9 @@
             box-sizing: border-box;
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            font-size: 3.5vw; /* Tamaño de fuente relativo al viewport width */
-            max-font-size: 24px; /* Tamaño máximo para la fuente */
-            overflow: hidden; /* Asegura que el contenido no se desborde */
+            font-size: 4.5vw; /* Aumentado para que la fuente sea más grande */
+            max-font-size: 30px; /* Tamaño máximo de fuente para evitar que sea gigantesca en pantallas muy grandes */
+            overflow: hidden;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
 
@@ -532,68 +533,7 @@
             font-size: 0.9em;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .header p {
-                font-size: 1em;
-            }
-
-            .wheel-container {
-                width: 200px;
-                height: 200px;
-            }
-
-            .wheel-item {
-                width: 120px;
-                height: 120px;
-                font-size: 1em;
-            }
-
-            .nav-button {
-                width: 40px;
-                height: 40px;
-                font-size: 1.5em;
-            }
-
-            .indicators {
-                margin-top: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                border-radius: 10px;
-                padding: 15px;
-            }
-
-            .wheel-container {
-                width: 180px;
-                height: 180px;
-            }
-
-            .wheel-item {
-                width: 100px;
-                height: 100px;
-                font-size: 0.9em;
-            }
-
-            .tab-content {
-                padding: 15px;
-                font-size: 0.95em;
-            }
-
-            .tab-content h2 {
-                font-size: 1.5em;
-            }
-        }
+       
     </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -3098,10 +3038,8 @@ function convertTime() {
             this.rotation = 0;
             this.itemAngle = 360 / this.wheelItems.length;
             // Calcular el radio dinámicamente basado en el tamaño del contenedor
-            // Se asume que el contenedor .wheel ya tiene un tamaño al momento de inicialización
-            // Si el .wheel-container no tiene un tamaño establecido al DOMContentLoaded,
-            // esta lógica podría necesitar un ajuste en un evento de resize o después de que se cargue el CSS
-            this.radius = this.wheel.offsetWidth / 2.5; // Aproximadamente 40% del ancho del .wheel
+            // Un valor de 2 a 2.1 suele funcionar bien para evitar solapamientos y la compresión
+            this.radius = this.wheel.offsetWidth / 2.05; // Ajustado para mejor visibilidad
             this.leafletMap = null; // Inicializa la propiedad del mapa
 
             this._initWheel();
