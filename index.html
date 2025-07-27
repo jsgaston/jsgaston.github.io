@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-    <style>
+        <style>
         /* Fuente Inter para un aspecto moderno y limpio */
         body {
             font-family: 'Inter', sans-serif;
@@ -28,305 +28,248 @@
             background-attachment: fixed;
         }
         .container {
-            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+            padding: 30px;
+            border-radius: 12px; /* Bordes más redondeados */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
             width: 100%;
-            background-color: #ffffff;
-            padding: 32px;
-            border-us: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-            background-color: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
+            max-width: 900px; /* Ancho máximo aumentado */
+            box-sizing: border-box;
+            text-align: center;
+            position: relative; /* Para posicionar los botones de navegación */
         }
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: block;
-            color: #374151;
-        }
-        .form-input, .form-textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-us: 8px;
-            font-size: 1rem;
-            color: #1f2937;
-            background-color: #f9fafb;
-            transition: border-color 0.2s;
-        }
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #3b82f6; /* Un azul bonito al enfocar */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-        }
-        .btn {
-            background-color: #4f46e5; /* Morado intenso */
-            color: white;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
+        .tab-buttons {
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 8px;
+            margin-bottom: 25px; /* Espacio debajo de los botones de tab */
+            flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
         }
-        .btn:hover {
-            background-color: #4338ca; /* Morado más oscuro al pasar el ratón */
-            transform: translateY(-1px);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-        .message-box {
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-weight: 500;
-            display: none; /* Oculto por defecto */
-        }
-        .message-box.success {
-            background-color: #d1fae5; /* Verde claro */
-            color: #065f46; /* Verde oscuro */
-            border: 1px solid #10b981;
-        }
-        .message-box.error {
-            background-color: #fee2e2; /* Rojo claro */
-            color: #991b1b; /* Rojo oscuro */
-            border: 1px solid #ef4444;
-        }
-        .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #ffffff;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: none; /* Oculto por defecto */
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Estilos para las pestañas de navegación principal */
-        .main-tab-button {
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            font-weight: 600;
-            cursor: pointer;
-            background-color: #e5e7eb; /* Gris claro */
-            color: #4b5563;
-            transition: background-color 0.2s, color 0.2s;
-            white-space: nowrap; /* Evita que el texto se rompa */
-        }
-        .main-tab-button.active {
-            background-color: #ffffff;
-            color: #4f46e5; /* Morado */
-            box-shadow: 0 -2px 0 0 #4f46e5 inset; /* Subrayado morado */
-        }
-        .main-tab-content {
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        /* Estilos para las sub-pestañas del diario */
-        .diary-sub-tab-button {
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            background-color: #f3f4f6;
-            color: #6b7280;
-            transition: background-color 0.2s, color 0.2s;
-            margin-right: 8px; /* Espacio entre botones */
-        }
-        .diary-sub-tab-button.active {
+        .tab-button {
             background-color: #e0e7ff; /* Azul claro */
-            color: #4f46e5; /* Morado */
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: #4338ca; /* Azul oscuro para el texto */
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px; /* Espacio entre botones */
+            flex-grow: 1; /* Permite que los botones se expandan */
+            min-width: 120px; /* Ancho mínimo para cada botón */
         }
-        .diary-sub-tab-content {
-            padding-top: 16px;
+        .tab-button:hover {
+            background-color: #c7d2fe; /* Azul más claro al pasar el ratón */
+            transform: translateY(-2px); /* Pequeño efecto de elevación */
+        }
+        .tab-button.active {
+            background-color: #4338ca; /* Azul oscuro para el botón activo */
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(67, 56, 202, 0.3); /* Sombra para el botón activo */
+            transform: translateY(-2px);
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid #e5e7eb; /* Separador sutil */
+            text-align: left; /* Alineación de texto por defecto */
+        }
+        .tab-content.active {
+            display: block;
+        }
+        h1 {
+            color: #1f2937; /* Gris oscuro para el título */
+            margin-bottom: 20px;
+            font-size: 2.5em; /* Título más grande */
+            font-weight: 800;
+        }
+        h2 {
+            color: #374151; /* Gris oscuro para subtítulos */
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        p {
+            color: #4b5563; /* Gris medio para el párrafo */
+            line-height: 1.7; /* Mayor interlineado */
+            margin-bottom: 15px;
+        }
+        a {
+            color: #4338ca;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #4338ca; /* Borde alrededor de la imagen */
+            box-shadow: 0 0 15px rgba(67, 56, 202, 0.2);
+        }
+        .map-container {
+            width: 100%;
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .hidden {
-            display: none !important;
-        }
-        .entry-card {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .entry-card img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            margin-top: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .entry-card img:hover {
-            transform: scale(1.02);
-        }
-        
-        /* Estilos para el modal de imagen */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-        }
-        .modal-content {
+        .number-input-group {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100%;
-            padding: 20px;
+            margin-top: 20px;
+            gap: 10px;
         }
-        .modal-image {
-            max-width: 90%;
-            max-height: 90%;
+
+        .number-input-group input[type="text"] {
+            padding: 10px 15px;
+            border: 2px solid #ccc;
             border-radius: 8px;
+            font-size: 1.1em;
+            width: 200px;
+            max-width: 70%;
+            box-sizing: border-box;
+            text-align: center;
         }
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 30px;
+
+        .number-input-group button {
+            background-color: #4338ca;
             color: white;
-            font-size: 40px;
-            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
         }
-        .close-modal:hover {
-            color: #ccc;
+
+        .number-input-group button:hover {
+            background-color: #312e81;
         }
-        
-        /* Indicador de carga para imágenes */
-        .image-loading {
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #result p {
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .symbol-container {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #4f46e5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
+            margin: 0 2px;
+            vertical-align: middle;
         }
-        .radio-button {
-  background: linear-gradient(to right, #6366f1, #8b5cf6);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 9999px;
-  font-weight: bold;
-  transition: all 0.2s;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-.radio-button:hover {
-  transform: scale(1.05);
-  background: linear-gradient(to right, #4f46e5, #7c3aed);
-}
 
-        /* Nuevo estilo para el estado activo/presionado de los botones de radio */
-.radio-button.active {
-  background: linear-gradient(to right, #4338ca, #6d28d9); /* Un morado más oscuro */
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3); /* Efecto hundido */
-  transform: translateY(0); /* Asegura que no se eleve */
-  color: white; /* Asegura que el texto permanezca blanco */
-}
+        .symbol-container img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            display: inline-block;
+        }
 
-/* Modificación para el hover cuando el botón está activo, para mantener el efecto hundido */
-.radio-button.active:hover {
-  background: linear-gradient(to right, #4338ca, #6d28d9); /* Mantiene el color oscuro */
-  transform: translateY(0); /* Evita que se eleve */
-}
+        .symbol-container div { /* Fallback for missing images */
+            display: inline-flex;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            background-color: #e5e7eb;
+            color: #374151;
+            font-weight: bold;
+            border-radius: 0.25rem;
+        }
 
-.song-info-box {
-  background-color: #f3f4f6;
-  border: 2px solid #6366f1;
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
-}
-.song-info-title {
-  font-weight: 700;
-  color: #374151;
-  font-size: 1rem;
-}
-.song-info-content {
-  font-size: 1.2rem;
-  color: #4f46e5;
-}
-.song-info-next {
-  font-size: 0.9rem;
-  color: #6b7280;
-  font-style: italic;
-  margin-top: 0.3rem;
-}
-        .drop-zone {
-  border: 2px dashed #6366f1;
-  padding: 20px;
-  text-align: center;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.2s;
-  color: #4f46e5;
-}
-.drop-zone:hover {
-  background: #eef2ff;
-}
-        body > script:not([src]) {
-  display: none;
-}
-        nav.flex {
-  overflow-x: auto;
-  white-space: nowrap;
-  padding-bottom: 10px; /* Espacio para scroll */
-  margin-right: 20px; /* Espacio al final */
-}
+        /* Styles for navigation buttons */
+        .nav-button {
+            background-color: #6366f1; /* Indigo */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10; /* Ensure buttons are above content */
+        }
 
-        .main-tab-button {
-  margin-right: 8px; /* Espacio entre pestañas */
-  flex-shrink: 0; /* Evita que se compriman */
-}
+        .nav-button:hover {
+            background-color: #4f46e5;
+        }
 
-        #mainGraphSection {
-  overflow: hidden;
-}
+        #prevButton {
+            left: -60px; /* Adjust as needed to position outside the container */
+        }
 
-#mainGraphSection iframe {
-  display: block;
-  position: relative;
-  z-index: 1;
-}
-/* Oculta cualquier iframe dentro de secciones ocultas */
-.main-tab-content.hidden iframe {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none;
-      z-index: -1000 !important;
-}
+        #nextButton {
+            right: -60px; /* Adjust as needed */
+        }
 
-
-
-
-
-
-        
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .tab-button {
+                flex-basis: calc(50% - 10px); /* Dos botones por fila en pantallas pequeñas */
+            }
+            #prevButton, #nextButton {
+                position: static; /* Position normally for smaller screens */
+                transform: none;
+                margin: 10px auto; /* Center them */
+                display: block; /* Make them block-level to stack */
+            }
+            .tab-buttons {
+                flex-direction: column; /* Stack tab buttons vertically */
+            }
+            .tab-button {
+                width: 100%; /* Full width for stacked buttons */
+                margin: 5px 0;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            .tab-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            .profile-img {
+                width: 100px;
+                height: 100px;
+            }
+        }
     </style>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
+<body>
+
 
     <!-- Modal para ver imágenes en grande -->
     <div id="imageModal" class="modal">
@@ -340,7 +283,10 @@
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera</h1>
 
         <!-- Nueva pestaña en navegación principal -->
-        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
+            <div class="container">
+        <button id="prevButton" class="nav-button">Anterior</button>
+        <button id="nextButton" class="nav-button">Siguiente</button>
+                <div class="tab-buttons">
           <button class="main-tab-button" data-main-tab="home">Inicio</button>
           <button class="main-tab-button" data-main-tab="diary">Anotaciones</button>
                         <button class="main-tab-button" data-main-tab="stories">Stories</button>
@@ -359,7 +305,7 @@
 
             
 
-        </nav>
+       </div>
 
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
@@ -2714,7 +2660,153 @@ function translateNumber() {
 }
 </script>
 
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            let currentTabIndex = 0;
+
+            function showTab(tabId) {
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                tabButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+
+                document.getElementById(tabId).classList.add('active');
+                document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+
+                // Update currentTabIndex
+                currentTabIndex = Array.from(tabButtons).findIndex(button => button.dataset.tab === tabId);
+
+                // Initialize map if the "projects" tab is active
+                if (tabId === 'projects' && !window.myMap) {
+                    initMap();
+                }
+            }
+
+            // Function to navigate to the next tab
+            function showNextTab() {
+                currentTabIndex = (currentTabIndex + 1) % tabButtons.length;
+                const nextTabId = tabButtons[currentTabIndex].dataset.tab;
+                showTab(nextTabId);
+            }
+
+            // Function to navigate to the previous tab
+            function showPrevTab() {
+                currentTabIndex = (currentTabIndex - 1 + tabButtons.length) % tabButtons.length;
+                const prevTabId = tabButtons[currentTabIndex].dataset.tab;
+                showTab(prevTabId);
+            }
+
+            // Event listeners for tab buttons (click and hover)
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    showTab(tabId);
+                });
+
+                // Optional: Hover functionality (uncomment if desired)
+                /*
+                button.addEventListener('mouseenter', function() {
+                    const tabId = this.dataset.tab;
+                    showTab(tabId);
+                });
+                */
+            });
+
+            // Event listeners for navigation buttons
+            nextButton.addEventListener('click', showNextTab);
+            prevButton.addEventListener('click', showPrevTab);
+
+            // Initialize the first tab
+            showTab('about');
+
+            // Map Initialization (only if "projects" tab is active)
+            function initMap() {
+                if (!window.myMap) { // Prevent re-initialization
+                    window.myMap = L.map('map').setView([38.3452, -0.4810], 13); // Coordinates for Alicante, Spain
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(window.myMap);
+
+                    L.marker([38.3452, -0.4810]).addTo(window.myMap)
+                        .bindPopup('¡Hola desde Alicante!')
+                        .openPopup();
+                }
+            }
+
+            // Number conversion logic
+            const numberInput = document.getElementById('numberInput');
+            const convertButton = document.getElementById('convertButton');
+            const resultDiv = document.getElementById('result');
+
+            convertButton.addEventListener('click', function() {
+                const numberStr = numberInput.value.trim();
+                resultDiv.innerHTML = ''; // Clear previous results
+
+                if (!/^\d+$/.test(numberStr)) {
+                    resultDiv.innerHTML = '<p style="color: #dc2626; font-weight: bold;">Por favor, introduce solo números.</p>';
+                    return;
+                }
+
+                if (numberStr.length === 0) {
+                    resultDiv.innerHTML = '<p>Los símbolos aparecerán aquí.</p>';
+                    return;
+                }
+
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.flexWrap = 'wrap';
+                container.style.justifyContent = 'center';
+                container.style.alignItems = 'center';
+                container.style.gap = '5px';
+
+                for (const digit of numberStr) {
+                    const symbolContainer = document.createElement('span');
+                    symbolContainer.className = 'symbol-container';
+                    symbolContainer.style.margin = '0 2px';
+                    symbolContainer.style.verticalAlign = 'middle';
+
+                    const img = document.createElement('img');
+                    img.src = `UniversalSistemNumbers/${digit}.jpg`; // Assumes images are in this folder
+                    img.alt = `Símbolo del número ${digit}`;
+                    img.style.width = '50px';
+                    img.style.height = '50px';
+                    img.style.objectFit = 'contain';
+                    img.style.display = 'inline-block';
+
+                    img.onerror = function() {
+                        const fallback = document.createElement('div');
+                        fallback.style.display = 'inline-flex';
+                        fallback.style.width = '50px';
+                        fallback.style.height = '50px';
+                        fallback.style.alignItems = 'center';
+                        fallback.style.justifyContent = 'center';
+                        fallback.style.backgroundColor = '#e5e7eb';
+                        fallback.style.color = '#374151';
+                        fallback.style.fontWeight = 'bold';
+                        fallback.style.borderRadius = '0.25rem';
+                        fallback.textContent = digit;
+                        symbolContainer.replaceChild(fallback, img);
+                    };
+
+                    symbolContainer.appendChild(img);
+                    container.appendChild(symbolContainer);
+                }
+
+                resultDiv.appendChild(container);
+
+                if (container.children.length === 0) {
+                    resultDiv.innerHTML = '<p style="color: #6b7280; font-style: italic;">Los símbolos aparecerán aquí.</p>';
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
