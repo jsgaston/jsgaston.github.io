@@ -1346,9 +1346,11 @@ function showMainTab(tabName) {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
     } else if (tabName === 'graph') {
-            document.getElementById('mainGraphSection').classList.remove('hidden');
-            document.querySelector('[data-main-tab="graph"]').classList.add('active');
-    } else if (tabName === 'time-elapsed') {
+        document.getElementById('mainGraphSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="graph"]').classList.add('active');
+    }
+
+     else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="time-elapsed"]').classList.add('active');
         // Prellenar fecha final si está vacía
