@@ -24,16 +24,22 @@
             min-height: 100vh;
             padding: 20px;
             margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll on small screens */
         }
 
         .container {
             max-width: 1000px;
             width: 100%;
             background-color: rgba(255, 255, 255, 0.95);
-            padding: 32px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1; /* Ensure container is above other elements if any */
         }
 
         .main-title {
@@ -325,88 +331,91 @@
 }
 
 
+
+
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 5px;
+            color: #4a4a4a;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Wheel Navigation */
+        .wheel-navigation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            width: 100%;
+            position: relative;
+            padding-bottom: 50px; /* Space for indicators */
+        }
+
         .wheel-container {
             position: relative;
-            width: 100%;
-            max-width: 900px;
-            height: 280px;
-            margin: 2rem auto;
-            perspective: 1200px;
+            width: 250px; /* Ancho del contenedor del carrusel */
+            height: 250px; /* Alto del contenedor del carrusel */
+            margin: 0 auto;
+            perspective: 1000px; /* Profundidad de la perspectiva 3D */
+            transform-style: preserve-3d; /* Permite que los elementos hijos mantengan su 3D */
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: visible;
         }
 
         .wheel {
-            position: relative;
+            position: absolute;
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            transition: transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
-            transform: rotateX(10deg);
+            transition: transform 0.6s ease-in-out; /* Smooth transition for wheel rotation */
         }
 
         .wheel-item {
             position: absolute;
-            width: 130px;
-            height: 65px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 10px;
+            width: 150px; /* Ancho de cada elemento del carrusel */
+            height: 150px; /* Alto de cada elemento del carrusel */
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-weight: 600;
-            font-size: 13px;
+            align-items: center;
+            font-size: 1.2em;
+            background-color: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-            backface-visibility: hidden;
-            user-select: none;
-            border: 1px solid #e2e8f0;
+            transition: transform 0.6s ease-in-out, background-color 0.3s, border-color 0.3s;
+            backface-visibility: hidden; /* Prevents flickering on some browsers */
+            color: #333;
+            font-weight: 600;
             text-align: center;
-            padding: 6px;
-            word-wrap: break-word;
-            color: #4a5568;
-            transform-origin: center center;
-            line-height: 1.2;
+            padding: 10px;
+            box-sizing: border-box;
+            transform-origin: center center; /* Crucial for correct rotation */
         }
 
         .wheel-item.active {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
-            transform: translateZ(70px) scale(1.15);
-            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
-            font-weight: 700;
-            z-index: 20;
-            border-color: #6366f1;
+            background-color: #667eea;
+            border-color: #764ba2;
+            color: #fff;
+            transform: scale(1.1); /* Slightly enlarge active item */
+            z-index: 10; /* Ensure active item is on top */
         }
 
-        .wheel-item:hover:not(.active) {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            transform: translateZ(40px) scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-
-        
-        /* Posicionamiento de los items en círculo (12 elementos) */
-        .wheel-item:nth-child(1) { transform: rotateY(0deg) translateZ(450px); }
-        .wheel-item:nth-child(2) { transform: rotateY(28deg) translateZ(450px); }
-        .wheel-item:nth-child(3) { transform: rotateY(55deg) translateZ(450px); }
-        .wheel-item:nth-child(4) { transform: rotateY(83deg) translateZ(450px); }
-        .wheel-item:nth-child(5) { transform: rotateY(110deg) translateZ(450px); }
-        .wheel-item:nth-child(6) { transform: rotateY(138deg) translateZ(450px); }
-        .wheel-item:nth-child(7) { transform: rotateY(166deg) translateZ(450px); }
-        .wheel-item:nth-child(8) { transform: rotateY(193deg) translateZ(450px); }
-        .wheel-item:nth-child(9) { transform: rotateY(221deg) translateZ(450px); }
-        .wheel-item:nth-child(10) { transform: rotateY(249deg) translateZ(450px); }
-        .wheel-item:nth-child(11) { transform: rotateY(276deg) translateZ(450px); }
-        .wheel-item:nth-child(12) { transform: rotateY(304deg) translateZ(450px); }
-        .wheel-item:nth-child(13) { transform: rotateY(333deg) translateZ(450px); }
-     
-        /* Controles de navegación */
-        .nav-controls {
+        .navigation-buttons {
             display: flex;
             justify-content: center;
             gap: 20px;
@@ -414,127 +423,161 @@
         }
 
         .nav-button {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            background-color: #667eea;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-weight: 600;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.8em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .nav-button:hover {
+            background-color: #764ba2;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
         }
 
-        .nav-button:active {
-            transform: translateY(0);
+        .indicators {
+            display: flex;
+            margin-top: 30px;
+            gap: 10px;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
-        /* Contenido de las pestañas */
+        .indicator {
+            width: 12px;
+            height: 12px;
+            background-color: #ccc;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .indicator.active {
+            background-color: #667eea;
+            transform: scale(1.2);
+        }
+
+        /* Tab Content */
+        .tab-content-wrapper {
+            margin-top: 40px;
+            width: 100%;
+        }
+
         .tab-content {
-            margin-top: 2rem;
-            padding: 2rem;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            min-height: 300px;
             display: none;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: left;
+            line-height: 1.6;
+            color: #555;
+            min-height: 200px; /* Ensure a minimum height for content */
         }
 
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .tab-content h2 {
-            color: #2d3748;
-            margin-bottom: 1rem;
-            font-size: 1.8rem;
-            font-weight: 700;
+            color: #4a4a4a;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            font-weight: 600;
         }
 
         .tab-content p {
-            color: #4a5568;
-            line-height: 1.6;
-            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-size: 1.1em;
         }
 
-        /* Indicadores de posición */
-        .position-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
+        /* Specific styles for map tab */
+        #map {
+            height: 300px;
+            border-radius: 8px;
             margin-top: 15px;
         }
 
-        .indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #cbd5e0;
-            transition: all 0.3s ease;
-            cursor: pointer;
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: #777;
+            font-size: 0.9em;
         }
 
-        .indicator.active {
-            background: #4f46e5;
-            transform: scale(1.3);
-        }
-
-        /* Responsive mejorado */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .main-title {
-                font-size: 1.8rem;
-                margin-bottom: 1.5rem;
-            }
-            
-            .wheel-container {
-                height: 220px;
-                max-width: 600px;
-            }
-            
-            .wheel-item {
-                width: 110px;
-                height: 55px;
-                font-size: 11px;
-                padding: 4px;
-            }
-            
-            .wheel-item:nth-child(n) {
-                transform: rotateY(calc(var(--index, 0) * 30deg)) translateZ(280px);
+            .container {
+                padding: 20px;
             }
 
-            .wheel-item.active {
-                transform: translateZ(60px) scale(1.1);
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .wheel-container {
+                width: 200px;
+                height: 200px;
+            }
+
+            .wheel-item {
+                width: 120px;
+                height: 120px;
+                font-size: 1em;
+            }
+
+            .nav-button {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5em;
+            }
+
+            .indicators {
+                margin-top: 20px;
             }
         }
 
         @media (max-width: 480px) {
-            .main-title {
-                font-size: 1.5rem;
+            .container {
+                border-radius: 10px;
+                padding: 15px;
             }
-            
+
             .wheel-container {
+                width: 180px;
                 height: 180px;
             }
-            
+
             .wheel-item {
-                width: 90px;
-                height: 45px;
-                font-size: 10px;
+                width: 100px;
+                height: 100px;
+                font-size: 0.9em;
             }
-            
-            .wheel-item:nth-child(n) {
-                transform: rotateY(calc(var(--index, 0) * 30deg)) translateZ(220px);
+
+            .tab-content {
+                padding: 15px;
+                font-size: 0.95em;
+            }
+
+            .tab-content h2 {
+                font-size: 1.5em;
             }
         }
     </style>
@@ -550,37 +593,47 @@
         </div>
     </div>
 
-    <div class="container rounded-xl shadow-xl flex flex-col">
+    <div class="container">
+        <header class="header">
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera</h1>
+            </header>
 
         <!-- Nueva pestaña en navegación principal -->
-        <div class="wheel-container">
-            <div class="wheel" id="wheel">
-          <button class="wheel-item active" data-main-tab="home">Inicio</button>
-          <button class="wheel-item" data-main-tab="diary">Anotaciones</button>
-            <button class="wheel-item" data-main-tab="stories">Stories</button>
-            <button class="wheel-item" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
-          <button class="wheel-item" data-main-tab="radio">Radio</button>
-            <button class="wheel-item" data-main-tab="time-converter">Conversor de Tiempo</button>
-             <button class="wheel-item" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
-            <button class="wheel-item" data-main-tab="number-symbols">Traductor de Números</button>
-            <button class="wheel-item" data-main-tab="graph">La Función Mundo Azul</button>
-          <button class="wheel-item" data-main-tab="maps">Mapas de Recorridos</button>
-          <button class="wheel-item" data-main-tab="trips">Organizar Viajes</button>
-          <button class="wheel-item" data-main-tab="menus">Menús de Comida</button>
-          <button class="wheel-item" data-main-tab="projects">Proyectos</button>
+        <section class="wheel-navigation">
+            <div class="wheel-container">
+                <div class="wheel">
+          <div class="wheel-item" data-main-tab="home">Inicio</div>
+          <div class="wheel-item" data-main-tab="diary">Anotaciones</div>
+            <div class="wheel-item" data-main-tab="stories">Stories</div>
+            <div class="wheel-item" data-main-tab="profile">Perfil</div> <!-- Nueva pestaña -->
+         <div class="wheel-item" data-main-tab="radio">Radio</div>
+            <div class="wheel-item" data-main-tab="time-converter">Conversor de Tiempo</div>
+             <div class="wheel-item" data-main-tab="time-elapsed">Tiempo Transcurrido</div>
+            <div class="wheel-item" data-main-tab="number-symbols">Traductor de Números</div>
+            <div class="wheel-item" data-main-tab="graph">La Función Mundo Azul</div>
+          <div class="wheel-item" data-main-tab="maps">Mapas de Recorridos</div>
+          <div class="wheel-item" data-main-tab="trips">Organizar Viajes</div>
+          <div class="wheel-item" data-main-tab="menus">Menús de Comida</div>
+          <div class="wheel-item" data-main-tab="projects">Proyectos</div>
 
             
         </div>
     </div>
 
         
-        <div class="nav-controls">
-            <button class="nav-button" onclick="rotatePrevious()">⬅ Anterior</button>
-            <button class="nav-button" onclick="rotateNext()">Siguiente ➡</button>
-        </div>
+            <div class="navigation-buttons">
+                <button class="nav-button" onclick="rotatePrevious()">&#9664;</button>
+                <button class="nav-button" onclick="rotateNext()">&#9654;</button>
+            </div>
 
-        <div class="position-indicators" id="indicators"></div>
+            <div class="indicators">
+                <div class="indicator active"></div>
+                <div class="indicator"></div>
+                <div class="indicator"></div>
+                <div class="indicator"></div>
+                <div class="indicator"></div>
+            </div>
+        </section>
 
 
         
@@ -2962,152 +3015,145 @@ function convertTime() {
 
 
 
-    <script>
+<script>
         class WheelNavigation {
             constructor() {
-                this.wheel = document.getElementById('wheel');
-                this.items = document.querySelectorAll('.wheel-item');
-                this.indicators = document.getElementById('indicators');
-                this.currentAngle = 0;
-                this.activeIndex = 0;
-                this.angleIncrement = 30; // 360° / 12 items
-                this.isAnimating = false;
-                
-                this.init();
+                this.container = document.querySelector('.wheel');
+                this.items = Array.from(document.querySelectorAll('.wheel-item'));
+                this.indicators = Array.from(document.querySelectorAll('.indicator'));
+                this.numItems = this.items.length;
+                this.angleStep = 360 / this.numItems; // Angle between each item
+                this.activeIndex = 0; // Current active item index
+
+                this.initializeWheel();
+                this.addEventListeners();
+                this.updateWheel(); // Initial update to show the first tab content
             }
 
-            init() {
-                this.createIndicators();
-                this.bindEvents();
-                this.updateActiveItem();
-            }
-
-            createIndicators() {
-                this.indicators.innerHTML = '';
-                this.items.forEach((_, index) => {
-                    const indicator = document.createElement('div');
-                    indicator.className = 'indicator';
-                    if (index === 0) indicator.classList.add('active');
-                    indicator.addEventListener('click', () => this.goToIndex(index));
-                    this.indicators.appendChild(indicator);
-                });
-            }
-
-            bindEvents() {
-                // Click en elementos de la rueda
+            initializeWheel() {
+                // Position items in a circle
                 this.items.forEach((item, index) => {
-                    item.addEventListener('click', () => this.goToIndex(index));
-                });
-
-                // Navegación con teclado
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'ArrowLeft') {
-                        e.preventDefault();
-                        this.rotatePrevious();
-                    } else if (e.key === 'ArrowRight') {
-                        e.preventDefault();
-                        this.rotateNext();
-                    }
-                });
-
-                // Touch/swipe para móviles
-                let startX = 0;
-                this.wheel.addEventListener('touchstart', (e) => {
-                    startX = e.touches[0].clientX;
-                });
-
-                this.wheel.addEventListener('touchend', (e) => {
-                    const endX = e.changedTouches[0].clientX;
-                    const diff = startX - endX;
-                    
-                    if (Math.abs(diff) > 50) {
-                        if (diff > 0) {
-                            this.rotateNext();
-                        } else {
-                            this.rotatePrevious();
-                        }
-                    }
+                    const angle = index * this.angleStep;
+                    // Calculate radius based on container size to ensure items fit
+                    const radius = this.container.offsetWidth / 2 / Math.tan(Math.PI / this.numItems);
+                    item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
                 });
             }
 
-            goToIndex(index) {
-                if (this.isAnimating || index === this.activeIndex) return;
-                
-                this.activeIndex = index;
-                this.currentAngle = -index * this.angleIncrement;
-                this.rotateWheel();
-            }
+            addEventListeners() {
+                // Add click listeners to individual wheel items
+                this.items.forEach((item, index) => {
+                    item.addEventListener('click', () => {
+                        this.activeIndex = index;
+                        this.updateWheel();
+                    });
+                });
 
-            rotatePrevious() {
-                if (this.isAnimating) return;
-                
-                this.activeIndex = (this.activeIndex - 1 + this.items.length) % this.items.length;
-                this.currentAngle += this.angleIncrement;
-                this.rotateWheel();
+                // Add click listeners to indicators
+                this.indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => {
+                        this.activeIndex = index;
+                        this.updateWheel();
+                    });
+                });
             }
 
             rotateNext() {
-                if (this.isAnimating) return;
-                
-                this.activeIndex = (this.activeIndex + 1) % this.items.length;
-                this.currentAngle -= this.angleIncrement;
-                this.rotateWheel();
+                this.activeIndex = (this.activeIndex + 1) % this.numItems;
+                this.updateWheel();
             }
 
-            rotateWheel() {
-                this.isAnimating = true;
-                this.wheel.style.transform = `rotateX(15deg) rotateY(${this.currentAngle}deg)`;
-                
-                setTimeout(() => {
-                    this.updateActiveItem();
-                    this.isAnimating = false;
-                }, 800);
+            rotatePrevious() {
+                this.activeIndex = (this.activeIndex - 1 + this.numItems) % this.numItems;
+                this.updateWheel();
             }
 
-            updateActiveItem() {
-                // Actualizar elementos activos
+            updateWheel() {
+                // Rotate the entire wheel container
+                this.container.style.transform = `rotateY(${-this.activeIndex * this.angleStep}deg)`;
+
+                // Update active class for items and indicators
                 this.items.forEach((item, index) => {
                     item.classList.toggle('active', index === this.activeIndex);
                 });
 
-                // Actualizar indicadores
-                document.querySelectorAll('.indicator').forEach((indicator, index) => {
+                this.indicators.forEach((indicator, index) => {
                     indicator.classList.toggle('active', index === this.activeIndex);
                 });
 
-                // Mostrar contenido de la pestaña activa
+                // Show content of the active tab
                 this.showTabContent();
             }
 
             showTabContent() {
                 const activeItem = this.items[this.activeIndex];
                 const tabId = activeItem.dataset.tab;
-                
-                // Ocultar todas las pestañas
+
+                // Hide all tabs
                 document.querySelectorAll('.tab-content').forEach(content => {
                     content.classList.remove('active');
                 });
 
-                // Mostrar la pestaña activa
+                // Show the active tab
                 const activeContent = document.getElementById(tabId);
                 if (activeContent) {
                     activeContent.classList.add('active');
                 }
+
+                // Initialize Leaflet map if the contact tab is active and map is not initialized
+                if (tabId === 'tab5' && !this.mapInitialized) {
+                    this.initializeMap();
+                    this.mapInitialized = true; // Set flag to true after initialization
+                }
+            }
+
+            initializeMap() {
+                // Ensure the map container is visible before initializing
+                const mapContainer = document.getElementById('map');
+                if (mapContainer && mapContainer.offsetWidth === 0 && mapContainer.offsetHeight === 0) {
+                     // If map container is hidden, wait for it to be displayed
+                     // This is a common issue with Leaflet and hidden divs.
+                     // A more robust solution might involve observing mutations or a deferred init.
+                     // For now, assume it will be displayed after tab becomes active.
+                     setTimeout(() => this._initLeafletMap(), 100);
+                } else {
+                    this._initLeafletMap();
+                }
+            }
+
+            _initLeafletMap() {
+                if (this.leafletMap) { // If map already exists, invalidate size and return
+                    this.leafletMap.invalidateSize();
+                    return;
+                }
+                this.leafletMap = L.map('map').setView([38.3452, -0.4810], 13); // Alicante coordinates
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.leafletMap);
+
+                L.marker([38.3452, -0.4810]).addTo(this.leafletMap)
+                    .bindPopup('Mi ubicación en Alicante')
+                    .openPopup();
             }
         }
 
-        // Funciones globales para los botones
+        // Global functions for buttons
         let wheelNav;
 
         function rotatePrevious() {
-            wheelNav.rotatePrevious();
+            if (wheelNav) {
+                wheelNav.rotatePrevious();
+            }
         }
 
         function rotateNext() {
-            wheelNav.rotateNext();
+            if (wheelNav) {
+                wheelNav.rotateNext();
+            }
         }
 
-        // Inicializar cuando el DOM esté listo
+        // Initialize when the DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             wheelNav = new WheelNavigation();
         });
