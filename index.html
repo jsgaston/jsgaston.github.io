@@ -11,6 +11,7 @@
     <!-- Insertar en el <head> de tu HTML -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
     <style>
         /* Fuente Inter para un aspecto moderno y limpio */
         body {
@@ -316,47 +317,11 @@
       z-index: -1000 !important;
 }
 
-/* Estilos de la barra de desplazamiento */
-/* Para navegadores basados en WebKit (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-    width: 12px; /* Ancho de la barra de desplazamiento vertical */
-    height: 12px; /* Altura de la barra de desplazamiento horizontal */
-}
 
-::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Color de fondo de la pista de la barra */
-    border-radius: 10px;
-}
 
-::-webkit-scrollbar-thumb {
-    background: #888; /* Color del "pulgar" de la barra de desplazamiento */
-    border-radius: 10px;
-}
 
-::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Color del pulgar al pasar el ratón */
-}
 
-/* Para Firefox */
-html {
-    scrollbar-width: thin; /* 'auto' | 'thin' | 'none' */
-    scrollbar-color: #888 #f1f1f1; /* thumb color track color */
-}
 
-/* Estilos para hacer que la barra sea visible al pasar el ratón por el área con scroll */
-/* Esto puede requerir JavaScript para un control más fino en todos los navegadores
-   pero esta es una aproximación CSS */
-body:hover::-webkit-scrollbar-thumb {
-    background: #888; /* Se mantiene el color al hacer hover sobre el cuerpo si hay scroll */
-}
-
-body:hover::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Color del pulgar al pasar el ratón sobre él */
-}
-
-/* Puedes aplicar estos estilos a elementos específicos con desbordamiento
-   en lugar de globalmente al body si lo prefieres.
-   Ejemplo: .container-con-scroll:hover::-webkit-scrollbar-thumb */
         
     </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
