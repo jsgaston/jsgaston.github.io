@@ -298,14 +298,7 @@
   margin-right: 8px; /* Espacio entre pestañas */
   flex-shrink: 0; /* Evita que se compriman */
 }
-#mainGraphSection iframe {
-    display: block;
-    position: relative;
-    z-index: 1;
-}
-
-        
-
+      
         #mainGraphSection iframe {
     display: block;
     position: relative;
@@ -1310,7 +1303,7 @@ function showMainTab(tabName) {
     // Activar la pestaña correspondiente
     mainTabButtons.forEach(button => button.classList.remove('active'));
 
-    const graphSection = document.getElementById('mainGraphSection');
+
 
     // Mostrar la sección correspondiente
     if (tabName === 'home') {
@@ -1353,13 +1346,7 @@ function showMainTab(tabName) {
     } else if (tabName === 'number-symbols') {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
-    } if (tabName !== 'graph') {
-          const iframe = graphSection.querySelector('iframe');
-          if (iframe) iframe.src = ''; // Vacía el iframe al salir
-        } else {
-          const iframe = graphSection.querySelector('iframe');
-          if (iframe && iframe.src === '') iframe.src = 'funcion.html'; // recarga si estaba vaciado
-        }
+    } 
 
      else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
@@ -1375,6 +1362,11 @@ function showMainTab(tabName) {
         }
         updateElapsedTime();
     }
+
+    if (tabName == 'graph') {
+          document.getElementById('mainGraphSection').classList.remove('hidden');
+         document.querySelector('[data-main-tab="graph"]').classList.add('active');
+        }
     
     hideMessage();
 }
