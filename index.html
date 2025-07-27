@@ -2061,33 +2061,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
 function obtenerLetraDesdeAppScript() {
-  const song = songs[currentTrack];
-  const title = (song?.title || '').replace(/^\\d+\\s*/, '');
-  const artist = song?.artist || '';
+        const currentSongTitle = document.getElementById('currentSong').textContent.split(': ')[1];
+        if (!currentSongTitle || currentSongTitle === '---') {
+            document.getElementById('letraTexto').textContent = 'No hay canción seleccionada para buscar la letra.';
+            document.getElementById('letraCancion').classList.remove('hidden');
+            return;
+        }
 
-  if (!title || !artist) {
-    alert('Faltan datos para buscar la letra.');
-    return;
-  }
+        // Asumimos que el formato es "Título - Artista"
+        const parts = currentSongTitle.split(' - ');
+        const title = parts[0] ? parts[0].trim() : '';
+        const artist = parts[1] ? parts[1].trim() : '';
+        const GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps = "https://script.google.com/macros/s/AKfycbwFtA-lXTjWfONlEBxEpZOoCfnk8diCqeNT9khhI2VctXbpOY4u08-eADvbBz7Tw9IWTw/exec"
 
-  const queryUrl = 'https://script.google.com/macros/s/AKfycbxXTwmC8-KY1bYIki7EAtsgM7rCvTb0Ej4qK5oeQIXcJMM4DJEDqPCliJ47eMJpN43SJA/exec' +
-    '?title=' + encodeURIComponent(title) +
-    '&artist=' + encodeURIComponent(artist);
+        if (!title || !artist) {
+            document.getElementById('letraTexto').textContent = 'No se pudo determinar el título o artista de la canción actual.';
+            document.getElementById('letraCancion').classList.remove('hidden');
+            return;
+        }
 
-  fetch(queryUrl)
-    .then(res => res.text())
-    .then(lyric => {
-      const div = document.getElementById('letraCancion');
-const letraTexto = document.getElementById('letraTexto');
-letraTexto.textContent = lyric;
-div.classList.remove('hidden');
+        const url = `${GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps}?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`;
+        document.getElementById('letraTexto').innerHTML = 'Buscando letra...'; // Usar innerHTML para permitir enlaces
+        document.getElementById('letraCancion').classList.remove('hidden');
 
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Error al buscar la letra');
-    });
-}
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                if (data.startsWith("GENIUS_LINK:")) {
+                    const geniusUrl = data.substring("GENIUS_LINK:".length);
+                    document.getElementById('letraTexto').innerHTML = `Letra no encontrada en la base de datos principal. Puedes buscar en Genius.com aquí: <a href="${geniusUrl}" target="_blank" class="text-blue-600 underline hover:text-blue-800">Buscar en Genius.com</a>`;
+                } else if (data && data !== 'Letra no encontrada.') {
+                    document.getElementById('letraTexto').textContent = data;
+                } else {
+                    document.getElementById('letraTexto').textContent = 'Letra no encontrada.';
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener la letra:', error);
+                document.getElementById('letraTexto').textContent = 'Error al cargar la letra.';
+            });
+    }
 
 </script>
 
