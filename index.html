@@ -370,10 +370,12 @@
 
 .wheel-container {
             position: relative;
-            width: 300px; /* Aumentado para más espacio */
-            height: 300px; /* Aumentado para más espacio */
+            width: 75vw; /* 75% del ancho del viewport */
+            height: 75vw; /* Mantiene una relación de aspecto cuadrada */
+            max-width: 500px; /* Limita el tamaño máximo para pantallas muy grandes */
+            max-height: 500px; /* Limita el tamaño máximo para pantallas muy grandes */
             margin: 0 auto;
-            perspective: 1500px; /* Profundidad de la perspectiva 3D aumentada */
+            perspective: 2000px; /* Aumentado para menos compresión en tamaños grandes */
             transform-style: preserve-3d;
             display: flex;
             justify-content: center;
@@ -388,27 +390,35 @@
             transition: transform 0.6s ease-in-out; /* Smooth transition for wheel rotation */
         }
 
-        .wheel-item {
+.wheel-item {
             position: absolute;
-            width: 160px; /* Ancho de cada elemento del carrusel */
-            height: 160px; /* Alto de cada elemento del carrusel */
+            width: 40%; /* Un porcentaje del tamaño de .wheel-container */
+            height: 40%; /* Un porcentaje del tamaño de .wheel-container */
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 1.3em;
-            background-color: #f0f0f0;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: transform 0.6s ease-in-out, background-color 0.3s, border-color 0.3s;
-            backface-visibility: hidden; /* Prevents flickering on some browsers */
-            color: #333;
-            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white;
             text-align: center;
             padding: 10px;
             box-sizing: border-box;
-            transform-origin: center center; /* Crucial for correct rotation */
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 3.5vw; /* Tamaño de fuente relativo al viewport width */
+            max-font-size: 24px; /* Tamaño máximo para la fuente */
+            overflow: hidden; /* Asegura que el contenido no se desborde */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Ajusta el tamaño de la imagen dentro de wheel-item si existe */
+        .wheel-item img {
+            max-width: 60%; /* Ajusta el tamaño de la imagen dentro del ítem */
+            max-height: 60%;
+            object-fit: contain;
+            margin-bottom: 5px;
         }
 
         .wheel-item.active {
@@ -3087,11 +3097,14 @@ function convertTime() {
             this.currentIndex = 0;
             this.rotation = 0;
             this.itemAngle = 360 / this.wheelItems.length;
-            this.radius = 150; // Radio de la rueda en px
+            // Calcular el radio dinámicamente basado en el tamaño del contenedor
+            // Se asume que el contenedor .wheel ya tiene un tamaño al momento de inicialización
+            // Si el .wheel-container no tiene un tamaño establecido al DOMContentLoaded,
+            // esta lógica podría necesitar un ajuste en un evento de resize o después de que se cargue el CSS
+            this.radius = this.wheel.offsetWidth / 2.5; // Aproximadamente 40% del ancho del .wheel
             this.leafletMap = null; // Inicializa la propiedad del mapa
 
             this._initWheel();
-            // No llamar a _initLeafletMap() aquí directamente, solo cuando se necesite al activar la pestaña de mapas
         }
 
         _initWheel() {
