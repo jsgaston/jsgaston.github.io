@@ -317,7 +317,104 @@
       z-index: -1000 !important;
 }
 
+.tabs-container {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    padding: 10px 0;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
 
+.tabs-wrapper {
+    flex-grow: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.tabs-wrapper::-webkit-scrollbar { display: none; }
+
+.tabs-list {
+    display: inline-flex;
+    padding: 0 5px; /* Pequeño padding para los botones de scroll */
+}
+
+.tab-button {
+    background-color: #e0e0e0;
+    border: 1px solid #c0c0c0;
+    padding: 10px 18px;
+    margin-right: 8px; /* Espacio entre botones */
+    cursor: pointer;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-size: 15px;
+    color: #333;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease; /* Transición para hover */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Efecto al hacer hover */
+.tab-button:hover {
+    background-color: #d0d0d0; /* Un gris más oscuro */
+    border-color: #a0a0a0;
+    transform: translateY(-2px); /* Un pequeño levantamiento */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.tab-button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transform: none; /* Asegura que la activa no se levante */
+}
+/* Al hacer hover en la activa, no hay cambio */
+.tab-button.active:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+.scroll-button {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 20px;
+    border-radius: 5px;
+    margin: 0 5px;
+    display: flex; /* Para centrar el icono */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.scroll-button:hover {
+    background-color: #ddd;
+    border-color: #bbb;
+}
+
+/* Contenido de las pestañas */
+.tab-content-container {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-top: none;
+    background-color: #fff;
+    min-height: 200px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
 
 
 
@@ -340,26 +437,50 @@
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera</h1>
 
         <!-- Nueva pestaña en navegación principal -->
-        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
-          <button class="main-tab-button" data-main-tab="home">Inicio</button>
-          <button class="main-tab-button" data-main-tab="diary">Anotaciones</button>
-                        <button class="main-tab-button" data-main-tab="stories">Stories</button>
-                      <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
-          <button class="main-tab-button" data-main-tab="radio">Radio</button>
-            <button class="main-tab-button" data-main-tab="time-converter">Conversor de Tiempo</button>
-             <button class="main-tab-button" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
-            <button class="main-tab-button" data-main-tab="number-symbols">Traductor de Números</button>
-            <button class="main-tab-button" data-main-tab="graph">La Función Mundo Azul</button>
+        <div class="tabs-container">
+    <button class="scroll-button left" onclick="scrollTabs(-1)">&#9664;</button>
+    <div class="tabs-wrapper">
+        <div class="tabs-list" id="tabsList">
+          <button class="tab-button" data-tab="home">Inicio</button>
+          <button class="tab-button" data-tab="diary">Anotaciones</button>
+          <button class="tab-button" data-tab="stories">Stories</button>
+          <button class="tab-button" data-tab="profile">Perfil</button> <!-- Nueva pestaña -->
+          <button class="tab-button" data-tab="radio">Radio</button>
+          <button class="tab-button" data-tab="time-converter">Conversor de Tiempo</button>
+          <button class="tab-button" data-tab="time-elapsed">Tiempo Transcurrido</button>
+         <button class="tab-button" data-tab="number-symbols">Traductor de Números</button>
+          <button class="tab-button" data-tab="graph">La Función Mundo Azul</button>
+          <button class="tab-button" data-tab="maps">Mapas de Recorridos</button>
+          <button class="tab-button" data-tab="trips">Organizar Viajes</button>
+          <button class="tab-button" data-tab="menus">Menús de Comida</button>
+          <button class="tab-button" data-tab="projects">Proyectos</button>
+
+        </div>
+    </div>
+    <button class="scroll-button right" onclick="scrollTabs(1)">&#9654;</button>
+</div>
 
 
-          <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
-          <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
-          <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
-          <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+        <div class="tab-content-container">
+    <div id="inicio" class="tab-pane active">Contenido de Inicio</div>
+    <div id="anotaciones" class="tab-pane">Contenido de Anotaciones</div>
+    <div id="stories" class="tab-pane">Contenido de Stories</div>
+    <div id="perfil" class="tab-pane">Contenido de Perfil</div>
+    <div id="radio" class="tab-pane">Contenido de Radio</div>
+    <div id="conversor" class="tab-pane">Contenido de Conversor de Tiempo</div>
+    <div id="transcurrido" class="tab-pane">Contenido de Tiempo Transcurrido</div>
+    <div id="tab8" class="tab-pane">Contenido de Tab 8</div>
+    <div id="tab9" class="tab-pane">Contenido de Tab 9</div>
+    <div id="tab10" class="tab-pane">Contenido de Tab 10</div>
+    <div id="tab11" class="tab-pane">Contenido de Tab 11</div>
+    <div id="tab12" class="tab-pane">Contenido de Tab 12</div>
+    <div id="tab13" class="tab-pane">Contenido de Tab 13</div>
+</div>
 
-            
 
-        </nav>
+
+
+        
 
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
@@ -2650,6 +2771,65 @@ function convertTime() {
 
 
 
+
+
+
+<script>
+
+function scrollTabs(direction) {
+    const tabsWrapper = document.getElementById('tabsList').parentNode;
+    const scrollAmount = 200; // Ajusta la cantidad de scroll por clic
+
+    tabsWrapper.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth' // Desplazamiento suave
+    });
+}
+
+// Desplazamiento con la rueda del ratón
+document.querySelector('.tabs-wrapper').addEventListener('wheel', function(event) {
+    // Solo si el scroll horizontal es posible, prevenimos el scroll vertical de la página
+    if (this.scrollWidth > this.clientWidth) {
+        event.preventDefault();
+        this.scrollLeft += event.deltaY;
+    }
+}, { passive: false }); // Usar { passive: false } para que preventDefault funcione
+
+
+// Lógica para activar la pestaña y mostrar el contenido
+document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTabId = button.dataset.tab; // Obtener el ID del contenido
+            
+            // Remover 'active' de todas las pestañas y paneles
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+
+            // Añadir 'active' a la pestaña clicada
+            button.classList.add('active');
+            
+            // Mostrar el contenido correspondiente
+            document.getElementById(targetTabId).classList.add('active');
+        });
+    });
+
+    // Asegurarse de que la primera pestaña y su contenido estén activos al cargar
+    if (tabButtons.length > 0) {
+        tabButtons[0].click(); // Simula un clic en la primera para activarla
+    }
+});    
+
+</script>
+
+
+
+
+
+    
 
 <script>
 function sanitizeNumberInput(input) {
