@@ -1297,7 +1297,7 @@ function showMainTab(tabName) {
     document.getElementById('mainTimeConverterSection').classList.add('hidden');
     document.getElementById('mainTimeElapsedSection').classList.add('hidden');
     document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
-    document.getElementById('mainGraphSection').classList.remove('hidden');
+    document.getElementById('mainGraphSection').classList.add('hidden'); // Asegurarse de ocultar
     
     // Eliminar el div extra si existe
     const extraTimeUnits = document.getElementById('extraTimeUnits');
@@ -1307,8 +1307,6 @@ function showMainTab(tabName) {
 
     // Activar la pestaña correspondiente
     mainTabButtons.forEach(button => button.classList.remove('active'));
-
-
 
     // Mostrar la sección correspondiente
     if (tabName === 'home') {
@@ -1364,14 +1362,10 @@ function showMainTab(tabName) {
             // Ajustar 2 horas para horario de verano en España (UTC+2)
             const madridTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
             endInput.value = madridTime.toISOString().slice(0,16);
-        
         }
         updateElapsedTime();
     }
 
-
-
-    
     hideMessage();
 }
     
