@@ -370,13 +370,10 @@
 
 .wheel-container {
             position: relative;
-            width: 75vw; /* 75% del ancho del viewport */
-            height: 75vw; /* Mantiene una relación de aspecto cuadrada */
-            /* Eliminamos max-width y max-height para que siempre ocupe el 75vw,
-               puedes reintroducirlos con valores más altos si la rueda es demasiado grande
-               en monitores muy anchos, por ejemplo: max-width: 700px; max-height: 700px; */
+            width: 75vw;
+            height: 75vw;
             margin: 0 auto;
-            perspective: 2500px; /* Aumentado para un efecto 3D más suave y menos compresión */
+            perspective: 3500px; /* Aumentado significativamente para reducir el efecto de distorsión 3D y el solapamiento */
             transform-style: preserve-3d;
             display: flex;
             justify-content: center;
@@ -393,8 +390,8 @@
 
 .wheel-item {
             position: absolute;
-            width: 45%; /* Aumentado ligeramente para que ocupen más espacio en el contenedor */
-            height: 45%; /* Aumentado ligeramente */
+            width: 42%; /* Ligeramente reducido para dar más espacio entre ítems */
+            height: 42%; /* Ligeramente reducido */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -408,8 +405,8 @@
             box-sizing: border-box;
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            font-size: 4.5vw; /* Aumentado para que la fuente sea más grande */
-            max-font-size: 30px; /* Tamaño máximo de fuente para evitar que sea gigantesca en pantallas muy grandes */
+            font-size: 4.5vw; /* Mantenemos el tamaño de fuente relativo */
+            max-font-size: 30px; /* Máximo de fuente */
             overflow: hidden;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
@@ -3037,9 +3034,8 @@ function convertTime() {
             this.currentIndex = 0;
             this.rotation = 0;
             this.itemAngle = 360 / this.wheelItems.length;
-            // Calcular el radio dinámicamente basado en el tamaño del contenedor
-            // Un valor de 2 a 2.1 suele funcionar bien para evitar solapamientos y la compresión
-            this.radius = this.wheel.offsetWidth / 2.05; // Ajustado para mejor visibilidad
+            // Aumenta el radio para que los ítems se separen más y no se solapen
+            this.radius = this.wheel.offsetWidth / 1.8; // Más cercano a la mitad del ancho del contenedor
             this.leafletMap = null; // Inicializa la propiedad del mapa
 
             this._initWheel();
