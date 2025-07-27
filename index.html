@@ -369,16 +369,19 @@
         }
 
 .wheel-container {
-            position: relative;
-            width: 75vw;
-            height: 75vw;
-            margin: 0 auto;
-            perspective: 3500px; /* Aumentado significativamente para reducir el efecto de distorsión 3D y el solapamiento */
-            transform-style: preserve-3d;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    position: relative;
+    /* Reducir el tamaño base y añadir un max-width para control */
+    width: 600px; /* Tamaño fijo, o un porcentaje más pequeño */
+    height: 600px; /* Tamaño fijo */
+    max-width: 80vw; /* Asegura que no sea demasiado grande en pantallas muy anchas */
+    max-height: 80vw; /* Asegura la proporción */
+    margin: 0 auto;
+    perspective: 1500px; /* Reducido para una perspectiva menos "exagerada" */
+    transform-style: preserve-3d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
         .wheel {
             position: absolute;
@@ -389,35 +392,37 @@
         }
 
 .wheel-item {
-            position: absolute;
-            width: 42%; /* Ligeramente reducido para dar más espacio entre ítems */
-            height: 42%; /* Ligeramente reducido */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: white;
-            text-align: center;
-            padding: 10px;
-            box-sizing: border-box;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            font-size: 4.5vw; /* Mantenemos el tamaño de fuente relativo */
-            max-font-size: 30px; /* Máximo de fuente */
-            overflow: hidden;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
+    position: absolute;
+    width: 200px; /* Tamaño fijo para el elemento, o un porcentaje relativo al wheel-container */
+    height: 200px; /* Tamaño fijo */
+    max-width: 35%; /* Controla el tamaño máximo del ítem dentro del contenedor */
+    max-height: 35%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1.5rem; /* Usar rem para un tamaño de fuente más controlable */
+    max-font-size: 24px; /* Ajustar según sea necesario */
+    overflow: hidden;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
 
         /* Ajusta el tamaño de la imagen dentro de wheel-item si existe */
-        .wheel-item img {
-            max-width: 60%; /* Ajusta el tamaño de la imagen dentro del ítem */
-            max-height: 60%;
-            object-fit: contain;
-            margin-bottom: 5px;
-        }
+.wheel-item img {
+    max-width: 70%; /* Ajusta el tamaño de la imagen dentro del ítem */
+    max-height: 70%;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
 
         .wheel-item.active {
             background-color: #667eea;
@@ -3026,156 +3031,150 @@ function convertTime() {
 
     // --- Lógica para la rueda de navegación (Wheel Navigation) ---
     // Esta clase maneja la rotación de los elementos de la rueda y la activación de las pestañas.
-    class WheelNavigation {
-        constructor() {
-            this.wheel = document.querySelector('.wheel');
-            this.wheelItems = Array.from(document.querySelectorAll('.wheel-item'));
-            this.indicators = Array.from(document.querySelectorAll('.indicator'));
-            this.currentIndex = 0;
-            this.rotation = 0;
-            this.itemAngle = 360 / this.wheelItems.length;
-            // Aumenta el radio para que los ítems se separen más y no se solapen
-            this.radius = this.wheel.offsetWidth / 1.8; // Más cercano a la mitad del ancho del contenedor
-            this.leafletMap = null; // Inicializa la propiedad del mapa
+class WheelNavigation {
+    constructor() {
+        this.wheel = document.querySelector('.wheel');
+        this.items = Array.from(this.wheel.querySelectorAll('.wheel-item'));
+        this.totalItems = this.items.length;
+        this.currentIndex = 0;
+        this.currentRotation = 0;
+        this.rotationStep = 360 / this.totalItems; // Calculate based on total items
+        this.indicatorsContainer = document.querySelector('.indicators');
+        this.indicators = [];
 
-            this._initWheel();
+        this._setupItems();
+        this._setupIndicators();
+        this._updateWheelRotation(); // Initial positioning
+    }
+
+    _setupItems() {
+        this.items.forEach((item, index) => {
+            const angle = index * this.rotationStep;
+            item.style.transform = `rotateY(${angle}deg) translateZ(300px)`; // Adjust translateZ as needed
+            // item.style.transform = `rotateY(${angle}deg) translateZ(calc(var(--wheel-radius, 300px)))`; // Alternative using CSS variable
+            item.addEventListener('click', () => this.showItem(index));
+        });
+    }
+
+    _setupIndicators() {
+        // Clear existing indicators to prevent duplicates on re-initialization
+        this.indicatorsContainer.innerHTML = '';
+        for (let i = 0; i < this.totalItems; i++) {
+            const indicator = document.createElement('div');
+            indicator.classList.add('indicator');
+            indicator.addEventListener('click', () => this.showItem(i));
+            this.indicatorsContainer.appendChild(indicator);
+            this.indicators.push(indicator);
         }
+        this._updateIndicators();
+    }
 
-        _initWheel() {
-            this.wheelItems.forEach((item, index) => {
-                const angle = index * this.itemAngle;
-                // Posiciona los elementos en un círculo en 3D
-                item.style.transform = `rotateY(${angle}deg) translateZ(${this.radius}px)`;
-                item.addEventListener('click', () => this.activateItem(item));
-            });
-            this.activateItem(this.wheelItems[0]); // Activa el primer elemento al cargar
-        }
+    _updateWheelRotation() {
+        this.wheel.style.transform = `rotateY(${-this.currentRotation}deg)`;
+        this._updateActiveItem();
+        this._updateIndicators();
+    }
 
-        activateItem(itemToActivate) {
-            // Encuentra el índice del elemento a activar
-            const newIndex = this.wheelItems.indexOf(itemToActivate);
-            if (newIndex === -1) return; // Si no se encuentra el elemento, salir
-
-            this.currentIndex = newIndex;
-            this.rotation = -this.currentIndex * this.itemAngle;
-            this.wheel.style.transform = `rotateY(${this.rotation}deg)`;
-
-            this.wheelItems.forEach((item, index) => {
-                if (item === itemToActivate) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-            this._updateIndicators();
-            this._showAssociatedTab(itemToActivate);
-        }
-
-        rotateNext() {
-            this.currentIndex = (this.currentIndex + 1) % this.wheelItems.length;
-            this.activateItem(this.wheelItems[this.currentIndex]);
-        }
-
-        rotatePrevious() {
-            this.currentIndex = (this.currentIndex - 1 + this.wheelItems.length) % this.wheelItems.length;
-            this.activateItem(this.wheelItems[this.currentIndex]);
-        }
-
-        _updateIndicators() {
-            this.indicators.forEach((indicator, index) => {
-                // Asegúrate de que el número de indicadores coincida con el número de ítems si es dinámico,
-                // o ajusta el cálculo de 'index' si los indicadores son fijos y menos que los ítems.
-                if (index === this.currentIndex % this.indicators.length) {
-                    indicator.classList.add('active');
-                } else {
-                    indicator.classList.remove('active');
-                }
-            });
-        }
-
-        _showAssociatedTab(item) {
-            const tabId = item.dataset.mainTab;
-            if (tabId) {
-                // Llama a la función global para mostrar la pestaña principal
-                showMainTab('main' + tabId.charAt(0).toUpperCase() + tabId.slice(1) + 'Section');
-
-                // Si es la sección del mapa, inicializa o refresca el mapa
-                if (tabId === 'maps') {
-                    // Pequeño retraso para asegurar que el div del mapa es visible antes de inicializar
-                    setTimeout(() => this._initLeafletMap(), 100);
-                }
+    _updateActiveItem() {
+        this.items.forEach((item, index) => {
+            if (index === this.currentIndex) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
             }
-        }
-
-        // Esta función debe ser un método directo de la clase WheelNavigation
-        _initLeafletMap() {
-            if (this.leafletMap) { // Si el mapa ya existe, invalida su tamaño y retorna
-                this.leafletMap.invalidateSize();
-                return;
-            }
-            // Asegúrate de que el div 'mapid' existe en tu HTML
-            this.leafletMap = L.map('mapid').setView([38.3452, -0.4810], 13); // Coordenadas de Alicante
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(this.leafletMap);
-
-            L.marker([38.3452, -0.4810]).addTo(this.leafletMap)
-                .bindPopup('Mi ubicación en Alicante')
-                .openPopup();
-
-            window.myLeafletMap = this.leafletMap; // Hacer el mapa accesible globalmente si es necesario
-        }
-    }
-
-    // Funciones globales para botones de navegación de la rueda
-    let wheelNav;
-
-    function rotatePrevious() {
-        if (wheelNav) {
-            wheelNav.rotatePrevious();
-        }
-    }
-
-    function rotateNext() {
-        if (wheelNav) {
-            wheelNav.rotateNext();
-        }
-    }
-
-    // Función para manejar el estado activo de los botones de radio (shuffle, repeat, sort)
-    function toggleActiveClass(button, isToggle = true, group = '') {
-        if (isToggle) {
-            button.classList.toggle('active');
-        } else {
-            // Si no es un toggle, desactiva otros botones en el mismo grupo (si existe)
-            if (group) {
-                document.querySelectorAll(`.${group}`).forEach(btn => {
-                    if (btn !== button) {
-                        btn.classList.remove('active');
-                    }
-                });
-            }
-            // Y activa el botón actual
-            button.classList.add('active');
-        }
-    }
-
-
-    // Inicializa cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', () => {
-        wheelNav = new WheelNavigation();
-
-        // Asigna eventos a los botones de sub-pestañas del diario
-        document.querySelectorAll('.diary-sub-tab-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const tabId = button.dataset.diarySubTab;
-                showDiarySubTab(tabId);
-            });
         });
 
-        // Asegúrate de que la primera pestaña principal (Inicio) esté activa al cargar
-        showMainTab('mainHomeSection');
+        // Show corresponding main tab content
+        const activeTabId = this.items[this.currentIndex].dataset.mainTab;
+        showMainTab(activeTabId);
+    }
+
+    _updateIndicators() {
+        this.indicators.forEach((indicator, index) => {
+            if (index === this.currentIndex) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        });
+    }
+
+    rotateNext() {
+        this.currentIndex = (this.currentIndex + 1) % this.totalItems;
+        this.currentRotation += this.rotationStep;
+        this._updateWheelRotation();
+    }
+
+    rotatePrevious() {
+        this.currentIndex = (this.currentIndex - 1 + this.totalItems) % this.totalItems;
+        this.currentRotation -= this.rotationStep;
+        this._updateWheelRotation();
+    }
+
+    showItem(index) {
+        this.currentIndex = index;
+        this.currentRotation = index * this.rotationStep; // Align rotation with the item
+        this._updateWheelRotation();
+    }
+}
+
+let wheelNav; // Declare globally or in a scope accessible by onclick
+
+document.addEventListener('DOMContentLoaded', () => {
+    wheelNav = new WheelNavigation();
+
+    // Ensure showMainTab and showDiarySubTab are defined and accessible
+    // For example:
+    window.showMainTab = (tabId) => {
+        document.querySelectorAll('.main-tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        document.getElementById(tabId).classList.remove('hidden');
+
+        // Update main navigation buttons if any (though wheel is main nav)
+        document.querySelectorAll('.main-tab-button').forEach(button => {
+            if (button.dataset.mainTab === tabId) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    };
+
+    window.showDiarySubTab = (tabId) => {
+        document.querySelectorAll('.diary-sub-tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        document.getElementById(`diary${tabId.charAt(0).toUpperCase() + tabId.slice(1)}EntrySection`).classList.remove('hidden');
+
+        document.querySelectorAll('.diary-sub-tab-button').forEach(button => {
+            if (button.dataset.diarySubTab === tabId) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    };
+
+    // Assign events to diary sub-tab buttons
+    document.querySelectorAll('.diary-sub-tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.dataset.diarySubTab;
+            showDiarySubTab(tabId);
+        });
+    });
+
+    // Ensure the first main tab (Home) is active on load
+    showMainTab('mainHomeSection');
+
+    // Make rotate functions globally accessible for onclick
+    window.rotateNext = () => wheelNav.rotateNext();
+    window.rotatePrevious = () => wheelNav.rotatePrevious();
+
+    // Rest of your DOMContentLoaded logic (image modal, etc.)
+});
+
+
 
         // Lógica para el modal de imágenes
         const imageModal = document.getElementById('imageModal');
