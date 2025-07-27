@@ -3016,106 +3016,144 @@ function convertTime() {
 
 
 <script>
-        class WheelNavigation {
-            constructor() {
-                this.container = document.querySelector('.wheel');
-                this.items = Array.from(document.querySelectorAll('.wheel-item'));
-                this.indicators = Array.from(document.querySelectorAll('.indicator'));
-                this.numItems = this.items.length;
-                this.angleStep = 360 / this.numItems; // Angle between each item
-                this.activeIndex = 0; // Current active item index
+    // --- Funciones para la navegación principal de pestañas ---
+    function showMainTab(tabId) {
+        // Oculta todas las secciones de contenido principal
+        document.querySelectorAll('.main-tab-content').forEach(section => {
+            section.classList.add('hidden');
+        });
 
-                this.initializeWheel();
-                this.addEventListeners();
-                this.updateWheel(); // Initial update to show the first tab content
-            }
+        // Muestra la sección de contenido de la pestaña activa
+        const activeSection = document.getElementById(tabId);
+        if (activeSection) {
+            activeSection.classList.remove('hidden');
+        }
 
-            initializeWheel() {
-                // Position items in a circle
-                this.items.forEach((item, index) => {
-                    const angle = index * this.angleStep;
-                    // Calculate radius based on container size to ensure items fit
-                    const radius = this.container.offsetWidth / 2 / Math.tan(Math.PI / this.numItems);
-                    item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-                });
-            }
+        // Desactiva todos los botones de la rueda de navegación
+        document.querySelectorAll('.wheel-item').forEach(button => {
+            button.classList.remove('active');
+        });
 
-            addEventListeners() {
-                // Add click listeners to individual wheel items
-                this.items.forEach((item, index) => {
-                    item.addEventListener('click', () => {
-                        this.activeIndex = index;
-                        this.updateWheel();
-                    });
-                });
+        // Activa el botón de la rueda de navegación correspondiente
+        const activeButton = document.querySelector(`.wheel-item[data-main-tab="${tabId.replace('main', '').replace('Section', '').toLowerCase()}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
 
-                // Add click listeners to indicators
-                this.indicators.forEach((indicator, index) => {
-                    indicator.addEventListener('click', () => {
-                        this.activeIndex = index;
-                        this.updateWheel();
-                    });
-                });
-            }
+        // Si la pestaña activada es el mapa, invalida su tamaño para asegurar que se renderice correctamente
+        if (tabId === 'mainMapsSection' && window.myLeafletMap) {
+            setTimeout(() => { // Pequeño retraso para asegurar que el div es visible
+                window.myLeafletMap.invalidateSize();
+            }, 100);
+        }
+    }
 
-            rotateNext() {
-                this.activeIndex = (this.activeIndex + 1) % this.numItems;
-                this.updateWheel();
-            }
+    // --- Funciones para las sub-pestañas del diario ---
+    function showDiarySubTab(tabId) {
+        // Oculta todas las secciones de contenido de sub-pestañas del diario
+        document.querySelectorAll('.diary-sub-tab-content').forEach(section => {
+            section.classList.add('hidden');
+        });
 
-            rotatePrevious() {
-                this.activeIndex = (this.activeIndex - 1 + this.numItems) % this.numItems;
-                this.updateWheel();
-            }
+        // Muestra la sección de contenido de la sub-pestaña activa
+        const activeSection = document.getElementById('diary' + tabId.charAt(0).toUpperCase() + tabId.slice(1) + 'EntrySection'); // Construye el ID
+        if (activeSection) {
+            activeSection.classList.remove('hidden');
+        }
 
-            updateWheel() {
-                // Rotate the entire wheel container
-                this.container.style.transform = `rotateY(${-this.activeIndex * this.angleStep}deg)`;
+        // Desactiva todos los botones de sub-pestañas del diario
+        document.querySelectorAll('.diary-sub-tab-button').forEach(button => {
+            button.classList.remove('active');
+        });
 
-                // Update active class for items and indicators
-                this.items.forEach((item, index) => {
-                    item.classList.toggle('active', index === this.activeIndex);
-                });
+        // Activa el botón de sub-pestaña correspondiente
+        const activeButton = document.querySelector(`.diary-sub-tab-button[data-diary-sub-tab="${tabId}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+    }
 
-                this.indicators.forEach((indicator, index) => {
-                    indicator.classList.toggle('active', index === this.activeIndex);
-                });
+    // --- Lógica para la rueda de navegación (Wheel Navigation) ---
+    // Esta clase maneja la rotación de los elementos de la rueda y la activación de las pestañas.
+    class WheelNavigation {
+        constructor() {
+            this.wheel = document.querySelector('.wheel');
+            this.wheelItems = Array.from(document.querySelectorAll('.wheel-item'));
+            this.indicators = Array.from(document.querySelectorAll('.indicator'));
+            this.currentIndex = 0;
+            this.rotation = 0;
+            this.itemAngle = 360 / this.wheelItems.length;
+            this.radius = 120; // Radio de la rueda en px
 
-                // Show content of the active tab
-                this.showTabContent();
-            }
+            this._initWheel();
+            this._initLeafletMap(); // Inicializa el mapa cuando la clase se construye
+        }
 
-            showTabContent() {
-                const activeItem = this.items[this.activeIndex];
-                const tabId = activeItem.dataset.tab;
+        _initWheel() {
+            this.wheelItems.forEach((item, index) => {
+                const angle = index * this.itemAngle;
+                // Posiciona los elementos en un círculo en 3D
+                item.style.transform = `rotateY(${angle}deg) translateZ(${this.radius}px)`;
+                item.addEventListener('click', () => this.activateItem(item));
+            });
+            this.activateItem(this.wheelItems[0]); // Activa el primer elemento al cargar
+        }
 
-                // Hide all tabs
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
+        activateItem(itemToActivate) {
+            // Encuentra el índice del elemento a activar
+            const newIndex = this.wheelItems.indexOf(itemToActivate);
+            if (newIndex === -1) return; // Si no se encuentra el elemento, salir
 
-                // Show the active tab
-                const activeContent = document.getElementById(tabId);
-                if (activeContent) {
-                    activeContent.classList.add('active');
+            this.currentIndex = newIndex;
+            this.rotation = -this.currentIndex * this.itemAngle;
+            this.wheel.style.transform = `rotateY(${this.rotation}deg)`;
+
+            this.wheelItems.forEach((item, index) => {
+                if (item === itemToActivate) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
                 }
+            });
+            this._updateIndicators();
+            this._showAssociatedTab(itemToActivate);
+        }
 
-                // Initialize Leaflet map if the contact tab is active and map is not initialized
-                if (tabId === 'tab5' && !this.mapInitialized) {
-                    this.initializeMap();
-                    this.mapInitialized = true; // Set flag to true after initialization
+        rotateNext() {
+            this.currentIndex = (this.currentIndex + 1) % this.wheelItems.length;
+            this.activateItem(this.wheelItems[this.currentIndex]);
+        }
+
+        rotatePrevious() {
+            this.currentIndex = (this.currentIndex - 1 + this.wheelItems.length) % this.wheelItems.length;
+            this.activateItem(this.wheelItems[this.currentIndex]);
+        }
+
+        _updateIndicators() {
+            this.indicators.forEach((indicator, index) => {
+                if (index === this.currentIndex % this.indicators.length) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
                 }
-            }
+            });
+        }
 
-            initializeMap() {
-                // Ensure the map container is visible before initializing
-                const mapContainer = document.getElementById('map');
-                if (mapContainer && mapContainer.offsetWidth === 0 && mapContainer.offsetHeight === 0) {
-                     // If map container is hidden, wait for it to be displayed
-                     // This is a common issue with Leaflet and hidden divs.
-                     // A more robust solution might involve observing mutations or a deferred init.
-                     // For now, assume it will be displayed after tab becomes active.
-                     setTimeout(() => this._initLeafletMap(), 100);
+        _showAssociatedTab(item) {
+            const tabId = item.dataset.mainTab;
+            if (tabId) {
+                // Todas las secciones de contenido principal
+                document.querySelectorAll('.main-tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                // Muestra solo la sección relevante
+                const targetSection = document.getElementById('main' + tabId.charAt(0).toUpperCase() + tabId.slice(1) + 'Section');
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                    // Si es la sección del mapa, refresca el mapa
+                    if (tabId === 'maps') {
+                        setTimeout(() => this._initLeafletMap(), 100);
+                    }
                 } else {
                     this._initLeafletMap();
                 }
@@ -3138,26 +3176,60 @@ function convertTime() {
             }
         }
 
-        // Global functions for buttons
-        let wheelNav;
+    // Funciones globales para botones de navegación de la rueda
+    let wheelNav;
 
-        function rotatePrevious() {
-            if (wheelNav) {
-                wheelNav.rotatePrevious();
-            }
+    function rotatePrevious() {
+        if (wheelNav) {
+            wheelNav.rotatePrevious();
         }
+    }
 
-        function rotateNext() {
-            if (wheelNav) {
-                wheelNav.rotateNext();
-            }
+    function rotateNext() {
+        if (wheelNav) {
+            wheelNav.rotateNext();
         }
+    }
 
-        // Initialize when the DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            wheelNav = new WheelNavigation();
+    // Inicializa cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+        wheelNav = new WheelNavigation();
+
+        // Asigna eventos a los botones de sub-pestañas del diario
+        document.querySelectorAll('.diary-sub-tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.diarySubTab;
+                showDiarySubTab(tabId);
+            });
         });
-    </script>
+
+        // Asegúrate de que la primera pestaña principal (Inicio) esté activa al cargar
+        showMainTab('mainHomeSection');
+
+        // Lógica para el modal de imágenes (si aún no la tienes)
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.querySelector('.close-modal');
+
+        document.querySelectorAll('.entry-card img').forEach(img => {
+            img.addEventListener('click', function() {
+                modalImage.src = this.src;
+                imageModal.style.display = 'block';
+            });
+        });
+
+        closeModal.addEventListener('click', () => {
+            imageModal.style.display = 'none';
+        });
+
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                imageModal.style.display = 'none';
+            }
+        });
+    });
+
+</script>
 
     
 
