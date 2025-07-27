@@ -2062,6 +2062,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
 function obtenerLetraDesdeAppScript() {
         const currentSongTitle = document.getElementById('currentSong').textContent.split(': ')[1];
+    const GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps = "https://script.google.com/macros/s/AKfycbwFtA-lXTjWfONlEBxEpZOoCfnk8diCqeNT9khhI2VctXbpOY4u08-eADvbBz7Tw9IWTw/exec";
         if (!currentSongTitle || currentSongTitle === '---') {
             document.getElementById('letraTexto').textContent = 'No hay canción seleccionada para buscar la letra.';
             document.getElementById('letraCancion').classList.remove('hidden');
@@ -2072,7 +2073,7 @@ function obtenerLetraDesdeAppScript() {
         const parts = currentSongTitle.split(' - ');
         const title = parts[0] ? parts[0].trim() : '';
         const artist = parts[1] ? parts[1].trim() : '';
-        const GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps = "https://script.google.com/macros/s/AKfycbwFtA-lXTjWfONlEBxEpZOoCfnk8diCqeNT9khhI2VctXbpOY4u08-eADvbBz7Tw9IWTw/exec"
+        
 
         if (!title || !artist) {
             document.getElementById('letraTexto').textContent = 'No se pudo determinar el título o artista de la canción actual.';
