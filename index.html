@@ -2060,18 +2060,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps = "https://script.google.com/macros/s/AKfycbzS0AKvfczxGIoYEvkncsU1tghfenI_lkew54TZCFOk-jQGbRu0STcXtsM2w3_senroAw/exec";
 
-        function updateCurrentSong(title, artist) {
+
+    function updateCurrentSong(title, artist) {
         const currentSongSpan = document.getElementById('currentSong');
         if (currentSongSpan) {
             currentSongSpan.textContent = `${title} - ${artist}`;
         }
     }
 
-    
-function obtenerLetraDesdeAppScript() {
+    function obtenerLetraDesdeAppScript() {
         const currentSongSpan = document.getElementById('currentSong');
-        // Obtiene el texto del span. Si el span no existe o está vacío/defecto, usa '---'.
         const currentSongText = currentSongSpan ? currentSongSpan.textContent : '---';
+
+        console.log('1. Texto actual de la canción (currentSongText):', currentSongText); // LOG
 
         if (!currentSongText || currentSongText === '---' || currentSongText.trim() === '') {
             document.getElementById('letraTexto').textContent = 'No hay canción seleccionada para buscar la letra.';
@@ -2079,10 +2080,12 @@ function obtenerLetraDesdeAppScript() {
             return;
         }
 
-        // Asumimos que el formato es "Título - Artista"
         const parts = currentSongText.split(' - ');
         const title = parts[0] ? parts[0].trim() : '';
         const artist = parts[1] ? parts[1].trim() : '';
+
+        console.log('2. Título extraído:', title); // LOG
+        console.log('3. Artista extraído:', artist); // LOG
 
         if (!title || !artist) {
             document.getElementById('letraTexto').textContent = 'No se pudo determinar el título o artista de la canción actual. Asegúrate de que el formato es "Título - Artista".';
@@ -2090,24 +2093,31 @@ function obtenerLetraDesdeAppScript() {
             return;
         }
 
-        const url = `${GOOGLE_APPS_SCRIPT_URL_lyrics_google_apps}?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`;
-        document.getElementById('letraTexto').innerHTML = 'Buscando letra...'; // Usar innerHTML para permitir enlaces
+        const url = `${GOOGLE_APPS_SCRIPT_URL}?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`;
+        console.log('4. URL de la petición al Apps Script:', url); // LOG
+
+        document.getElementById('letraTexto').innerHTML = 'Buscando letra...';
         document.getElementById('letraCancion').classList.remove('hidden');
 
         fetch(url)
-            .then(response => response.text())
+            .then(response => {
+                console.log('5. Respuesta bruta del Apps Script:', response); // LOG
+                return response.text();
+            })
             .then(data => {
+                console.log('6. Datos recibidos del Apps Script:', data); // LOG
+
                 if (data.startsWith("GENIUS_LINK:")) {
                     const geniusUrl = data.substring("GENIUS_LINK:".length);
                     document.getElementById('letraTexto').innerHTML = `Letra no encontrada en la base de datos principal. Puedes buscar en Genius.com aquí: <a href="${geniusUrl}" target="_blank" class="text-blue-600 underline hover:text-blue-800">Buscar en Genius.com</a>`;
-                } else if (data && data !== 'Letra no encontrada.') {
+                } else if (data && data !== 'Letra no encontrada.' && data.trim() !== '') { // Añadido trim() para mayor robustez
                     document.getElementById('letraTexto').textContent = data;
                 } else {
                     document.getElementById('letraTexto').textContent = 'Letra no encontrada para ' + currentSongText + '.';
                 }
             })
             .catch(error => {
-                console.error('Error al obtener la letra:', error);
+                console.error('7. Error en la petición fetch:', error); // LOG
                 document.getElementById('letraTexto').textContent = 'Error al cargar la letra. Por favor, revisa la consola del navegador para más detalles.';
             });
     }
