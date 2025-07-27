@@ -287,17 +287,53 @@
         body > script:not([src]) {
   display: none;
 }
-        nav.flex {
-  overflow-x: auto;
-  white-space: nowrap;
-  padding-bottom: 10px; /* Espacio para scroll */
-  margin-right: 20px; /* Espacio al final */
-}
+    nav.flex {
+        display: flex;
+        justify-content: center; /* Centra los elementos */
+        flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas pequeñas */
+        gap: 8px; /* Espacio entre botones */
+        margin: 0 auto; /* Centrado adicional */
+        max-width: 100%; /* Asegura que no se desborde */
+        padding: 10px 0; /* Espaciado vertical */
+    }
 
-        .main-tab-button {
-  margin-right: 8px; /* Espacio entre pestañas */
-  flex-shrink: 0; /* Evita que se compriman */
-}
+    .main-tab-button {
+        padding: 12px 20px;
+        border-radius: 8px 8px 0 0;
+        font-weight: 600;
+        cursor: pointer;
+        background-color: #e5e7eb;
+        color: #4b5563;
+        transition: all 0.3s ease; /* Transición suave para todos los efectos */
+        position: relative;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+        flex-shrink: 0; /* Evita que los botones se compriman */
+    }
+
+    .main-tab-button:hover {
+        transform: rotateY(15deg); /* Efecto de giro en 3D */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        background-color: #d1d5db;
+    }
+
+    .main-tab-button.active {
+        background-color: #ffffff;
+        color: #4f46e5;
+        box-shadow: 0 -2px 0 0 #4f46e5 inset;
+        transform: none; /* Elimina el giro cuando está activo */
+    }
+
+    .main-tab-button.active:hover {
+        transform: none; /* Elimina el giro cuando está activo */
+    }
+
+    /* Efecto de giro más pronunciado para pantallas grandes */
+    @media (min-width: 768px) {
+        .main-tab-button:hover {
+            transform: rotateY(20deg);
+        }
+    }
 
         #mainGraphSection {
   overflow: hidden;
@@ -340,7 +376,7 @@
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera</h1>
 
         <!-- Nueva pestaña en navegación principal -->
-        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
+        <nav class="flex border-b border-gray-200 -mt-8 mb-8">
           <button class="main-tab-button" data-main-tab="home">Inicio</button>
           <button class="main-tab-button" data-main-tab="diary">Anotaciones</button>
                         <button class="main-tab-button" data-main-tab="stories">Stories</button>
