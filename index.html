@@ -1356,7 +1356,10 @@ function showMainTab(tabName) {
     } else if (tabName === 'number-symbols') {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
-
+    } else if (tabName === 'graph') {
+        document.getElementById('mainGraphSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="graph"]').classList.add('active');
+    
     
     } else if (tabName === 'time-elapsed') {
         document.getElementById('mainTimeElapsedSection').classList.remove('hidden');
@@ -1372,22 +1375,7 @@ function showMainTab(tabName) {
         updateElapsedTime();
     }
 
-    if (tabName === 'graph') {
-                document.getElementById('mainGraphSection').classList.remove('hidden');
-                document.querySelector('[data-main-tab="graph"]').classList.add('active');
-                
-                // Cargar el iframe solo si no se ha cargado antes
-                if (!graphIframeLoaded) {
-                    loadGraphIframe();
-                }
-                
-                // Mostrar el contenedor
-                document.getElementById('graphIframeContainer').classList.add('active');
-            } else {
-                // Ocultar el contenedor cuando no está activo
-                document.getElementById('graphIframeContainer')?.classList.remove('active');
-            }
-        }
+   
 
 
     hideMessage();
