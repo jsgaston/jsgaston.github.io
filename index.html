@@ -946,6 +946,8 @@
         const modalImage = document.getElementById('modalImage');
         const closeModal = document.querySelector('.close-modal');
 
+        const graphSection = document.getElementById('mainGraphSection');
+
 
 
 text.addEventListener('paste', function (event) {
@@ -1295,6 +1297,8 @@ function showMainTab(tabName) {
     document.getElementById('mainTimeConverterSection').classList.add('hidden');
     document.getElementById('mainTimeElapsedSection').classList.add('hidden');
     document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
+
+    document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
     
     // Eliminar el div extra si existe
     const extraTimeUnits = document.getElementById('extraTimeUnits');
@@ -1348,13 +1352,10 @@ function showMainTab(tabName) {
     } else if (tabName === 'number-symbols') {
         document.getElementById('mainNumberSymbolsSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="number-symbols"]').classList.add('active');
-    const graphSection = document.getElementById('mainGraphSection');
-    if (tabName !== 'graph') {
-      const iframe = graphSection.querySelector('iframe');
-      if (iframe) iframe.src = ''; // Vacía el iframe al salir
-    } else {
-      const iframe = graphSection.querySelector('iframe');
-      if (iframe && iframe.src === '') iframe.src = 'funcion.html'; // recarga si estaba vaciado
+
+    } if (tabName === 'graph') {
+        document.getElementById('mainGraphSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="graph"]').classList.add('active');
     }
 
 
