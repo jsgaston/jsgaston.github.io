@@ -319,7 +319,119 @@
 
 
 
-
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 500px;
+            margin: 3rem 0;
+            perspective: 1200px;
+        }
+        
+        .wheel {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+            display: flex;
+            justify-content: center;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .wheel-item {
+            position: absolute;
+            width: 220px;
+            height: 100px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-out;
+            backface-visibility: hidden;
+            user-select: none;
+            border: 1px solid #e2e8f0;
+            transform-origin: center center;
+        }
+        
+        .wheel-item.active {
+            background: var(--primary-color);
+            color: white;
+            transform: translateZ(100px) scale(1.25);
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.35);
+            font-weight: 600;
+            z-index: 10;
+        }
+        
+        .wheel-item:hover:not(.active) {
+            background: #f1f5f9;
+            transform: translateZ(50px);
+        }
+        
+        /* Posicionamiento de los items en círculo (12 elementos) */
+        .wheel-item:nth-child(1) { transform: rotateY(0deg) translateZ(450px); }
+        .wheel-item:nth-child(2) { transform: rotateY(30deg) translateZ(450px); }
+        .wheel-item:nth-child(3) { transform: rotateY(60deg) translateZ(450px); }
+        .wheel-item:nth-child(4) { transform: rotateY(90deg) translateZ(450px); }
+        .wheel-item:nth-child(5) { transform: rotateY(120deg) translateZ(450px); }
+        .wheel-item:nth-child(6) { transform: rotateY(150deg) translateZ(450px); }
+        .wheel-item:nth-child(7) { transform: rotateY(180deg) translateZ(450px); }
+        .wheel-item:nth-child(8) { transform: rotateY(210deg) translateZ(450px); }
+        .wheel-item:nth-child(9) { transform: rotateY(240deg) translateZ(450px); }
+        .wheel-item:nth-child(10) { transform: rotateY(270deg) translateZ(450px); }
+        .wheel-item:nth-child(11) { transform: rotateY(300deg) translateZ(450px); }
+        .wheel-item:nth-child(12) { transform: rotateY(330deg) translateZ(450px); }
+        
+        /* Áreas de hover para rotación */
+        .hover-left, .hover-right {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 25%;
+            z-index: 20;
+            cursor: pointer;
+        }
+        
+        .hover-left {
+            left: 0;
+        }
+        
+        .hover-right {
+            right: 0;
+        }
+        
+        .hover-left:hover ~ .wheel {
+            transform: translateX(-50%) rotateY(-30deg);
+        }
+        
+        .hover-right:hover ~ .wheel {
+            transform: translateX(-50%) rotateY(30deg);
+        }
+        
+        /* Efecto de movimiento continuo al mantener el hover */
+        .hover-left:hover ~ .wheel {
+            animation: rotateLeft 2s linear infinite;
+        }
+        
+        .hover-right:hover ~ .wheel {
+            animation: rotateRight 2s linear infinite;
+        }
+        
+        @keyframes rotateLeft {
+            0% { transform: translateX(-50%) rotateY(0deg); }
+            100% { transform: translateX(-50%) rotateY(-360deg); }
+        }
+        
+        @keyframes rotateRight {
+            0% { transform: translateX(-50%) rotateY(0deg); }
+            100% { transform: translateX(-50%) rotateY(360deg); }
+        }
 
 
         
@@ -340,26 +452,30 @@
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera</h1>
 
         <!-- Nueva pestaña en navegación principal -->
-        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
-          <button class="main-tab-button" data-main-tab="home">Inicio</button>
-          <button class="main-tab-button" data-main-tab="diary">Anotaciones</button>
-                        <button class="main-tab-button" data-main-tab="stories">Stories</button>
-                      <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
-          <button class="main-tab-button" data-main-tab="radio">Radio</button>
-            <button class="main-tab-button" data-main-tab="time-converter">Conversor de Tiempo</button>
-             <button class="main-tab-button" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
-            <button class="main-tab-button" data-main-tab="number-symbols">Traductor de Números</button>
-            <button class="main-tab-button" data-main-tab="graph">La Función Mundo Azul</button>
+    <div class="wheel-container">
+        <div class="hover-left"></div>
+        <div class="hover-right"></div>
+        
+        <div class="wheel" id="wheel">
+          <button class="wheel-item active" data-main-tab="home">Inicio</button>
+          <button class="wheel-item" data-main-tab="diary">Anotaciones</button>
+            <button class="wheel-item" data-main-tab="stories">Stories</button>
+            <button class="wheel-item" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
+          <button class="wheel-item" data-main-tab="radio">Radio</button>
+            <button class="wheel-item" data-main-tab="time-converter">Conversor de Tiempo</button>
+             <button class="wheel-item" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
+            <button class="wheel-item" data-main-tab="number-symbols">Traductor de Números</button>
+            <button class="wheel-item" data-main-tab="graph">La Función Mundo Azul</button>
 
 
-          <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
-          <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
-          <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
-          <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
+          <button class="wheel-item" data-main-tab="maps">Mapas de Recorridos</button>
+          <button class="wheel-item" data-main-tab="trips">Organizar Viajes</button>
+          <button class="wheel-item" data-main-tab="menus">Menús de Comida</button>
+          <button class="wheel-item" data-main-tab="projects">Proyectos</button>
 
             
-
-        </nav>
+        </div>
+    </div>
 
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
@@ -2649,6 +2765,92 @@ function convertTime() {
 </script>
 
 
+
+
+    <script>
+        const wheel = document.getElementById('wheel');
+        const items = document.querySelectorAll('.wheel-item');
+        const hoverLeft = document.querySelector('.hover-left');
+        const hoverRight = document.querySelector('.hover-right');
+        let currentAngle = 0;
+        const angleIncrement = 30; // 360° / 12 items
+        let isAnimating = false;
+        let hoverInterval;
+        
+        // Función para rotar la rueda
+        function rotateWheel(angle) {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            currentAngle = angle;
+            wheel.style.transform = `translateX(-50%) rotateY(${currentAngle}deg)`;
+            
+            setTimeout(() => {
+                updateActiveItem();
+                isAnimating = false;
+            }, 600);
+        }
+        
+        // Actualizar el item activo
+        function updateActiveItem() {
+            const activeIndex = Math.round((360 - (currentAngle % 360)) / angleIncrement) % items.length;
+            items.forEach((item, index) => {
+                item.classList.toggle('active', index === activeIndex);
+                
+                // Ocultar elementos que están atrás
+                const itemAngle = (currentAngle + (index * angleIncrement)) % 360;
+                if (itemAngle > 90 && itemAngle < 270) {
+                    item.style.opacity = '0.5';
+                    item.style.pointerEvents = 'none';
+                } else {
+                    item.style.opacity = '1';
+                    item.style.pointerEvents = 'auto';
+                }
+            });
+        }
+        
+        // Navegación por hover continuo
+        hoverLeft.addEventListener('mouseenter', () => {
+            clearInterval(hoverInterval);
+            hoverInterval = setInterval(() => {
+                rotateWheel(currentAngle - angleIncrement);
+            }, 300);
+        });
+        
+        hoverRight.addEventListener('mouseenter', () => {
+            clearInterval(hoverInterval);
+            hoverInterval = setInterval(() => {
+                rotateWheel(currentAngle + angleIncrement);
+            }, 300);
+        });
+        
+        // Detener la rotación al salir del área de hover
+        [hoverLeft, hoverRight].forEach(area => {
+            area.addEventListener('mouseleave', () => {
+                clearInterval(hoverInterval);
+            });
+        });
+        
+        // Click en items
+        items.forEach(item => {
+            item.addEventListener('click', function() {
+                const index = Array.from(items).indexOf(this);
+                const targetAngle = 360 - (index * angleIncrement);
+                rotateWheel(targetAngle);
+                console.log(`Seleccionado: ${this.dataset.tab}`);
+            });
+        });
+        
+        // Inicialización
+        rotateWheel(0);
+    </script>
+    
+
+
+
+
+
+    
 
 
 <script>
