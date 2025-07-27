@@ -287,53 +287,17 @@
         body > script:not([src]) {
   display: none;
 }
-    nav.flex {
-        display: flex;
-        justify-content: center; /* Centra los elementos */
-        flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas pequeñas */
-        gap: 8px; /* Espacio entre botones */
-        margin: 0 auto; /* Centrado adicional */
-        max-width: 100%; /* Asegura que no se desborde */
-        padding: 10px 0; /* Espaciado vertical */
-    }
+        nav.flex {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 10px; /* Espacio para scroll */
+  margin-right: 20px; /* Espacio al final */
+}
 
-    .main-tab-button {
-        padding: 12px 20px;
-        border-radius: 8px 8px 0 0;
-        font-weight: 600;
-        cursor: pointer;
-        background-color: #e5e7eb;
-        color: #4b5563;
-        transition: all 0.3s ease; /* Transición suave para todos los efectos */
-        position: relative;
-        transform-style: preserve-3d;
-        perspective: 1000px;
-        flex-shrink: 0; /* Evita que los botones se compriman */
-    }
-
-    .main-tab-button:hover {
-        transform: rotateY(15deg); /* Efecto de giro en 3D */
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        background-color: #d1d5db;
-    }
-
-    .main-tab-button.active {
-        background-color: #ffffff;
-        color: #4f46e5;
-        box-shadow: 0 -2px 0 0 #4f46e5 inset;
-        transform: none; /* Elimina el giro cuando está activo */
-    }
-
-    .main-tab-button.active:hover {
-        transform: none; /* Elimina el giro cuando está activo */
-    }
-
-    /* Efecto de giro más pronunciado para pantallas grandes */
-    @media (min-width: 768px) {
-        .main-tab-button:hover {
-            transform: rotateY(20deg);
-        }
-    }
+        .main-tab-button {
+  margin-right: 8px; /* Espacio entre pestañas */
+  flex-shrink: 0; /* Evita que se compriman */
+}
 
         #mainGraphSection {
   overflow: hidden;
@@ -352,64 +316,6 @@
   pointer-events: none;
       z-index: -1000 !important;
 }
-
-
-    /* Contenedor del carrusel */
-    .nav-wheel-container {
-        position: relative;
-        height: 100px;
-        margin: 30px 0;
-        perspective: 1000px;
-        display: flex;
-        justify-content: center;
-    }
-
-    /* La "rueda" de tabs */
-    .nav-wheel {
-        display: flex;
-        position: relative;
-        transform-style: preserve-3d;
-        transition: transform 0.5s ease;
-        height: 60px;
-        align-items: center;
-    }
-
-    /* Cada tab individual */
-    .wheel-tab {
-        position: absolute;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        background-color: #e5e7eb;
-        color: #4b5563;
-        transition: all 0.3s ease;
-        transform-origin: center center -150px;
-        transform-style: preserve-3d;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        min-width: 120px;
-        text-align: center;
-    }
-
-    /* Efecto hover sobre la rueda */
-    .nav-wheel:hover {
-        transform: rotateY(15deg);
-    }
-
-    /* Tab activo/centrado */
-    .wheel-tab.active {
-        background-color: #4f46e5;
-        color: white;
-        transform: translateZ(30px) scale(1.2);
-        z-index: 10;
-        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
-    }
-
-    /* Efecto hover en tabs individuales */
-    .wheel-tab:hover {
-        background-color: #d1d5db;
-        transform: translateZ(20px);
-    }
 
 
 
@@ -434,28 +340,26 @@
         <h1 class="text-4xl font-extrabold text-gray-900 mb-8 text-center">Javier Santiago Gastón de Iriarte Cabrera</h1>
 
         <!-- Nueva pestaña en navegación principal -->
-        <div class="nav-wheel-container">
-            <div class="nav-wheel" id="navWheel">
-                  <button class="wheel-tab" data-main-tab="home">Inicio</button>
-                    <button class="wheel-tab" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
-                  <button class="wheel-tab" data-main-tab="diary">Anotaciones</button>
-                    <button class="wheel-tab" data-main-tab="stories">Stories</button>
-                              
-                  <button class="wheel-tab" data-main-tab="radio">Radio</button>
-                    <button class="wheel-tab" data-main-tab="time-converter">Conversor de Tiempo</button>
-                     <button class="wheel-tab" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
-                    <button class="wheel-tab" data-main-tab="number-symbols">Traductor de Números</button>
-                    <button class="wheel-tab" data-main-tab="graph">La Función Mundo Azul</button>
-        
-        
-                  <button class="wheel-tab" data-main-tab="maps">Mapas de Recorridos</button>
-                  <button class="wheel-tab" data-main-tab="trips">Organizar Viajes</button>
-                  <button class="wheel-tab" data-main-tab="menus">Menús de Comida</button>
-                  <button class="wheel-tab" data-main-tab="projects">Proyectos</button>
+        <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
+          <button class="main-tab-button" data-main-tab="home">Inicio</button>
+          <button class="main-tab-button" data-main-tab="diary">Anotaciones</button>
+                        <button class="main-tab-button" data-main-tab="stories">Stories</button>
+                      <button class="main-tab-button" data-main-tab="profile">Perfil</button> <!-- Nueva pestaña -->
+          <button class="main-tab-button" data-main-tab="radio">Radio</button>
+            <button class="main-tab-button" data-main-tab="time-converter">Conversor de Tiempo</button>
+             <button class="main-tab-button" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
+            <button class="main-tab-button" data-main-tab="number-symbols">Traductor de Números</button>
+            <button class="main-tab-button" data-main-tab="graph">La Función Mundo Azul</button>
+
+
+          <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
+          <button class="main-tab-button" data-main-tab="trips">Organizar Viajes</button>
+          <button class="main-tab-button" data-main-tab="menus">Menús de Comida</button>
+          <button class="main-tab-button" data-main-tab="projects">Proyectos</button>
 
             
-            </div>
-        </div>
+
+        </nav>
 
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
@@ -2745,54 +2649,6 @@ function convertTime() {
 </script>
 
 
-
-<script>
-    // Posicionar los tabs en forma de rueda
-    function positionWheelTabs() {
-        const wheel = document.getElementById('navWheel');
-        const tabs = wheel.querySelectorAll('.wheel-tab');
-        const angle = 360 / tabs.length;
-        
-        tabs.forEach((tab, index) => {
-            const rotateY = angle * index;
-            if (!tab.classList.contains('active')) {
-                tab.style.transform = `rotateY(${rotateY}deg) translateZ(150px)`;
-            }
-            tab.style.transformOrigin = `center center -150px`;
-        });
-    }
-
-    // Rotar la rueda al hacer clic
-    function rotateWheel(selectedTab) {
-        const wheel = document.getElementById('navWheel');
-        const tabs = wheel.querySelectorAll('.wheel-tab');
-        const activeIndex = Array.from(tabs).findIndex(tab => tab === selectedTab);
-        const angle = 360 / tabs.length;
-        const rotation = -angle * activeIndex;
-        
-        wheel.style.transform = `rotateY(${rotation}deg)`;
-        
-        tabs.forEach(tab => tab.classList.remove('active'));
-        selectedTab.classList.add('active');
-        
-        // Recolocar tabs después de rotación
-        setTimeout(positionWheelTabs, 500);
-    }
-
-    // Inicializar
-    document.addEventListener('DOMContentLoaded', () => {
-        positionWheelTabs();
-        
-        document.querySelectorAll('.wheel-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                rotateWheel(this);
-                showMainTab(this.dataset.mainTab);
-            });
-        });
-    });
-</script>
-
-    
 
 
 <script>
