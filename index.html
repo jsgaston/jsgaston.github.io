@@ -368,22 +368,30 @@
             padding-bottom: 50px; /* Space for indicators */
         }
 
-.wheel-container {
-    position: relative;
-    /* Asegúrate de un tamaño base y max-width */
-    width: 600px; /* O un porcentaje, pero con max-width */
-    height: 600px;
-    max-width: 80vw;
-    max-height: 80vw;
-    margin: 0 auto;
-    perspective: 1500px; /* Esencial para el efecto 3D */
-    transform-style: preserve-3d; /* Esencial para que los hijos giren en 3D */
+.wheel-item {
+    position: absolute;
+    width: 200px; /* O porcentaje */
+    height: 200px;
+    max-width: 35%;
+    max-height: 35%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* Background para ver el contenedor si no se ve */
-    /* background-color: rgba(255, 0, 0, 0.1); */ /* Temporal para depuración */
-}
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1.5rem; /* Usar rem para un tamaño de fuente más controlable */
+    max-font-size: 24px; /* Ajustar según sea necesario */
+    overflow: hidden;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    backface-visibility: hidden; /* Opcional, para ocultar la parte trasera si se gira 360 */
 
 .wheel {
     position: absolute;
