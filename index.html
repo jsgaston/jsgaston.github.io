@@ -1847,8 +1847,11 @@ function updateElapsedTime() {
                 const personasCeldaStr = document.getElementById('personasCeldaInput').value;
         const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
 
-                    let personasCelda = parseFloat(personasCeldaStr);
-        let personasAfectadas = parseFloat(personasAfectadasStr);
+    const personasCeldaStrB = personasCeldaStr ? new personasCeldaStr : new personasCeldaStr = 16;
+        const personasAfectadasStrB = personasAfectadasStr ? new personasAfectadasStr : new personasAfectadasStr = 606;
+
+                    let personasCelda = parseFloat(personasCeldaStrB);
+        let personasAfectadas = parseFloat(personasAfectadasStrB);
 
   if (isNaN(startDate) || isNaN(endDate)) {
     document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
@@ -1868,7 +1871,7 @@ function updateElapsedTime() {
     const totalSeconds2 = Math.floor(msElapsed *  personasCeldaStr * personasAfectadasStr / 1000);
 
   // Cálculos base
-  const totalDays = Math.floor(totalSeconds2/ (1000 * 60 * 60 * 24 ));
+  const totalDays = Math.floor(totalSeconds2/ ( 60 * 60 * 24 ));
   const hours = Math.floor((totalSeconds2 / (1000 * 60 * 60)) % 24);
   const minutes = Math.floor((totalSeconds2 / (1000 * 60)) % 60);
 
