@@ -1906,16 +1906,14 @@ function updateElapsedTime() {
 
 // Cálculos base
 const totalDays = Math.floor(totalSeconds2 / (60 * 60 * 24)); // Total full days
-const remainingSecondsAfterDays = totalSeconds2 % (60 * 60 * 24);
+const remainingSecondsAfterDays = (totalSeconds2 / (60 * 60 * 24)) % (60 * 60 * 24);
+const remainingMinutesAfterDays = (totalSeconds2 / (60 * 60 * 24)) % ( 60 * 24);
+const remainingHourtsAfterDays = (totalSeconds2 / (60 * 60 * 24)) % (24);
 
 const hours = Math.floor(remainingSecondsAfterDays / (60 * 60)); // Remaining hours
-const remainingSecondsAfterHours = remainingSecondsAfterDays % (60 * 60);
 
 const minutes = Math.floor(remainingSecondsAfterHours / 60); // Remaining minutes
-const seconds = remainingSecondsAfterHours % 60; // Remaining seconds (if needed)
 
-
-    // --- Your calculation logic would go here ---
     // For demonstration, let's just display these values
     const resultDiv = document.getElementById('resultDisplay');
     resultDiv.innerHTML = `
@@ -1930,17 +1928,11 @@ const seconds = remainingSecondsAfterHours % 60; // Remaining seconds (if needed
     console.log("Personas en Celda:", personasCelda);
     console.log("Personas Afectadas:", personasAfectadas);
 
-    
-
   // Mostrar tiempo básico
   document.getElementById("elapsedDaysText").textContent = `${totalDays } días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedHours").textContent = (totalSeconds2 /( 60 * 60 )).toLocaleString();
   document.getElementById("elapsedMinutes").textContent = (totalSeconds2  / 60).toLocaleString();
-  document.getElementById("elapsedSeconds").textContent = totalSeconds2.toLocaleString();
 
-
-
-        
   // Conversiones especiales
   let extra = document.getElementById("extraTimeUnits");
   if (!extra) {
@@ -1951,7 +1943,7 @@ const seconds = remainingSecondsAfterHours % 60; // Remaining seconds (if needed
   }
 
   extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en tiradas:</strong> ${(totalSeconds2 / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
     <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
     <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
     <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
