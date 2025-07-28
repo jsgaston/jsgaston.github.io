@@ -2906,78 +2906,114 @@ function translateNumber() {
 
 
 
- <script>
-        function generateAndCalculate() {
-            const universalNumberInput = document.getElementById('universalNumber');
-            const personasCeldaInput = document.getElementById('personasCelda');
-            const personasAfectadasInput = document.getElementById('personasAfectadas');
-            const resultDiv = document.getElementById('resultDiv');
-            const multiplicationResultDiv = document.getElementById('multiplicationResultDiv');
-            const productValueSpan = document.getElementById('productValue');
+<script>
+    function calculateAndDisplay() {
+        const universalNumberStr = document.getElementById('universalNumberInput').value;
+        const personasCeldaStr = document.getElementById('personasCeldaInput').value;
+        const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
 
-            const universalNumberStr = universalNumberInput.value.trim();
-            const personasCeldaStr = personasCeldaInput.value.trim();
-            const personasAfectadasStr = personasAfectadasInput.value.trim();
+        const resultDiv = document.getElementById('resultDiv');
+        const multiplicationResultDiv = document.getElementById('multiplicationResultDiv');
+        const productValueSpan = document.getElementById('productValue'); // Assuming this is where the base product goes
 
-            resultDiv.innerHTML = ''; // Clear previous results
-            multiplicationResultDiv.style.display = 'none'; // Hide multiplication result by default
+        let universalNumber = parseFloat(universalNumberStr);
+        let personasCelda = parseFloat(personasCeldaStr);
+        let personasAfectadas = parseFloat(personasAfectadasStr);
 
-            // --- Universal Number Logic ---
-            if (universalNumberStr) {
-                const parts = universalNumberStr.match(/.{1,2}/g); // Split into 2-digit pairs
-                if (parts) {
-                    const formattedParts = parts.map(part => `[${part}]`);
-                    resultDiv.innerHTML += `<p>Símbolo Universal: ${formattedParts.join('')}</p>`;
-                } else {
-                    resultDiv.innerHTML += '<p style="color: #e53e3e;">Formato de Número Universal inválido.</p>';
-                }
-            } else {
-                resultDiv.innerHTML += '<p style="color: #6b7280;">No se ingresó un Número Universal.</p>';
-            }
+        // Clear previous results or set default message
+        resultDiv.innerHTML = '<p style="color: #6b7280;">Ingresa valores en los campos para generar símbolos o calcular.</p>';
+        multiplicationResultDiv.style.display = 'none';
 
-            // --- Multiplication Logic for Total Values ---
-            const numPersonasCelda = parseFloat(personasCeldaStr);
-            const numPersonasAfectadas = parseFloat(personasAfectadasStr);
+        if (!isNaN(universalNumber) && universalNumberStr.trim() !== '') {
+            // Your existing logic for base product and initial calculations
+            const baseProduct = universalNumber * 1; // Assuming '1' is the base for 'Total en' calculations
 
-            if (!isNaN(numPersonasCelda) && !isNaN(numPersonasAfectadas)) {
-                const baseProduct = numPersonasCelda * numPersonasAfectadas;
-                productValueSpan.textContent = baseProduct;
-                multiplicationResultDiv.style.display = 'block'; // Show the multiplication result
+            // Update the product display
+            productValueSpan.textContent = baseProduct.toFixed(2);
+            multiplicationResultDiv.style.display = 'block';
+            multiplicationResultDiv.style.backgroundColor = '#d1fae5'; // Light green for success
+            multiplicationResultDiv.style.color = '#065f46'; // Dark green text
 
-                // Define the additional values to multiply by
-                const additionalValues = {
-                    'Tiempo': 1.0, // Assuming 1 for a direct product, adjust if "Tiempo" has a specific value
-                    'Total en h (horas)': 0.5, // Example value, adjust as needed
-                    'Total en m (minutos)': 30, // Example value, adjust as needed (e.g., 0.5 hours * 60 minutes)
-                    'Total en s (segundos)': 1800, // Example value, adjust as needed (e.g., 30 minutes * 60 seconds)
-                    'Total en tiradas': 3, // Example value
-                    'Total en :-_ (Porciones pequeñas)': 0.25, // Example value
-                    'Total en :- (Porciones medianas)': 0.5, // Example value
-                    'Total en : (Porciones grandes)': 1, // Example value
-                    'Total en o (Soles)': 100 // Example value
-                };
+            // **Retrieve the calculated elapsed time values (assuming they are already numerical in your JS)**
+            // If they are only in the HTML, you'd need to parse them from the span.textContent.
+            // For this example, let's assume they are already available as numbers from previous calculations
+            // or you'll parse them. I'll use placeholders for now.
+            // You should replace these placeholder values with the actual calculated numbers from your time logic.
+            const totalHoras = parseFloat(document.getElementById('totalHorasSpan').textContent.replace('Total en h (horas): ', ''));
+            const totalMinutos = parseFloat(document.getElementById('totalMinutosSpan').textContent.replace('Total en m (minutos): ', ''));
+            const totalSegundos = parseFloat(document.getElementById('totalSegundosSpan').textContent.replace('Total en s (segundos): ', ''));
+            const totalTiradas = parseFloat(document.getElementById('totalTiradasSpan').textContent.replace('Total en tiradas: ', ''));
+            const totalPorcionesPequenas = parseFloat(document.getElementById('totalPorcionesPequenasSpan').textContent.replace('Total en :-_ (Porciones pequeñas): ', ''));
+            const totalPorcionesMedianas = parseFloat(document.getElementById('totalPorcionesMedianasSpan').textContent.replace('Total en :- (Porciones medianas): ', ''));
+            const totalPorcionesGrandes = parseFloat(document.getElementById('totalPorcionesGrandesSpan').textContent.replace('Total en : (Porciones grandes): ', ''));
+            const totalSoles = parseFloat(document.getElementById('totalSolesSpan').textContent.replace('Total en o (Soles): ', ''));
 
-                resultDiv.innerHTML += '<h2>Resultados de la Multiplicación por Valores Adicionales:</h2>';
+            // Example additional values (from your existing code, but now we'll use the elapsed time values)
+            // You had these in your example, but we need to use the dynamically calculated ones.
+            const additionalValues = {
+                'Total en h (horas)': totalHoras,
+                'Total en m (minutos)': totalMinutos,
+                'Total en s (segundos)': totalSegundos,
+                'Total en tiradas': totalTiradas,
+                'Total en :-_ (Porciones pequeñas)': totalPorcionesPequenas,
+                'Total en :- (Porciones medianas)': totalPorcionesMedianas,
+                'Total en : (Porciones grandes)': totalPorcionesGrandes,
+                'Total en o (Soles)': totalSoles
+            };
+
+            resultDiv.innerHTML = '<h2>Resultados de la Multiplicación por Valores Adicionales:</h2>';
+
+            if (!isNaN(personasCelda) && personasCeldaStr.trim() !== '' && !isNaN(personasAfectadas) && personasAfectadasStr.trim() !== '') {
+                // Perform multiplication with personasCelda and personasAfectadas
+                resultDiv.innerHTML += '<h3>Multiplicación por Personas en Celda y Personas Afectadas:</h3>';
                 for (const key in additionalValues) {
                     if (additionalValues.hasOwnProperty(key)) {
-                        const multipliedValue = baseProduct * additionalValues[key];
-                        resultDiv.innerHTML += `<p>${key}: ${multipliedValue.toFixed(2)}</p>`; // .toFixed(2) for 2 decimal places
+                        const multipliedValue = additionalValues[key] * personasCelda * personasAfectadas;
+                        resultDiv.innerHTML += `<p>${key} * Personas en Celda * Personas Afectadas: ${multipliedValue.toFixed(2)}</p>`;
                     }
                 }
-
-            } else if (personasCeldaStr || personasAfectadasStr) {
-                // Only show error if user attempted to enter values but they are invalid
-                productValueSpan.textContent = 'Entrada inválida. Por favor, ingresa números válidos.';
-                multiplicationResultDiv.style.display = 'block';
-                multiplicationResultDiv.style.backgroundColor = '#fee2e2'; // Light red for error
-                multiplicationResultDiv.style.color = '#991b1b'; // Dark red text for error
+            } else if (!isNaN(personasCelda) && personasCeldaStr.trim() !== '') {
+                // Perform multiplication only with personasCelda
+                resultDiv.innerHTML += '<h3>Multiplicación por Personas en Celda:</h3>';
+                for (const key in additionalValues) {
+                    if (additionalValues.hasOwnProperty(key)) {
+                        const multipliedValue = additionalValues[key] * personasCelda;
+                        resultDiv.innerHTML += `<p>${key} * Personas en Celda: ${multipliedValue.toFixed(2)}</p>`;
+                    }
+                }
+            } else if (!isNaN(personasAfectadas) && personasAfectadasStr.trim() !== '') {
+                // Perform multiplication only with personasAfectadas
+                resultDiv.innerHTML += '<h3>Multiplicación por Personas Afectadas:</h3>';
+                for (const key in additionalValues) {
+                    if (additionalValues.hasOwnProperty(key)) {
+                        const multipliedValue = additionalValues[key] * personasAfectadas;
+                        resultDiv.innerHTML += `<p>${key} * Personas Afectadas: ${multipliedValue.toFixed(2)}</p>`;
+                    }
+                }
+            } else {
+                // If only universal number is entered, just show the base product
+                resultDiv.innerHTML += '<h3>Valores Base (sin multiplicación adicional):</h3>';
+                for (const key in additionalValues) {
+                    if (additionalValues.hasOwnProperty(key)) {
+                        resultDiv.innerHTML += `<p>${key}: ${additionalValues[key].toFixed(2)}</p>`;
+                    }
+                }
             }
 
-            if (!universalNumberStr && !personasCeldaStr && !personasAfectadasStr) {
-                resultDiv.innerHTML = '<p style="color: #6b7280;">Ingresa valores en los campos para generar símbolos o calcular.</p>';
-                multiplicationResultDiv.style.display = 'none';
-            }
+        } else if (personasCeldaStr || personasAfectadasStr) {
+            // Only show error if user attempted to enter values but they are invalid
+            productValueSpan.textContent = 'Entrada inválida. Por favor, ingresa números válidos.';
+            multiplicationResultDiv.style.display = 'block';
+            multiplicationResultDiv.style.backgroundColor = '#fee2e2'; // Light red for error
+            multiplicationResultDiv.style.color = '#991b1b'; // Dark red text for error
         }
+
+        if (!universalNumberStr && !personasCeldaStr && !personasAfectadasStr) {
+            resultDiv.innerHTML = '<p style="color: #6b7280;">Ingresa valores en los campos para generar símbolos o calcular.</p>';
+            multiplicationResultDiv.style.display = 'none';
+        }
+    }
+</script>
     </script>
 
     
