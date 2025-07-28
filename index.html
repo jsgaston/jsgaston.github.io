@@ -1850,8 +1850,6 @@ function showMainTab(tabName) {
     </script>
 
 
-
-    
 <script>
 function updateElapsedTime() {
   const startInput = document.getElementById("startElapsed").value;
@@ -1863,39 +1861,39 @@ function updateElapsedTime() {
   const personasCeldaStr = document.getElementById('personasCeldaInput').value;
   const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
 
-  // If you want them as numbers, parse them. parseInt handles empty strings by returning NaN.
-  // Use || to provide a default if parseInt returns NaN.
   let personasCelda = parseInt(personasCeldaStr) || 16;
   let personasAfectadas = parseInt(personasAfectadasStr) || 606;
 
-  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) { // Use .getTime() to check for valid dates
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
     document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
     return;
   }
 
-  // No need for this block if you're already handling defaults with || during parseInt
-  // and want the calculation to proceed even if initial inputs were invalid.
-  // The 'let' declaration for personasCelda and personasAfectadas above allows reassignment if needed,
-  // but the || 16 / || 606 is generally sufficient.
-  // if (isNaN(personasCelda) || isNaN(personasAfectadas)) {
-  //   personasCelda = 1;
-  //   personasAfectadas = 1;
-  //   // No 'return;' here, allow the rest of the function to execute
-  // }
-
   const msElapsed = endDate - startDate;
-  // const totalSeconds = Math.floor(msElapsed / 1000); // This variable is not used after this line, could be removed or adjusted.
-  const totalSeconds2 = Math.floor(msElapsed * personasCelda * personasAfectadas / 1000); // This is the main total seconds for calculations
+  const totalSeconds2 = Math.floor(msElapsed * personasCelda * personasAfectadas / 1000); // Esto sigue siendo el total de segundos calculados con tus factores.
 
-  // Cálculos base
-  const totalDays = Math.floor(totalSeconds2 / (60 * 60 * 24)); // Total full days
-  const secondsAfterDays = totalSeconds2 % (60 * 60 * 24); // Remaining seconds after removing full days
+  // Cálculos base para días, horas, minutos a partir de totalSeconds2
+  const totalDays = Math.floor(totalSeconds2 / (60 * 60 * 24));
+  const secondsAfterDays = totalSeconds2 % (60 * 60 * 24);
 
-  const hours = Math.floor(secondsAfterDays / (60 * 60)); // Remaining hours
-  const minutes = Math.floor((secondsAfterDays % (60 * 60)) / 60); // Remaining minutes
+  const hours = Math.floor(secondsAfterDays / (60 * 60));
+  const minutes = Math.floor((secondsAfterDays % (60 * 60)) / 60);
 
-  const cambio_de_cuchuflus_a_seg = 200000 / (3600 * 24); // Corrected division for "per day" conversion
-  const cambio_de_seg_a_cuchuflus = (3600 * 24) / 200000; // Corrected for "per second" conversion
+  // **NUEVAS CONSTANTES DE CONVERSIÓN BASADAS EN TU ACLARACIÓN**
+  const SECONDS_IN_STANDARD_DAY = 24 * 60 * 60; // 86400 segundos
+  const CUCHUFLUS_PEQUENOS_PER_STANDARD_DAY = 200000;
+
+  // Factor para convertir segundos estándar (totalSeconds2) a :-_
+  const conversion_factor_seconds_to_cuchuflus_pequenos = CUCHUFLUS_PEQUENOS_PER_STANDARD_DAY / SECONDS_IN_STANDARD_DAY;
+
+  // Factores internos entre tus unidades (de la imagen):
+  const CUCHUFLUS_MEDIANOS_PER_CUCHUFLUS_PEQUENO = 1 / 100; // 1 :- = 100 :-_  => 1 :-_ = 1/100 :-
+  const CUCHUFLUS_GRANDES_PER_CUCHUFLUS_MEDIANO = 1 / 100; // 1 : = 100 :- => 1 :- = 1/100 :
+  const SOLES_PER_CUCHUFLUS_GRANDE = 1 / 20; // 1 o = 20 : => 1 : = 1/20 o
+
+  // Factor para "tiradas" (1 tirada = 1.7 segundos)
+  const TIRADAS_PER_SECOND = 1 / 1.7;
+
 
   // For demonstration, let's just display these values
   const resultDiv = document.getElementById('resultDisplay');
@@ -1927,16 +1925,23 @@ function updateElapsedTime() {
     document.getElementById("mainTimeElapsedSection").appendChild(extra);
   }
 
+  // Cálculos usando las nuevas constantes
+  const totalTiradas = totalSeconds2 * TIRADAS_PER_SECOND;
+  const totalCuchuflusPequenos = totalSeconds2 * conversion_factor_seconds_to_cuchuflus_pequenos;
+  const totalCuchuflusMedianos = totalCuchuflusPequenos * CUCHUFLUS_MEDIANOS_PER_CUCHUFLUS_PEQUENO;
+  const totalCuchuflusGrandes = totalCuchuflusMedianos * CUCHUFLUS_GRANDES_PER_CUCHUFLUS_MEDIANO;
+  const totalSoles = totalCuchuflusGrandes * SOLES_PER_CUCHUFLUS_GRANDE;
+
+
   extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds2 * 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus * 100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus * 100 * 100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus * 100 * 100 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en tiradas:</strong> ${totalTiradas.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${totalCuchuflusPequenos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${totalCuchuflusMedianos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${totalCuchuflusGrandes.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${totalSoles.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 }
 </script>
-
 
 
 
