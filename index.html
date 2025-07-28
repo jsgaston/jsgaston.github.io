@@ -14,35 +14,91 @@
 
     <style>
         /* Fuente Inter para un aspecto moderno y limpio */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Un gris claro para el fondo */
+          body {
+            font-family: 'Inter', sans-serif; /* Assuming Inter is available or fallback to sans-serif */
+            background-color: #f3f4f6; /* Light gray background */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            background-image: url('mi%20bandera.jpg');
+            background-image: url('mi%20bandera.jpg'); /* Your background image */
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            margin: 0;
         }
         .container {
-            background-color: rgba(255, 255, 255, 0.9); /* Blanco con un poco de transparencia */
-            padding: 30px;
-            border-radius: 12px; /* Bordes más redondeados */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
-            width: 70%;
-            max-width: 65%;
+            background-color: #ffffff; /* White card background */
+            padding: 2.5rem; /* Increased padding */
+            border-radius: 0.75rem; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Stronger shadow */
             text-align: center;
-            backdrop-filter: blur(5px); /* Efecto de desenfoque */
-            -webkit-backdrop-filter: blur(5px); /* Compatibilidad con Safari */
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid #e5e7eb; /* Light border */
         }
         h1 {
-            color: #1a202c; /* Un gris oscuro para el título */
-            margin-bottom: 25px;
-            font-size: 2.2em; /* Título más grande */
-            font-weight: 700; /* Negrita */
+            color: #1a202c; /* Darker heading color */
+            margin-bottom: 1.5rem;
+            font-size: 2rem; /* Larger heading */
+            font-weight: 700; /* Bold */
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left; /* Align labels and inputs to the left */
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568; /* Medium gray for labels */
+            font-weight: 600; /* Semi-bold label */
+        }
+        input[type="text"],
+        input[type="datetime-local"],
+        input[type="number"] { /* Added number type for numerical inputs */
+            width: calc(100% - 20px); /* Adjust for padding */
+            padding: 0.75rem 10px; /* More padding */
+            border: 1px solid #cbd5e0; /* Light border for inputs */
+            border-radius: 0.375rem; /* Slightly rounded corners */
+            font-size: 1rem;
+            color: #2d3748; /* Dark text in input */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        input[type="text"]:focus,
+        input[type="datetime-local"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #6366f1; /* Indigo border on focus */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* Light indigo shadow on focus */
+        }
+        button {
+            background-color: #6366f1; /* Indigo button */
+            color: white;
+            padding: 0.85rem 1.75rem; /* Larger button padding */
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 1.1rem; /* Larger font for button */
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            margin-top: 1.5rem;
+        }
+        button:hover {
+            background-color: #4f46e5; /* Darker indigo on hover */
+            transform: translateY(-1px); /* Slight lift effect */
+        }
+        #resultDisplay {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #e0f2f7; /* Light blue background for results */
+            border: 1px solid #bae6fd; /* Light blue border */
+            border-radius: 0.5rem;
+            color: #0c4a6e; /* Dark blue text */
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: left;
         }
         .input-group {
                         font-weight: 600;
@@ -56,18 +112,7 @@
             color: #4a5568; /* Gris medio para las etiquetas */
             font-weight: 600;
         }
-        input[type="text"] {
-            width: 100% ;
-            padding: 12px ;
-            border: 1px solid #cbd5e0; /* Borde gris claro */
-            border-us: 8px;
-            font-size: 1.1em;
-            color: #1f2937;
-            background-color: #f9fafb;
-            box-sizing: border-box; /* Asegura que el padding no aumente el ancho */
 
-      
-        }
         button {
             background-color: #4CAF50; /* Un verde vibrante */
             color: white;
