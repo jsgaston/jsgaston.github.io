@@ -1906,8 +1906,8 @@ function updateElapsedTime() {
 
   // Cálculos base
   const totalDays = Math.floor(totalSeconds2/ ( 60 * 60 * 24 ));
-  const hours = Math.floor((totalSeconds2  * 60 * 60) % 24);
-  const minutes = Math.floor((totalSeconds2 * 60 ) % 60);
+  const hours = ((totalSeconds2  * 60 * 60) % 24);
+  const minutes = ((totalSeconds2 * 60 ) % 60);
 
 
     // --- Your calculation logic would go here ---
