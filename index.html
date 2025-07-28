@@ -1886,10 +1886,10 @@ function updateElapsedTime() {
 
   extra.innerHTML = `
     <div><strong>Total en tiradas:</strong> ${(totalSeconds * 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds * 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds * 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds * 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds * 4320 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 * 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 * 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 * 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 * 4320 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 }
 
@@ -2950,6 +2950,8 @@ function translateNumber() {
   const msElapsed = endDate - startDate;
   const totalSeconds = Math.floor(msElapsed / 1000);
 
+        const totalSeconds2 = Math.floor(msElapsed *  personasCelda *  personasAfectadas / 1000);
+
   // Cálculos base
   const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24 ));
   const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
@@ -2957,9 +2959,9 @@ function translateNumber() {
 
   // Mostrar tiempo básico
   document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = Math.floor(msElapsed / (1000 * 60 * 60)).toLocaleString();
-  document.getElementById("elapsedMinutes").textContent = Math.floor(msElapsed / (1000 * 60)).toLocaleString();
-  document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
+  document.getElementById("elapsedHours").textContent = Math.floor(totalSeconds2  / (1000 * 60 * 60)).toLocaleString();
+  document.getElementById("elapsedMinutes").textContent = Math.floor(totalSeconds2  / (1000 * 60)).toLocaleString();
+  document.getElementById("elapsedSeconds").textContent = totalSeconds2.toLocaleString();
 
 
 
@@ -2975,10 +2977,10 @@ function translateNumber() {
 
   extra.innerHTML = `
     <div><strong>Total en tiradas:</strong> ${(totalSeconds * 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds * 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds * 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds * 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds * 4320 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 * 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 * 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 * 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 * 4320 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 
 
