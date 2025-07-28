@@ -313,7 +313,7 @@
   overflow: hidden;
 }
 
-#maintontoSection iframe {
+#maintontoSection iframe2 {
   display: block;
   position: relative;
   z-index: 1;
@@ -327,7 +327,15 @@
       z-index: -1000 !important;
 }
 
-
+}
+/* Oculta cualquier iframe dentro de secciones ocultas */
+.main-tab-content.hidden iframe2 {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none;
+      z-index: -1000 !important;
+}
 
 
 
@@ -967,7 +975,7 @@
         const closeModal = document.querySelector('.close-modal');
 
         const graphSection = document.getElementById('mainGraphSection');
-        const graphSection = document.getElementById('maintontoSection');
+        const tontoSection = document.getElementById('maintontoSection');
 
 
 
