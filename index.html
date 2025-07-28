@@ -1880,7 +1880,7 @@ function updateElapsedTime() {
              if (isNaN(personasCelda) || isNaN(personasAfectadas )) {
     personasCelda = 1;
           personasAfectadas = 1;
-    return;
+    
   }
 
   const msElapsed = endDate - startDate;
@@ -1898,8 +1898,9 @@ const cambio_de_cuchuflus_a_seg =   200000 / 3600*24   ;
 const cambio_de_seg_a_cuchuflus =   3600*24 / 200000    ;
 
 const hours = Math.floor(remainingSecondsAfterDays / (60 * 60)); // Remaining hours
+const remainingMinutesAfterHours = (totalDays*24*60*60 - hours*60*60 ) % ( 60 );
 
-const minutes = Math.floor(remainingSecondsAfterHours / 60); // Remaining minutes
+const minutes = Math.floor(remainingMinutesAfterHours / 60); // Remaining minutes
 
     // For demonstration, let's just display these values
     const resultDiv = document.getElementById('resultDisplay');
