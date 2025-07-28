@@ -28,15 +28,108 @@
             background-attachment: fixed;
         }
         .container {
-            max-width: 900px; /* Ancho un poco mayor para las nuevas secciones */
+            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+            padding: 40px;
+            border-radius: 12px; /* Bordes más redondeados */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+            text-align: center;
+            max-width: 500px;
             width: 100%;
-            background-color: #ffffff;
-            padding: 32px;
-            border-us: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-            background-color: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px); /* Efecto de desenfoque en el fondo */
         }
+
+                }
+        h1 {
+            color: #1a202c; /* Un gris oscuro para el título */
+            margin-bottom: 20px;
+            font-size: 2.25rem; /* Título más grande */
+            font-weight: 700; /* Negrita */
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568; /* Color de etiqueta */
+            font-weight: 600;
+        }
+        input[type="text"] {
+            width: calc(100% - 24px); /* Ancho completo con padding */
+            padding: 12px;
+            border: 2px solid #cbd5e0; /* Borde más definido */
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #2d3748;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4299e1; /* Color de foco */
+        }
+        button {
+            background-color: #4299e1; /* Azul vibrante */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3); /* Sombra para el botón */
+        }
+        button:hover {
+            background-color: #3182ce; /* Azul más oscuro al pasar el ratón */
+            transform: translateY(-2px); /* Pequeño levantamiento */
+        }
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e2e8f0; /* Fondo para el resultado */
+            border-radius: 8px;
+            min-height: 80px; /* Altura mínima */
+            display: flex;
+            flex-wrap: wrap; /* Permite que los símbolos se envuelvan */
+            justify-content: center; /* Centra los símbolos */
+            align-items: center;
+            gap: 10px; /* Espacio entre símbolos */
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra interna */
+        }
+        #multiplicationResult {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d1fae5; /* Light green for multiplication result */
+            border-radius: 8px;
+            color: #065f46;
+            font-weight: bold;
+            display: none; /* Initially hidden */
+        }
+        .symbol-container {
+            display: inline-block; /* Asegura que cada símbolo sea un bloque en línea */
+            margin: 0 2px;
+            vertical-align: middle;
+        }
+        img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            display: inline-block;
+        }
+        .fallback-symbol {
+            display: inline-flex;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            background-color: #e5e7eb;
+            color: #374151;
+            font-weight: bold;
+            border-radius: 0.25rem;
+        }
+
+
+        
         .form-label {
             font-weight: 600;
             margin-bottom: 8px;
@@ -642,7 +735,9 @@
             <option disabled selected>-- Elegir canción --</option>
         </select>
     </div>
-
+           
+<h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
+           
     <div id="dropZone" class="drop-zone border-2 border-dashed border-purple-400 bg-purple-50 hover:bg-purple-100 p-8 rounded-xl text-purple-700 transition-all cursor-pointer mb-8">
         Arrastra tu canción aquí o haz clic para elegir
         <input type="file" id="uploader" hidden accept="audio/*">
@@ -854,13 +949,7 @@
 
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
 
-  <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
-    <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
-    <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span> h </div>
-    <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
-    <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
-  </div>
-
+    
 
                 <div class="input-group">
             <label for="personasCeldaInput">Número de personas en la celda:</label>
@@ -883,6 +972,17 @@
             El producto de los números es: <span id="productValue"></span>
         </div>
 
+
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
+
+
+
+  <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
+    <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
+    <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span> h </div>
+    <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
+    <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
+  </div>
 
 
     
