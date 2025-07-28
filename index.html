@@ -1910,6 +1910,10 @@ const remainingSecondsAfterDays = (totalSeconds2 / (60 * 60 * 24)) % (60 * 60 * 
 const remainingMinutesAfterDays = (totalSeconds2 / (60 * 60 * 24)) % ( 60 * 24);
 const remainingHourtsAfterDays = (totalSeconds2 / (60 * 60 * 24)) % (24);
 
+const cambio_de_cuchuflus_a_seg =   200000 / 3600*24   ;
+    
+const cambio_de_seg_a_cuchuflus =   3600*24 / 200000    ;
+
 const hours = Math.floor(remainingSecondsAfterDays / (60 * 60)); // Remaining hours
 
 const minutes = Math.floor(remainingSecondsAfterHours / 60); // Remaining minutes
@@ -1943,11 +1947,11 @@ const minutes = Math.floor(remainingSecondsAfterHours / 60); // Remaining minute
   }
 
   extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds2 / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 / (4320 * 20)).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en tiradas:</strong> ${(totalSeconds2 * 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus *100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus *100 *100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus *100 *100 *20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 }
 
