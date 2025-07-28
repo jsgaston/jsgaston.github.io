@@ -308,6 +308,16 @@
   position: relative;
   z-index: 1;
 }
+
+                #maintontoSection {
+  overflow: hidden;
+}
+
+#maintontoSection iframe {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
 /* Oculta cualquier iframe dentro de secciones ocultas */
 .main-tab-content.hidden iframe {
   display: none !important;
@@ -350,6 +360,7 @@
              <button class="main-tab-button" data-main-tab="time-elapsed">Tiempo Transcurrido</button>
             <button class="main-tab-button" data-main-tab="number-symbols">Traductor de Números</button>
             <button class="main-tab-button" data-main-tab="graph">La Función Mundo Azul</button>
+            <button class="main-tab-button" data-main-tab="armario">Los Tontos</button>
 
 
           <button class="main-tab-button" data-main-tab="maps">Mapas de Recorridos</button>
@@ -881,7 +892,11 @@
     <iframe src="funcion.html" style="width:100%; height:600px; border:none; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" allowfullscreen></iframe>
 </div>
 
-
+ <!-- Añadir esta nueva sección al final, antes del cierre del div container -->
+<div id="maintontoSection" class="main-tab-content hidden">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Premio Tontos</h2>
+    <iframe src="Roomba_93.html" style="width:100%; height:600px; border:none; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" allowfullscreen></iframe>
+</div>
 
 
 
@@ -952,6 +967,7 @@
         const closeModal = document.querySelector('.close-modal');
 
         const graphSection = document.getElementById('mainGraphSection');
+        const graphSection = document.getElementById('maintontoSection');
 
 
 
@@ -1305,6 +1321,7 @@ function showMainTab(tabName) {
     document.getElementById('mainTimeElapsedSection').classList.add('hidden');
     document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
     document.getElementById('mainGraphSection').classList.add('hidden'); // Asegurarse de ocultar
+    document.getElementById('maintontoSection').classList.add('hidden'); // Asegurarse de ocultar
     
     // Eliminar el div extra si existe
     const extraTimeUnits = document.getElementById('extraTimeUnits');
@@ -1359,6 +1376,10 @@ function showMainTab(tabName) {
     } else if (tabName === 'graph') {
         document.getElementById('mainGraphSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="graph"]').classList.add('active');
+
+        } else if (tabName === 'tonto') {
+        document.getElementById('maintontoSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="tonto"]').classList.add('active');
     
     
     } else if (tabName === 'time-elapsed') {
