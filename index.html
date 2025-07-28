@@ -2918,6 +2918,61 @@ function translateNumber() {
         let personasCelda = parseFloat(personasCeldaStr);
         let personasAfectadas = parseFloat(personasAfectadasStr);
 
+
+
+        
+ const startInput = document.getElementById("startElapsed").value;
+  const endInput = document.getElementById("endElapsed").value;
+
+  const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
+  const endDate = endInput ? new Date(endInput) : new Date();
+
+  if (isNaN(startDate) || isNaN(endDate)) {
+    document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
+    return;
+  }
+
+  const msElapsed = endDate - startDate;
+  const totalSeconds = Math.floor(msElapsed / 1000);
+
+  // Cálculos base
+  const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24 ));
+  const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((msElapsed / (1000 * 60)) % 60);
+
+  // Mostrar tiempo básico
+  document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
+  document.getElementById("elapsedHours").textContent = Math.floor(msElapsed / (1000 * 60 * 60)).toLocaleString();
+  document.getElementById("elapsedMinutes").textContent = Math.floor(msElapsed / (1000 * 60)).toLocaleString();
+  document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
+
+
+
+        
+  // Conversiones especiales
+  let extra = document.getElementById("extraTimeUnits");
+  if (!extra) {
+    extra = document.createElement("div");
+    extra.id = "extraTimeUnits";
+    extra.className = "mt-6 p-4 bg-white rounded-lg shadow space-y-2 text-center text-gray-700";
+    document.getElementById("mainTimeElapsedSection").appendChild(extra);
+  }
+
+  extra.innerHTML = `
+    <div><strong>Total en tiradas:</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 86400).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+  `;
+
+
+
+
+
+
+        
+
         // Function to extract number from text content, e.g., "Total en h (horas): 123.45" -> 123.45
         function extractNumber(text) {
             const match = text.match(/[\d.]+/); // Matches one or more digits or a dot
@@ -2978,6 +3033,11 @@ function translateNumber() {
             resultDiv.style.color = '#6b7280'; // Reset text color
         }
     }
+
+
+
+
+    
 </script>
 
     
