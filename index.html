@@ -1844,14 +1844,17 @@ function updateElapsedTime() {
   const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
   const endDate = endInput ? new Date(endInput) : new Date();
 
-                const personasCeldaStr = document.getElementById('personasCeldaInput').value;
-        const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
+  const personasCeldaStr = document.getElementById('personasCeldaInput').value;
+  const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
 
-    const personasCeldaStrB = personasCeldaStr ? new personasCeldaStr : new personasCeldaStr = 16;
-        const personasAfectadasStrB = personasAfectadasStr ? new personasAfectadasStr : new personasAfectadasStr = 606;
+  // Corrected way to set default values:
+  const personasCeldaStrB = personasCeldaStr ? personasCeldaStr : "16"; // Sets "16" if personasCeldaStr is empty
+  const personasAfectadasStrB = personasAfectadasStr ? personasAfectadasStr : "606"; // Sets "606" if personasAfectadasStr is empty
 
-                    let personasCelda = parseFloat(personasCeldaStrB);
-        let personasAfectadas = parseFloat(personasAfectadasStrB);
+  // If you want them as numbers, you can parse them:
+  const personasCelda = parseInt(personasCeldaStr) || 16; // Parses to int, defaults to 16 if empty or invalid
+  const personasAfectadas = parseInt(personasAfectadasStr) || 606; // Parses to int, defaults to 606 if empty or invalid
+
 
   if (isNaN(startDate) || isNaN(endDate)) {
     document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
@@ -1868,7 +1871,7 @@ function updateElapsedTime() {
 
   const msElapsed = endDate - startDate;
   const totalSeconds = Math.floor(msElapsed / 1000);
-    const totalSeconds2 = Math.floor(msElapsed *  personasCeldaStr * personasAfectadasStr / 1000);
+    const totalSeconds2 = Math.floor(msElapsed *  personasCelda * personasAfectadas / 1000);
 
   // Cálculos base
   const totalDays = Math.floor(totalSeconds2/ ( 60 * 60 * 24 ));
