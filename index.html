@@ -45,8 +45,10 @@
             font-weight: 700; /* Negrita */
         }
         .input-group {
-            margin-bottom: 20px;
-            text-align: left;
+                        font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: #374151;
         }
         label {
             display: block;
@@ -55,13 +57,16 @@
             font-weight: 600;
         }
         input[type="text"] {
-            width: calc(100% - 20px);
-            padding: 12px 10px;
+            width: 100% ;
+            padding: 12px ;
             border: 1px solid #cbd5e0; /* Borde gris claro */
-            border-radius: 8px;
+            border-us: 8px;
             font-size: 1.1em;
-            color: #2d3748;
+            color: #1f2937;
+            background-color: #f9fafb;
             box-sizing: border-box; /* Asegura que el padding no aumente el ancho */
+
+      
         }
         button {
             background-color: #4CAF50; /* Un verde vibrante */
@@ -963,12 +968,12 @@
 
 <div class="input-group">
             <label for="personasCelda">Número de personas en la celda:</label>
-           <input type="number" id="personasCeldaInput" placeholder="Número de personas en la celda" oninput="calculateAndDisplay()">
+           <input type="number" id="personasCeldaInput" value="16" oninput="calculateAndDisplay()">
 
         </div>
         <div class="input-group">
             <label for="personasAfectadas">Número de personas afectadas:</label>
-            <input type="number" id="personasAfectadasInput" placeholder="Número de personas afectadas" oninput="calculateAndDisplay()">
+            <input type="number" id="personasAfectadasInput" value="606" oninput="calculateAndDisplay()">
         </div>
       
 
