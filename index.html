@@ -846,6 +846,8 @@
     </div>
   </div>
 
+
+
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
 
   <button onclick="updateElapsedTime()" class="btn w-full mb-6">Calcular</button>
@@ -858,6 +860,32 @@
     <div><strong>Total en m (minutos):</strong> <span id="elapsedMinutes">...</span> m </div>
     <div><strong>Total en s (segundos):</strong> <span id="elapsedSeconds">...</span> s </div>
   </div>
+
+
+                <div class="input-group">
+            <label for="personasCeldaInput">Número de personas en la celda:</label>
+            <input type="text" id="personasCeldaInput" placeholder="Introduce el número de personas en la celda">
+        </div>
+
+        <div class="input-group">
+            <label for="personasAfectadasInput">Número de personas afectadas:</label>
+            <input type="text" id="personasAfectadasInput" placeholder="Introduce el número de personas afectadas">
+        </div>
+
+
+            <button onclick="generateSymbols()">Generar Símbolos y Calcular</button>
+
+        <div id="result">
+            <p style="color: #6b7280;">Los símbolos aparecerán aquí.</p>
+        </div>
+
+        <div id="multiplicationResult">
+            El producto de los números es: <span id="productValue"></span>
+        </div>
+
+
+
+    
 </div>
 
 
@@ -2765,6 +2793,78 @@ function translateNumber() {
     }
 }
 </script>
+
+
+
+    <script>
+        function generateSymbols() {
+            const universalNumberInput = document.getElementById('universalNumberInput');
+            const personasCeldaInput = document.getElementById('personasCeldaInput');
+            const personasAfectadasInput = document.getElementById('personasAfectadasInput');
+            const resultDiv = document.getElementById('result');
+            const multiplicationResultDiv = document.getElementById('multiplicationResult');
+            const productValueSpan = document.getElementById('productValue');
+
+            const universalNumberStr = universalNumberInput.value.trim();
+            const personasCeldaStr = personasCeldaInput.value.trim();
+            const personasAfectadasStr = personasAfectadasInput.value.trim();
+
+            resultDiv.innerHTML = ''; // Clear previous results
+            multiplicationResultDiv.style.display = 'none'; // Hide multiplication result by default
+
+            // --- Universal Number Symbol Generation ---
+            if (universalNumberStr) {
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.justifyContent = 'center';
+                container.style.flexWrap = 'wrap';
+                container.style.gap = '10px'; // Space between symbols for universal number
+
+                for (const digit of universalNumberStr) {
+                    const symbolContainer = document.createElement('div');
+                    symbolContainer.className = 'symbol-container';
+
+                    const img = document.createElement('img');
+                    img.src = `UniversalSistemNumbers/${digit}.jpg`;
+                    img.alt = `Símbolo del número ${digit}`;
+
+                    img.onerror = function() {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'fallback-symbol';
+                        fallback.textContent = digit;
+                        symbolContainer.replaceChild(fallback, img);
+                    };
+
+                    symbolContainer.appendChild(img);
+                    container.appendChild(symbolContainer);
+                }
+                resultDiv.appendChild(container);
+            } else {
+                resultDiv.innerHTML += '<p style="color: #6b7280;">No se ingresó un Número Universal.</p>';
+            }
+
+            // --- Multiplication Logic ---
+            const numPersonasCelda = parseFloat(personasCeldaStr);
+            const numPersonasAfectadas = parseFloat(personasAfectadasStr);
+
+            if (!isNaN(numPersonasCelda) && !isNaN(numPersonasAfectadas)) {
+                const product = numPersonasCelda * numPersonasAfectadas;
+                productValueSpan.textContent = product;
+                multiplicationResultDiv.style.display = 'block'; // Show the multiplication result
+            } else if (personasCeldaStr || personasAfectadasStr) {
+                // Only show error if user attempted to enter values but they are invalid
+                productValueSpan.textContent = 'Entrada inválida. Por favor, ingresa números válidos.';
+                multiplicationResultDiv.style.display = 'block';
+                multiplicationResultDiv.style.backgroundColor = '#fee2e2'; // Light red for error
+                multiplicationResultDiv.style.color = '#991b1b'; // Dark red text for error
+            }
+
+            if (!universalNumberStr && !personasCeldaStr && !personasAfectadasStr) {
+                resultDiv.innerHTML = '<p style="color: #6b7280;">Ingresa valores en los campos para generar símbolos o calcular.</p>';
+                multiplicationResultDiv.style.display = 'none';
+            }
+        }
+    </script>
 
     
 
