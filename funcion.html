@@ -251,13 +251,13 @@
         function updateGraph(variable) {
             const roundedVariable = Math.round(variable * 10) / 10;
             document.getElementById('variableValue').textContent = roundedVariable.toFixed(1);
-            document.getElementById('equationDisplay').textContent = `x = y² - ${roundedVariable.toFixed(1)}/2`;
+            document.getElementById('equationDisplay').textContent = `x = y² - ${roundedVariable.toFixed(1)}/2 con y > 0`;
 
             const data = generateGraphData(variable);
 
             if (chart) {
                 chart.data.datasets[0].data = data;
-                chart.data.datasets[0].label = `x = y² - ${roundedVariable.toFixed(1)}/2`;
+                chart.data.datasets[0].label = `x = y² - ${roundedVariable.toFixed(1)}/2, y>0`;
                 chart.update('none'); // No animation for better performance
             } else {
                 createChart(data, roundedVariable);
