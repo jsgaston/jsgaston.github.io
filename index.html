@@ -28,21 +28,20 @@
             background-attachment: fixed;
         }
         .container {
-            background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
-            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.9); /* Blanco con un poco de transparencia */
+            padding: 30px;
             border-radius: 12px; /* Bordes más redondeados */
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
-            text-align: center;
-            max-width: 70%;
             width: 100%;
-            backdrop-filter: blur(5px); /* Efecto de desenfoque en el fondo */
+            max-width: 500px;
+            text-align: center;
+            backdrop-filter: blur(5px); /* Efecto de desenfoque */
+            -webkit-backdrop-filter: blur(5px); /* Compatibilidad con Safari */
         }
-
-                
         h1 {
             color: #1a202c; /* Un gris oscuro para el título */
-            margin-bottom: 20px;
-            font-size: 2.25rem; /* Título más grande */
+            margin-bottom: 25px;
+            font-size: 2.2em; /* Título más grande */
             font-weight: 700; /* Negrita */
         }
         .input-group {
@@ -52,36 +51,53 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #4a5568; /* Color de etiqueta */
+            color: #4a5568; /* Gris medio para las etiquetas */
             font-weight: 600;
         }
         input[type="text"] {
-            width: calc(100% - 24px); /* Ancho completo con padding */
-            padding: 12px;
-            border: 2px solid #cbd5e0; /* Borde más definido */
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            border: 1px solid #cbd5e0; /* Borde gris claro */
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.1em;
             color: #2d3748;
-            transition: border-color 0.3s ease;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #4299e1; /* Color de foco */
+            box-sizing: border-box; /* Asegura que el padding no aumente el ancho */
         }
         button {
-            background-color: #4299e1; /* Azul vibrante */
+            background-color: #4CAF50; /* Un verde vibrante */
             color: white;
             padding: 12px 25px;
             border: none;
             border-radius: 8px;
-            font-size: 1.1rem;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3); /* Sombra para el botón */
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
         }
         button:hover {
-            background-color: #3182ce; /* Azul más oscuro al pasar el ratón */
-            transform: translateY(-2px); /* Pequeño levantamiento */
+            background-color: #45a049; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+        #resultDiv, #multiplicationResultDiv {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #e2e8f0; /* Un gris azulado claro para los resultados */
+            color: #2d3748;
+            font-size: 1.1em;
+            text-align: center;
+            word-wrap: break-word; /* Para asegurar que el texto largo se ajuste */
+        }
+        #multiplicationResultDiv {
+            background-color: #d1fae5; /* Verde claro para el resultado de multiplicación */
+            color: #065f46;
+            font-weight: 600;
+            display: none; /* Hidden by default */
+        }
+        .error {
+            color: #e53e3e; /* Rojo para mensajes de error */
+            font-size: 0.9em;
+            margin-top: 5px;
         }
         #result {
             margin-top: 30px;
@@ -436,6 +452,7 @@
         
     </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
 
@@ -941,7 +958,23 @@
     </div>
   </div>
 
+<div class="input-group">
+            <label for="personasCelda">Número de personas en la celda:</label>
+            <input type="text" id="personasCelda" placeholder="Ej: 5">
+        </div>
+        <div class="input-group">
+            <label for="personasAfectadas">Número de personas afectadas:</label>
+            <input type="text" id="personasAfectadas" placeholder="Ej: 10">
+        </div>
+        <button onclick="generateAndCalculate()">Generar Símbolos y Calcular</button>
 
+        <div id="resultDiv">
+            <p style="color: #6b7280;">Los símbolos aparecerán aquí.</p>
+        </div>
+
+        <div id="multiplicationResultDiv">
+            Resultado de la Multiplicación: <span id="productValue"></span>
+        </div>
 
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center"></h2>
 
@@ -2896,13 +2929,13 @@ function translateNumber() {
 
 
 
-    <script>
-        function generateSymbols() {
-            const universalNumberInput = document.getElementById('universalNumberInput');
-            const personasCeldaInput = document.getElementById('personasCeldaInput');
-            const personasAfectadasInput = document.getElementById('personasAfectadasInput');
-            const resultDiv = document.getElementById('result');
-            const multiplicationResultDiv = document.getElementById('multiplicationResult');
+ <script>
+        function generateAndCalculate() {
+            const universalNumberInput = document.getElementById('universalNumber');
+            const personasCeldaInput = document.getElementById('personasCelda');
+            const personasAfectadasInput = document.getElementById('personasAfectadas');
+            const resultDiv = document.getElementById('resultDiv');
+            const multiplicationResultDiv = document.getElementById('multiplicationResultDiv');
             const productValueSpan = document.getElementById('productValue');
 
             const universalNumberStr = universalNumberInput.value.trim();
@@ -2912,45 +2945,49 @@ function translateNumber() {
             resultDiv.innerHTML = ''; // Clear previous results
             multiplicationResultDiv.style.display = 'none'; // Hide multiplication result by default
 
-            // --- Universal Number Symbol Generation ---
+            // --- Universal Number Logic ---
             if (universalNumberStr) {
-                const container = document.createElement('div');
-                container.style.display = 'flex';
-                container.style.justifyContent = 'center';
-                container.style.flexWrap = 'wrap';
-                container.style.gap = '10px'; // Space between symbols for universal number
-
-                for (const digit of universalNumberStr) {
-                    const symbolContainer = document.createElement('div');
-                    symbolContainer.className = 'symbol-container';
-
-                    const img = document.createElement('img');
-                    img.src = `UniversalSistemNumbers/${digit}.jpg`;
-                    img.alt = `Símbolo del número ${digit}`;
-
-                    img.onerror = function() {
-                        const fallback = document.createElement('div');
-                        fallback.className = 'fallback-symbol';
-                        fallback.textContent = digit;
-                        symbolContainer.replaceChild(fallback, img);
-                    };
-
-                    symbolContainer.appendChild(img);
-                    container.appendChild(symbolContainer);
+                const parts = universalNumberStr.match(/.{1,2}/g); // Split into 2-digit pairs
+                if (parts) {
+                    const formattedParts = parts.map(part => `[${part}]`);
+                    resultDiv.innerHTML += `<p>Símbolo Universal: ${formattedParts.join('')}</p>`;
+                } else {
+                    resultDiv.innerHTML += '<p style="color: #e53e3e;">Formato de Número Universal inválido.</p>';
                 }
-                resultDiv.appendChild(container);
             } else {
                 resultDiv.innerHTML += '<p style="color: #6b7280;">No se ingresó un Número Universal.</p>';
             }
 
-            // --- Multiplication Logic ---
+            // --- Multiplication Logic for Total Values ---
             const numPersonasCelda = parseFloat(personasCeldaStr);
             const numPersonasAfectadas = parseFloat(personasAfectadasStr);
 
             if (!isNaN(numPersonasCelda) && !isNaN(numPersonasAfectadas)) {
-                const product = numPersonasCelda * numPersonasAfectadas;
-                productValueSpan.textContent = product;
+                const baseProduct = numPersonasCelda * numPersonasAfectadas;
+                productValueSpan.textContent = baseProduct;
                 multiplicationResultDiv.style.display = 'block'; // Show the multiplication result
+
+                // Define the additional values to multiply by
+                const additionalValues = {
+                    'Tiempo': 1.0, // Assuming 1 for a direct product, adjust if "Tiempo" has a specific value
+                    'Total en h (horas)': 0.5, // Example value, adjust as needed
+                    'Total en m (minutos)': 30, // Example value, adjust as needed (e.g., 0.5 hours * 60 minutes)
+                    'Total en s (segundos)': 1800, // Example value, adjust as needed (e.g., 30 minutes * 60 seconds)
+                    'Total en tiradas': 3, // Example value
+                    'Total en :-_ (Porciones pequeñas)': 0.25, // Example value
+                    'Total en :- (Porciones medianas)': 0.5, // Example value
+                    'Total en : (Porciones grandes)': 1, // Example value
+                    'Total en o (Soles)': 100 // Example value
+                };
+
+                resultDiv.innerHTML += '<h2>Resultados de la Multiplicación por Valores Adicionales:</h2>';
+                for (const key in additionalValues) {
+                    if (additionalValues.hasOwnProperty(key)) {
+                        const multipliedValue = baseProduct * additionalValues[key];
+                        resultDiv.innerHTML += `<p>${key}: ${multipliedValue.toFixed(2)}</p>`; // .toFixed(2) for 2 decimal places
+                    }
+                }
+
             } else if (personasCeldaStr || personasAfectadasStr) {
                 // Only show error if user attempted to enter values but they are invalid
                 productValueSpan.textContent = 'Entrada inválida. Por favor, ingresa números válidos.';
