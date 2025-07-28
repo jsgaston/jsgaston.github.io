@@ -1850,6 +1850,8 @@ function showMainTab(tabName) {
     </script>
 
 
+
+    
 <script>
 function updateElapsedTime() {
   const startInput = document.getElementById("startElapsed").value;
@@ -1861,65 +1863,60 @@ function updateElapsedTime() {
   const personasCeldaStr = document.getElementById('personasCeldaInput').value;
   const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
 
-  // Corrected way to set default values:
-  const personasCeldaStrB = personasCeldaStr ? personasCeldaStr : "16"; // Sets "16" if personasCeldaStr is empty
-  const personasAfectadasStrB = personasAfectadasStr ? personasAfectadasStr : "606"; // Sets "606" if personasAfectadasStr is empty
+  // If you want them as numbers, parse them. parseInt handles empty strings by returning NaN.
+  // Use || to provide a default if parseInt returns NaN.
+  let personasCelda = parseInt(personasCeldaStr) || 16;
+  let personasAfectadas = parseInt(personasAfectadasStr) || 606;
 
-  // If you want them as numbers, you can parse them:
-  const personasCelda = parseInt(personasCeldaStr) || 16; // Parses to int, defaults to 16 if empty or invalid
-  const personasAfectadas = parseInt(personasAfectadasStr) || 606; // Parses to int, defaults to 606 if empty or invalid
-
-
-  if (isNaN(startDate) || isNaN(endDate)) {
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) { // Use .getTime() to check for valid dates
     document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
     return;
   }
 
-
-
-             if (isNaN(personasCelda) || isNaN(personasAfectadas )) {
-    personasCelda = 1;
-          personasAfectadas = 1;
-    
-  }
+  // No need for this block if you're already handling defaults with || during parseInt
+  // and want the calculation to proceed even if initial inputs were invalid.
+  // The 'let' declaration for personasCelda and personasAfectadas above allows reassignment if needed,
+  // but the || 16 / || 606 is generally sufficient.
+  // if (isNaN(personasCelda) || isNaN(personasAfectadas)) {
+  //   personasCelda = 1;
+  //   personasAfectadas = 1;
+  //   // No 'return;' here, allow the rest of the function to execute
+  // }
 
   const msElapsed = endDate - startDate;
-  const totalSeconds = Math.floor(msElapsed / 1000);
-    const totalSeconds2 = Math.floor(msElapsed *  personasCelda * personasAfectadas /1000);
+  // const totalSeconds = Math.floor(msElapsed / 1000); // This variable is not used after this line, could be removed or adjusted.
+  const totalSeconds2 = Math.floor(msElapsed * personasCelda * personasAfectadas / 1000); // This is the main total seconds for calculations
 
-// Cálculos base
-const totalDays = Math.floor(totalSeconds2 / (60 * 60 * 24)); // Total full days
-const remainingSecondsAfterDays = (totalSeconds2 / (60 * 60 * 24)) % (60 * 60 * 24);
-const remainingMinutesAfterDays = (totalSeconds2 / (60 * 60 * 24)) % ( 60 * 24);
-const remainingHourtsAfterDays = (totalSeconds2 / (60 * 60 * 24)) % (24);
+  // Cálculos base
+  const totalDays = Math.floor(totalSeconds2 / (60 * 60 * 24)); // Total full days
+  const secondsAfterDays = totalSeconds2 % (60 * 60 * 24); // Remaining seconds after removing full days
 
-const cambio_de_cuchuflus_a_seg =   200000 / 3600*24   ;
-    
-const cambio_de_seg_a_cuchuflus =   3600*24 / 200000    ;
+  const hours = Math.floor(secondsAfterDays / (60 * 60)); // Remaining hours
+  const minutes = Math.floor((secondsAfterDays % (60 * 60)) / 60); // Remaining minutes
 
-const hours = Math.floor(remainingSecondsAfterDays / (60 * 60)); // Remaining hours
-const remainingMinutesAfterHours = (totalDays*24*60*60 - hours*60*60 ) % ( 60 );
+  const cambio_de_cuchuflus_a_seg = 200000 / (3600 * 24); // Corrected division for "per day" conversion
+  const cambio_de_seg_a_cuchuflus = (3600 * 24) / 200000; // Corrected for "per second" conversion
 
-const minutes = Math.floor(remainingMinutesAfterHours / 60); // Remaining minutes
-
-    // For demonstration, let's just display these values
-    const resultDiv = document.getElementById('resultDisplay');
-    resultDiv.innerHTML = `
+  // For demonstration, let's just display these values
+  const resultDiv = document.getElementById('resultDisplay');
+  resultDiv.innerHTML = `
         <p>Fecha de Inicio: ${startDate.toLocaleString()}</p>
         <p>Fecha Fin: ${endDate.toLocaleString()}</p>
         <p>Personas en Celda (inicial): ${personasCelda}</p>
         <p>Personas Afectadas (inicial): ${personasAfectadas}</p>
         `;
 
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
-    console.log("Personas en Celda:", personasCelda);
-    console.log("Personas Afectadas:", personasAfectadas);
+  console.log("Start Date:", startDate);
+  console.log("End Date:", endDate);
+  console.log("Personas en Celda:", personasCelda);
+  console.log("Personas Afectadas:", personasAfectadas);
+  console.log("Total Seconds (totalSeconds2):", totalSeconds2);
+
 
   // Mostrar tiempo básico
-  document.getElementById("elapsedDaysText").textContent = `${totalDays } días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = (totalSeconds2 /( 60 * 60 )).toLocaleString();
-  document.getElementById("elapsedMinutes").textContent = (totalSeconds2  / 60).toLocaleString();
+  document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
+  document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
+  document.getElementById("elapsedMinutes").textContent = (totalSeconds2 / 60).toLocaleString(undefined, {maximumFractionDigits: 2});
 
   // Conversiones especiales
   let extra = document.getElementById("extraTimeUnits");
@@ -1933,12 +1930,11 @@ const minutes = Math.floor(remainingMinutesAfterHours / 60); // Remaining minute
   extra.innerHTML = `
     <div><strong>Total en tiradas:</strong> ${(totalSeconds2 * 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
     <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus *100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus *100 *100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus *100 *100 *20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus * 100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus * 100 * 100).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 * cambio_de_seg_a_cuchuflus * 100 * 100 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 }
-
 </script>
 
 
