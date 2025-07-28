@@ -963,11 +963,12 @@
 
 <div class="input-group">
             <label for="personasCelda">Número de personas en la celda:</label>
-            <input type="text" id="personasCelda" placeholder="Ej: 5">
+           <input type="number" id="personasCeldaInput" placeholder="Número de personas en la celda" oninput="calculateAndDisplay()">
+
         </div>
         <div class="input-group">
             <label for="personasAfectadas">Número de personas afectadas:</label>
-            <input type="text" id="personasAfectadas" placeholder="Ej: 10">
+            <input type="number" id="personasAfectadasInput" placeholder="Número de personas afectadas" oninput="calculateAndDisplay()">
         </div>
         <button onclick="generateAndCalculate()">Calcular</button>
 
