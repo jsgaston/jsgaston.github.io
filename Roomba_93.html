@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roomba Game</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      
+      background-color: transparent;
+
+
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #screensaver {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .roomba-container {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+    }
+
+    .roomba {
+      width: 100%;
+      height: 100%;
+      background-color: #111;
+      border-radius: 50%;
+      border: 5px solid #222;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .roomba-detail {
+      width: 50px;
+      height: 50px;
+      background-color: #333;
+      border-radius: 50%;
+      border: 2px solid #999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 14px;
+      font-family: sans-serif;
+      box-shadow: inset 0 0 5px #00ffcc;
+    }
+
+    .roomba-detail::after {
+      content: "Winner";
+    }
+
+    .item-on-roomba {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+  height: 120px;
+  object-fit: cover;
+      object-fit: contain;
+      pointer-events: none;
+      display: none;
+    }
+
+    .controls {
+      position: fixed;
+      top: 20pv;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .controls label, .controls select {
+      margin-right: 5px;
+    }
+
+    .controls select {
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background-color: #444;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <label for="itemSelect">Objeto en la Roomba:</label>
+     <button id="enableSound">Activar sonido</button>
+    <select id="itemSelect">
+      <option value="">Ninguno</option>
+      <option value="C:\Users\jsgas\Downloads\larry bird.jpg">Larry</option>
+      <option value="C:\Users\jsgas\Downloads\urkel.jpg">Urkel</option>
+      <option value="C:\Users\jsgas\Downloads\Copilot_20250724_135211.png">Taza de café</option>
+      <option value="C:\Users\jsgas\Downloads\nazis hablando por teléfono.jpg">Pato de goma</option>
+      <option value="C:\Users\jsgas\Downloads\Dalton fumao.jpg">Dalton fumao</option>
+      <option value="C:\Users\jsgas\Downloads\Dalton malo.jpg">Pato malo</option>
+      <option value="C:\Users\jsgas\Downloads\Dalton enmedio.jpg">Dalton Bueno</option>
+    </select>
+
+    <label for="backgroundSelect">Fondo:</label>
+    <select id="backgroundSelect">
+      <option value="#333">Gris oscuro</option>
+      <option value="#000000">Negro Armario</option>
+      <option value="#5c4b5c">Púrpura suave</option>
+      <option value="#4f6d7a">Azul acero</option>
+      <option value="#7f8c8d">Plata</option>
+      <option value="#d35400">Naranja calabaza</option>
+    </select>
+  </div>
+
+  <div id="screensaver">
+    <div class="roomba-container" id="roombaContainer">
+      <div class="roomba">
+        <div class="roomba-detail"></div>
+        <img id="itemOnRoomba" class="item-on-roomba" src="" alt="">
+      </div>
+    </div>
+  </div>
+
+ 
+<script>
+  document.getElementById("enableSound").addEventListener("click", () => {
+    soundEnabled = true;
+    document.getElementById("enableSound").style.display = "none";
+  });
+</script>
+
+  <script>
+    const itemSelect = document.getElementById("itemSelect");
+    const itemOnRoomba = document.getElementById("itemOnRoomba");
+    const backgroundSelect = document.getElementById("backgroundSelect");
+    const roomba = document.getElementById("roombaContainer");
+
+    itemSelect.addEventListener("change", (event) => {
+      const url = event.target.value;
+      itemOnRoomba.src = url;
+      itemOnRoomba.style.display = url ? "block" : "none";
+    });
+
+    backgroundSelect.addEventListener("change", (event) => {
+  document.getElementById("screensaver").style.backgroundColor = event.target.value;
+});
+
+
+    const soundLinks = [
+   "C:/Users/jsgas/Downloads/sounds/ough-47202.mp3", "C:/Users/jsgas/Downloads/sounds/get_ready_1-104602.mp3", "C:/Users/jsgas/Downloads/sounds/suena-con-todo-el-poder-159764 (1).mp3", 
+   "C:/Users/jsgas/Downloads/sounds/bloopers-27027.mp3", "C:/Users/jsgas/Downloads/sounds/14-types-of-society-32960.mp3", "C:/Users/jsgas/Downloads/sounds/palindromes-58638.mp3", 
+   "C:/Users/jsgas/Downloads/sounds/reversed-phrase-95134.mp3", "C:/Users/jsgas/Downloads/sounds/npc-bernard-encounter-phrases-201842.mp3", "C:/Users/jsgas/Downloads/sounds/u-call-that-dancin-87400.mp3",
+    "C:/Users/jsgas/Downloads/sounds/is-your-kidney-1-87501.mp3", "C:/Users/jsgas/Downloads/sounds/frase-91642.mp3", "C:/Users/jsgas/Downloads/sounds/und-wir-haben-107107.mp3", 
+    "C:/Users/jsgas/Downloads/sounds/cabrones-88016.mp3", "C:/Users/jsgas/Downloads/sounds/peanut-butter-smothered-105318.mp3",
+     "C:/Users/jsgas/Downloads/sounds/este-tipo-de-casos-son-muy-sencillos-alo-alo-94693.mp3", "C:/Users/jsgas/Downloads/sounds/dont-touch-323641.mp3",
+      "C:/Users/jsgas/Downloads/sounds/counterevolutionary-puppy-kisser-87211.mp3", "C:/Users/jsgas/Downloads/sounds/gravy-is-a-meat-extender-2-105565.mp3",
+       "C:/Users/jsgas/Downloads/sounds/if-u-don-move-105196.mp3", "C:/Users/jsgas/Downloads/sounds/gravy-is-a-meat-extender-3-87906.mp3", "C:/Users/jsgas/Downloads/sounds/suena-con-todo-el-poder-159764.mp3", 
+    ];
+
+    let soundEnabled = false;
+
+    document.body.addEventListener("click", () => {
+    soundEnabled = true;
+    });
+
+    function playRandomSound() {
+    if (!soundEnabled) return;
+    const audio = new Audio(soundLinks[Math.floor(Math.random() * soundLinks.length)]);
+    audio.volume = 0.9;
+    audio.play();
+    }
+
+
+    let posX = Math.random() * (window.innerWidth - roomba.offsetWidth);
+    let posY = Math.random() * (window.innerHeight - roomba.offsetHeight);
+    let velocidad = 8; // o 10, según qué tan rápido lo quieras
+    let velX = velocidad * (Math.random() < 0.5 ? -1 : 1);
+    let velY = velocidad * (Math.random() < 0.5 ? -1 : 1);
+
+
+    function updateRoombaPosition() {
+      posX += velX;
+      posY += velY;
+
+      let bounced = false;
+
+      if (posX <= 0 || posX >= window.innerWidth - roomba.offsetWidth) {
+        velX = -velX + (Math.random() - 0.5);
+        bounced = true;
+      }
+
+      if (posY <= 0 || posY >= window.innerHeight - roomba.offsetHeight) {
+        velY = -velY + (Math.random() - 0.5);
+        bounced = true;
+      }
+
+      roomba.style.left = `${posX}px`;
+      roomba.style.top = `${posY}px`;
+
+      if (bounced) playRandomSound();
+    }
+
+    setInterval(updateRoombaPosition, 20);
+  </script>
+
+</body>
+</html>
