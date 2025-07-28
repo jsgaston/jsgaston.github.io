@@ -265,7 +265,6 @@
         }
 
         // Removed the misplaced plugins block here. It belongs inside createChart options.
-
         function createChart(data, variable) {
             const ctx = document.getElementById('mathChart').getContext('2d');
 
@@ -282,16 +281,16 @@
                         data: data,
                         borderColor: gradient,
                         backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 5, // Increased line thickness
+                        borderWidth: 5,
                         pointRadius: 0,
                         showLine: true,
-                        fill: false, // Important: do not use Chart.js built-in fill
+                        fill: false,
                         tension: 0.1
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // Asegúrate de que esto esté en false para permitir que las escalas se ajusten libremente
                     interaction: {
                         intersect: false,
                         mode: 'nearest'
@@ -320,63 +319,57 @@
                                 }
                             }
                         },
-                        // Zoom plugin configuration moved here and adjusted for 2x = y ratio
                         zoom: {
                             pan: {
                                 enabled: true,
-                                mode: 'xy', // Enable panning in both x and y directions
-                                modifierKey: 'shift', // Only pan when shift key is pressed (or remove for always)
+                                mode: 'xy',
+                                modifierKey: 'shift',
                                 onPanComplete: function({ chart }) {
                                     const xScale = chart.scales.x;
                                     const yScale = chart.scales.y;
 
-                                    // Calculate the center of the current X-axis range
-                                    const xCenter = (xScale.min + xScale.max) / 2;
+                                    // Calcula el rango actual del eje X
                                     const xRange = xScale.max - xScale.min;
 
-                                    // Calculate the new y-axis range based on 2x relationship
-                                    // This attempts to maintain the ratio around the *center* of the x-axis,
-                                    // or scale the y-axis to be twice the x-axis span while keeping 0 as min.
-                                    // Given y starts at 0, we'll try to keep the y-axis range proportional
-                                    // to the x-axis range, rather than strict y=2x of min/max values.
-                                    // For a function like x = y^2 - C, y is always positive.
-                                    // So we aim for yScale.max to be 2 * xScale.max (roughly)
-                                    // A simpler approach for visual aspect is to directly set the aspect ratio,
-                                    // but if the user wants an *exact* 2x=y scaling, we need to adjust ranges.
+                                    // Calcula el nuevo rango del eje Y basado en la relación 2x = y
+                                    const newYRange = xRange * 2;
 
-                                    // Let's assume the user wants the *span* of the y-axis to be 2 times the *span* of the x-axis.
-                                    const newYRange = 2 * xRange;
-
-                                    // If y always starts at 0, then new max will be the new range.
+                                    // Ajusta los límites del eje Y. Dado que y >= 0, el mínimo es 0.
+                                    // Y el máximo es el nuevo rango.
                                     yScale.max = newYRange;
-                                    yScale.min = 0; // Keep y-min at 0 for this function
+                                    yScale.min = 0;
 
-                                    chart.update('none'); // No animation for immediate update
+                                    chart.update('none');
                                 }
                             },
                             zoom: {
                                 wheel: {
-                                    enabled: true, // Enable zooming with mouse wheel
+                                    enabled: true,
                                 },
                                 pinch: {
-                                    enabled: true // Enable zooming with pinch gestures on touch devices
+                                    enabled: true
                                 },
-                                mode: 'xy', // Enable zooming in both x and y directions
+                                mode: 'xy',
                                 onZoomComplete: function({ chart }) {
                                     const xScale = chart.scales.x;
                                     const yScale = chart.scales.y;
 
+                                    // Calcula el rango actual del eje X
                                     const xRange = xScale.max - xScale.min;
-                                    const newYRange = 2 * xRange;
 
+                                    // Calcula el nuevo rango del eje Y basado en la relación 2x = y
+                                    const newYRange = xRange * 2;
+
+                                    // Ajusta los límites del eje Y. Dado que y >= 0, el mínimo es 0.
+                                    // Y el máximo es el nuevo rango.
                                     yScale.max = newYRange;
-                                    yScale.min = 0; // Keep y-min at 0 for this function
+                                    yScale.min = 0;
 
-                                    chart.update('none'); // No animation for immediate update
+                                    chart.update('none');
                                 }
                             }
                         },
-                        fillFunctionArea: {} // Enable our custom fill plugin
+                        fillFunctionArea: {}
                     },
                     scales: {
                         x: {
@@ -401,8 +394,8 @@
                                     weight: '600'
                                 }
                             },
-                            min: -5, // Adjusted for typical parabola range
-                            max: 2
+                            min: -50, // Rango inicial de x más amplio para ver más de la parábola
+                            max: 50
                         },
                         y: {
                             type: 'linear',
@@ -425,16 +418,30 @@
                                     weight: '600'
                                 }
                             },
-                            min: 0, // Only show positive y values
-                            max: 50 // Adjusted for visible curve
+                            min: 0,
+                            max: 200 // Max inicial de y (2 * (50 - (-50)) = 200)
                         }
                     },
                     animation: {
-                        duration: 0 // Deactivate animation for better performance
+                        duration: 0
                     }
                 },
-                plugins: [fillFunctionAreaPlugin, ChartZoom] // Register the custom plugin and zoom plugin
+                plugins: [fillFunctionAreaPlugin, ChartZoom]
             });
+        }
+
+        function resetZoom() {
+            if (chart) {
+                // Manually reset scales to initial values if resetZoom() doesn't restore custom logic
+                chart.options.scales.x.min = -50; // Valores iniciales para x
+                chart.options.scales.x.max = 50;
+
+                // Restablecer el eje y a la proporción 2x del rango inicial de x
+                chart.options.scales.y.min = 0;
+                chart.options.scales.y.max = (50 - (-50)) * 2; // (max_x - min_x) * 2
+
+                chart.update('none');
+            }
         }
 
         function resetGraph() {
@@ -444,19 +451,7 @@
             resetZoom(); // Also reset zoom when graph is reset
         }
 
-        function resetZoom() {
-            if (chart) {
-                // Manually reset scales to initial values if resetZoom() doesn't restore custom logic
-                chart.options.scales.x.min = -5;
-                chart.options.scales.x.max = 2;
-                chart.options.scales.y.min = 0;
-                chart.options.scales.y.max = 50; // Set back to initial y-max
-                chart.update('none'); // Update the chart to reflect the reset
-                // chart.resetZoom() can be used after this if more robust reset is needed,
-                // but for custom scaling, direct manipulation is sometimes necessary.
-                // chart.resetZoom(); // Keep this if you want to use the plugin's reset functionality too.
-            }
-        }
+
 
         function animateVariable() {
             if (isAnimating) return;
