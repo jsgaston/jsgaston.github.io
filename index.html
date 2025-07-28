@@ -1934,7 +1934,7 @@ const seconds = remainingSecondsAfterHours % 60; // Remaining seconds (if needed
 
   // Mostrar tiempo básico
   document.getElementById("elapsedDaysText").textContent = `${totalDays } días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = (totalSeconds2 &/( 60 * 60 )).toLocaleString();
+  document.getElementById("elapsedHours").textContent = (totalSeconds2 /( 60 * 60 )).toLocaleString();
   document.getElementById("elapsedMinutes").textContent = (totalSeconds2  / 60).toLocaleString();
   document.getElementById("elapsedSeconds").textContent = totalSeconds2.toLocaleString();
 
