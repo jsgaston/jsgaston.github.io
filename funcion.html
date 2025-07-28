@@ -41,7 +41,7 @@
             gap: 20px;
             margin-bottom: 30px;
             padding: 20px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(5deg, #f093fb 0%, #f5576c 100%);
             border-radius: 15px;
             color: white;
         }
@@ -115,7 +115,7 @@
             font-weight: 600;
         }
         .info-panel {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(5deg, #4facfe 0%, #00f2fe 100%);
             color: white;
             padding: 15px;
             border-radius: 10px;
@@ -241,7 +241,7 @@
             const data = [];
             // Generate points only for positive y values
             // Adjusted y range to go higher for a larger visible curve
-            for (let y = 0; y <= 10; y += 0.05) { // Start y from 0 for positive values
+            for (let y = 0; y <= 200; y += 0.05) { // Start y from 0 for positive values
                 const x = Math.pow(y, 2) - (variable / 2);
                 data.push({x: x, y: y});
             }
