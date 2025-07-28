@@ -1929,8 +1929,8 @@ function updateElapsedTime() {
 
   // Mostrar tiempo básico
   document.getElementById("elapsedDaysText").textContent = `${totalDays } días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = Math.floor(totalSeconds2 * 60 * 60 / (1000 )).toLocaleString();
-  document.getElementById("elapsedMinutes").textContent = Math.floor(totalSeconds2  * 60/ (1000 )).toLocaleString();
+  document.getElementById("elapsedHours").textContent = Math.floor(totalSeconds2 * 60 * 60 ).toLocaleString();
+  document.getElementById("elapsedMinutes").textContent = Math.floor(totalSeconds2  * 60).toLocaleString();
   document.getElementById("elapsedSeconds").textContent = totalSeconds2.toLocaleString();
 
 
