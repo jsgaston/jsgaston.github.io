@@ -1305,6 +1305,9 @@ function toggleActiveClass(buttonElement, isToggle, groupClass = null) {
         // --- Funciones de Navegación Principal ---
 let graphIframeSrc = 'funcion.html';
 let graphIframe = null;
+
+        let graphIframe2Src = 'Roomba_93.html';
+let graphIframe2 = null;
         
 function showMainTab(tabName) {
     // Ocultar todas las secciones
@@ -1425,6 +1428,26 @@ function showMainTab(tabName) {
             
             // Manejar errores
             graphIframe.addEventListener('error', () => {
+                container.innerHTML = '<p class="text-center p-4 text-red-500">Error al cargar la gráfica</p>';
+            });
+        }
+
+
+                function loadGraphIframe2() {
+            const container = document.getElementById('graphIframe2Container');
+            if (!container) return;
+            
+            // Crear el iframe
+            graphIframe2 = document.createElement('iframe');
+            graphIframe2.src = 'Roomba_93.html';
+            graphIframe2.allowFullscreen = true;
+            
+            // Agregar al contenedor
+            container.appendChild(graphIframe2);
+            graphIframe2Loaded = true;
+            
+            // Manejar errores
+            graphIframe2.addEventListener('error', () => {
                 container.innerHTML = '<p class="text-center p-4 text-red-500">Error al cargar la gráfica</p>';
             });
         }
