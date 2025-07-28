@@ -264,46 +264,7 @@
             }
         }
 
-
-        plugins: {
-  zoom: {
-    zoom: {
-      wheel: {
-        enabled: true,
-      },
-      onZoom: ({ chart }) => {
-        // Obtener los rangos actuales
-        const xScale = chart.scales.x;
-        const yScale = chart.scales.y;
-
-        const xRange = xScale.max - xScale.min;
-
-        // Aplicar relación y = 2x
-        yScale.min = 2 * xScale.min;
-        yScale.max = 2 * xScale.max;
-
-        chart.update('none'); // No animar
-      }
-    },
-    pan: {
-      enabled: true,
-      onPan: ({ chart }) => {
-        const xScale = chart.scales.x;
-        const yScale = chart.scales.y;
-
-        // Mantener relación durante el pan
-        yScale.min = 2 * xScale.min;
-        yScale.max = 2 * xScale.max;
-
-        chart.update('none');
-      }
-    }
-  }
-}
-
-
-
-        
+        // Removed the misplaced plugins block here. It belongs inside createChart options.
 
         function createChart(data, variable) {
             const ctx = document.getElementById('mathChart').getContext('2d');
@@ -359,12 +320,39 @@
                                 }
                             }
                         },
-                        // Zoom plugin configuration
+                        // Zoom plugin configuration moved here and adjusted for 2x = y ratio
                         zoom: {
                             pan: {
                                 enabled: true,
-                                mode: 'custom', // Enable panning in both x and y directions
+                                mode: 'xy', // Enable panning in both x and y directions
                                 modifierKey: 'shift', // Only pan when shift key is pressed (or remove for always)
+                                onPanComplete: function({ chart }) {
+                                    const xScale = chart.scales.x;
+                                    const yScale = chart.scales.y;
+
+                                    // Calculate the center of the current X-axis range
+                                    const xCenter = (xScale.min + xScale.max) / 2;
+                                    const xRange = xScale.max - xScale.min;
+
+                                    // Calculate the new y-axis range based on 2x relationship
+                                    // This attempts to maintain the ratio around the *center* of the x-axis,
+                                    // or scale the y-axis to be twice the x-axis span while keeping 0 as min.
+                                    // Given y starts at 0, we'll try to keep the y-axis range proportional
+                                    // to the x-axis range, rather than strict y=2x of min/max values.
+                                    // For a function like x = y^2 - C, y is always positive.
+                                    // So we aim for yScale.max to be 2 * xScale.max (roughly)
+                                    // A simpler approach for visual aspect is to directly set the aspect ratio,
+                                    // but if the user wants an *exact* 2x=y scaling, we need to adjust ranges.
+
+                                    // Let's assume the user wants the *span* of the y-axis to be 2 times the *span* of the x-axis.
+                                    const newYRange = 2 * xRange;
+
+                                    // If y always starts at 0, then new max will be the new range.
+                                    yScale.max = newYRange;
+                                    yScale.min = 0; // Keep y-min at 0 for this function
+
+                                    chart.update('none'); // No animation for immediate update
+                                }
                             },
                             zoom: {
                                 wheel: {
@@ -373,7 +361,19 @@
                                 pinch: {
                                     enabled: true // Enable zooming with pinch gestures on touch devices
                                 },
-                                mode: 'custom', // Enable zooming in both x and y directions
+                                mode: 'xy', // Enable zooming in both x and y directions
+                                onZoomComplete: function({ chart }) {
+                                    const xScale = chart.scales.x;
+                                    const yScale = chart.scales.y;
+
+                                    const xRange = xScale.max - xScale.min;
+                                    const newYRange = 2 * xRange;
+
+                                    yScale.max = newYRange;
+                                    yScale.min = 0; // Keep y-min at 0 for this function
+
+                                    chart.update('none'); // No animation for immediate update
+                                }
                             }
                         },
                         fillFunctionArea: {} // Enable our custom fill plugin
@@ -446,7 +446,15 @@
 
         function resetZoom() {
             if (chart) {
-                chart.resetZoom();
+                // Manually reset scales to initial values if resetZoom() doesn't restore custom logic
+                chart.options.scales.x.min = -5;
+                chart.options.scales.x.max = 2;
+                chart.options.scales.y.min = 0;
+                chart.options.scales.y.max = 50; // Set back to initial y-max
+                chart.update('none'); // Update the chart to reflect the reset
+                // chart.resetZoom() can be used after this if more robust reset is needed,
+                // but for custom scaling, direct manipulation is sometimes necessary.
+                // chart.resetZoom(); // Keep this if you want to use the plugin's reset functionality too.
             }
         }
 
