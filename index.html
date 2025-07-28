@@ -1189,23 +1189,6 @@ diaryDropZone.addEventListener("drop", e => {
 
 
 
-const conversionesTiempoEspecial = {
-    segundos: {
-        tiradas: 10 / 17,
-        años: 1 / (86400 * 365.25),
-        dias: 1 / (60 * 60 * 24),
-        horas: 1 / (60 * 60),
-        minutos: 1 / 60,
-        "o": 1 / (60 * 60 * 24), // 1 o = 1 día = 86400 segundos
-        ":-_": 1 / 0.432,        // 1 :-_ = 0.432 segundos
-        ":-": 1 / (0.432 * 100), // 1 :- = 100 :-_ = 43.2 segundos
-        ":": 1 / (0.432 * 100 * 100) // 1 : = 100 :- = 4320 segundos
-    }
-};
-
-
-
-
         
 
         // --- Funciones de Utilidad ---
