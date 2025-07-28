@@ -1885,11 +1885,11 @@ function updateElapsedTime() {
   }
 
   extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds / 86400).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en tiradas:</strong> ${(totalSeconds * 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds * 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds * 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds * 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds * 4320 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 }
 
@@ -2921,6 +2921,12 @@ function translateNumber() {
         const personasCeldaStr = document.getElementById('personasCeldaInput').value;
         const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
 
+             if (isNaN(personasCeldaStr) || isNaN(personasAfectadasStr )) {
+    personasCeldaStr = 1;
+          personasAfectadasStr = 1;
+    return;
+  }
+
         // Get the output division for results
         const resultDiv = document.getElementById('resultDiv');
 
@@ -2968,11 +2974,11 @@ function translateNumber() {
   }
 
   extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds * personasCeldaStr * personasAfectadasStr  / 86400).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en tiradas:</strong> ${(totalSeconds * 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds * 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds * 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds * 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles):</strong> ${(totalSeconds * 4320 * 20).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 
 
