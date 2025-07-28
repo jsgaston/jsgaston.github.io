@@ -1847,14 +1847,19 @@ function updateElapsedTime() {
                 const personasCeldaStr = document.getElementById('personasCeldaInput').value;
         const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
 
+                    let personasCelda = parseFloat(personasCeldaStr);
+        let personasAfectadas = parseFloat(personasAfectadasStr);
+
   if (isNaN(startDate) || isNaN(endDate)) {
     document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
     return;
   }
 
-      if (isNaN(personasCeldaStr) || isNaN(personasAfectadasStr )) {
-    personasCeldaStr = 1;
-          personasAfectadasStr = 1;
+
+
+             if (isNaN(personasCelda) || isNaN(personasAfectadas )) {
+    personasCelda = 1;
+          personasAfectadas = 1;
     return;
   }
 
@@ -1863,12 +1868,12 @@ function updateElapsedTime() {
     const totalSeconds2 = Math.floor(msElapsed *  personasCeldaStr * personasAfectadasStr / 1000);
 
   // Cálculos base
-  const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24 ));
-  const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((msElapsed / (1000 * 60)) % 60);
+  const totalDays = Math.floor(totalSeconds2/ (1000 * 60 * 60 * 24 ));
+  const hours = Math.floor((totalSeconds2 / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((totalSeconds2 / (1000 * 60)) % 60);
 
   // Mostrar tiempo básico
-  document.getElementById("elapsedDaysText").textContent = `${totalDays * *  personasCelda *  personasAfectadas} días, ${hours} horas y ${minutes} minutos.`;
+  document.getElementById("elapsedDaysText").textContent = `${totalDays } días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedHours").textContent = Math.floor(totalSeconds2  / (1000 * 60 * 60)).toLocaleString();
   document.getElementById("elapsedMinutes").textContent = Math.floor(totalSeconds2  / (1000 * 60)).toLocaleString();
   document.getElementById("elapsedSeconds").textContent = totalSeconds2.toLocaleString();
@@ -2916,147 +2921,6 @@ function translateNumber() {
 
 
 
-<script>
-    function calculateAndDisplay() {
-        // Get input values for persons
-        const personasCeldaStr = document.getElementById('personasCeldaInput').value;
-        const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
-
-             if (isNaN(personasCeldaStr) || isNaN(personasAfectadasStr )) {
-    personasCeldaStr = 1;
-          personasAfectadasStr = 1;
-    return;
-  }
-
-        // Get the output division for results
-        const resultDiv = document.getElementById('resultDiv');
-
-        let personasCelda = parseFloat(personasCeldaStr);
-        let personasAfectadas = parseFloat(personasAfectadasStr);
-
-
-
-        
- const startInput = document.getElementById("startElapsed").value;
-  const endInput = document.getElementById("endElapsed").value;
-
-  const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
-  const endDate = endInput ? new Date(endInput) : new Date();
-
-  if (isNaN(startDate) || isNaN(endDate)) {
-    document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
-    return;
-  }
-
-  const msElapsed = endDate - startDate;
-  const totalSeconds = Math.floor(msElapsed / 1000);
-
-        const totalSeconds2 = Math.floor(msElapsed *  personasCelda *  personasAfectadas / 1000);
-
-  // Cálculos base
-  const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24 ));
-  const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((msElapsed / (1000 * 60)) % 60);
-
-  // Mostrar tiempo básico
-  document.getElementById("elapsedDaysText").textContent = `${totalDays * *  personasCelda *  personasAfectadas} días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = Math.floor(totalSeconds2  / (1000 * 60 * 60)).toLocaleString();
-  document.getElementById("elapsedMinutes").textContent = Math.floor(totalSeconds2  / (1000 * 60)).toLocaleString();
-  document.getElementById("elapsedSeconds").textContent = totalSeconds2.toLocaleString();
-
-
-
-        
-  // Conversiones especiales
-  let extra = document.getElementById("extraTimeUnits");
-  if (!extra) {
-    extra = document.createElement("div");
-    extra.id = "extraTimeUnits";
-    extra.className = "mt-6 p-4 bg-white rounded-lg shadow space-y-2 text-center text-gray-700";
-    document.getElementById("mainTimeElapsedSection").appendChild(extra);
-  }
-
-  extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${(totalSeconds / 1.7).toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${(totalSeconds2 / 0.432).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${(totalSeconds2 / 43.2).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${(totalSeconds2 / 4320).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${(totalSeconds2 / (4320 * 20)).toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
-  `;
-
-
-
-
-
-
-        
-
-        // Function to extract number from text content, e.g., "Total en h (horas): 123.45" -> 123.45
-        function extractNumber(text) {
-            const match = text.match(/[\d.]+/); // Matches one or more digits or a dot
-            return match ? parseFloat(match[0]) : 0; // Return 0 if no number found, or the parsed float
-        }
-
-        // Retrieve the calculated elapsed time values by parsing their text content
-        // IMPORTANT: Ensure these spans have content generated by your time calculation logic
-        const totalHoras = extractNumber(document.getElementById('totalHorasSpan').textContent);
-        const totalMinutos = extractNumber(document.getElementById('totalMinutosSpan').textContent);
-        const totalSegundos = extractNumber(document.getElementById('totalSegundosSpan').textContent);
-        const totalTiradas = extractNumber(document.getElementById('totalTiradasSpan').textContent);
-        const totalPorcionesPequenas = extractNumber(document.getElementById('totalPorcionesPequenasSpan').textContent);
-        const totalPorcionesMedianas = extractNumber(document.getElementById('totalPorcionesMedianasSpan').textContent);
-        const totalPorcionesGrandes = extractNumber(document.getElementById('totalPorcionesGrandesSpan').textContent);
-        const totalSoles = extractNumber(document.getElementById('totalSolesSpan').textContent);
-
-
-        // Check if at least one of the 'personas' fields has a valid number
-        if ((!isNaN(personasCelda) && personasCeldaStr.trim() !== '') || (!isNaN(personasAfectadas) && personasAfectadasStr.trim() !== '')) {
-            resultDiv.innerHTML = '<h2>Resultados de la Multiplicación por Tiempo Transcurrido:</h2>';
-            resultDiv.style.backgroundColor = '#d1fae5'; // Light green for results
-            resultDiv.style.color = '#065f46'; // Dark green text
-
-            const elapsedValues = {
-                'Total en h (horas)': totalHoras,
-                'Total en m (minutos)': totalMinutos,
-                'Total en s (segundos)': totalSegundos,
-                'Total en tiradas': totalTiradas,
-                'Total en :-_ (Porciones pequeñas)': totalPorcionesPequenas,
-                'Total en :- (Porciones medianas)': totalPorcionesMedianas,
-                'Total en : (Porciones grandes)': totalPorcionesGrandes,
-                'Total en o (Soles)': totalSoles
-            };
-
-            for (const key in elapsedValues) {
-                if (elapsedValues.hasOwnProperty(key)) {
-                    let currentCalculatedValue = elapsedValues[key];
-                    let finalMultipliedValue = currentCalculatedValue;
-                    let description = `${key}`;
-
-                    if (!isNaN(personasCelda) && personasCeldaStr.trim() !== '') {
-                        finalMultipliedValue *= personasCelda;
-                        description += ` * Personas en Celda (${personasCelda})`;
-                    }
-                    if (!isNaN(personasAfectadas) && personasAfectadasStr.trim() !== '') {
-                        finalMultipliedValue *= personasAfectadas;
-                        description += ` * Personas Afectadas (${personasAfectadas})`;
-                    }
-
-                    resultDiv.innerHTML += `<p>${description}: <span style="font-weight: bold;">${finalMultipliedValue.toFixed(2)}</span></p>`;
-                }
-            }
-        } else {
-            // Default message when no valid 'personas' inputs are provided
-            resultDiv.innerHTML = '<p style="color: #6b7280;">Ingresa valores en "Número de personas en la celda" o "Número de personas afectadas" para calcular.</p>';
-            resultDiv.style.backgroundColor = 'transparent'; // Reset background
-            resultDiv.style.color = '#6b7280'; // Reset text color
-        }
-    }
-
-
-
-
-    
-</script>
 
     
 
