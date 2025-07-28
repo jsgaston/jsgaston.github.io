@@ -970,11 +970,7 @@
             <label for="personasAfectadas">Número de personas afectadas:</label>
             <input type="number" id="personasAfectadasInput" placeholder="Número de personas afectadas" oninput="calculateAndDisplay()">
         </div>
-        <button onclick="generateAndCalculate()">Calcular</button>
-
-        <div id="resultDiv">
-            <p style="color: #6b7280;">Los resultado aparecerán aquí.</p>
-        </div>
+      
 
         <div id="multiplicationResultDiv">
             Resultado de la Multiplicación: <span id="productValue"></span>
@@ -1848,24 +1844,36 @@ function updateElapsedTime() {
   const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
   const endDate = endInput ? new Date(endInput) : new Date();
 
+                const personasCeldaStr = document.getElementById('personasCeldaInput').value;
+        const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
+
   if (isNaN(startDate) || isNaN(endDate)) {
     document.getElementById("elapsedDaysText").textContent = "Fechas no válidas.";
     return;
   }
 
+      if (isNaN(personasCeldaStr) || isNaN(personasAfectadasStr )) {
+    personasCeldaStr = 1;
+          personasAfectadasStr = 1;
+    return;
+  }
+
   const msElapsed = endDate - startDate;
   const totalSeconds = Math.floor(msElapsed / 1000);
+    const totalSeconds2 = Math.floor(msElapsed *  personasCeldaStr * personasAfectadasStr / 1000);
 
   // Cálculos base
   const totalDays = Math.floor(msElapsed / (1000 * 60 * 60 * 24));
   const hours = Math.floor((msElapsed / (1000 * 60 * 60)) % 24);
   const minutes = Math.floor((msElapsed / (1000 * 60)) % 60);
 
+
+
   // Mostrar tiempo básico
   document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
-  document.getElementById("elapsedHours").textContent = Math.floor(msElapsed / (1000 * 60 * 60)).toLocaleString();
-  document.getElementById("elapsedMinutes").textContent = Math.floor(msElapsed / (1000 * 60)).toLocaleString();
-  document.getElementById("elapsedSeconds").textContent = totalSeconds.toLocaleString();
+  document.getElementById("elapsedHours").textContent = Math.floor(msElapsed *  personasCeldaStr * personasAfectadasStr  / (1000 * 60 * 60)).toLocaleString();
+  document.getElementById("elapsedMinutes").textContent = Math.floor(msElapsed *  personasCeldaStr * personasAfectadasStr / (1000 * 60)).toLocaleString();
+  document.getElementById("elapsedSeconds").textContent = totalSeconds2.toLocaleString();
 
   // Conversiones especiales
   let extra = document.getElementById("extraTimeUnits");
