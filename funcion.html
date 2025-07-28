@@ -264,6 +264,47 @@
             }
         }
 
+
+        plugins: {
+  zoom: {
+    zoom: {
+      wheel: {
+        enabled: true,
+      },
+      onZoom: ({ chart }) => {
+        // Obtener los rangos actuales
+        const xScale = chart.scales.x;
+        const yScale = chart.scales.y;
+
+        const xRange = xScale.max - xScale.min;
+
+        // Aplicar relación y = 2x
+        yScale.min = 2 * xScale.min;
+        yScale.max = 2 * xScale.max;
+
+        chart.update('none'); // No animar
+      }
+    },
+    pan: {
+      enabled: true,
+      onPan: ({ chart }) => {
+        const xScale = chart.scales.x;
+        const yScale = chart.scales.y;
+
+        // Mantener relación durante el pan
+        yScale.min = 2 * xScale.min;
+        yScale.max = 2 * xScale.max;
+
+        chart.update('none');
+      }
+    }
+  }
+}
+
+
+
+        
+
         function createChart(data, variable) {
             const ctx = document.getElementById('mathChart').getContext('2d');
 
@@ -322,7 +363,7 @@
                         zoom: {
                             pan: {
                                 enabled: true,
-                                mode: 'xy', // Enable panning in both x and y directions
+                                mode: 'custom', // Enable panning in both x and y directions
                                 modifierKey: 'shift', // Only pan when shift key is pressed (or remove for always)
                             },
                             zoom: {
@@ -332,7 +373,7 @@
                                 pinch: {
                                     enabled: true // Enable zooming with pinch gestures on touch devices
                                 },
-                                mode: 'xy', // Enable zooming in both x and y directions
+                                mode: 'custom', // Enable zooming in both x and y directions
                             }
                         },
                         fillFunctionArea: {} // Enable our custom fill plugin
