@@ -438,7 +438,7 @@
 
                 // Restablecer el eje y a la proporción 2x del rango inicial de x
                 chart.options.scales.y.min = 0;
-                chart.options.scales.y.max = (50 - (-50)) * 2; // (max_x - min_x) * 2
+                chart.options.scales.y.max = (50 - (-50)) * 0.5; // (max_x - min_x) * 2
 
                 chart.update('none');
             }
