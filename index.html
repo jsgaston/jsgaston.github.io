@@ -498,6 +498,33 @@
 
 
 
+/* Estilos para las imágenes dentro del contenido de las historias */
+    /* Apunta a las imágenes que están dentro de un contenedor con la clase 'prose' */
+    .prose img {
+        width: 100%; /* Las imágenes ocuparán el 100% del ancho de su contenedor */
+        max-width: 300px; /* Limita el ancho máximo para que no sean excesivamente grandes */
+        height: auto; /* Mantiene la proporción de la imagen */
+        display: block; /* Asegura que la imagen sea un bloque y no haya espacio extra debajo */
+        margin-left: auto; /* Centra la imagen si es más pequeña que el contenedor */
+        margin-right: auto; /* Centra la imagen si es más pequeña que el contenedor */
+        transition: transform 0.3s ease-in-out; /* Suaviza la transición al hacer hover */
+    }
+
+    /* Efecto de hover para las imágenes dentro del contenido de las historias */
+    .prose img:hover {
+        transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el ratón (5%) */
+    }
+
+    /* Opcional: Si quieres que el efecto hover se active cuando el ratón está sobre el contenedor de la historia */
+    /* Esto es más complejo ya que el 'prose' div está anidado. */
+    /* Si el div con la clase 'entry-card' es el contenedor principal de la historia y el contenido se expande dentro de él. */
+    .entry-card .prose img:hover {
+        transform: scale(1.05);
+    }
+
+
+
+
         
     </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
