@@ -148,12 +148,12 @@
                 <label class="control-label">Variable:</label>
                 <input type="range" id="variableSlider" class="slider"
                        min="0" max="500" step="1" value="0">
-                <div class="value-display" id="variableValue">0.0</div>
+                <div class="value-display" id="variableValue">0</div>
             </div>
         </div>
 
         <div class="equation-display" id="equationDisplay">
-            x = y² - 0.0/2 con y > 0
+            x = y² - var/2 con y > 0
         </div>
 
         <div class="graph-container">
@@ -462,7 +462,7 @@
             let currentValue = parseFloat(slider.value); // Start animation from current slider value
 
             const animate = () => {
-                currentValue += direction * 0.2;
+                currentValue += direction * 1;
 
                 if (currentValue >= 100) {
                     direction = -1;
