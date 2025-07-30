@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eventos por Fecha</title>
+
+    <script src="https://apis.google.com/js/api.js"></script> 
+
     <style>
+        /* Aquí va el diseño de tu página (colores, fuentes, etc.) */
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -46,6 +50,12 @@
             color: #555;
             margin-top: 50px;
         }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -57,26 +67,37 @@
     </div>
 
     <script>
-        // Función que se ejecuta cuando la página HTML ha terminado de cargar
+        // Este es el programa (JavaScript) que se ejecuta en tu navegador web.
+
+        // Cuando la página se carga completamente en el navegador...
         document.addEventListener('DOMContentLoaded', function() {
-            // Llama a la función 'getHistoricalData' en el script de Google Apps Script
+            console.log('DOM cargado, intentando pedir datos a Google Apps Script...');
+            // Aquí es donde "tira del script": llama a la función 'getHistoricalData' en tu archivo Code.gs.
             google.script.run
-                .withSuccessHandler(displayData) // Si la llamada es exitosa, ejecuta displayData
-                .withFailureHandler(showError)   // Si hay un error, ejecuta showError
-                .getHistoricalData();            // La función de Apps Script a llamar
+                .withSuccessHandler(displayData) // Si la llamada es exitosa, ejecuta la función 'displayData'.
+                .withFailureHandler(showError)   // Si hay un error, ejecuta la función 'showError'.
+                .getHistoricalData();            // El nombre de la función en Code.gs que quieres llamar.
         });
 
-        // Función para mostrar los datos recibidos de Apps Script
+        // Esta función se ejecuta si Google Apps Script le devuelve datos.
         function displayData(data) {
             const loadingDiv = document.getElementById('loading');
             const dateInfoDiv = document.getElementById('date-info');
-            loadingDiv.style.display = 'none'; // Oculta el mensaje de carga
+            loadingDiv.style.display = 'none'; // Oculta el mensaje de "Cargando..."
+            console.log('Datos recibidos de Apps Script:', data); // Puedes ver esto en la Consola del navegador (F12).
 
-            if (data.error) {
-                dateInfoDiv.innerHTML = `<p style="color: red;">Error al cargar los datos: ${data.error}</p>`;
+            // Si Apps Script nos envió un error (por ejemplo, si no encontró la hoja).
+            if (data && data.error) {
+                dateInfoDiv.innerHTML = `<p class="error-message">Error del servidor: ${data.error}</p>`;
                 return;
             }
+            // Si no se encontraron datos para las fechas.
+            if (!data || data.length === 0) {
+                 dateInfoDiv.innerHTML = `<p class="error-message">No se encontró información para las fechas.</p>`;
+                 return;
+            }
 
+            // Construye el HTML con la información recibida.
             let htmlContent = '';
             data.forEach(item => {
                 htmlContent += `
@@ -86,16 +107,24 @@
                     <hr>
                 `;
             });
-            dateInfoDiv.innerHTML = htmlContent;
+            dateInfoDiv.innerHTML = htmlContent; // Inserta el HTML generado en la página.
         }
 
-        // Función para manejar errores de la llamada a Apps Script
+        // Esta función se ejecuta si hay un problema al intentar comunicarse con Apps Script.
         function showError(error) {
             const loadingDiv = document.getElementById('loading');
             const dateInfoDiv = document.getElementById('date-info');
-            loadingDiv.style.display = 'none'; // Oculta el mensaje de carga
-            dateInfoDiv.innerHTML = `<p style="color: red;">Se produjo un error al obtener la información: ${error.message || error}. Por favor, recarga la página o contacta al administrador.</p>`;
-            console.error('Apps Script error:', error);
+            loadingDiv.style.display = 'none'; // Oculta el mensaje de "Cargando..."
+
+            let errorMessage = "Se produjo un error desconocido al obtener la información.";
+            if (error && error.message) {
+                errorMessage = `Se produjo un error: ${error.message}`;
+            } else if (typeof error === 'string') {
+                errorMessage = `Se produjo un error: ${error}`;
+            }
+
+            dateInfoDiv.innerHTML = `<p class="error-message">${errorMessage} Por favor, recarga la página o contacta al administrador.</p>`;
+            console.error('Error de Apps Script:', error); // Muestra el error en la Consola del navegador.
         }
     </script>
 </body>
