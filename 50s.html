@@ -6,12 +6,12 @@
     <title>Eventos Históricos - 50s Timeline</title>
     <meta name="description" content="Descubre qué eventos históricos ocurrieron en fechas como hoy hace 20-30 años. Una ventana al pasado de España y el mundo.">
     <meta name="keywords" content="eventos históricos, historia España, acontecimientos mundiales, cronología">
-
+    
     <meta property="og:title" content="Eventos Históricos - 50s Timeline">
     <meta property="og:description" content="Explora eventos históricos que ocurrieron en fechas como hoy hace décadas">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://jsgaston.github.io/50s.html">
-
+    
     <style>
         :root {
             --primary-color: #667eea;
@@ -48,7 +48,7 @@
         /* ========================================
            HEADER PRINCIPAL
         ======================================== */
-
+        
         .header {
             background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
             backdrop-filter: blur(20px);
@@ -220,6 +220,7 @@
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
             box-shadow: var(--card-shadow);
+            display: none; /* Oculto por defecto */
         }
 
         .loading-spinner {
@@ -250,6 +251,7 @@
             border-radius: var(--border-radius);
             margin-bottom: 20px;
             box-shadow: var(--card-shadow);
+            display: none; /* Oculto por defecto */
         }
 
         .error h4 {
@@ -272,7 +274,7 @@
 
         .eventos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ajustado para más flexibilidad */
             gap: 25px;
         }
 
@@ -357,22 +359,23 @@
             letter-spacing: 0.3px;
         }
 
-        .tag-españa {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .tag-mundial {
+        /* Colores de tags más genéricos */
+        .tag-mundial, .tag-general, .tag-conmemorativo {
             background: #d1ecf1;
             color: #0c5460;
         }
 
-        .tag-historico {
+        .tag-españa, .tag-nacional, .tag-regional {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .tag-historico, .tag-institucional {
             background: #e2e3e5;
             color: #383d41;
         }
 
-        .tag-politico {
+        .tag-politico, .tag-terrorismo, .tag-social, .tag-internacional {
             background: #f8d7da;
             color: #721c24;
         }
@@ -382,50 +385,11 @@
             color: #155724;
         }
 
-        .tag-cultural {
-            background: #e7f3ff;
-            color: #004085;
+        .tag-cultural, .tag-religioso, .tag-festivo, .tag-sanitario {
+            background: #d6e9f1; /* Light blue */
+            color: #004085; /* Dark blue */
         }
 
-        .tag-festivo {
-            background: #f0e6fa;
-            color: #6a1a8c;
-        }
-
-        .tag-nacional {
-            background: #ffecb3;
-            color: #9c27b0;
-        }
-
-        .tag-regional {
-            background: #e0f2f7;
-            color: #01579b;
-        }
-
-        .tag-social {
-            background: #ffe0b2;
-            color: #ef6c00;
-        }
-
-        .tag-religioso {
-            background: #ede7f6;
-            color: #4527a0;
-        }
-
-        .tag-institucional {
-            background: #f3e5f5;
-            color: #ab47bc;
-        }
-
-        .tag-sanitario {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .tag-terrorismo {
-            background: #ffebee;
-            color: #c62828;
-        }
 
         /* ========================================
            ESTADOS ESPECIALES
@@ -438,6 +402,7 @@
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
             box-shadow: var(--card-shadow);
+            display: none; /* Oculto por defecto */
         }
 
         .no-eventos-icon {
@@ -526,7 +491,6 @@
             .stats {
                 grid-template-columns: 1fr;
             }
-
             .evento-card {
                 padding: 20px;
             }
@@ -537,47 +501,19 @@
         ======================================== */
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .fade-in {
-            animation: fadeInUp 0.6s ease-out;
-        }
+        .fade-in { animation: fadeInUp 0.6s ease-out; }
 
-        .stagger-animation .evento-card {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .stagger-animation .evento-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .stagger-animation .evento-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .stagger-animation .evento-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .stagger-animation .evento-card:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        .stagger-animation .evento-card:nth-child(5) {
-            animation-delay: 0.5s;
-        }
-
-        .stagger-animation .evento-card:nth-child(6) {
-            animation-delay: 0.6s;
-        }
+        .stagger-animation .evento-card { animation: fadeInUp 0.6s ease-out; }
+        .stagger-animation .evento-card:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-animation .evento-card:nth-child(2) { animation-delay: 0.2s; }
+        .stagger-animation .evento-card:nth-child(3) { animation-delay: 0.3s; }
+        .stagger-animation .evento-card:nth-child(4) { animation-delay: 0.4s; }
+        .stagger-animation .evento-card:nth-child(5) { animation-delay: 0.5s; }
+        .stagger-animation .evento-card:nth-child(6) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
@@ -616,8 +552,7 @@
                         <option value="">Todos los países</option>
                         <option value="España">🇪🇸 España</option>
                         <option value="Mundial">🌍 Mundial</option>
-                        <option value="Europa">🇪🇺 Europa</option>
-                    </select>
+                        </select>
                 </div>
                 <div class="filter-group">
                     <label for="filtroCategoria">Categoría:</label>
@@ -629,20 +564,20 @@
                         <option value="Cultural">🎭 Cultural</option>
                         <option value="Festivo">🎉 Festivo</option>
                         <option value="Nacional">🇪🇸 Nacional</option>
-                        <option value="Regional">🗺️ Regional</option>
+                        <option value="General">🌐 General</option>
+                        <option value="Conmemorativo">🎖️ Conmemorativo</option>
                         <option value="Social">🤝 Social</option>
-                        <option value="Religioso">🛐 Religioso</option>
-                        <option value="Institucional">🏛️ Institucional</option>
+                        <option value="Religioso">⛪ Religioso</option>
                         <option value="Sanitario">⚕️ Sanitario</option>
-                        <option value="Terrorismo">💣 Terrorismo</option>
-                        <option value="Internacional">🌐 Internacional</option>
-                        <option value="General">💡 General</option>
-                        <option value="Conmemorativo">🗓️ Conmemorativo</option>
+                        <option value="Terrorismo">🚨 Terrorismo</option>
+                        <option value="Institucional">🏛️ Institucional</option>
+                        <option value="Internacional">🌍 Internacional</option>
+                        <option value="Regional">📍 Regional</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label>&nbsp;</label>
-                    <button class="btn" onclick="cargarEventos()">
+                    <button class="btn" onclick="actualizarEventos()">
                         🔄 Actualizar Datos
                     </button>
                 </div>
@@ -663,186 +598,269 @@
                 <span class="stat-label">Eventos Mundiales</span>
             </div>
             <div class="stat-card">
-                <span class="stat-number" id="ultimaActualizacion">N/A</span>
-                <span class="stat-label">Última Actualización</span>
+                <span class="stat-number" id="añosRango">20-30</span>
+                <span class="stat-label">Rango de Años</span>
             </div>
         </section>
 
         <div id="loading" class="loading">
             <div class="loading-spinner"></div>
             <p>🔄 Cargando eventos históricos...</p>
-            <small>Consultando fuentes de datos y Google Drive...</small>
+            <small>Consultando fuentes de datos...</small>
         </div>
-
-        <div id="error" class="error" style="display: none;">
+        <div id="error" class="error">
             <h4>⚠️ Error al cargar datos</h4>
-            <p id="errorMessage">Se ha producido un error al obtener los datos. Por favor, inténtalo de nuevo más tarde o revisa la configuración del script de Google Apps Script.</p>
+            <p id="errorMessage">Se ha producido un error al obtener los datos. Por favor, inténtelo de nuevo más tarde.</p>
         </div>
 
         <section class="eventos-container">
-            <div id="eventos" class="eventos-grid" style="display: none;"></div>
-            <div id="noEventos" class="no-eventos" style="display: none;">
+            <div id="eventos" class="eventos-grid"></div>
+            <div id="noEventos" class="no-eventos">
                 <span class="no-eventos-icon">🤷‍♂️</span>
                 <h3>No se encontraron eventos</h3>
-                <p>Prueba a ajustar los filtros o a actualizar los datos.</p>
+                <p>Intenta ajustar tus filtros o espera a que se carguen más datos.</p>
             </div>
         </section>
     </div>
 
-    <footer class="footer">
-        <p>Hecho con ❤️ para la historia</p>
-        <p>&copy; <span id="currentYear"></span> Eventos Históricos</p>
-        <p><a href="https://github.com/jsgaston/50s.html" target="_blank">Ver en GitHub</a></p>
+    <footer class="footer fade-in">
+        <p>✨ Creado con la magia de la historia y el código.</p>
+        <p>Datos proporcionados por <a href="https://www.wikipedia.org" target="_blank">Wikipedia</a> y Google Sheets.</p>
+        <p>&copy; 2024 Eventos Históricos.</p>
     </footer>
 
     <script>
-        // *** IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT ***
-        const GOOGLE_APP_SCRIPT_WEB_APP_URL = 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI'; //
+        // ¡IMPORTANTE! Reemplaza esta URL con la URL de tu Web App de Google Apps Script.
+        // La obtuviste en el paso 6 de la configuración del Apps Script.
+        const GOOGLE_APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfyc.../exec"; 
 
-        let todosLosEventos = []; // Almacena todos los eventos para filtrado local
+        let allEvents = []; // Almacenará todos los eventos cargados
+        const eventosGrid = document.getElementById('eventos');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const errorMessageElem = document.getElementById('errorMessage');
+        const noEventosDiv = document.getElementById('noEventos');
+        const statsSection = document.getElementById('estadisticas');
+
+        // Referencias a los filtros
+        const filtroAños = document.getElementById('filtroAños');
+        const filtroPais = document.getElementById('filtroPais');
+        const filtroCategoria = document.getElementById('filtroCategoria');
+
+        // Event Listeners para los filtros
+        filtroAños.addEventListener('change', displayEvents);
+        filtroPais.addEventListener('change', displayEvents);
+        filtroCategoria.addEventListener('change', displayEvents);
+
+        // ========================================
+        // INICIALIZACIÓN
+        // ========================================
 
         document.addEventListener('DOMContentLoaded', () => {
-            mostrarFechaActual();
-            cargarEventos(); // Carga inicial de eventos
-
-            // Añadir event listeners a los filtros para recargar los eventos
-            document.getElementById('filtroAños').addEventListener('change', filtrarYMostrarEventos);
-            document.getElementById('filtroPais').addEventListener('change', filtrarYMostrarEventos);
-            document.getElementById('filtroCategoria').addEventListener('change', filtrarYMostrarEventos);
-
-            // Actualizar año del footer
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            displayCurrentDate();
+            fetchEvents();
         });
 
-        function mostrarFechaActual() {
-            const fechaElement = document.getElementById('fechaHoy');
-            const hoy = new Date();
-            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            fechaElement.textContent = hoy.toLocaleDateString('es-ES', opciones);
+        function displayCurrentDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('fechaHoy').textContent = today.toLocaleDateString('es-ES', options);
         }
 
-        async function cargarEventos() {
-            mostrarEstado('loading');
+        // ========================================
+        // MANEJO DE DATOS
+        // ========================================
+
+        async function fetchEvents() {
+            showLoading(true);
+            hideError();
+            hideNoEvents();
+            eventosGrid.style.display = 'none';
+            statsSection.style.display = 'none';
+
             try {
-                const response = await fetch(GOOGLE_APP_SCRIPT_WEB_APP_URL); //
+                const response = await fetch(GOOGLE_APPS_SCRIPT_WEB_APP_URL);
                 if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json(); //
+                const data = await response.json();
 
-                if (data.error) { //
-                    throw new Error(`Error del servidor: ${data.message}`); //
+                if (data.error) {
+                    throw new Error(data.message || "Error desconocido de la aplicación web.");
                 }
 
-                todosLosEventos = data.data.eventos || []; //
-                actualizarEstadisticas(data.data.metadata); //
-                filtrarYMostrarEventos();
+                allEvents = data.eventos || [];
+                displayEvents(); // Muestra los eventos iniciales (todos)
 
             } catch (error) {
-                console.error("Error al cargar eventos:", error);
-                mostrarEstado('error', error.message);
+                console.error("Error al obtener eventos:", error);
+                showError(`No se pudieron cargar los datos históricos. ${error.message}`);
+                // Mostrar datos de ejemplo si la carga falla completamente
+                allEvents = getExampleEvents();
+                displayEvents(); // Intenta mostrar eventos de ejemplo
+            } finally {
+                showLoading(false);
             }
         }
 
-        function filtrarYMostrarEventos() {
-            const filtroAños = document.getElementById('filtroAños').value;
-            const filtroPais = document.getElementById('filtroPais').value;
-            const filtroCategoria = document.getElementById('filtroCategoria').value;
+        function displayEvents() {
+            eventosGrid.innerHTML = ''; // Limpiar la cuadrícula
+            hideError();
+            hideNoEvents();
+            
+            let filteredEvents = allEvents;
 
-            let eventosFiltrados = todosLosEventos;
+            // Aplicar filtros
+            const selectedAños = filtroAños.value;
+            const selectedPais = filtroPais.value;
+            const selectedCategoria = filtroCategoria.value;
 
-            if (filtroAños) {
-                eventosFiltrados = eventosFiltrados.filter(evento =>
-                    evento.añosAtras == parseInt(filtroAños)
-                );
+            if (selectedAños) {
+                filteredEvents = filteredEvents.filter(evento => String(evento.AñosAtrás) === selectedAños);
             }
-
-            if (filtroPais) {
-                eventosFiltrados = eventosFiltrados.filter(evento =>
-                    evento.pais === filtroPais
-                );
+            if (selectedPais) {
+                filteredEvents = filteredEvents.filter(evento => evento.País === selectedPais);
             }
-
-            if (filtroCategoria) {
-                eventosFiltrados = eventosFiltrados.filter(evento =>
-                    evento.categoria === filtroCategoria
-                );
+            if (selectedCategoria) {
+                filteredEvents = filteredEvents.filter(evento => evento.Categoría === selectedCategoria);
             }
-
-            renderizarEventos(eventosFiltrados);
-            mostrarEstado('content');
-        }
-
-        function renderizarEventos(eventos) {
-            const eventosGrid = document.getElementById('eventos');
-            eventosGrid.innerHTML = ''; // Limpiar eventos anteriores
-
-            if (eventos.length === 0) {
-                mostrarEstado('no-eventos');
+            
+            // Si no hay eventos filtrados
+            if (filteredEvents.length === 0) {
+                showNoEvents();
+                eventosGrid.style.display = 'none';
+                statsSection.style.display = 'none';
+                updateStats(0, 0, 0); // Reset stats
                 return;
             }
 
-            eventos.forEach(evento => {
-                const card = document.createElement('div');
-                card.className = 'evento-card fade-in'; // Añadir clase de animación
+            // Ordenar por relevancia y año
+            filteredEvents.sort((a, b) => {
+                const relevanciaDiff = (b.Relevancia || 5) - (a.Relevancia || 5);
+                if (relevanciaDiff !== 0) return relevanciaDiff;
+                const añoA = parseInt(a.AñoEvento);
+                const añoB = parseInt(b.AñoEvento);
+                if (!isNaN(añoA) && !isNaN(añoB)) return añoA - añoB;
+                return 0;
+            });
 
-                const tagPaisClass = evento.pais === "España" ? "tag-españa" : "tag-mundial";
-                const tagCategoriaClass = `tag-${evento.categoria.toLowerCase().replace(/ /g, '-')}`;
+            // Renderizar eventos
+            filteredEvents.forEach(evento => {
+                const card = document.createElement('div');
+                card.className = 'evento-card fade-in'; // Aplicar animación
+                
+                const tagsHtml = `<div class="evento-tags">
+                                    <span class="evento-tag tag-${evento.País?.toLowerCase().replace(/ /g, '-') || 'general'}">${evento.País || 'Global'}</span>
+                                    <span class="evento-tag tag-${evento.Categoría?.toLowerCase().replace(/ /g, '-') || 'general'}">${evento.Categoría || 'General'}</span>
+                                  </div>`;
 
                 card.innerHTML = `
                     <div class="evento-header">
-                        <span class="evento-fecha">Fecha: ${new Date(evento.fecha + 'T00:00:00').toLocaleDateString('es-ES', { month: 'long', day: 'numeric' })}</span>
-                        <span class="evento-años">${evento.añosAtras} años atrás</span>
+                        <span class="evento-fecha">${evento.Fecha || 'Fecha Desconocida'}</span>
+                        <span class="evento-años">${evento.AñosAtrás ? evento.AñosAtrás + ' años' : ''}</span>
                     </div>
-                    <div class="evento-año">${evento.añoEvento}</div>
-                    <div class="evento-titulo">${evento.evento}</div>
-                    <div class="evento-tags">
-                        <span class="evento-tag ${tagPaisClass}">${evento.pais}</span>
-                        <span class="evento-tag ${tagCategoriaClass}">${evento.categoria}</span>
-                        <span class="evento-tag tag-historico">${evento.fuente}</span>
-                    </div>
+                    <div class="evento-año">${evento.AñoEvento || 'N/A'}</div>
+                    <h3 class="evento-titulo">${evento.Evento || 'Evento Desconocido'}</h3>
+                    ${tagsHtml}
                 `;
                 eventosGrid.appendChild(card);
             });
-            eventosGrid.style.display = 'grid'; // Asegurarse de que el grid se muestra
+            eventosGrid.style.display = 'grid';
+            statsSection.style.display = 'grid';
+            updateStats(filteredEvents.length); // Actualiza estadísticas con eventos filtrados
         }
 
-        function actualizarEstadisticas(metadata) {
-            document.getElementById('totalEventos').textContent = metadata.totalEventos;
-            document.getElementById('ultimaActualizacion').textContent = metadata.ultimaActualizacion.split('T')[0]; // Solo la fecha
-
-            const eventosEspaña = todosLosEventos.filter(e => e.pais === 'España').length;
-            const eventosMundiales = todosLosEventos.filter(e => e.pais === 'Mundial').length;
-
+        function updateStats(displayedCount) {
+            const eventosEspaña = allEvents.filter(e => e.País === 'España').length;
+            const eventosMundiales = allEvents.filter(e => e.País === 'Mundial').length;
+            
+            document.getElementById('totalEventos').textContent = displayedCount;
             document.getElementById('eventosEspaña').textContent = eventosEspaña;
             document.getElementById('eventosMundiales').textContent = eventosMundiales;
-
-            document.getElementById('estadisticas').style.display = 'grid'; // Mostrar estadísticas
+            // El rango de años es estático en el Apps Script (20-30 años atrás)
+            document.getElementById('añosRango').textContent = '20-30';
         }
 
-        function mostrarEstado(estado, mensaje = '') {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'none';
-            document.getElementById('eventos').style.display = 'none';
-            document.getElementById('noEventos').style.display = 'none';
-            document.getElementById('estadisticas').style.display = 'none'; // Ocultar por defecto, se muestra si hay datos
+        // ========================================
+        // ESTADOS DE UI
+        // ========================================
 
-            switch (estado) {
-                case 'loading':
-                    document.getElementById('loading').style.display = 'block';
-                    break;
-                case 'error':
-                    document.getElementById('error').style.display = 'block';
-                    document.getElementById('errorMessage').textContent = mensaje || 'Se ha producido un error al obtener los datos. Por favor, inténtalo de nuevo más tarde o revisa la configuración del script de Google Apps Script.';
-                    break;
-                case 'no-eventos':
-                    document.getElementById('noEventos').style.display = 'block';
-                    break;
-                case 'content':
-                    document.getElementById('eventos').style.display = 'grid';
-                    document.getElementById('estadisticas').style.display = 'grid';
-                    break;
-            }
+        function showLoading(show) {
+            loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            errorMessageElem.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            errorDiv.style.display = 'none';
+        }
+
+        function showNoEvents() {
+            noEventosDiv.style.display = 'block';
+        }
+
+        function hideNoEvents() {
+            noEventosDiv.style.display = 'none';
+        }
+
+        // Función llamada por el botón "Actualizar Datos"
+        function actualizarEventos() {
+            fetchEvents();
+        }
+
+        // ========================================
+        // DATOS DE EJEMPLO (solo para fallback si la API falla)
+        // ========================================
+        function getExampleEvents() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+
+            return [
+                {
+                    "ID": "example_1",
+                    "Fecha": `${year - 25}-${month}-${day}`,
+                    "CategoríaTemporal": "25 años atrás",
+                    "AñosAtrás": 25,
+                    "AñoEvento": year - 25,
+                    "Evento": "Se funda una importante empresa tecnológica en Silicon Valley, marcando un hito en la era digital.",
+                    "País": "Mundial",
+                    "Categoría": "Tecnología",
+                    "Fuente": "Ejemplo",
+                    "Relevancia": 8,
+                    "Timestamp": new Date().toISOString()
+                },
+                {
+                    "ID": "example_2",
+                    "Fecha": `${year - 20}-${month}-${day}`,
+                    "CategoríaTemporal": "20 años atrás",
+                    "AñosAtrás": 20,
+                    "AñoEvento": year - 20,
+                    "Evento": "Gran manifestación nacional en España por derechos civiles y libertades fundamentales.",
+                    "País": "España",
+                    "Categoría": "Político",
+                    "Fuente": "Ejemplo",
+                    "Relevancia": 7,
+                    "Timestamp": new Date().toISOString()
+                },
+                {
+                    "ID": "example_3",
+                    "Fecha": `${year - 30}-${month}-${day}`,
+                    "CategoríaTemporal": "30 años atrás",
+                    "AñosAtrás": 30,
+                    "AñoEvento": year - 30,
+                    "Evento": "Un descubrimiento arqueológico importante redefine la comprensión de una antigua civilización.",
+                    "País": "Mundial",
+                    "Categoría": "Histórico",
+                    "Fuente": "Ejemplo",
+                    "Relevancia": 9,
+                    "Timestamp": new Date().toISOString()
+                }
+            ];
         }
     </script>
 </body>
