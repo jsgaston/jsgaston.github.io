@@ -326,14 +326,14 @@
             }
         }
 
-        function renderEvents(events) {
-            const eventsContainer = document.getElementById('events-container');
-            eventsContainer.innerHTML = ''; // Limpiar spinner de carga o contenido anterior
+function renderEvents(events) {
+    const eventsContainer = document.getElementById('events-container');
+    eventsContainer.innerHTML = ''; // Limpiar spinner de carga o contenido anterior
 
-            if (!events || events.length === 0) {
-                eventsContainer.innerHTML = '<p class="no-events">No se encontraron eventos históricos para hoy.</p>';
-                return;
-            }
+    if (!events || events.length === 0) {
+        eventsContainer.innerHTML = '<p class="no-events">No se encontraron eventos históricos para hoy.</p>';
+        return;
+    }
 
             // Agrupar eventos por 'Categoría Temporal'
             const groupedEvents = events.reduce((acc, event) => {
@@ -354,14 +354,14 @@
             
             const categoriesRendered = new Set();
 
-            // Renderizar secciones en el orden definido
             order.forEach(category => {
                 if (groupedEvents[category] && groupedEvents[category].length > 0) {
                     const sectionDiv = document.createElement('div');
                     sectionDiv.className = 'timeline-section';
                     sectionDiv.innerHTML = `<h2>${category}</h2>`; // Usar la categoría como título
-
+        
                     groupedEvents[category].forEach(event => {
+                        console.log("Evento Año:", event.AñoEvento); // <-- Añade esta línea para depurar
                         const eventCard = document.createElement('div');
                         eventCard.className = 'event-card';
                         eventCard.innerHTML = `
