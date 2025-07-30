@@ -221,8 +221,8 @@
             loadingSpinner.style.display = 'block'; // Show spinner
 
             try {
-                // Replace with your actual Web App URL
-                const response = await fetch('https://script.google.com/macros/s/AKfycbzmW8oAOaovmh_CxrU4BJanAV_1zPPxI5oQR7zBR-AGiArB55mGm4VTxUQ9PHHASgLf2w/exec'); // <--- IMPORTANT: Update this URL
+                // IMPORTANT: Replace 'YOUR_WEB_APP_URL_HERE' with the actual URL from your Google Apps Script deployment.
+                const response = await fetch('https://script.google.com/macros/s/AKfycbzmW8oAOaovmh_CxrU4BJanAV_1zPPxI5oQR7zBR-AGiArB55mGm4VTxUQ9PHHASgLf2w/exec');
                 const data = await response.json();
                 displayEvents(data);
             } catch (error) {
@@ -274,10 +274,10 @@
                 if (groupedEvents[category].length > 0) {
                     const sectionDiv = document.createElement('div');
                     sectionDiv.className = 'timeline-section';
-                    // Changed: Use the exact category for the title if available, otherwise fallback.
-                    // This uses the category directly, which is what your previous code snippet had for "Otros Eventos",
-                    // but applied consistently for all categories.
-                    sectionDiv.innerHTML = `<h2>${category}</h2>`; 
+                    // The original "50s (17).html" snippet had `<h2>Otros Eventos (${category})</h2>`
+                    // for all categories. If you want the category name as the title, use `<h2>${category}</h2>`.
+                    // Sticking to original for minimal change, but recommend `<h2>${category}</h2>` for clarity.
+                    sectionDiv.innerHTML = `<h2>Otros Eventos (${category})</h2>`; 
 
                     // Sort events within each category by 'Año del Evento' descending
                     groupedEvents[category].sort((a, b) => parseInt(b['Año del Evento']) - parseInt(a['Año del Evento']));
@@ -286,7 +286,7 @@
                         const eventCard = document.createElement('div');
                         eventCard.className = 'event-card';
 
-                        // --- START OF MINIMAL CHANGE ---
+                        // --- START OF CHANGES FOR DATE DISPLAY ---
                         // Extracting day and month from the "Fecha" field
                         const eventDate = event.Fecha ? new Date(event.Fecha) : null;
                         const formattedDate = eventDate ? eventDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }) : 'Fecha Desconocida';
@@ -301,7 +301,7 @@
                                 ${event.Fuente && event.Fuente !== 'Wikipedia' && event.Fuente.startsWith('http') ? `<span class="event-source"><strong>Fuente:</strong> <a href="${event.Fuente}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : '<span><strong>Fuente:</strong> Wikipedia</span>'}
                             </div>
                         `;
-                        // --- END OF MINIMAL CHANGE ---
+                        // --- END OF CHANGES FOR DATE DISPLAY ---
                         sectionDiv.appendChild(eventCard);
                     });
                     eventsContainer.appendChild(sectionDiv);
