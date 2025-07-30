@@ -1,131 +1,481 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos por Fecha - Gastón</title>
-    
+    <title>Eventos Históricos - 50s</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            background-color: #fff;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
+        }
+
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        h1 {
-            color: #0056b3;
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
             text-align: center;
         }
-        h3 {
-            color: #007bff;
-            margin-top: 25px;
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        p {
-            margin: 8px 0;
-            line-height: 1.6;
-        }
-        strong {
-            color: #0056b3;
-        }
-        hr {
-            border: 0;
-            border-top: 1px solid #eee;
-            margin: 20px 0;
-        }
-        #loading {
-            text-align: center;
+
+        .header p {
             font-size: 1.2em;
-            color: #555;
-            margin-top: 50px;
+            opacity: 0.9;
         }
-        .error-message {
-            color: red;
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-item label {
             font-weight: bold;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .loading {
             text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .eventos-container {
+            padding: 20px;
+        }
+
+        .eventos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
             margin-top: 20px;
+        }
+
+        .evento-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-left: 5px solid #4CAF50;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .evento-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .evento-fecha {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .evento-año {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .evento-titulo {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .evento-detalles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .evento-tag {
+            background: #e8f5e8;
+            color: #2e7d2e;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .evento-tag.españa {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .evento-tag.mundial {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            margin: 20px;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px;
+            border-left: 5px solid #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .eventos-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Información Histórica por Fecha</h1>
-        <div id="loading">Cargando información...</div>
-        <div id="date-info">
+        <div class="header">
+            <h1>📅 Eventos Históricos</h1>
+            <p>Descubre qué pasó en fechas como hoy hace 20-30 años</p>
+        </div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="filtroAños">Años atrás:</label>
+                    <select id="filtroAños">
+                        <option value="">Todos</option>
+                        <option value="25">25 años</option>
+                        <option value="20">20 años</option>
+                        <option value="21">21 años</option>
+                        <option value="22">22 años</option>
+                        <option value="23">23 años</option>
+                        <option value="24">24 años</option>
+                        <option value="26">26 años</option>
+                        <option value="27">27 años</option>
+                        <option value="28">28 años</option>
+                        <option value="29">29 años</option>
+                        <option value="30">30 años</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label for="filtroPais">País:</label>
+                    <select id="filtroPais">
+                        <option value="">Todos</option>
+                        <option value="España">España</option>
+                        <option value="Mundial">Mundial</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label for="filtroCategoria">Categoría:</label>
+                    <select id="filtroCategoria">
+                        <option value="">Todas</option>
+                        <option value="Histórico">Histórico</option>
+                        <option value="Nacional">Nacional</option>
+                        <option value="Político">Político</option>
+                        <option value="Cultural">Cultural</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="cargarEventos()">🔄 Actualizar</button>
             </div>
+        </div>
+
+        <div class="stats" id="estadisticas" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-number" id="totalEventos">0</div>
+                <div class="stat-label">Total Eventos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="eventosEspaña">0</div>
+                <div class="stat-label">Eventos España</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="eventosMundiales">0</div>
+                <div class="stat-label">Eventos Mundiales</div>
+            </div>
+        </div>
+
+        <div class="eventos-container">
+            <div id="loading" class="loading">
+                <p>🔄 Cargando eventos históricos...</p>
+            </div>
+            <div id="eventos" class="eventos-grid" style="display: none;"></div>
+            <div id="error" class="error" style="display: none;"></div>
+        </div>
     </div>
 
     <script>
-        // ¡¡¡MUY IMPORTANTE!!!
-        // PEGA AQUÍ LA URL DE TU API DE APPS SCRIPT QUE OBTUVISTE EN EL PASO 3.
-        const APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbyJShfeNwLll9nNHgVKbyTqk1fcbSgneqxqPcNXqmLHtRWYc1cjL8IFm9EtWHMvHqzlcw/exec'; 
+        // Configuración
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdwyA-JzriWaJqqUaX7z_Z4KhNRhpicb39hX6EGT-LD2L5TteGGkYsAwgCOeQ6f2hD7A/exec'; // Debes reemplazar esto
+        let eventosData = [];
 
+        // Cargar eventos al inicio
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM cargado, intentando obtener datos de Apps Script API...');
-            // Usa 'fetch' para hacer una petición HTTP GET a tu API de Apps Script
-            fetch(APPS_SCRIPT_API_URL)
-                .then(response => {
-                    if (!response.ok) { // Si la respuesta HTTP no es 200 OK
-                        throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json(); // Parsea la respuesta como JSON
-                })
-                .then(data => {
-                    displayData(data); // Llama a la función para mostrar los datos
-                })
-                .catch(error => {
-                    showError(error); // Llama a la función para mostrar errores
-                });
+            cargarEventos();
+            
+            // Agregar event listeners a los filtros
+            document.getElementById('filtroAños').addEventListener('change', filtrarEventos);
+            document.getElementById('filtroPais').addEventListener('change', filtrarEventos);
+            document.getElementById('filtroCategoria').addEventListener('change', filtrarEventos);
         });
 
-        function displayData(data) {
-            const loadingDiv = document.getElementById('loading');
-            const dateInfoDiv = document.getElementById('date-info');
-            loadingDiv.style.display = 'none';
-            console.log('Datos recibidos de Apps Script API:', data);
+        async function cargarEventos() {
+            const loading = document.getElementById('loading');
+            const eventos = document.getElementById('eventos');
+            const error = document.getElementById('error');
+            const estadisticas = document.getElementById('estadisticas');
 
-            if (data && data.error) {
-                dateInfoDiv.innerHTML = `<p class="error-message">Error del servidor (API): ${data.error}</p>`;
-                return;
-            }
-            if (!data || data.length === 0) {
-                 dateInfoDiv.innerHTML = `<p class="error-message">No se encontró información para las fechas.</p>`;
-                 return;
-            }
+            loading.style.display = 'block';
+            eventos.style.display = 'none';
+            error.style.display = 'none';
+            estadisticas.style.display = 'none';
 
-            let htmlContent = '';
-            data.forEach(item => {
-                htmlContent += `
-                    <h3>${item.label} (${item.date})</h3>
-                    <p><strong>En el mundo:</strong> ${item.infoMundial}</p>
-                    <p><strong>En España:</strong> ${item.infoEspana}</p>
-                    <hr>
+            try {
+                // Si no tienes la URL del Google Script configurada, usar datos de demostración
+                if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('TU_URL')) {
+                    eventosData = generarDatosDemostracion();
+                } else {
+                    const response = await fetch(GOOGLE_SCRIPT_URL);
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    eventosData = await response.json();
+                }
+
+                mostrarEventos(eventosData);
+                actualizarEstadisticas(eventosData);
+                
+                loading.style.display = 'none';
+                eventos.style.display = 'grid';
+                estadisticas.style.display = 'flex';
+
+            } catch (err) {
+                console.error('Error cargando eventos:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.innerHTML = `
+                    <strong>Error cargando datos:</strong> ${err.message}
+                    <br><small>Mostrando datos de demostración...</small>
                 `;
-            });
-            dateInfoDiv.innerHTML = htmlContent;
+                
+                // Mostrar datos de demostración en caso de error
+                eventosData = generarDatosDemostracion();
+                mostrarEventos(eventosData);
+                actualizarEstadisticas(eventosData);
+                eventos.style.display = 'grid';
+                estadisticas.style.display = 'flex';
+            }
         }
 
-        function showError(error) {
-            const loadingDiv = document.getElementById('loading');
-            const dateInfoDiv = document.getElementById('date-info');
-            loadingDiv.style.display = 'none';
+        function generarDatosDemostracion() {
+            const hoy = new Date();
+            const datos = [];
             
-            let errorMessage = "Se produjo un error desconocido al obtener la información.";
-            if (error && error.message) {
-                errorMessage = `Se produjo un error: ${error.message}`;
-            } else if (typeof error === 'string') {
-                errorMessage = `Se produjo un error: ${error}`;
+            // Generar algunos eventos de ejemplo
+            const eventosEjemplo = [
+                { evento: "Fundación de Google", pais: "Mundial", categoria: "Tecnológico" },
+                { evento: "Lanzamiento del Euro", pais: "Europa", categoria: "Económico" },
+                { evento: "Atentados del 11-M en Madrid", pais: "España", categoria: "Histórico" },
+                { evento: "Inauguración de la T4 en Barajas", pais: "España", categoria: "Infraestructura" },
+                { evento: "Lanzamiento de Facebook", pais: "Mundial", categoria: "Tecnológico" },
+                { evento: "Tsunami del Océano Índico", pais: "Mundial", categoria: "Natural" }
+            ];
+
+            [20, 25, 30].forEach(años => {
+                [-2, -1, 0, 1, 2].forEach(offset => {
+                    const fecha = new Date(hoy);
+                    fecha.setFullYear(fecha.getFullYear() - años);
+                    fecha.setDate(fecha.getDate() + offset);
+                    
+                    const eventoAleatorio = eventosEjemplo[Math.floor(Math.random() * eventosEjemplo.length)];
+                    
+                    datos.push({
+                        "Fecha": fecha.toISOString().split('T')[0],
+                        "Categoría Temporal": `${años} años atrás`,
+                        "Años Atrás": años,
+                        "Año del Evento": fecha.getFullYear(),
+                        "Evento": eventoAleatorio.evento,
+                        "País": eventoAleatorio.pais,
+                        "Categoría": eventoAleatorio.categoria,
+                        "Fuente": "Demostración"
+                    });
+                });
+            });
+
+            return datos;
+        }
+
+        function mostrarEventos(eventos) {
+            const container = document.getElementById('eventos');
+            
+            if (eventos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 50px;">No se encontraron eventos para los filtros seleccionados.</p>';
+                return;
             }
-            
-            dateInfoDiv.innerHTML = `<p class="error-message">${errorMessage} Por favor, verifica la URL de la API y los permisos de tu Apps Script.</p>`;
-            console.error('Error al llamar a Apps Script API:', error);
+
+            const html = eventos.map(evento => `
+                <div class="evento-card">
+                    <div class="evento-fecha">${formatearFecha(evento["Fecha"])}</div>
+                    <div class="evento-año">${evento["Año del Evento"]}</div>
+                    <div class="evento-titulo">${evento["Evento"]}</div>
+                    <div class="evento-detalles">
+                        <span class="evento-tag ${evento["País"].toLowerCase()}">${evento["País"]}</span>
+                        <span class="evento-tag">${evento["Categoría"]}</span>
+                        <span class="evento-tag">${evento["Años Atrás"]} años atrás</span>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function filtrarEventos() {
+            const filtroAños = document.getElementById('filtroAños').value;
+            const filtroPais = document.getElementById('filtroPais').value;
+            const filtroCategoria = document.getElementById('filtroCategoria').value;
+
+            let eventosFiltrados = eventosData;
+
+            if (filtroAños) {
+                eventosFiltrados = eventosFiltrados.filter(evento => 
+                    evento["Años Atrás"].toString() === filtroAños
+                );
+            }
+
+            if (filtroPais) {
+                eventosFiltrados = eventosFiltrados.filter(evento => 
+                    evento["País"] === filtroPais
+                );
+            }
+
+            if (filtroCategoria) {
+                eventosFiltrados = eventosFiltrados.filter(evento => 
+                    evento["Categoría"] === filtroCategoria
+                );
+            }
+
+            mostrarEventos(eventosFiltrados);
+            actualizarEstadisticas(eventosFiltrados);
+        }
+
+        function actualizarEstadisticas(eventos) {
+            const total = eventos.length;
+            const españa = eventos.filter(e => e["País"] === "España").length;
+            const mundiales = eventos.filter(e => e["País"] === "Mundial").length;
+
+            document.getElementById('totalEventos').textContent = total;
+            document.getElementById('eventosEspaña').textContent = españa;
+            document.getElementById('eventosMundiales').textContent = mundiales;
+        }
+
+        function formatearFecha(fecha) {
+            const date = new Date(fecha);
+            return date.toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
         }
     </script>
 </body>
