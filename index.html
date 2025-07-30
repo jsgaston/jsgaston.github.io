@@ -459,7 +459,13 @@
   overflow: hidden;
 }
 
-#maintontoSection {
+#maintontoSection iframe2 {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+        #maintontoSection {
   display: block;
   position: relative;
   z-index: 1;
@@ -475,6 +481,15 @@
   position: relative;
   z-index: 1;
 }
+
+        /* Oculta cualquier iframe dentro de secciones ocultas */
+.main-tab-content.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none;
+      z-index: -1000 !important;
+}
 /* Oculta cualquier iframe dentro de secciones ocultas */
 .main-tab-content.hidden iframe {
   display: none !important;
@@ -486,7 +501,7 @@
 
 }
 /* Oculta cualquier iframe dentro de secciones ocultas */
-.main-tab-content.hidden {
+.main-tab-content.hidden iframe2{
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
