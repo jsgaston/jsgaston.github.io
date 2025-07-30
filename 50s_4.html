@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos por Fecha</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center;
+        }
+        h3 {
+            color: #007bff;
+            margin-top: 25px;
+        }
+        p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        strong {
+            color: #0056b3;
+        }
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+        #loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Información Histórica por Fecha</h1>
+        <div id="loading">Cargando información...</div>
+        <div id="date-info">
+            </div>
+    </div>
+
+    <script>
+        // Función que se ejecuta cuando la página HTML ha terminado de cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Llama a la función 'getHistoricalData' en el script de Google Apps Script
+            google.script.run
+                .withSuccessHandler(displayData) // Si la llamada es exitosa, ejecuta displayData
+                .withFailureHandler(showError)   // Si hay un error, ejecuta showError
+                .getHistoricalData();            // La función de Apps Script a llamar
+        });
+
+        // Función para mostrar los datos recibidos de Apps Script
+        function displayData(data) {
+            const loadingDiv = document.getElementById('loading');
+            const dateInfoDiv = document.getElementById('date-info');
+            loadingDiv.style.display = 'none'; // Oculta el mensaje de carga
+
+            if (data.error) {
+                dateInfoDiv.innerHTML = `<p style="color: red;">Error al cargar los datos: ${data.error}</p>`;
+                return;
+            }
+
+            let htmlContent = '';
+            data.forEach(item => {
+                htmlContent += `
+                    <h3>${item.label} (${item.date})</h3>
+                    <p><strong>En el mundo:</strong> ${item.infoMundial}</p>
+                    <p><strong>En España:</strong> ${item.infoEspana}</p>
+                    <hr>
+                `;
+            });
+            dateInfoDiv.innerHTML = htmlContent;
+        }
+
+        // Función para manejar errores de la llamada a Apps Script
+        function showError(error) {
+            const loadingDiv = document.getElementById('loading');
+            const dateInfoDiv = document.getElementById('date-info');
+            loadingDiv.style.display = 'none'; // Oculta el mensaje de carga
+            dateInfoDiv.innerHTML = `<p style="color: red;">Se produjo un error al obtener la información: ${error.message || error}. Por favor, recarga la página o contacta al administrador.</p>`;
+            console.error('Apps Script error:', error);
+        }
+    </script>
+</body>
+</html>
