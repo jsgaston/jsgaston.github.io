@@ -358,7 +358,7 @@
     <script>
         // *** IMPORTANTE: REEMPLAZA ESTO CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT DESPLEGADA ***
         // Ejemplo: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX.../exec";
-        const SCRIPT_URL_50s = "https://script.google.com/macros/s/AKfycbwBFpdKF48xcoJAExj2xpMA0X8e2mjMVqjN8hTUERjU3-IK2Brt0nsCwwYuD116AjWTzQ/exec"; 
+        const SCRIPT_URL_50s = "https://script.google.com/macros/s/AKfycbzmW8oAOaovmh_CxrU4BJanAV_1zPPxI5oQR7zBR-AGiArB55mGm4VTxUQ9PHHASgLf2w/exec"; 
 
         document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('date-input');
@@ -463,7 +463,7 @@
                         eventCard.className = 'event-card';
                         eventCard.innerHTML = `
                             <h3>${event.Evento}</h3>
-                            <p><strong>Año:</strong> ${event.AñoDelEvento}</p>
+                            <p><strong>Año:</strong> ${event.AñoDelEvento}</p> <!-- CAMBIO AQUÍ: event.AñoDelEvento -->
                             <div class="event-meta">
                                 <span><strong>País:</strong> ${event.País || 'Desconocido'}</span>
                                 <span><strong>Categoría:</strong> ${event.Categoría || 'General'}</span>
@@ -490,7 +490,7 @@
                         eventCard.className = 'event-card';
                         eventCard.innerHTML = `
                             <h3>${event.Evento}</h3>
-                            <p><strong>Año:</strong> ${event.AñoDelEvento}</p>
+                            <p><strong>Año:</strong> ${event.AñoDelEvento}</p> <!-- CAMBIO AQUÍ: event.AñoDelEvento -->
                             <div class="event-meta">
                                 <span><strong>País:</strong> ${event.País || 'Desconocido'}</span>
                                 <span><strong>Categoría:</strong> ${event.Categoría || 'General'}</span>
