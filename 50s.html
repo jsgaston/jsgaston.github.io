@@ -299,10 +299,10 @@
                 </div>
             `; // Mostrar spinner de carga
 
-            try {
-                if (SCRIPT_URL === SCRIPT_URL_50s ) {
-                    throw new Error("La URL del Script de Google Apps no está configurada. Por favor, despliega tu script como una aplicación web y actualiza SCRIPT_URL en el HTML.");
-                }
+            //try {
+                //if (SCRIPT_URL === SCRIPT_URL_50s ) {
+                 //   throw new Error("La URL del Script de Google Apps no está configurada. Por favor, despliega tu script como una aplicación web y actualiza SCRIPT_URL en el HTML.");
+                //}
 
                 const response = await fetch(SCRIPT_URL_50s);
                 if (!response.ok) {
