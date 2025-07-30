@@ -283,9 +283,9 @@
     </footer>
 
     <script>
-        // REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
+        // *** IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL ***
         // Example: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX.../exec";
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcWqrMLrx8UyaO5E4UFZTTFqZplOiJ6gogFEDGpepK0uMdZqLfiqQ7IxFYQibLSMHfuQ/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxarp1KtZv2XxNt_ihGUDhiwU1YKFimRKjsZB0QaCdpzNb8fXK7rLTXptd9up0ueSb3Pw/exec"; 
 
         document.addEventListener('DOMContentLoaded', fetchAndRenderEvents);
 
@@ -300,12 +300,16 @@
             `; // Show loading spinner
 
             try {
+                if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbxarp1KtZv2XxNt_ihGUDhiwU1YKFimRKjsZB0QaCdpzNb8fXK7rLTXptd9up0ueSb3Pw/exec") {
+                    throw new Error("La URL del Script de Google Apps no está configurada. Por favor, despliega tu script como una aplicación web y actualiza SCRIPT_URL en el HTML.");
+                }
+
                 const response = await fetch(SCRIPT_URL);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log("Fetched data:", data); // Debugging
+                console.log("Fetched data:", data); // Debugging: Check what data is received
 
                 currentDateElement.textContent = `Eventos del ${data.date || 'día actual'}`;
                 renderEvents(data.events);
@@ -342,7 +346,9 @@
             }, {});
 
             // Define a preferred order for sections
-            const order = ["20 años atrás", "30 años atrás", "50 años atrás", "Otros"]; // Add "Otros" for any unexpected categories
+            // Ensure the keys here match exactly the "Categoría Temporal" values from your script
+            const order = ["20 años atrás", "30 años atrás", "50 años atrás"]; 
+            const categoriesRendered = new Set();
 
             // Render sections in the defined order
             order.forEach(category => {
@@ -361,21 +367,23 @@
                                 <span><strong>País:</strong> ${event.País || 'Desconocido'}</span>
                                 <span><strong>Categoría:</strong> ${event.Categoría || 'General'}</span>
                                 <span><strong>Relevancia:</strong> ${event.Relevancia || 'N/A'}/10</span>
-                                ${event.Fuente && event.Fuente !== 'Wikipedia' ? `<span class="event-source"><strong>Fuente:</strong> <a href="${event.Fuente}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : '<span><strong>Fuente:</strong> Wikipedia</span>'}
+                                ${event.Fuente && event.Fuente !== 'Wikipedia' && event.Fuente.startsWith('http') ? `<span class="event-source"><strong>Fuente:</strong> <a href="${event.Fuente}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : '<span><strong>Fuente:</strong> Wikipedia</span>'}
                             </div>
                         `;
                         sectionDiv.appendChild(eventCard);
                     });
                     eventsContainer.appendChild(sectionDiv);
+                    categoriesRendered.add(category);
                 }
             });
 
-            // Handle any categories not in the preferred order (e.g., if Wikipedia returns "100 years ago")
+            // Handle any categories not in the preferred order (e.g., if Wikipedia returns something else)
+            // This ensures all data is displayed even if a new category appears.
             Object.keys(groupedEvents).forEach(category => {
-                if (!order.includes(category)) {
+                if (!categoriesRendered.has(category)) {
                     const sectionDiv = document.createElement('div');
                     sectionDiv.className = 'timeline-section';
-                    sectionDiv.innerHTML = `<h2>Hace ${category}</h2>`; // Use the category as is
+                    sectionDiv.innerHTML = `<h2>Otros Eventos (${category})</h2>`; // Use a generic title for "other" categories
 
                     groupedEvents[category].forEach(event => {
                         const eventCard = document.createElement('div');
@@ -387,7 +395,7 @@
                                 <span><strong>País:</strong> ${event.País || 'Desconocido'}</span>
                                 <span><strong>Categoría:</strong> ${event.Categoría || 'General'}</span>
                                 <span><strong>Relevancia:</strong> ${event.Relevancia || 'N/A'}/10</span>
-                                ${event.Fuente && event.Fuente !== 'Wikipedia' ? `<span class="event-source"><strong>Fuente:</strong> <a href="${event.Fuente}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : '<span><strong>Fuente:</strong> Wikipedia</span>'}
+                                ${event.Fuente && event.Fuente !== 'Wikipedia' && event.Fuente.startsWith('http') ? `<span class="event-source"><strong>Fuente:</strong> <a href="${event.Fuente}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : '<span><strong>Fuente:</strong> Wikipedia</span>'}
                             </div>
                         `;
                         sectionDiv.appendChild(eventCard);
