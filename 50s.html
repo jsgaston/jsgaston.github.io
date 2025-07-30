@@ -285,7 +285,7 @@
     <script>
         // *** IMPORTANTE: REEMPLAZA ESTO CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT DESPLEGADA ***
         // Ejemplo: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX.../exec";
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxi6OaOBqmW2RWS-O632I9OUqYPJVFv6jChxrZWK4ojZXAPpV_FW5LQEcT9KvqQbm40pA/exec"; 
+        const SCRIPT_URL_50s = "https://script.google.com/macros/s/AKfycbzmW8oAOaovmh_CxrU4BJanAV_1zPPxI5oQR7zBR-AGiArB55mGm4VTxUQ9PHHASgLf2w/exec"; 
 
         document.addEventListener('DOMContentLoaded', fetchAndRenderEvents);
 
@@ -300,7 +300,7 @@
             `; // Mostrar spinner de carga
 
             try {
-                if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbxi6OaOBqmW2RWS-O632I9OUqYPJVFv6jChxrZWK4ojZXAPpV_FW5LQEcT9KvqQbm40pA/exec" ) {
+                if (SCRIPT_URL === SCRIPT_URL_50s ) {
                     throw new Error("La URL del Script de Google Apps no está configurada. Por favor, despliega tu script como una aplicación web y actualiza SCRIPT_URL en el HTML.");
                 }
 
