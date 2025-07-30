@@ -298,14 +298,22 @@
                     Cargando eventos...
                 </div>
             `; // Mostrar spinner de carga
-
-
+        
+            try {
+                // *** ESTAS SON LAS LÍNEAS QUE FALTABAN O ESTABAN MAL ***
+                const response = await fetch(SCRIPT_URL_50s);
+                if (!response.ok) {
+                    // Si la respuesta HTTP no es exitosa (ej. 404, 500), lanzamos un error
+                    throw new Error(`Error HTTP! estado: ${response.status}`);
+                }
+                // *** FIN DE LAS LÍNEAS CORREGIDAS ***
+        
                 const data = await response.json();
                 console.log("Datos obtenidos:", data); // Depuración: Comprobar qué datos se reciben
-
+        
                 currentDateElement.textContent = `Eventos del ${data.date || 'día actual'}`;
                 renderEvents(data.events);
-
+        
             } catch (error) {
                 console.error("Error al obtener eventos históricos:", error);
                 eventsContainer.innerHTML = `
