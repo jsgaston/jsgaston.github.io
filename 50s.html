@@ -703,72 +703,118 @@
             }
         }
 
-        function displayEvents() {
-            eventosGrid.innerHTML = ''; // Limpiar la cuadrícula
-            hideError();
-            hideNoEvents();
-            
-            let filteredEvents = allEvents;
+    function displayEvents() {
+        const container = document.getElementById('events'); // Usar 'events' como en tu HTML
+        container.innerHTML = ''; // Limpiar eventos anteriores
 
-            // Aplicar filtros
-            const selectedAños = filtroAños.value;
-            const selectedPais = filtroPais.value;
-            const selectedCategoria = filtroCategoria.value;
-
-            if (selectedAños) {
-                filteredEvents = filteredEvents.filter(evento => String(evento.AñosAtrás) === selectedAños);
-            }
-            if (selectedPais) {
-                filteredEvents = filteredEvents.filter(evento => evento.País === selectedPais);
-            }
-            if (selectedCategoria) {
-                filteredEvents = filteredEvents.filter(evento => evento.Categoría === selectedCategoria);
-            }
-            
-            // Si no hay eventos filtrados
-            if (filteredEvents.length === 0) {
-                showNoEvents();
-                eventosGrid.style.display = 'none';
-                statsSection.style.display = 'none';
-                updateStats(0, 0, 0); // Reset stats
-                return;
-            }
-
-            // Ordenar por relevancia y año
-            filteredEvents.sort((a, b) => {
-                const relevanciaDiff = (b.Relevancia || 5) - (a.Relevancia || 5);
-                if (relevanciaDiff !== 0) return relevanciaDiff;
-                const añoA = parseInt(a.AñoEvento);
-                const añoB = parseInt(b.AñoEvento);
-                if (!isNaN(añoA) && !isNaN(añoB)) return añoA - añoB;
-                return 0;
-            });
-
-            // Renderizar eventos
-            filteredEvents.forEach(evento => {
-                const card = document.createElement('div');
-                card.className = 'evento-card fade-in'; // Aplicar animación
-                
-                const tagsHtml = `<div class="evento-tags">
-                                    <span class="evento-tag tag-${evento.País?.toLowerCase().replace(/ /g, '-') || 'general'}">${evento.País || 'Global'}</span>
-                                    <span class="evento-tag tag-${evento.Categoría?.toLowerCase().replace(/ /g, '-') || 'general'}">${evento.Categoría || 'General'}</span>
-                                  </div>`;
-
-                card.innerHTML = `
-                    <div class="evento-header">
-                        <span class="evento-fecha">${evento.Fecha || 'Fecha Desconocida'}</span>
-                        <span class="evento-años">${evento.AñosAtrás ? evento.AñosAtrás + ' años' : ''}</span>
-                    </div>
-                    <div class="evento-año">${evento.AñoEvento || 'N/A'}</div>
-                    <h3 class="evento-titulo">${evento.Evento || 'Evento Desconocido'}</h3>
-                    ${tagsHtml}
-                `;
-                eventosGrid.appendChild(card);
-            });
-            eventosGrid.style.display = 'grid';
-            statsSection.style.display = 'grid';
-            updateStats(filteredEvents.length); // Actualiza estadísticas con eventos filtrados
+        if (loadedEvents.length === 0) { // Usar 'loadedEvents' como en tu HTML
+            container.innerHTML = '<p class="text-light">No se encontraron eventos para los filtros seleccionados.</p>';
+            return;
         }
+
+        // Ordenar eventos para una mejor visualización (ej. por 'Años Atrás', luego por 'Año del Evento')
+        // Aquí usamos la notación de corchetes para acceder a las propiedades con espacios en el nombre
+        const eventsOrdered = [...loadedEvents].sort((a, b) => {
+            if (a['Años Atrás'] !== b['Años Atrás']) {
+                return a['Años Atrás'] - b['Años Atrás'];
+            }
+            return b['Año del Evento'] - a['Año del Evento'];
+        });
+
+        eventsOrdered.forEach(eventData => { // Renombramos 'evento' a 'eventData' para mayor claridad
+            const card = document.createElement('div');
+            card.className = 'event-card';
+
+            // Determinar color de icono según la categoría
+            let iconClass = 'fas fa-history'; // Default
+            let categoryIcon = '';
+            let categoryColor = 'var(--text-light)'; // Default color
+
+            // Asegurarse de que eventData.Categoría exista y sea una cadena para toLowerCase
+            const eventCategoryLower = eventData.Categoría ? eventData.Categoría.toLowerCase() : '';
+
+            switch (eventCategoryLower) {
+                case 'event':
+                case 'selected':
+                    iconClass = 'fas fa-calendar-alt';
+                    categoryIcon = '🗓️';
+                    categoryColor = 'var(--primary-color)';
+                    break;
+                case 'birth':
+                    iconClass = 'fas fa-baby';
+                    categoryIcon = '👶';
+                    categoryColor = '#28a745'; // Green for births
+                    break;
+                case 'death':
+                    iconClass = 'fas fa-cross'; // O un icono más apropiado
+                    categoryIcon = '💀';
+                    categoryColor = '#dc3545'; // Red for deaths
+                    break;
+                case 'holiday and observances':
+                case 'holiday':
+                    iconClass = 'fas fa-gift';
+                    categoryIcon = '🎉';
+                    categoryColor = '#ffc107'; // Yellow for holidays
+                    break;
+                // Estas categorías 'político', 'económico', etc. se aplicarían si el script de Apps Script
+                // las clasifica o si vienen directamente de Wikipedia.
+                case 'político':
+                    iconClass = 'fas fa-landmark';
+                    categoryIcon = '🏛️';
+                    categoryColor = '#007bff';
+                    break;
+                case 'económico':
+                    iconClass = 'fas fa-chart-line';
+                    categoryIcon = '📈';
+                    categoryColor = '#6f42c1';
+                    break;
+                case 'social':
+                    iconClass = 'fas fa-users';
+                    categoryIcon = '👥';
+                    categoryColor = '#17a2b8';
+                    break;
+                case 'científico':
+                case 'tecnológico':
+                    iconClass = 'fas fa-flask';
+                    categoryIcon = '🔬';
+                    categoryColor = '#fd7e14';
+                    break;
+                case 'deportivo':
+                    iconClass = 'fas fa-football-ball';
+                    categoryIcon = '🏅';
+                    categoryColor = '#6c757d';
+                    break;
+                case 'cultural':
+                case 'artístico':
+                    iconClass = 'fas fa-palette';
+                    categoryIcon = '🎭';
+                    categoryColor = '#e83e8c';
+                    break;
+                default:
+                    iconClass = 'fas fa-history';
+                    categoryIcon = '⏳';
+                    categoryColor = 'var(--text-light)';
+            }
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="category-icon" style="color: ${categoryColor};">${categoryIcon}</span>
+                    <h3>${eventData['Categoría Temporal']} (${eventData['Año del Evento']})</h3>
+                    <span class="years-ago">${eventData['Años Atrás']} años atrás</span>
+                </div>
+                <div class="card-body">
+                    <p class="event-text">${eventData.Evento}</p>
+                    <div class="event-meta">
+                        ${eventData.País ? `<span class="meta-item"><i class="fas fa-globe-americas"></i> ${eventData.País}</span>` : ''}
+                        ${eventData.Categoría ? `<span class="meta-item"><i class="fas fa-tag"></i> ${eventData.Categoría}</span>` : ''}
+                        ${eventData.Fuente ? `<span class="meta-item"><i class="fas fa-book"></i> ${eventData.Fuente}</span>` : ''}
+                        ${eventData.Relevancia ? `<span class="meta-item"><i class="fas fa-star"></i> ${eventData.Relevancia}/10</span>` : ''}
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
 
         function updateStats(displayedCount) {
             const eventosEspaña = allEvents.filter(e => e.País === 'España').length;
