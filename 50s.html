@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos por Fecha</title>
-
-    <script src="https://apis.google.com/js/api.js"></script> 
-
+    <title>Eventos por Fecha - Gastón</title>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,22 +63,36 @@
     </div>
 
     <script>
+        // ¡¡¡MUY IMPORTANTE!!!
+        // PEGA AQUÍ LA URL DE TU API DE APPS SCRIPT QUE OBTUVISTE EN EL PASO 3.
+        const APPS_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbxEfTC54A2dwAfj3LxuE-OWQnvbvl2_9BL3qXktMUH2jLGsWumxczLilp6lsJAiqbCb1A/exec'; 
+
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM cargado, intentando pedir datos a Google Apps Script...');
-            google.script.run
-                .withSuccessHandler(displayData)
-                .withFailureHandler(showError)
-                .getHistoricalData();
+            console.log('DOM cargado, intentando obtener datos de Apps Script API...');
+            // Usa 'fetch' para hacer una petición HTTP GET a tu API de Apps Script
+            fetch(APPS_SCRIPT_API_URL)
+                .then(response => {
+                    if (!response.ok) { // Si la respuesta HTTP no es 200 OK
+                        throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json(); // Parsea la respuesta como JSON
+                })
+                .then(data => {
+                    displayData(data); // Llama a la función para mostrar los datos
+                })
+                .catch(error => {
+                    showError(error); // Llama a la función para mostrar errores
+                });
         });
 
         function displayData(data) {
             const loadingDiv = document.getElementById('loading');
             const dateInfoDiv = document.getElementById('date-info');
             loadingDiv.style.display = 'none';
-            console.log('Datos recibidos de Apps Script:', data);
+            console.log('Datos recibidos de Apps Script API:', data);
 
             if (data && data.error) {
-                dateInfoDiv.innerHTML = `<p class="error-message">Error del servidor: ${data.error}</p>`;
+                dateInfoDiv.innerHTML = `<p class="error-message">Error del servidor (API): ${data.error}</p>`;
                 return;
             }
             if (!data || data.length === 0) {
@@ -105,16 +116,16 @@
             const loadingDiv = document.getElementById('loading');
             const dateInfoDiv = document.getElementById('date-info');
             loadingDiv.style.display = 'none';
-
+            
             let errorMessage = "Se produjo un error desconocido al obtener la información.";
             if (error && error.message) {
                 errorMessage = `Se produjo un error: ${error.message}`;
             } else if (typeof error === 'string') {
                 errorMessage = `Se produjo un error: ${error}`;
             }
-
-            dateInfoDiv.innerHTML = `<p class="error-message">${errorMessage} Por favor, recarga la página o contacta al administrador.</p>`;
-            console.error('Error de Apps Script:', error);
+            
+            dateInfoDiv.innerHTML = `<p class="error-message">${errorMessage} Por favor, verifica la URL de la API y los permisos de tu Apps Script.</p>`;
+            console.error('Error al llamar a Apps Script API:', error);
         }
     </script>
 </body>
