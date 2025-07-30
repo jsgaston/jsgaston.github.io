@@ -3,8 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos Históricos - 50s</title>
+    <title>Eventos Históricos - 50s Timeline</title>
+    <meta name="description" content="Descubre qué eventos históricos ocurrieron en fechas como hoy hace 20-30 años. Una ventana al pasado de España y el mundo.">
+    <meta name="keywords" content="eventos históricos, historia España, acontecimientos mundiales, cronología">
+
+    <meta property="og:title" content="Eventos Históricos - 50s Timeline">
+    <meta property="og:description" content="Explora eventos históricos que ocurrieron en fechas como hoy hace décadas">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jsgaston.github.io/50s.html">
+
     <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #4CAF50;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --background-light: #f8f9fa;
+            --card-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,242 +32,577 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             min-height: 100vh;
-            padding: 20px;
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            padding: 20px;
         }
 
+        /* ========================================
+           HEADER PRINCIPAL
+        ======================================== */
+
         .header {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            padding: 30px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 40px;
             text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
+        .header .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            font-weight: 400;
+            margin-bottom: 20px;
         }
+
+        .header .date-info {
+            display: inline-block;
+            background: var(--accent-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* ========================================
+           PANEL DE CONTROL
+        ======================================== */
 
         .controls {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .controls h3 {
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
         }
 
         .filter-group {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .filter-item {
-            display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
 
-        .filter-item label {
-            font-weight: bold;
-            color: #333;
-            font-size: 0.9em;
+        .filter-group label {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
         }
 
-        select, input {
-            padding: 8px 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            min-width: 120px;
+        .filter-input {
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: white;
         }
 
-        select:focus, input:focus {
+        .filter-input:focus {
             outline: none;
-            border-color: #4CAF50;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
         }
 
         .btn {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
+            background: linear-gradient(135deg, var(--accent-color), #45a049);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: transform 0.2s;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
         }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* ========================================
+           ESTADÍSTICAS
+        ======================================== */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========================================
+           ESTADOS DE CARGA Y ERROR
+        ======================================== */
 
         .loading {
             text-align: center;
-            padding: 50px;
-            font-size: 1.2em;
-            color: #666;
+            padding: 60px 20px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
         }
 
-        .eventos-container {
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-top: 20px;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
             padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .error h4 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .error p {
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        /* ========================================
+           GRID DE EVENTOS
+        ======================================== */
+
+        .eventos-container {
+            margin-top: 30px;
         }
 
         .eventos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            gap: 25px;
         }
 
         .evento-card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            padding: 20px;
-            border-left: 5px solid #4CAF50;
-            transition: transform 0.3s, box-shadow 0.3s;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .evento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent-color), #45a049);
         }
 
         .evento-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .evento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
 
         .evento-fecha {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .evento-años {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
 
         .evento-año {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #4CAF50;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            line-height: 1;
         }
 
         .evento-titulo {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 15px;
             line-height: 1.4;
         }
 
-        .evento-detalles {
+        .evento-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             margin-top: 15px;
         }
 
         .evento-tag {
-            background: #e8f5e8;
-            color: #2e7d2e;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
-        .evento-tag.españa {
+        .tag-españa {
             background: #fff3cd;
             color: #856404;
         }
 
-        .evento-tag.mundial {
+        .tag-mundial {
             background: #d1ecf1;
             color: #0c5460;
         }
 
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            padding: 20px;
-            background: #f8f9fa;
-            margin: 20px;
-            border-radius: 10px;
+        .tag-historico {
+            background: #e2e3e5;
+            color: #383d41;
         }
 
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #4CAF50;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .error {
+        .tag-politico {
             background: #f8d7da;
             color: #721c24;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px;
-            border-left: 5px solid #dc3545;
         }
 
+        .tag-deportivo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tag-cultural {
+            background: #e7f3ff;
+            color: #004085;
+        }
+
+        .tag-festivo {
+            background: #f0e6fa;
+            color: #6a1a8c;
+        }
+
+        .tag-nacional {
+            background: #ffecb3;
+            color: #9c27b0;
+        }
+
+        .tag-regional {
+            background: #e0f2f7;
+            color: #01579b;
+        }
+
+        .tag-social {
+            background: #ffe0b2;
+            color: #ef6c00;
+        }
+
+        .tag-religioso {
+            background: #ede7f6;
+            color: #4527a0;
+        }
+
+        .tag-institucional {
+            background: #f3e5f5;
+            color: #ab47bc;
+        }
+
+        .tag-sanitario {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .tag-terrorismo {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* ========================================
+           ESTADOS ESPECIALES
+        ======================================== */
+
+        .no-eventos {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .no-eventos-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .no-eventos h3 {
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .no-eventos p {
+            color: var(--text-light);
+        }
+
+        /* ========================================
+           FOOTER
+        ======================================== */
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            color: white;
+        }
+
+        .footer p {
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========================================
+           RESPONSIVE DESIGN
+        ======================================== */
+
         @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 25px 20px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
             .eventos-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
-            
-            .filter-group {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .evento-header {
                 flex-direction: column;
-                align-items: stretch;
+                gap: 10px;
+                align-items: flex-start;
             }
-            
-            .header h1 {
-                font-size: 2em;
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
             }
+
+            .evento-card {
+                padding: 20px;
+            }
+        }
+
+        /* ========================================
+           ANIMACIONES
+        ======================================== */
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .stagger-animation .evento-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .stagger-animation .evento-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-animation .evento-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-animation .evento-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-animation .evento-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .stagger-animation .evento-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .stagger-animation .evento-card:nth-child(6) {
+            animation-delay: 0.6s;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <header class="header fade-in">
             <h1>📅 Eventos Históricos</h1>
-            <p>Descubre qué pasó en fechas como hoy hace 20-30 años</p>
-        </div>
+            <p class="subtitle">Descubre qué pasó en fechas como hoy hace décadas</p>
+            <div class="date-info" id="fechaActual">
+                <span id="fechaHoy"></span>
+            </div>
+        </header>
 
-        <div class="controls">
-            <div class="filter-group">
-                <div class="filter-item">
+        <section class="controls fade-in">
+            <h3>🔍 Filtrar Eventos</h3>
+            <div class="filter-grid">
+                <div class="filter-group">
                     <label for="filtroAños">Años atrás:</label>
-                    <select id="filtroAños">
-                        <option value="">Todos</option>
-                        <option value="25">25 años</option>
+                    <select id="filtroAños" class="filter-input">
+                        <option value="">Todos los años</option>
                         <option value="20">20 años</option>
                         <option value="21">21 años</option>
                         <option value="22">22 años</option>
                         <option value="23">23 años</option>
                         <option value="24">24 años</option>
+                        <option value="25">25 años ⭐</option>
                         <option value="26">26 años</option>
                         <option value="27">27 años</option>
                         <option value="28">28 años</option>
@@ -255,227 +610,239 @@
                         <option value="30">30 años</option>
                     </select>
                 </div>
-
-                <div class="filter-item">
-                    <label for="filtroPais">País:</label>
-                    <select id="filtroPais">
-                        <option value="">Todos</option>
-                        <option value="España">España</option>
-                        <option value="Mundial">Mundial</option>
+                <div class="filter-group">
+                    <label for="filtroPais">País/Región:</label>
+                    <select id="filtroPais" class="filter-input">
+                        <option value="">Todos los países</option>
+                        <option value="España">🇪🇸 España</option>
+                        <option value="Mundial">🌍 Mundial</option>
+                        <option value="Europa">🇪🇺 Europa</option>
                     </select>
                 </div>
-
-                <div class="filter-item">
+                <div class="filter-group">
                     <label for="filtroCategoria">Categoría:</label>
-                    <select id="filtroCategoria">
-                        <option value="">Todas</option>
-                        <option value="Histórico">Histórico</option>
-                        <option value="Nacional">Nacional</option>
-                        <option value="Político">Político</option>
-                        <option value="Cultural">Cultural</option>
+                    <select id="filtroCategoria" class="filter-input">
+                        <option value="">Todas las categorías</option>
+                        <option value="Histórico">📚 Histórico</option>
+                        <option value="Político">🏛️ Político</option>
+                        <option value="Deportivo">⚽ Deportivo</option>
+                        <option value="Cultural">🎭 Cultural</option>
+                        <option value="Festivo">🎉 Festivo</option>
+                        <option value="Nacional">🇪🇸 Nacional</option>
+                        <option value="Regional">🗺️ Regional</option>
+                        <option value="Social">🤝 Social</option>
+                        <option value="Religioso">🛐 Religioso</option>
+                        <option value="Institucional">🏛️ Institucional</option>
+                        <option value="Sanitario">⚕️ Sanitario</option>
+                        <option value="Terrorismo">💣 Terrorismo</option>
+                        <option value="Internacional">🌐 Internacional</option>
+                        <option value="General">💡 General</option>
+                        <option value="Conmemorativo">🗓️ Conmemorativo</option>
                     </select>
                 </div>
-
-                <button class="btn" onclick="cargarEventos()">🔄 Actualizar</button>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="cargarEventos()">
+                        🔄 Actualizar Datos
+                    </button>
+                </div>
             </div>
+        </section>
+
+        <section class="stats" id="estadisticas" style="display: none;">
+            <div class="stat-card">
+                <span class="stat-number" id="totalEventos">0</span>
+                <span class="stat-label">Total Eventos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="eventosEspaña">0</span>
+                <span class="stat-label">Eventos España</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="eventosMundiales">0</span>
+                <span class="stat-label">Eventos Mundiales</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="ultimaActualizacion">N/A</span>
+                <span class="stat-label">Última Actualización</span>
+            </div>
+        </section>
+
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>🔄 Cargando eventos históricos...</p>
+            <small>Consultando fuentes de datos y Google Drive...</small>
         </div>
 
-        <div class="stats" id="estadisticas" style="display: none;">
-            <div class="stat-item">
-                <div class="stat-number" id="totalEventos">0</div>
-                <div class="stat-label">Total Eventos</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="eventosEspaña">0</div>
-                <div class="stat-label">Eventos España</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="eventosMundiales">0</div>
-                <div class="stat-label">Eventos Mundiales</div>
-            </div>
+        <div id="error" class="error" style="display: none;">
+            <h4>⚠️ Error al cargar datos</h4>
+            <p id="errorMessage">Se ha producido un error al obtener los datos. Por favor, inténtalo de nuevo más tarde o revisa la configuración del script de Google Apps Script.</p>
         </div>
 
-        <div class="eventos-container">
-            <div id="loading" class="loading">
-                <p>🔄 Cargando eventos históricos...</p>
-            </div>
+        <section class="eventos-container">
             <div id="eventos" class="eventos-grid" style="display: none;"></div>
-            <div id="error" class="error" style="display: none;"></div>
-        </div>
+            <div id="noEventos" class="no-eventos" style="display: none;">
+                <span class="no-eventos-icon">🤷‍♂️</span>
+                <h3>No se encontraron eventos</h3>
+                <p>Prueba a ajustar los filtros o a actualizar los datos.</p>
+            </div>
+        </section>
     </div>
 
-    <script>
-        // Configuración
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwdwyA-JzriWaJqqUaX7z_Z4KhNRhpicb39hX6EGT-LD2L5TteGGkYsAwgCOeQ6f2hD7A/exec'; // Debes reemplazar esto
-        let eventosData = [];
+    <footer class="footer">
+        <p>Hecho con ❤️ para la historia</p>
+        <p>&copy; <span id="currentYear"></span> Eventos Históricos</p>
+        <p><a href="https://github.com/jsgaston/50s.html" target="_blank">Ver en GitHub</a></p>
+    </footer>
 
-        // Cargar eventos al inicio
-        document.addEventListener('DOMContentLoaded', function() {
-            cargarEventos();
-            
-            // Agregar event listeners a los filtros
-            document.getElementById('filtroAños').addEventListener('change', filtrarEventos);
-            document.getElementById('filtroPais').addEventListener('change', filtrarEventos);
-            document.getElementById('filtroCategoria').addEventListener('change', filtrarEventos);
+    <script>
+        // *** IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT ***
+        const GOOGLE_APP_SCRIPT_WEB_APP_URL = 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI'; //
+
+        let todosLosEventos = []; // Almacena todos los eventos para filtrado local
+
+        document.addEventListener('DOMContentLoaded', () => {
+            mostrarFechaActual();
+            cargarEventos(); // Carga inicial de eventos
+
+            // Añadir event listeners a los filtros para recargar los eventos
+            document.getElementById('filtroAños').addEventListener('change', filtrarYMostrarEventos);
+            document.getElementById('filtroPais').addEventListener('change', filtrarYMostrarEventos);
+            document.getElementById('filtroCategoria').addEventListener('change', filtrarYMostrarEventos);
+
+            // Actualizar año del footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
         });
 
+        function mostrarFechaActual() {
+            const fechaElement = document.getElementById('fechaHoy');
+            const hoy = new Date();
+            const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            fechaElement.textContent = hoy.toLocaleDateString('es-ES', opciones);
+        }
+
         async function cargarEventos() {
-            const loading = document.getElementById('loading');
-            const eventos = document.getElementById('eventos');
-            const error = document.getElementById('error');
-            const estadisticas = document.getElementById('estadisticas');
-
-            loading.style.display = 'block';
-            eventos.style.display = 'none';
-            error.style.display = 'none';
-            estadisticas.style.display = 'none';
-
+            mostrarEstado('loading');
             try {
-                // Si no tienes la URL del Google Script configurada, usar datos de demostración
-                if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('TU_URL')) {
-                    eventosData = generarDatosDemostracion();
-                } else {
-                    const response = await fetch(GOOGLE_SCRIPT_URL);
-                    if (!response.ok) {
-                        throw new Error(`Error HTTP: ${response.status}`);
-                    }
-                    eventosData = await response.json();
+                const response = await fetch(GOOGLE_APP_SCRIPT_WEB_APP_URL); //
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                const data = await response.json(); //
+
+                if (data.error) { //
+                    throw new Error(`Error del servidor: ${data.message}`); //
                 }
 
-                mostrarEventos(eventosData);
-                actualizarEstadisticas(eventosData);
-                
-                loading.style.display = 'none';
-                eventos.style.display = 'grid';
-                estadisticas.style.display = 'flex';
+                todosLosEventos = data.data.eventos || []; //
+                actualizarEstadisticas(data.data.metadata); //
+                filtrarYMostrarEventos();
 
-            } catch (err) {
-                console.error('Error cargando eventos:', err);
-                loading.style.display = 'none';
-                error.style.display = 'block';
-                error.innerHTML = `
-                    <strong>Error cargando datos:</strong> ${err.message}
-                    <br><small>Mostrando datos de demostración...</small>
-                `;
-                
-                // Mostrar datos de demostración en caso de error
-                eventosData = generarDatosDemostracion();
-                mostrarEventos(eventosData);
-                actualizarEstadisticas(eventosData);
-                eventos.style.display = 'grid';
-                estadisticas.style.display = 'flex';
+            } catch (error) {
+                console.error("Error al cargar eventos:", error);
+                mostrarEstado('error', error.message);
             }
         }
 
-        function generarDatosDemostracion() {
-            const hoy = new Date();
-            const datos = [];
-            
-            // Generar algunos eventos de ejemplo
-            const eventosEjemplo = [
-                { evento: "Fundación de Google", pais: "Mundial", categoria: "Tecnológico" },
-                { evento: "Lanzamiento del Euro", pais: "Europa", categoria: "Económico" },
-                { evento: "Atentados del 11-M en Madrid", pais: "España", categoria: "Histórico" },
-                { evento: "Inauguración de la T4 en Barajas", pais: "España", categoria: "Infraestructura" },
-                { evento: "Lanzamiento de Facebook", pais: "Mundial", categoria: "Tecnológico" },
-                { evento: "Tsunami del Océano Índico", pais: "Mundial", categoria: "Natural" }
-            ];
-
-            [20, 25, 30].forEach(años => {
-                [-2, -1, 0, 1, 2].forEach(offset => {
-                    const fecha = new Date(hoy);
-                    fecha.setFullYear(fecha.getFullYear() - años);
-                    fecha.setDate(fecha.getDate() + offset);
-                    
-                    const eventoAleatorio = eventosEjemplo[Math.floor(Math.random() * eventosEjemplo.length)];
-                    
-                    datos.push({
-                        "Fecha": fecha.toISOString().split('T')[0],
-                        "Categoría Temporal": `${años} años atrás`,
-                        "Años Atrás": años,
-                        "Año del Evento": fecha.getFullYear(),
-                        "Evento": eventoAleatorio.evento,
-                        "País": eventoAleatorio.pais,
-                        "Categoría": eventoAleatorio.categoria,
-                        "Fuente": "Demostración"
-                    });
-                });
-            });
-
-            return datos;
-        }
-
-        function mostrarEventos(eventos) {
-            const container = document.getElementById('eventos');
-            
-            if (eventos.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 50px;">No se encontraron eventos para los filtros seleccionados.</p>';
-                return;
-            }
-
-            const html = eventos.map(evento => `
-                <div class="evento-card">
-                    <div class="evento-fecha">${formatearFecha(evento["Fecha"])}</div>
-                    <div class="evento-año">${evento["Año del Evento"]}</div>
-                    <div class="evento-titulo">${evento["Evento"]}</div>
-                    <div class="evento-detalles">
-                        <span class="evento-tag ${evento["País"].toLowerCase()}">${evento["País"]}</span>
-                        <span class="evento-tag">${evento["Categoría"]}</span>
-                        <span class="evento-tag">${evento["Años Atrás"]} años atrás</span>
-                    </div>
-                </div>
-            `).join('');
-
-            container.innerHTML = html;
-        }
-
-        function filtrarEventos() {
+        function filtrarYMostrarEventos() {
             const filtroAños = document.getElementById('filtroAños').value;
             const filtroPais = document.getElementById('filtroPais').value;
             const filtroCategoria = document.getElementById('filtroCategoria').value;
 
-            let eventosFiltrados = eventosData;
+            let eventosFiltrados = todosLosEventos;
 
             if (filtroAños) {
-                eventosFiltrados = eventosFiltrados.filter(evento => 
-                    evento["Años Atrás"].toString() === filtroAños
+                eventosFiltrados = eventosFiltrados.filter(evento =>
+                    evento.añosAtras == parseInt(filtroAños)
                 );
             }
 
             if (filtroPais) {
-                eventosFiltrados = eventosFiltrados.filter(evento => 
-                    evento["País"] === filtroPais
+                eventosFiltrados = eventosFiltrados.filter(evento =>
+                    evento.pais === filtroPais
                 );
             }
 
             if (filtroCategoria) {
-                eventosFiltrados = eventosFiltrados.filter(evento => 
-                    evento["Categoría"] === filtroCategoria
+                eventosFiltrados = eventosFiltrados.filter(evento =>
+                    evento.categoria === filtroCategoria
                 );
             }
 
-            mostrarEventos(eventosFiltrados);
-            actualizarEstadisticas(eventosFiltrados);
+            renderizarEventos(eventosFiltrados);
+            mostrarEstado('content');
         }
 
-        function actualizarEstadisticas(eventos) {
-            const total = eventos.length;
-            const españa = eventos.filter(e => e["País"] === "España").length;
-            const mundiales = eventos.filter(e => e["País"] === "Mundial").length;
+        function renderizarEventos(eventos) {
+            const eventosGrid = document.getElementById('eventos');
+            eventosGrid.innerHTML = ''; // Limpiar eventos anteriores
 
-            document.getElementById('totalEventos').textContent = total;
-            document.getElementById('eventosEspaña').textContent = españa;
-            document.getElementById('eventosMundiales').textContent = mundiales;
-        }
+            if (eventos.length === 0) {
+                mostrarEstado('no-eventos');
+                return;
+            }
 
-        function formatearFecha(fecha) {
-            const date = new Date(fecha);
-            return date.toLocaleDateString('es-ES', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            eventos.forEach(evento => {
+                const card = document.createElement('div');
+                card.className = 'evento-card fade-in'; // Añadir clase de animación
+
+                const tagPaisClass = evento.pais === "España" ? "tag-españa" : "tag-mundial";
+                const tagCategoriaClass = `tag-${evento.categoria.toLowerCase().replace(/ /g, '-')}`;
+
+                card.innerHTML = `
+                    <div class="evento-header">
+                        <span class="evento-fecha">Fecha: ${new Date(evento.fecha + 'T00:00:00').toLocaleDateString('es-ES', { month: 'long', day: 'numeric' })}</span>
+                        <span class="evento-años">${evento.añosAtras} años atrás</span>
+                    </div>
+                    <div class="evento-año">${evento.añoEvento}</div>
+                    <div class="evento-titulo">${evento.evento}</div>
+                    <div class="evento-tags">
+                        <span class="evento-tag ${tagPaisClass}">${evento.pais}</span>
+                        <span class="evento-tag ${tagCategoriaClass}">${evento.categoria}</span>
+                        <span class="evento-tag tag-historico">${evento.fuente}</span>
+                    </div>
+                `;
+                eventosGrid.appendChild(card);
             });
+            eventosGrid.style.display = 'grid'; // Asegurarse de que el grid se muestra
+        }
+
+        function actualizarEstadisticas(metadata) {
+            document.getElementById('totalEventos').textContent = metadata.totalEventos;
+            document.getElementById('ultimaActualizacion').textContent = metadata.ultimaActualizacion.split('T')[0]; // Solo la fecha
+
+            const eventosEspaña = todosLosEventos.filter(e => e.pais === 'España').length;
+            const eventosMundiales = todosLosEventos.filter(e => e.pais === 'Mundial').length;
+
+            document.getElementById('eventosEspaña').textContent = eventosEspaña;
+            document.getElementById('eventosMundiales').textContent = eventosMundiales;
+
+            document.getElementById('estadisticas').style.display = 'grid'; // Mostrar estadísticas
+        }
+
+        function mostrarEstado(estado, mensaje = '') {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('eventos').style.display = 'none';
+            document.getElementById('noEventos').style.display = 'none';
+            document.getElementById('estadisticas').style.display = 'none'; // Ocultar por defecto, se muestra si hay datos
+
+            switch (estado) {
+                case 'loading':
+                    document.getElementById('loading').style.display = 'block';
+                    break;
+                case 'error':
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('errorMessage').textContent = mensaje || 'Se ha producido un error al obtener los datos. Por favor, inténtalo de nuevo más tarde o revisa la configuración del script de Google Apps Script.';
+                    break;
+                case 'no-eventos':
+                    document.getElementById('noEventos').style.display = 'block';
+                    break;
+                case 'content':
+                    document.getElementById('eventos').style.display = 'grid';
+                    document.getElementById('estadisticas').style.display = 'grid';
+                    break;
+            }
         }
     </script>
 </body>
