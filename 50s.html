@@ -360,6 +360,25 @@
         // Ejemplo: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX.../exec";
         const SCRIPT_URL_50s = "https://script.google.com/macros/s/AKfycbwBFpdKF48xcoJAExj2xpMA0X8e2mjMVqjN8hTUERjU3-IK2Brt0nsCwwYuD116AjWTzQ/exec"; 
 
+            const GOOGLE_APP_SCRIPT_WEB_APP_URL = SCRIPT_URL_50s; // Pega tu URL aquí
+
+    async function loadEvents() {
+        try {
+            const response = await fetch(GOOGLE_APP_SCRIPT_WEB_APP_URL);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            displayEvents(data);
+        } catch (error) {
+            console.error("Error loading events:", error);
+            document.getElementById('eventsContainer').innerHTML = '<p>Error al cargar los eventos. Por favor, inténtalo de nuevo más tarde.</p>';
+        }
+    }
+
+    // Llama a loadEvents cuando la página cargue
+    document.addEventListener('DOMContentLoaded', loadEvents);
+
         document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('date-input');
             const searchButton = document.getElementById('search-button');
