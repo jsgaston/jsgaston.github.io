@@ -69,7 +69,7 @@
 
         #date-selector-container {
             display: flex;
-            flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+            flex-wrap: wrap;
             justify-content: center;
             align-items: center;
             gap: 1rem;
@@ -93,8 +93,8 @@
             color: var(--text-dark);
             outline: none;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            flex-grow: 1; /* Permite que el input crezca */
-            max-width: 250px; /* Limita el ancho máximo */
+            flex-grow: 1;
+            max-width: 250px;
         }
 
         #date-input:focus {
@@ -267,7 +267,7 @@
         }
 
         .error-message {
-            color: #D32F2F; /* Red for errors */
+            color: #D32F2F;
             background-color: #FFEBEE;
             border: 1px solid #EF9A9A;
             border-radius: var(--border-radius);
@@ -325,7 +325,7 @@
             }
 
             #date-input {
-                max-width: 100%; /* Permite que el input ocupe todo el ancho disponible */
+                max-width: 100%;
             }
         }
     </style>
@@ -356,34 +356,15 @@
     </footer>
 
     <script>
-        // *** IMPORTANTE: REEMPLAZA ESTO CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT DESPLEGADA ***
-        // Ejemplo: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX.../exec";
-        const SCRIPT_URL_50s = "https://script.google.com/macros/s/AKfycbwHcSmLKyLQKxJCX9TcJwZYF-7kF-z8QCv_4ZN4rwJKBuzdx3N-G1QLXz5dJwIoX0NT/exec"; 
+        // URL de tu Google Apps Script Web App
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHcSmLKyLQKxJCX9TcJwZYF-7kF-z8QCv_4ZN4rwJKBuzdx3N-G1QLXz5dJwIoX0NT/exec";
 
-            const GOOGLE_APP_SCRIPT_WEB_APP_URL = SCRIPT_URL_50s; // Pega tu URL aquí
-
-    async function loadEvents() {
-        try {
-            const response = await fetch(GOOGLE_APP_SCRIPT_WEB_APP_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            displayEvents(data);
-        } catch (error) {
-            console.error("Error loading events:", error);
-            document.getElementById('eventsContainer').innerHTML = '<p>Error al cargar los eventos. Por favor, inténtalo de nuevo más tarde.</p>';
-        }
-    }
-
-    // Llama a loadEvents cuando la página cargue
-    document.addEventListener('DOMContentLoaded', loadEvents);
-
+        // Inicialización cuando la página carga
         document.addEventListener('DOMContentLoaded', () => {
             const dateInput = document.getElementById('date-input');
             const searchButton = document.getElementById('search-button');
 
-            // Establecer la fecha actual por defecto en el input del calendario
+            // Establecer la fecha actual por defecto
             const today = new Date();
             const year = today.getFullYear();
             const month = (today.getMonth() + 1).toString().padStart(2, '0');
@@ -393,15 +374,20 @@
             // Cargar eventos para la fecha actual al inicio
             fetchAndRenderEvents(dateInput.value);
 
-            // Añadir event listener al botón de búsqueda
+            // Event listener para el botón de búsqueda
             searchButton.addEventListener('click', () => {
+                fetchAndRenderEvents(dateInput.value);
+            });
+
+            // Event listener para cambios en el input de fecha
+            dateInput.addEventListener('change', () => {
                 fetchAndRenderEvents(dateInput.value);
             });
         });
 
         /**
-         * Fetches and renders historical events for a given date.
-         * @param {string} selectedDate - The date in 'YYYY-MM-DD' format. If null or empty, uses current date.
+         * Obtiene y renderiza eventos históricos para una fecha dada
+         * @param {string} selectedDate - Fecha en formato 'YYYY-MM-DD'
          */
         async function fetchAndRenderEvents(selectedDate = null) {
             const eventsContainer = document.getElementById('events-container');
@@ -414,131 +400,129 @@
                     Cargando eventos...
                 </div>
             `;
-        
+
             try {
-                let url = SCRIPT_URL_50s;
+                let url = SCRIPT_URL;
                 
                 // Agregar parámetro de fecha si se proporciona
                 if (selectedDate) {
                     url += `?date=${encodeURIComponent(selectedDate)}`;
-                    console.log(`Solicitando eventos para fecha: ${selectedDate}`);
+                    console.log(`📅 Solicitando eventos para: ${selectedDate}`);
                 }
                 
-                console.log(`Haciendo petición a: ${url}`);
+                console.log(`🌐 Haciendo petición a: ${url}`);
                 
-                // Configurar opciones de fetch con timeout
+                // Configurar fetch con timeout
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
                 
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                     },
                     signal: controller.signal
                 });
                 
                 clearTimeout(timeoutId);
                 
-                console.log(`Respuesta recibida. Status: ${response.status}`);
+                console.log(`📡 Respuesta recibida - Status: ${response.status}`);
                 
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
                 }
                 
+                // Verificar que la respuesta sea JSON
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
                     const textResponse = await response.text();
-                    console.error('Respuesta no es JSON:', textResponse);
-                    throw new Error('La respuesta del servidor no es JSON válido');
+                    console.error('❌ Respuesta no es JSON:', textResponse.substring(0, 200));
+                    throw new Error('El servidor no devolvió JSON válido');
                 }
                 
                 const data = await response.json();
-                console.log("Datos recibidos:", data);
+                console.log('✅ Datos recibidos:', data);
                 
                 // Verificar si hay error en la respuesta
                 if (data.error) {
-                    throw new Error(data.message || 'Error desconocido del servidor');
+                    throw new Error(data.message || 'Error del servidor');
                 }
                 
-                // Actualizar la fecha mostrada
-                currentDateElement.textContent = `Eventos del ${data.date || 'día seleccionado'}`;
+                // Actualizar fecha mostrada
+                if (data.date) {
+                    currentDateElement.textContent = `Eventos del ${data.date}`;
+                } else {
+                    currentDateElement.textContent = 'Eventos del día seleccionado';
+                }
                 
                 // Renderizar eventos
                 renderEvents(data.events || []);
                 
             } catch (error) {
-                console.error("Error al obtener eventos históricos:", error);
+                console.error('❌ Error al obtener eventos:', error);
                 
                 let errorMessage = 'Error desconocido';
+                let techDetails = error.message;
                 
                 if (error.name === 'AbortError') {
-                    errorMessage = 'La petición tardó demasiado tiempo (timeout)';
-                } else if (error.message.includes('fetch')) {
-                    errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+                    errorMessage = 'La petición tardó demasiado (timeout de 30s)';
+                } else if (error.message.includes('fetch') || error.message.includes('network')) {
+                    errorMessage = 'Error de conexión a internet';
                 } else if (error.message.includes('JSON')) {
-                    errorMessage = 'Error en el formato de datos del servidor';
+                    errorMessage = 'Error en formato de datos del servidor';
+                } else if (error.message.includes('HTTP')) {
+                    errorMessage = 'Error del servidor';
                 } else {
                     errorMessage = error.message;
                 }
                 
                 eventsContainer.innerHTML = `
                     <div class="error-message">
-                        ❌ Error al cargar los eventos históricos.
-                        <br><strong>Detalles:</strong> ${errorMessage}
+                        ❌ <strong>Error al cargar eventos históricos</strong>
                         <br><br>
-                        <button onclick="location.reload()" style="background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        <strong>Problema:</strong> ${errorMessage}
+                        <br>
+                        <small><strong>Detalles técnicos:</strong> ${techDetails}</small>
+                        <br><br>
+                        <button onclick="fetchAndRenderEvents(document.getElementById('date-input').value)" 
+                                style="background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
                             🔄 Reintentar
+                        </button>
+                        <button onclick="testConnection()" 
+                                style="background: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            🔧 Probar Conexión
                         </button>
                     </div>
                 `;
-                currentDateElement.textContent = `Eventos del día seleccionado`;
+                
+                currentDateElement.textContent = 'Error al cargar eventos';
             }
         }
 
-
-
-                // Función mejorada para debugging
-        function testConnection() {
-            console.log('Testing connection to:', SCRIPT_URL_50s);
-            fetch(SCRIPT_URL_50s)
-                .then(response => {
-                    console.log('Test response status:', response.status);
-                    console.log('Test response headers:', [...response.headers.entries()]);
-                    return response.text();
-                })
-                .then(text => {
-                    console.log('Test response body:', text);
-                    try {
-                        const json = JSON.parse(text);
-                        console.log('Parsed JSON:', json);
-                    } catch (e) {
-                        console.log('Response is not valid JSON');
-                    }
-                })
-                .catch(error => {
-                    console.error('Test connection failed:', error);
-                });
-        }
-
-
-
-
-        
-
+        /**
+         * Renderiza los eventos en el DOM
+         * @param {Array} events - Array de eventos
+         */
         function renderEvents(events) {
             const eventsContainer = document.getElementById('events-container');
-            eventsContainer.innerHTML = ''; // Limpiar spinner de carga o contenido anterior
+            eventsContainer.innerHTML = '';
 
             if (!events || events.length === 0) {
-                eventsContainer.innerHTML = '<p class="no-events">No se encontraron eventos históricos para la fecha seleccionada.</p>';
+                eventsContainer.innerHTML = `
+                    <div class="no-events">
+                        📅 No se encontraron eventos históricos para la fecha seleccionada.
+                        <br><small>Prueba con otra fecha o verifica que el sistema esté funcionando.</small>
+                    </div>
+                `;
                 return;
             }
 
-            // Agrupar eventos por 'Categoría Temporal'
+            console.log(`📊 Renderizando ${events.length} eventos`);
+
+            // Agrupar eventos por 'CategoríaTemporal'
             const groupedEvents = events.reduce((acc, event) => {
-                const category = event.CategoríaTemporal;
+                const category = event.CategoríaTemporal || event.CategoriaTemporall || 'Sin categoría';
                 if (!acc[category]) {
                     acc[category] = [];
                 }
@@ -546,66 +530,122 @@
                 return acc;
             }, {});
 
-            // Definir un orden preferido para las secciones
-            // Ajustar el orden para incluir "Hoy" y luego las categorías de "Hace X años"
-            const order = ["Hoy", "Hace 11 años", "Hace 22 años", "Hace 44 años", "Hace 55 años", "Hace 66 años"];
+            // Orden preferido para las secciones
+            const order = [
+                "Hoy", 
+                "Hace 11 años", 
+                "Hace 22 años", 
+                "Hace 26 años",
+                "Hace 27 años",
+                "Hace 28 años",
+                "Hace 29 años",
+                "Hace 32 años",
+                "Hace 33 años",
+                "Hace 34 años",
+                "Hace 35 años",
+                "Hace 36 años",
+                "Hace 37 años",
+                "Hace 38 años",
+                "Hace 44 años", 
+                "Hace 55 años", 
+                "Hace 66 años"
+            ];
+            
+            // Agregar años del 25 al 38 si no están ya
             for (let y = 25; y <= 38; y++) {
-                order.push(`Hace ${y} años`);
+                const categoryName = `Hace ${y} años`;
+                if (!order.includes(categoryName)) {
+                    order.push(categoryName);
+                }
             }
             
             const categoriesRendered = new Set();
 
+            // Renderizar categorías en orden
             order.forEach(category => {
                 if (groupedEvents[category] && groupedEvents[category].length > 0) {
-                    const sectionDiv = document.createElement('div');
-                    sectionDiv.className = 'timeline-section';
-                    sectionDiv.innerHTML = `<h2>${category}</h2>`; // Usar la categoría como título
-        
-                    groupedEvents[category].forEach(event => {
-                        const eventCard = document.createElement('div');
-                        eventCard.className = 'event-card';
-                        eventCard.innerHTML = `
-                            <h3>${event.Evento}</h3>
-                            <p><strong>Año:</strong> ${event.AñoDelEvento}</p>
-                            <div class="event-meta">
-                                <span><strong>País:</strong> ${event.País || 'Desconocido'}</span>
-                                <span><strong>Categoría:</strong> ${event.Categoría || 'General'}</span>
-                                <span><strong>Relevancia:</strong> ${event.Relevancia || 'N/A'}/10</span>
-                                ${event.Fuente && event.Fuente !== 'Wikipedia' && event.Fuente.startsWith('http') ? `<span class="event-source"><strong>Fuente:</strong> <a href="${event.Fuente}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : '<span><strong>Fuente:</strong> Wikipedia</span>'}
-                            </div>
-                        `;
-                        sectionDiv.appendChild(eventCard);
-                    });
-                    eventsContainer.appendChild(sectionDiv);
+                    renderEventSection(category, groupedEvents[category], eventsContainer);
                     categoriesRendered.add(category);
                 }
             });
 
-            // Manejar cualquier categoría que no esté en el orden preferido
+            // Renderizar categorías restantes
             Object.keys(groupedEvents).forEach(category => {
                 if (!categoriesRendered.has(category)) {
-                    const sectionDiv = document.createElement('div');
-                    sectionDiv.className = 'timeline-section';
-                    sectionDiv.innerHTML = `<h2>Otros Eventos (${category})</h2>`; // Título genérico para "otras" categorías
-
-                    groupedEvents[category].forEach(event => {
-                        const eventCard = document.createElement('div');
-                        eventCard.className = 'event-card';
-                        eventCard.innerHTML = `
-                            <h3>${event.Evento}</h3>
-                            <p><strong>Año:</strong> ${event.AñoDelEvento}</p>
-                            <div class="event-meta">
-                                <span><strong>País:</strong> ${event.País || 'Desconocido'}</span>
-                                <span><strong>Categoría:</strong> ${event.Categoría || 'General'}</span>
-                                <span><strong>Relevancia:</strong> ${event.Relevancia || 'N/A'}/10</span>
-                                ${event.Fuente && event.Fuente !== 'Wikipedia' && event.Fuente.startsWith('http') ? `<span class="event-source"><strong>Fuente:</strong> <a href="${event.Fuente}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : '<span><strong>Fuente:</strong> Wikipedia</span>'}
-                            </div>
-                        `;
-                        sectionDiv.appendChild(eventCard);
-                    });
-                    eventsContainer.appendChild(sectionDiv);
+                    renderEventSection(`Otros Eventos (${category})`, groupedEvents[category], eventsContainer);
                 }
             });
+        }
+
+        /**
+         * Renderiza una sección de eventos
+         * @param {string} categoryTitle - Título de la categoría
+         * @param {Array} events - Eventos de la categoría
+         * @param {HTMLElement} container - Contenedor donde añadir la sección
+         */
+        function renderEventSection(categoryTitle, events, container) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'timeline-section';
+            sectionDiv.innerHTML = `<h2>${categoryTitle} (${events.length})</h2>`;
+
+            events.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.className = 'event-card';
+                
+                // Manejar diferentes posibles nombres de propiedades
+                const eventTitle = event.Evento || event.evento || 'Evento sin título';
+                const eventYear = event.AñoDelEvento || event.YearOfEvent || event.año || 'Año desconocido';
+                const eventCountry = event.País || event.Country || event.pais || 'Desconocido';
+                const eventCategory = event.Categoría || event.Category || event.categoria || 'General';
+                const eventRelevance = event.Relevancia || event.Relevance || event.relevancia || 'N/A';
+                const eventSource = event.Fuente || event.Source || event.fuente || 'Wikipedia';
+                
+                eventCard.innerHTML = `
+                    <h3>${eventTitle}</h3>
+                    <p><strong>Año:</strong> ${eventYear}</p>
+                    <div class="event-meta">
+                        <span><strong>País:</strong> ${eventCountry}</span>
+                        <span><strong>Categoría:</strong> ${eventCategory}</span>
+                        <span><strong>Relevancia:</strong> ${eventRelevance}/10</span>
+                        ${eventSource && eventSource !== 'Wikipedia' && eventSource.startsWith('http') ? 
+                            `<span class="event-source"><strong>Fuente:</strong> <a href="${eventSource}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : 
+                            '<span><strong>Fuente:</strong> Wikipedia</span>'
+                        }
+                    </div>
+                `;
+                sectionDiv.appendChild(eventCard);
+            });
+            
+            container.appendChild(sectionDiv);
+        }
+
+        /**
+         * Función para probar la conexión (debugging)
+         */
+        function testConnection() {
+            console.log('🧪 Probando conexión a:', SCRIPT_URL);
+            
+            fetch(SCRIPT_URL)
+                .then(response => {
+                    console.log('📡 Status de prueba:', response.status);
+                    console.log('📋 Headers de prueba:', [...response.headers.entries()]);
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('📄 Respuesta de prueba (primeros 500 caracteres):', text.substring(0, 500));
+                    try {
+                        const json = JSON.parse(text);
+                        console.log('✅ JSON válido recibido:', json);
+                        alert(`✅ Conexión exitosa!\n\nEventos encontrados: ${json.events ? json.events.length : 0}\nFecha: ${json.date || 'No especificada'}`);
+                    } catch (e) {
+                        console.log('❌ La respuesta no es JSON válido');
+                        alert(`❌ Error: El servidor no devolvió JSON válido.\n\nRespuesta recibida: ${text.substring(0, 200)}...`);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Prueba de conexión falló:', error);
+                    alert(`❌ Error de conexión:\n\n${error.message}`);
+                });
         }
     </script>
 </body>
