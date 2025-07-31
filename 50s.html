@@ -471,6 +471,156 @@
         currentDateElement.textContent = 'Error al cargar eventos';
     }
 
+
+    
+        /**
+         * Renderiza los eventos en el DOM
+         * @param {Array} events - Array de eventos
+         */
+        function renderEvents(events) {
+            const eventsContainer = document.getElementById('events-container');
+            eventsContainer.innerHTML = '';
+
+            if (!events || events.length === 0) {
+                eventsContainer.innerHTML = `
+                    <div class="no-events">
+                        📅 No se encontraron eventos históricos para la fecha seleccionada.
+                        <br><small>Prueba con otra fecha o verifica que el sistema esté funcionando.</small>
+                    </div>
+                `;
+                return;
+            }
+
+            console.log(`📊 Renderizando ${events.length} eventos`);
+
+            // Agrupar eventos por 'CategoríaTemporal'
+            const groupedEvents = events.reduce((acc, event) => {
+                const category = event.CategoríaTemporal || event.CategoriaTemporall || 'Sin categoría';
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(event);
+                return acc;
+            }, {});
+
+            // Orden preferido para las secciones
+            const order = [
+                "Hoy", 
+                "Hace 11 años", 
+                "Hace 22 años", 
+                "Hace 26 años",
+                "Hace 27 años",
+                "Hace 28 años",
+                "Hace 29 años",
+                "Hace 32 años",
+                "Hace 33 años",
+                "Hace 34 años",
+                "Hace 35 años",
+                "Hace 36 años",
+                "Hace 37 años",
+                "Hace 38 años",
+                "Hace 44 años", 
+                "Hace 55 años", 
+                "Hace 66 años"
+            ];
+            
+            // Agregar años del 25 al 38 si no están ya
+            for (let y = 25; y <= 38; y++) {
+                const categoryName = `Hace ${y} años`;
+                if (!order.includes(categoryName)) {
+                    order.push(categoryName);
+                }
+            }
+            
+            const categoriesRendered = new Set();
+
+            // Renderizar categorías en orden
+            order.forEach(category => {
+                if (groupedEvents[category] && groupedEvents[category].length > 0) {
+                    renderEventSection(category, groupedEvents[category], eventsContainer);
+                    categoriesRendered.add(category);
+                }
+            });
+
+            // Renderizar categorías restantes
+            Object.keys(groupedEvents).forEach(category => {
+                if (!categoriesRendered.has(category)) {
+                    renderEventSection(`Otros Eventos (${category})`, groupedEvents[category], eventsContainer);
+                }
+            });
+        }
+
+        /**
+         * Renderiza una sección de eventos
+         * @param {string} categoryTitle - Título de la categoría
+         * @param {Array} events - Eventos de la categoría
+         * @param {HTMLElement} container - Contenedor donde añadir la sección
+         */
+        function renderEventSection(categoryTitle, events, container) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'timeline-section';
+            sectionDiv.innerHTML = `<h2>${categoryTitle} (${events.length})</h2>`;
+
+            events.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.className = 'event-card';
+                
+                // Manejar diferentes posibles nombres de propiedades
+                const eventTitle = event.Evento || event.evento || 'Evento sin título';
+                const eventYear = event.AñoDelEvento || event.YearOfEvent || event.año || 'Año desconocido';
+                const eventCountry = event.País || event.Country || event.pais || 'Desconocido';
+                const eventCategory = event.Categoría || event.Category || event.categoria || 'General';
+                const eventRelevance = event.Relevancia || event.Relevance || event.relevancia || 'N/A';
+                const eventSource = event.Fuente || event.Source || event.fuente || 'Wikipedia';
+                
+                eventCard.innerHTML = `
+                    <h3>${eventTitle}</h3>
+                    <p><strong>Año:</strong> ${eventYear}</p>
+                    <div class="event-meta">
+                        <span><strong>País:</strong> ${eventCountry}</span>
+                        <span><strong>Categoría:</strong> ${eventCategory}</span>
+                        <span><strong>Relevancia:</strong> ${eventRelevance}/10</span>
+                        ${eventSource && eventSource !== 'Wikipedia' && eventSource.startsWith('http') ? 
+                            `<span class="event-source"><strong>Fuente:</strong> <a href="${eventSource}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : 
+                            '<span><strong>Fuente:</strong> Wikipedia</span>'
+                        }
+                    </div>
+                `;
+                sectionDiv.appendChild(eventCard);
+            });
+            
+            container.appendChild(sectionDiv);
+        }
+
+        /**
+         * Función para probar la conexión (debugging)
+         */
+        function testConnection() {
+            console.log('🧪 Probando conexión a:', SCRIPT_URL);
+            
+            fetch(SCRIPT_URL)
+                .then(response => {
+                    console.log('📡 Status de prueba:', response.status);
+                    console.log('📋 Headers de prueba:', [...response.headers.entries()]);
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('📄 Respuesta de prueba (primeros 500 caracteres):', text.substring(0, 500));
+                    try {
+                        const json = JSON.parse(text);
+                        console.log('✅ JSON válido recibido:', json);
+                        alert(`✅ Conexión exitosa!\n\nEventos encontrados: ${json.events ? json.events.length : 0}\nFecha: ${json.date || 'No especificada'}`);
+                    } catch (e) {
+                        console.log('❌ La respuesta no es JSON válido');
+                        alert(`❌ Error: El servidor no devolvió JSON válido.\n\nRespuesta recibida: ${text.substring(0, 200)}...`);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Prueba de conexión falló:', error);
+                    alert(`❌ Error de conexión:\n\n${error.message}`);
+                });
+        }
+
     // Resto del código (renderEvents, renderEventSection, testConnection) permanece igual
 </script>
 </body>
