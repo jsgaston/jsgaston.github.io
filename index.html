@@ -1996,7 +1996,7 @@ function updateElapsedTime() {
 
   // Cálculos base para días, horas, minutos a partir de totalSeconds2
   const totalDays = Math.floor(msElapsed / (60 * 60 * 24 * 1000));
-  const totalSoles = Math.floor(totalSeconds2 / (60 * 60 * 24));
+  const totalSoles1 = Math.floor(totalSeconds2 / (60 * 60 * 24));
   const secondsAfterDays = totalSeconds2 % (60 * 60 * 24);
 
   const totalYears = Math.floor(totalSeconds2 / (60 * 60 * 24 *365.25));
@@ -2039,7 +2039,7 @@ function updateElapsedTime() {
 
   // Mostrar tiempo básico
   //document.getElementById("elapsedSoles").textContent = `${totalSoles} soles`;
-  document.getElementById("elapsedDays").textContent = `${totalSoles} días, ${hours} horas y ${minutes} minutos.`;
+  document.getElementById("elapsedDays").textContent = `${totalSoles1} días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
   document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
   document.getElementById("elapsedMinutes").textContent = (totalSeconds2 / 60).toLocaleString(undefined, {maximumFractionDigits: 2});
