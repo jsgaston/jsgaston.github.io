@@ -1103,7 +1103,7 @@
 
 
   <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
-      <div><strong>Soles Totales (o):</strong> <span id="elapsedSolesText">Calculando...</span></div>
+  
     <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
     <div><strong>Total en Years (years):</strong> <span id="elapsedYears">...</span> <strong> years</strong> </div>
     <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span><strong> h </strong></div>
@@ -2063,11 +2063,11 @@ function updateElapsedTime() {
 
 
   extra.innerHTML = `
-    <div><strong>Total en tiradas:</strong> ${totalTiradas.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-    <div><strong>Total en :-_ (Porciones pequeñas):</strong> ${totalCuchuflusPequenos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
-    <div><strong>Total en :- (Porciones medianas):</strong> ${totalCuchuflusMedianos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
-    <div><strong>Total en : (Porciones grandes):</strong> ${totalCuchuflusGrandes.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles):</strong> ${totalSoles.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en tiradas: </strong> ${totalTiradas.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
+    <div><strong>Total en :-_ (Porciones pequeñas): </strong> ${totalCuchuflusPequenos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
+    <div><strong>Total en :- (Porciones medianas): </strong> ${totalCuchuflusMedianos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
+    <div><strong>Total en : (Porciones grandes): </strong> ${totalCuchuflusGrandes.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
+    <div><strong>Total en o (Soles): </strong> ${totalSoles.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 }
 </script>
