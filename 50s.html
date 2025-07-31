@@ -426,51 +426,53 @@
                     Cargando eventos...
                 </div>
             `;
-
+        
             try {
                 let url = SCRIPT_URL;
                 
                 // Agregar parámetro de fecha si se proporciona
                 if (selectedDate) {
-                    url += `?date=${encodeURIComponent(selectedDate)}`;
+                    url += `?date=${encodeURIComponent(selectedDate)}&callback=handleEvents`;
                     console.log(`📅 Solicitando eventos para: ${selectedDate}`);
+                } else {
+                    url += `?callback=handleEvents`;
                 }
                 
-                console.log(`🌐 Haciendo petición a: ${url}`);
+                console.log(`🌐 Haciendo petición JSONP a: ${url}`);
                 
-                // Configurar fetch con timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000);
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    signal: controller.signal
+                // Crear una promesa para manejar la respuesta JSONP
+                const data = await new Promise((resolve, reject) => {
+                    // Definir la función de callback global
+                    window.handleEvents = (response) => {
+                        resolve(response);
+                        delete window.handleEvents;
+                    };
+                    
+                    // Configurar timeout
+                    const timeoutId = setTimeout(() => {
+                        reject(new Error('Timeout al cargar los eventos'));
+                        delete window.handleEvents;
+                    }, 30000);
+                    
+                    // Crear el script para JSONP
+                    const script = document.createElement('script');
+                    script.src = url;
+                    
+                    script.onerror = () => {
+                        clearTimeout(timeoutId);
+                        reject(new Error('Error al cargar el script JSONP'));
+                        delete window.handleEvents;
+                    };
+                    
+                    document.body.appendChild(script);
+                    
+                    // Limpiar después de cargar
+                    script.onload = () => {
+                        clearTimeout(timeoutId);
+                        document.body.removeChild(script);
+                    };
                 });
                 
-                clearTimeout(timeoutId);
-                
-                console.log(`📡 Respuesta recibida - Status: ${response.status}`);
-                
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
-                }
-                
-                // Verificar que la respuesta sea JSON
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    const textResponse = await response.text();
-                    console.error('❌ Respuesta no es JSON:', textResponse.substring(0, 200));
-                    throw new Error('El servidor no devolvió JSON válido');
-                }
-
-                    // Uso:
-                const data = await fetchWithJSONP(SCRIPT_URL + `?date=${encodeURIComponent(selectedDate)}`, 'handleEvents');
-                
-                //const data = await response.json();
                 console.log('✅ Datos recibidos:', data);
                 
                 // Verificar si hay error en la respuesta
@@ -494,14 +496,10 @@
                 let errorMessage = 'Error desconocido';
                 let techDetails = error.message;
                 
-                if (error.name === 'AbortError') {
+                if (error.message.includes('Timeout')) {
                     errorMessage = 'La petición tardó demasiado (timeout de 30s)';
-                } else if (error.message.includes('fetch') || error.message.includes('network')) {
-                    errorMessage = 'Error de conexión a internet';
-                } else if (error.message.includes('JSON')) {
-                    errorMessage = 'Error en formato de datos del servidor';
-                } else if (error.message.includes('HTTP')) {
-                    errorMessage = 'Error del servidor';
+                } else if (error.message.includes('script') || error.message.includes('JSONP')) {
+                    errorMessage = 'Error de conexión al servidor';
                 } else {
                     errorMessage = error.message;
                 }
