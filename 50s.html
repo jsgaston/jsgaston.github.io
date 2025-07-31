@@ -385,6 +385,32 @@
             });
         });
 
+
+
+
+
+        function fetchWithJSONP(url, callbackName) {
+              return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = `${url}${url.includes('?') ? '&' : '?'}callback=${callbackName}`;
+                document.body.appendChild(script);
+                
+                window[callbackName] = (data) => {
+                  resolve(data);
+                  document.body.removeChild(script);
+                  delete window[callbackName];
+                };
+                
+                script.onerror = () => {
+                  reject(new Error('JSONP request failed'));
+                  document.body.removeChild(script);
+                  delete window[callbackName];
+                };
+              });
+            }
+
+
+
         /**
          * Obtiene y renderiza eventos históricos para una fecha dada
          * @param {string} selectedDate - Fecha en formato 'YYYY-MM-DD'
@@ -440,8 +466,11 @@
                     console.error('❌ Respuesta no es JSON:', textResponse.substring(0, 200));
                     throw new Error('El servidor no devolvió JSON válido');
                 }
+
+                    // Uso:
+                const data = await fetchWithJSONP(SCRIPT_URL + `?date=${encodeURIComponent(selectedDate)}`, 'handleEvents');
                 
-                const data = await response.json();
+                //const data = await response.json();
                 console.log('✅ Datos recibidos:', data);
                 
                 // Verificar si hay error en la respuesta
