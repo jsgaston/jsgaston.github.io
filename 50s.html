@@ -358,7 +358,7 @@
     <script>
         // *** IMPORTANTE: REEMPLAZA ESTO CON LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT DESPLEGADA ***
         // Ejemplo: const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzX.../exec";
-        const SCRIPT_URL_50s = "https://script.google.com/macros/s/AKfycbyZqlNEOEitNsvBH1feNgwoDl1ICv7nM7xgyFOz4BGOJ69rlie9eWqH2ME-9sAGFPI_/exec"; 
+        const SCRIPT_URL_50s = "https://script.google.com/macros/s/AKfycbwHcSmLKyLQKxJCX9TcJwZYF-7kF-z8QCv_4ZN4rwJKBuzdx3N-G1QLXz5dJwIoX0NT/exec"; 
 
             const GOOGLE_APP_SCRIPT_WEB_APP_URL = SCRIPT_URL_50s; // Pega tu URL aquí
 
@@ -406,42 +406,126 @@
         async function fetchAndRenderEvents(selectedDate = null) {
             const eventsContainer = document.getElementById('events-container');
             const currentDateElement = document.getElementById('current-date');
+            
+            // Mostrar spinner de carga
             eventsContainer.innerHTML = `
                 <div class="loading-spinner">
                     <div class="spinner"></div>
                     Cargando eventos...
                 </div>
-            `; // Mostrar spinner de carga
+            `;
         
             try {
                 let url = SCRIPT_URL_50s;
+                
+                // Agregar parámetro de fecha si se proporciona
                 if (selectedDate) {
-                    // Si se proporciona una fecha, añadirla como parámetro a la URL del script
-                    url += `?date=${selectedDate}`;
+                    url += `?date=${encodeURIComponent(selectedDate)}`;
+                    console.log(`Solicitando eventos para fecha: ${selectedDate}`);
                 }
                 
-                const response = await fetch(url);
+                console.log(`Haciendo petición a: ${url}`);
+                
+                // Configurar opciones de fetch con timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                console.log(`Respuesta recibida. Status: ${response.status}`);
+                
                 if (!response.ok) {
-                    throw new Error(`Error HTTP! estado: ${response.status}`);
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const textResponse = await response.text();
+                    console.error('Respuesta no es JSON:', textResponse);
+                    throw new Error('La respuesta del servidor no es JSON válido');
                 }
                 
                 const data = await response.json();
-                console.log("Datos obtenidos:", data);
-        
+                console.log("Datos recibidos:", data);
+                
+                // Verificar si hay error en la respuesta
+                if (data.error) {
+                    throw new Error(data.message || 'Error desconocido del servidor');
+                }
+                
+                // Actualizar la fecha mostrada
                 currentDateElement.textContent = `Eventos del ${data.date || 'día seleccionado'}`;
-                renderEvents(data.events);
-        
+                
+                // Renderizar eventos
+                renderEvents(data.events || []);
+                
             } catch (error) {
                 console.error("Error al obtener eventos históricos:", error);
+                
+                let errorMessage = 'Error desconocido';
+                
+                if (error.name === 'AbortError') {
+                    errorMessage = 'La petición tardó demasiado tiempo (timeout)';
+                } else if (error.message.includes('fetch')) {
+                    errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+                } else if (error.message.includes('JSON')) {
+                    errorMessage = 'Error en el formato de datos del servidor';
+                } else {
+                    errorMessage = error.message;
+                }
+                
                 eventsContainer.innerHTML = `
                     <div class="error-message">
-                        ❌ Error al cargar los eventos históricos. Por favor, inténtelo de nuevo más tarde.
-                        <br>Detalles: ${error.message}
+                        ❌ Error al cargar los eventos históricos.
+                        <br><strong>Detalles:</strong> ${errorMessage}
+                        <br><br>
+                        <button onclick="location.reload()" style="background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            🔄 Reintentar
+                        </button>
                     </div>
                 `;
                 currentDateElement.textContent = `Eventos del día seleccionado`;
             }
         }
+
+
+
+                // Función mejorada para debugging
+        function testConnection() {
+            console.log('Testing connection to:', SCRIPT_URL_50s);
+            fetch(SCRIPT_URL_50s)
+                .then(response => {
+                    console.log('Test response status:', response.status);
+                    console.log('Test response headers:', [...response.headers.entries()]);
+                    return response.text();
+                })
+                .then(text => {
+                    console.log('Test response body:', text);
+                    try {
+                        const json = JSON.parse(text);
+                        console.log('Parsed JSON:', json);
+                    } catch (e) {
+                        console.log('Response is not valid JSON');
+                    }
+                })
+                .catch(error => {
+                    console.error('Test connection failed:', error);
+                });
+        }
+
+
+
+
+        
 
         function renderEvents(events) {
             const eventsContainer = document.getElementById('events-container');
