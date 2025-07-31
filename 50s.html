@@ -560,14 +560,34 @@
             const sectionDiv = document.createElement('div');
             sectionDiv.className = 'timeline-section';
             sectionDiv.innerHTML = `<h2>${categoryTitle} (${events.length})</h2>`;
-
+        
             events.forEach(event => {
                 const eventCard = document.createElement('div');
                 eventCard.className = 'event-card';
                 
-                // Manejar diferentes posibles nombres de propiedades
+                // Manejar diferentes nombres de propiedades de manera más robusta
                 const eventTitle = event.Evento || event.evento || 'Evento sin título';
-                const eventYear = event.AñodelEvento || event.YearOfEvent || event.año || 'Año desconocido';
+                
+                // Extraer el año de diferentes formas posibles
+                let eventYear = 'Año desconocido';
+                if (event.AñodelEvento) {
+                    eventYear = event.AñodelEvento;
+                } else if (event.YearOfEvent) {
+                    eventYear = event.YearOfEvent;
+                } else if (event.año) {
+                    eventYear = event.año;
+                } else if (event.Fecha) {
+                    // Si tenemos una fecha completa, extraemos el año
+                    try {
+                        const dateObj = new Date(event.Fecha);
+                        if (!isNaN(dateObj.getFullYear())) {
+                            eventYear = dateObj.getFullYear();
+                        }
+                    } catch (e) {
+                        console.error('Error al parsear fecha:', e);
+                    }
+                }
+        
                 const eventCountry = event.País || event.Country || event.pais || 'Desconocido';
                 const eventCategory = event.Categoría || event.Category || event.categoria || 'General';
                 const eventRelevance = event.Relevancia || event.Relevance || event.relevancia || 'N/A';
