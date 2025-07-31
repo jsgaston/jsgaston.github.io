@@ -1103,6 +1103,7 @@
 
 
   <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
+      <div><strong>Soles Totales (o):</strong> <span id="elapsedSolesText">Calculando...</span></div>
     <div><strong>Tiempo:</strong> <span id="elapsedDaysText">Calculando...</span></div>
     <div><strong>Total en Years (years):</strong> <span id="elapsedYears">...</span> <strong> years</strong> </div>
     <div><strong>Total en h (horas):</strong> <span id="elapsedHours">...</span><strong> h </strong></div>
@@ -1994,7 +1995,8 @@ function updateElapsedTime() {
   const totalSeconds2 = Math.floor(msElapsed * personasCelda * personasAfectadas / 1000); // Esto sigue siendo el total de segundos calculados con tus factores.
 
   // Cálculos base para días, horas, minutos a partir de totalSeconds2
-  const totalDays = Math.floor(totalSeconds2 / (60 * 60 * 24));
+  const totalDays = Math.floor(msElapsed / (60 * 60 * 24 * 1000));
+  const totalSoles = Math.floor(totalSeconds2 / (60 * 60 * 24));
   const secondsAfterDays = totalSeconds2 % (60 * 60 * 24);
 
   const totalYears = Math.floor(totalSeconds2 / (60 * 60 * 24 *365.25));
@@ -2027,14 +2029,16 @@ function updateElapsedTime() {
         <p>Personas Afectadas (inicial): ${personasAfectadas}</p>
         `;
 
-  console.log("Start Date:", startDate);
-  console.log("End Date:", endDate);
-  console.log("Personas en Celda:", personasCelda);
-  console.log("Personas Afectadas:", personasAfectadas);
-  console.log("Total Seconds (totalSeconds2):", totalSeconds2);
+  console.log("Start Date: ", startDate);
+  console.log("End Date: ", endDate);
+  console.log("Personas en Celda: ", personasCelda);
+  console.log("Personas Afectadas: ", personasAfectadas);
+  console.log("Total Seconds: ", totalSeconds2);
+    console.log("1 Día son estos soles: ", perosnasCelda);
 
 
   // Mostrar tiempo básico
+    document.getElementById("elapsedSolesText").textContent = `${totalSoles} soles`;
   document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
   document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
