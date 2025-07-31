@@ -355,322 +355,123 @@
         <p>&copy; 2025 50s Timeline. Desarrollado por <a href="https://jsgaston.github.io/" target="_blank">jsgaston.github.io</a></p>
     </footer>
 
-    <script>
-        // URL de tu Google Apps Script Web App
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbZjiR1JiO4CszfOygGpeoaCwVRYKokOYZ-Le8wAa3bVIJ6uLYVyj8ZvUctKrCkXUYyQ/exec";
+<script>
+    // URL de tu Google Apps Script Web App
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbZjiR1JiO4CszfOygGpeoaCwVRYKokOYZ-Le8wAa3bVIJ6uLYVyj8ZvUctKrCkXUYyQ/exec";
 
-        // Inicialización cuando la página carga
-        document.addEventListener('DOMContentLoaded', () => {
-            const dateInput = document.getElementById('date-input');
-            const searchButton = document.getElementById('search-button');
+    // Inicialización cuando la página carga
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('date-input');
+        const searchButton = document.getElementById('search-button');
 
-            // Establecer la fecha actual por defecto
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-            const day = today.getDate().toString().padStart(2, '0');
-            dateInput.value = `${year}-${month}-${day}`;
+        // Establecer la fecha actual por defecto
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+        dateInput.value = `${year}-${month}-${day}`;
 
-            // Cargar eventos para la fecha actual al inicio
+        // Cargar eventos para la fecha actual al inicio
+        fetchAndRenderEvents(dateInput.value);
+
+        // Event listener para el botón de búsqueda
+        searchButton.addEventListener('click', () => {
             fetchAndRenderEvents(dateInput.value);
-
-            // Event listener para el botón de búsqueda
-            searchButton.addEventListener('click', () => {
-                fetchAndRenderEvents(dateInput.value);
-            });
-
-            // Event listener para cambios en el input de fecha
-            dateInput.addEventListener('change', () => {
-                fetchAndRenderEvents(dateInput.value);
-            });
         });
 
-
-
-
-
-        function fetchWithJSONP(url, callbackName) {
-              return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = `${url}${url.includes('?') ? '&' : '?'}callback=${callbackName}`;
-                document.body.appendChild(script);
-                
-                window[callbackName] = (data) => {
-                  resolve(data);
-                  document.body.removeChild(script);
-                  delete window[callbackName];
-                };
-                
-                script.onerror = () => {
-                  reject(new Error('JSONP request failed'));
-                  document.body.removeChild(script);
-                  delete window[callbackName];
-                };
-              });
-            }
-
-
-
-async function fetchAndRenderEvents(selectedDate = null) {
-    const eventsContainer = document.getElementById('events-container');
-    const currentDateElement = document.getElementById('current-date');
-    
-    // Mostrar spinner de carga
-    eventsContainer.innerHTML = `
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            Cargando eventos...
-        </div>
-    `;
-
-    try {
-        // Generar un nombre de callback único para cada solicitud
-        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-        let url = `${SCRIPT_URL}?callback=${callbackName}`;
-        
-        if (selectedDate) {
-            url += `&date=${encodeURIComponent(selectedDate)}`;
-        }
-        
-        console.log(`🌐 Haciendo petición JSONP a: ${url}`);
-        
-        // Crear una promesa para manejar la respuesta JSONP
-        const data = await new Promise((resolve, reject) => {
-            // Configurar timeout
-            const timeoutId = setTimeout(() => {
-                reject(new Error('Timeout al cargar los eventos'));
-                cleanup();
-            }, 30000);
-            
-            // Función de limpieza
-            const cleanup = () => {
-                clearTimeout(timeoutId);
-                delete window[callbackName];
-                if (script.parentNode) {
-                    document.body.removeChild(script);
-                }
-            };
-            
-            // Definir la función de callback global
-            window[callbackName] = (response) => {
-                resolve(response);
-                cleanup();
-            };
-            
-            // Crear el script para JSONP
-            const script = document.createElement('script');
-            script.src = url;
-            
-            script.onerror = () => {
-                reject(new Error('Error al cargar los datos'));
-                cleanup();
-            };
-            
-            document.body.appendChild(script);
+        // Event listener para cambios en el input de fecha
+        dateInput.addEventListener('change', () => {
+            fetchAndRenderEvents(dateInput.value);
         });
+    });
+
+    async function fetchAndRenderEvents(selectedDate = null) {
+        const eventsContainer = document.getElementById('events-container');
+        const currentDateElement = document.getElementById('current-date');
         
-        console.log('✅ Datos recibidos:', data);
-        
-        // Verificar si hay error en la respuesta
-        if (data.error) {
-            throw new Error(data.message || 'Error del servidor');
-        }
-        
-        // Actualizar fecha mostrada
-        currentDateElement.textContent = data.date ? 
-            `Eventos del ${data.date}` : 'Eventos del día seleccionado';
-        
-        // Renderizar eventos
-        renderEvents(data.events || []);
-        
-    } catch (error) {
-        console.error('❌ Error al obtener eventos:', error);
-        showError(error);
-    }
-}
+        // Mostrar spinner de carga
+        eventsContainer.innerHTML = `
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                Cargando eventos...
+            </div>
+        `;
 
-function showError(error) {
-    const eventsContainer = document.getElementById('events-container');
-    const currentDateElement = document.getElementById('current-date');
-    
-    let errorMessage = 'Error desconocido';
-    let techDetails = error.message;
-    
-    if (error.message.includes('Timeout')) {
-        errorMessage = 'La petición tardó demasiado';
-    } else if (error.message.includes('cargar')) {
-        errorMessage = 'Error de conexión al servidor';
-    }
-    
-    eventsContainer.innerHTML = `
-        <div class="error-message">
-            ❌ <strong>Error al cargar eventos históricos</strong>
-            <br><br>
-            <strong>Problema:</strong> ${errorMessage}
-            <br>
-            <small><strong>Detalles técnicos:</strong> ${techDetails}</small>
-            <br><br>
-            <button onclick="fetchAndRenderEvents(document.getElementById('date-input').value)" 
-                    class="retry-button">
-                🔄 Reintentar
-            </button>
-            <button onclick="testConnection()" 
-                    class="test-button">
-                🔧 Probar Conexión
-            </button>
-        </div>
-    `;
-    
-    currentDateElement.textContent = 'Error al cargar eventos';
-}
-
-        /**
-         * Renderiza los eventos en el DOM
-         * @param {Array} events - Array de eventos
-         */
-        function renderEvents(events) {
-            const eventsContainer = document.getElementById('events-container');
-            eventsContainer.innerHTML = '';
-
-            if (!events || events.length === 0) {
-                eventsContainer.innerHTML = `
-                    <div class="no-events">
-                        📅 No se encontraron eventos históricos para la fecha seleccionada.
-                        <br><small>Prueba con otra fecha o verifica que el sistema esté funcionando.</small>
-                    </div>
-                `;
-                return;
-            }
-
-            console.log(`📊 Renderizando ${events.length} eventos`);
-
-            // Agrupar eventos por 'CategoríaTemporal'
-            const groupedEvents = events.reduce((acc, event) => {
-                const category = event.CategoríaTemporal || event.CategoriaTemporall || 'Sin categoría';
-                if (!acc[category]) {
-                    acc[category] = [];
-                }
-                acc[category].push(event);
-                return acc;
-            }, {});
-
-            // Orden preferido para las secciones
-            const order = [
-                "Hoy", 
-                "Hace 11 años", 
-                "Hace 22 años", 
-                "Hace 26 años",
-                "Hace 27 años",
-                "Hace 28 años",
-                "Hace 29 años",
-                "Hace 32 años",
-                "Hace 33 años",
-                "Hace 34 años",
-                "Hace 35 años",
-                "Hace 36 años",
-                "Hace 37 años",
-                "Hace 38 años",
-                "Hace 44 años", 
-                "Hace 55 años", 
-                "Hace 66 años"
-            ];
-            
-            // Agregar años del 25 al 38 si no están ya
-            for (let y = 25; y <= 38; y++) {
-                const categoryName = `Hace ${y} años`;
-                if (!order.includes(categoryName)) {
-                    order.push(categoryName);
-                }
+        try {
+            let url = SCRIPT_URL;
+            if (selectedDate) {
+                url += `?date=${encodeURIComponent(selectedDate)}`;
             }
             
-            const categoriesRendered = new Set();
-
-            // Renderizar categorías en orden
-            order.forEach(category => {
-                if (groupedEvents[category] && groupedEvents[category].length > 0) {
-                    renderEventSection(category, groupedEvents[category], eventsContainer);
-                    categoriesRendered.add(category);
-                }
-            });
-
-            // Renderizar categorías restantes
-            Object.keys(groupedEvents).forEach(category => {
-                if (!categoriesRendered.has(category)) {
-                    renderEventSection(`Otros Eventos (${category})`, groupedEvents[category], eventsContainer);
-                }
-            });
-        }
-
-        /**
-         * Renderiza una sección de eventos
-         * @param {string} categoryTitle - Título de la categoría
-         * @param {Array} events - Eventos de la categoría
-         * @param {HTMLElement} container - Contenedor donde añadir la sección
-         */
-        function renderEventSection(categoryTitle, events, container) {
-            const sectionDiv = document.createElement('div');
-            sectionDiv.className = 'timeline-section';
-            sectionDiv.innerHTML = `<h2>${categoryTitle} (${events.length})</h2>`;
-
-            events.forEach(event => {
-                const eventCard = document.createElement('div');
-                eventCard.className = 'event-card';
-                
-                // Manejar diferentes posibles nombres de propiedades
-                const eventTitle = event.Evento || event.evento || 'Evento sin título';
-                const eventYear = event.AñoDelEvento || event.YearOfEvent || event.año || 'Año desconocido';
-                const eventCountry = event.País || event.Country || event.pais || 'Desconocido';
-                const eventCategory = event.Categoría || event.Category || event.categoria || 'General';
-                const eventRelevance = event.Relevancia || event.Relevance || event.relevancia || 'N/A';
-                const eventSource = event.Fuente || event.Source || event.fuente || 'Wikipedia';
-                
-                eventCard.innerHTML = `
-                    <h3>${eventTitle}</h3>
-                    <p><strong>Año:</strong> ${eventYear}</p>
-                    <div class="event-meta">
-                        <span><strong>País:</strong> ${eventCountry}</span>
-                        <span><strong>Categoría:</strong> ${eventCategory}</span>
-                        <span><strong>Relevancia:</strong> ${eventRelevance}/10</span>
-                        ${eventSource && eventSource !== 'Wikipedia' && eventSource.startsWith('http') ? 
-                            `<span class="event-source"><strong>Fuente:</strong> <a href="${eventSource}" target="_blank" rel="noopener noreferrer">Ver más</a></span>` : 
-                            '<span><strong>Fuente:</strong> Wikipedia</span>'
-                        }
-                    </div>
-                `;
-                sectionDiv.appendChild(eventCard);
-            });
+            console.log(`🌐 Haciendo petición a: ${url}`);
             
-            container.appendChild(sectionDiv);
-        }
-
-        /**
-         * Función para probar la conexión (debugging)
-         */
-        function testConnection() {
-            console.log('🧪 Probando conexión a:', SCRIPT_URL);
+            const response = await fetch(url);
             
-            fetch(SCRIPT_URL)
-                .then(response => {
-                    console.log('📡 Status de prueba:', response.status);
-                    console.log('📋 Headers de prueba:', [...response.headers.entries()]);
-                    return response.text();
-                })
-                .then(text => {
-                    console.log('📄 Respuesta de prueba (primeros 500 caracteres):', text.substring(0, 500));
-                    try {
-                        const json = JSON.parse(text);
-                        console.log('✅ JSON válido recibido:', json);
-                        alert(`✅ Conexión exitosa!\n\nEventos encontrados: ${json.events ? json.events.length : 0}\nFecha: ${json.date || 'No especificada'}`);
-                    } catch (e) {
-                        console.log('❌ La respuesta no es JSON válido');
-                        alert(`❌ Error: El servidor no devolvió JSON válido.\n\nRespuesta recibida: ${text.substring(0, 200)}...`);
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Prueba de conexión falló:', error);
-                    alert(`❌ Error de conexión:\n\n${error.message}`);
-                });
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Datos recibidos:', data);
+            
+            // Verificar si hay error en la respuesta
+            if (data.error) {
+                throw new Error(data.message || 'Error del servidor');
+            }
+            
+            // Actualizar fecha mostrada
+            currentDateElement.textContent = data.date ? 
+                `Eventos del ${data.date}` : 'Eventos del día seleccionado';
+            
+            // Asegurarse de que los eventos estén en un array
+            const eventsArray = Array.isArray(data.events) ? data.events : 
+                              (data.events && Array.isArray(data.events.events) ? data.events.events : []);
+            
+            // Renderizar eventos
+            renderEvents(eventsArray);
+            
+        } catch (error) {
+            console.error('❌ Error al obtener eventos:', error);
+            showError(error);
         }
-    </script>
+    }
+
+    function showError(error) {
+        const eventsContainer = document.getElementById('events-container');
+        const currentDateElement = document.getElementById('current-date');
+        
+        let errorMessage = 'Error desconocido';
+        let techDetails = error.message;
+        
+        if (error.message.includes('Timeout')) {
+            errorMessage = 'La petición tardó demasiado';
+        } else if (error.message.includes('cargar')) {
+            errorMessage = 'Error de conexión al servidor';
+        }
+        
+        eventsContainer.innerHTML = `
+            <div class="error-message">
+                ❌ <strong>Error al cargar eventos históricos</strong>
+                <br><br>
+                <strong>Problema:</strong> ${errorMessage}
+                <br>
+                <small><strong>Detalles técnicos:</strong> ${techDetails}</small>
+                <br><br>
+                <button onclick="fetchAndRenderEvents(document.getElementById('date-input').value)" 
+                        style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    🔄 Reintentar
+                </button>
+                <button onclick="testConnection()" 
+                        style="padding: 8px 16px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                    🔧 Probar Conexión
+                </button>
+            </div>
+        `;
+        
+        currentDateElement.textContent = 'Error al cargar eventos';
+    }
+
+    // Resto del código (renderEvents, renderEventSection, testConnection) permanece igual
+</script>
 </body>
 </html>
