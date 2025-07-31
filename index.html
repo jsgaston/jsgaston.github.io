@@ -2034,11 +2034,11 @@ function updateElapsedTime() {
   console.log("Personas en Celda: ", personasCelda);
   console.log("Personas Afectadas: ", personasAfectadas);
   console.log("Total Seconds: ", totalSeconds2);
-    console.log("1 Día son estos soles: ", perosnasCelda);
+    console.log("1 Día son estos soles: ", personasCelda);
 
 
   // Mostrar tiempo básico
-    document.getElementById("elapsedSolesText").textContent = `${totalSoles} soles`;
+  document.getElementById("elapsedSolesText").textContent = `${totalSoles} soles`;
   document.getElementById("elapsedDaysText").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
   document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
