@@ -1997,6 +1997,7 @@ function updateElapsedTime() {
   // Cálculos base para días, horas, minutos a partir de totalSeconds2
   const totalDays = Math.floor(msElapsed / (60 * 60 * 24 * 1000));
   const totalSoles1 = Math.floor(totalSeconds2 / (60 * 60 * 24));
+  const totalSoles2 = Math.floor(msElapsed * personasCelda / (60 * 60 * 24 * 1000));
   const secondsAfterDays = totalSeconds2 % (60 * 60 * 24);
 
   const totalYears = Math.floor(totalSeconds2 / (60 * 60 * 24 *365.25));
@@ -2039,7 +2040,7 @@ function updateElapsedTime() {
 
 
   // Mostrar tiempo básico
-  document.getElementById("elapsedSoles").textContent = `${totalSoles1} soles`;
+  document.getElementById("elapsedSoles").textContent = `${totalSoles2} soles`;
   document.getElementById("elapsedDays").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
   document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
@@ -2068,7 +2069,7 @@ function updateElapsedTime() {
     <div><strong>Total en :-_ (Porciones pequeñas): </strong> ${totalCuchuflusPequenos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :-_ </strong></div>
     <div><strong>Total en :- (Porciones medianas): </strong> ${totalCuchuflusMedianos.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> :- </strong></div>
     <div><strong>Total en : (Porciones grandes): </strong> ${totalCuchuflusGrandes.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> : </strong></div>
-    <div><strong>Total en o (Soles): </strong> ${totalSoles.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
+    <div><strong>Total en soles totales ( o ): </strong> ${totalSoles.toLocaleString(undefined, {maximumFractionDigits: 2})}<strong> o </strong></div>
   `;
 }
 </script>
