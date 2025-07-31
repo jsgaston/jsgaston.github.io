@@ -2039,7 +2039,7 @@ function updateElapsedTime() {
 
   // Mostrar tiempo básico
   //document.getElementById("elapsedSoles").textContent = `${totalSoles} soles`;
-  document.getElementById("elapsedDays").textContent = `${totalDays} días, ${hours} horas y ${minutes} minutos.`;
+  document.getElementById("elapsedDays").textContent = `${totalSoles} días, ${hours} horas y ${minutes} minutos.`;
   document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
   document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
   document.getElementById("elapsedMinutes").textContent = (totalSeconds2 / 60).toLocaleString(undefined, {maximumFractionDigits: 2});
