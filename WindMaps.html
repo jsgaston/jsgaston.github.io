@@ -27,13 +27,15 @@
     <div id="selector-container">
         <label for="map-selector">Selecciona un mapa de viento:</label>
         <select id="map-selector" onchange="changeMap()">
-            <option value="https://es.windfinder.com/#3/42.6824/90.5273/2025-08-06T18:00Z/spot">Windfinder</option>
-            <option value="https://globalwindatlas.info/">Global Wind Atlas</option>
+
             <option value="https://wind-map.gosur.com/es/">Mapa de Vientos en Vivo (Windy.com)</option>
+
+            <option value="https://globalwindatlas.info/">Global Wind Atlas</option>
+
         </select>
     </div>
 
-    <iframe id="wind-map-iframe" src="https://www.windy.com/" frameborder="0"></iframe>
+    <iframe id="wind-map-iframe" src="https://wind-map.gosur.com/es/" frameborder="0"></iframe>
 
     <script>
         function changeMap() {
