@@ -12,7 +12,8 @@
 
   <h2>Mapas en vivo - Alicante</h2>
   <button onclick="cambiarMapa('waze')">🚗 Tráfico (Waze)</button>
-  <button onclick="cambiarMapa('barcos')">🚢 Marítimo (MarineTraffic)</button>
+  <button onclick="cambiarMapa('barcos pesqueros')">🚢 Marítimo (Marine Pesqueros Trackeo)</button>
+  <button onclick="cambiarMapa('barcos')">🚢 Marítimo (Vesselfinder)</button>
   <button onclick="cambiarMapa('aviones')">✈️ Aviones (ADS-B)</button>
 
   <div id="contenedorMapa">
@@ -24,13 +25,36 @@
       let iframe = document.getElementById('iframeMapa');
       if (tipo === 'waze') {
         iframe.src = "https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481";
+      } else if (tipo === 'barcos pesqueros') {
+        iframe.src = "https://globalfishingwatch.org/map/index?_gl=1%2A739szs%2A_gcl_au%2AMTIxMDM4NjkxOC4xNzU0MDg1MDI0%2A_ga%2AMTgwMjIyNDAxNi4xNzU0MDg1MDI0%2A_ga_5W83X3EYGW%2AczE3NTQwODUwMjMkbzEkZzEkdDE3NTQwODUwMzEkajUyJGwwJGg3OTc1OTA5MjA.%2A_ga_M5J2ZHDZMV%2AczE3NTQwODUwMjQkbzEkZzEkdDE3NTQwODUwMzIkajUyJGwwJGgyMDYxNDk1ODIz&longitude=7.730331046688063&latitude=40.20337153681337&zoom=4.601725361588393&vDi=public-global-vessel-identity%3Av3.0&vIs=selfReportedInfo&vSRi=f8a7e7a3e-e093-bee1-edad-4f5ff5bb688d&vE[0]=fishing&vE[1]=encounter&vE[2]=port_visit&vS=insights&lTD=&fTD=&trackCorrectionId=";
       } else if (tipo === 'barcos') {
-        iframe.src = "https://www.vesselfinder.com/";
+        <script type="text/javascript" src="https://www.vesselfinder.com/aismap.js"></script>;
       } else if (tipo === 'aviones') {
         iframe.src = "https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar";
       }
     }
   </script>
+
+  <script type="text/javascript">
+    // Map appearance
+    var width="100%";         // width in pixels or percentage
+    var height="300";         // height in pixels
+    var latitude="0.00";      // center latitude (decimal degrees)
+    var longitude="0.00";     // center longitude (decimal degrees)
+    var zoom="3";             // initial zoom (between 3 and 18)
+    var names=false;          // always show ship names (defaults to false)
+
+    // Single ship tracking
+    var mmsi="123456789";     // display latest position (by MMSI)
+    var imo="1234567";        // display latest position (by IMO, overrides MMSI)
+    var show_track=false;     // display track line (last 24 hours)
+
+    // Fleet tracking
+    var fleet="e48ab3d80a0e2a9bf28930f2dd08800c"; // your personal Fleet key (displayed in your User Profile)
+    var fleet_name="Carnival"; // display particular fleet from your fleet list
+    var fleet_timespan="1440"; // maximum age in minutes of the displayed ship positions
+</script>
+
 
 </body>
 </html>
