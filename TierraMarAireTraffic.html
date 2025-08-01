@@ -53,6 +53,19 @@
 
   <iframe id="iframeMapa" src="https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481"></iframe>
 
+
+  <script type="text/javascript">
+    // Map appearance
+    var width="100%";         // width in pixels or percentage
+    var height="300";         // height in pixels
+    var latitude="0.00";      // center latitude (decimal degrees)
+    var longitude="0.00";     // center longitude (decimal degrees)
+    var zoom="3";             // initial zoom (between 3 and 18)
+    var names=false;          // always show ship names (defaults to false)
+
+</script>
+<script type="text/javascript" src="https://www.vesselfinder.com/aismap.js"></script>
+
   <script>
     function cambiarMapa(tipo) {
       const iframe = document.getElementById('iframeMapa');
