@@ -3,46 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mapas de Tráfico</title>
+  <title>Mapas en Vivo - Alicante</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f8;
       margin: 0;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      padding: 20px;
     }
-    #selector-container {
+    h2 {
+      color: #333;
       margin-bottom: 10px;
     }
+    .botones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      background: #0078D4;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #005ea1;
+    }
     iframe {
-      flex-grow: 1;
-      border: 1px solid #ccc;
       width: 100%;
+      height: 500px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <div id="selector-container">
-    <label for="map-selector">Selecciona un mapa de tráfico:</label>
-    <select id="map-selector" onchange="changeMap()">
-      <option value="https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481">Tierra (Waze)</option>
-      <option value="https://globalfishingwatch.org/map/?lat=38.345&lon=-0.481&zoom=5">Mar (GobalFish)</option>
-      <option value="https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar">Aire (ADS-B Exchange)</option>
-    </select>
+
+  <h2>🗺️ Mapas en vivo – Alicante</h2>
+  <div class="botones">
+    <button onclick="cambiarMapa('waze')">🚗 Tráfico terrestre (Waze)</button>
+    <button onclick="cambiarMapa('pesca')">🎣 Barcos pesqueros (Global Fishing Watch)</button>
+    <button onclick="cambiarMapa('aereo')">✈️ Tráfico aéreo (ADS-B Exchange)</button>
   </div>
 
-  <!-- Aquí está el id que faltaba -->
-  <iframe id="https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481"></iframe>
+  <iframe id="iframeMapa" src="https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481"></iframe>
 
   <script>
-    function changeMap() {
-      const selector = document.getElementById('map-selector');
-      const iframe = document.getElementById('traffic-map-iframe');
-      iframe.src = selector.value;
+    function cambiarMapa(tipo) {
+      const iframe = document.getElementById('iframeMapa');
+      if (tipo === 'waze') {
+        iframe.src = "https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481";
+      } else if (tipo === 'pesca') {
+        iframe.src = "https://globalfishingwatch.org/map/?lat=38.345&lon=-0.481&zoom=5";
+      } else if (tipo === 'aereo') {
+        iframe.src = "https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar";
+      }
     }
   </script>
+
 </body>
 </html>
-
