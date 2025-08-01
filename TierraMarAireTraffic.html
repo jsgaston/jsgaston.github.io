@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapas de Trafico</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #selector-container {
+            margin-bottom: 10px;
+        }
+        iframe {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="selector-container">
+        <label for="map-selector">Selecciona un mapa de trafico:</label>
+        <select id="map-selector" onchange="changeMap()">
+
+            <option value="https://www.waze.com/es/live-map/">Tierra (Waze)</option>
+
+            <option value="https://www.marinetraffic.com/es/ais/home/centerx:-33.2/centery:27.4/zoom:3">Mar (MarineTraffic)</option>
+
+          <option value="https://www.flightradar24.com/43.04,-7.33/5">Aire (FlightRadar24)</option>
+
+        </select>
+    </div>
+
+    <iframe id="traffic-map-iframe" src="https://wind-map.gosur.com/es/" frameborder="0"></iframe>
+
+    <script>
+        function changeMap() {
+            const selector = document.getElementById('map-selector');
+            const iframe = document.getElementById('traffic-map-iframe');
+            iframe.src = selector.value;
+        }
+    </script>
+</body>
+</html>
