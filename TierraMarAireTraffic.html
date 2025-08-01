@@ -1,52 +1,36 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mapas de Tráfico en Alicante</title>
+  <title>Mapas de tráfico, marítimos y aéreos</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    #selector-container {
-      margin-bottom: 10px;
-    }
-    iframe {
-      flex-grow: 1;
-      border: 1px solid #ccc;
-      width: 100%;
-    }
+    body { font-family: Arial; background-color: #f0f0f0; padding: 20px; }
+    button { margin: 5px; padding: 10px; cursor: pointer; }
+    iframe { width: 100%; height: 400px; border: 1px solid #ccc; }
   </style>
 </head>
 <body>
-  <div id="selector-container">
-    <label for="map-selector">Selecciona un mapa de tráfico en Alicante:</label>
-    <select id="map-selector" onchange="changeMap()">
-      <!-- OpenStreetMap con capa de tráfico -->
-      <option value="https://www.openstreetmap.org/export/embed.html?bbox=-0.5,38.3,-0.4,38.4&layer=mapnik">Tierra (OpenStreetMap + Tráfico)</option>
 
-      <!-- MarineTraffic para ver barcos en tiempo real -->
-      <option value="https://www.marinetraffic.com/en/ais/home/centerx:-0.5/centery:38.3/zoom:10">Mar (MarineTraffic)</option>
+  <h2>Mapas en vivo - Alicante</h2>
+  <button onclick="cambiarMapa('waze')">🚗 Tráfico (Waze)</button>
+  <button onclick="cambiarMapa('barcos')">🚢 Marítimo (OpenSeaMap)</button>
+  <button onclick="cambiarMapa('aviones')">✈️ Aviones (ADS-B)</button>
 
-      <!-- ADS-B Exchange para visualizar vuelos sobre Alicante -->
-      <option value="https://globe.adsbexchange.com/?zoom=10&lat=38.3&lon=-0.5&hideSidebar">Aire (ADS-B Exchange)</option>
-    </select>
+  <div id="contenedorMapa">
+    <iframe id="iframeMapa" src="https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481"></iframe>
   </div>
 
-  <!-- iframe con id para manejar los cambios -->
-  <iframe id="traffic-map-iframe" width="100%" height="400" src="https://www.openstreetmap.org/export/embed.html?bbox=-0.5,38.3,-0.4,38.4&layer=mapnik"></iframe>
-
   <script>
-    function changeMap() {
-      const selector = document.getElementById('map-selector');
-      const iframe = document.getElementById('traffic-map-iframe');
-      iframe.src = selector.value;
+    function cambiarMapa(tipo) {
+      let iframe = document.getElementById('iframeMapa');
+      if (tipo === 'waze') {
+        iframe.src = "https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481";
+      } else if (tipo === 'barcos') {
+        iframe.src = "https://map.openseamap.org/?zoom=12&lat=38.345&lon=-0.481&layers=BFT";
+      } else if (tipo === 'aviones') {
+        iframe.src = "https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar";
+      }
     }
   </script>
+
 </body>
 </html>
