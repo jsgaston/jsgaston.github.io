@@ -476,6 +476,11 @@
   overflow: hidden;
 }
 
+                        #mainwindSection {
+  overflow: hidden;
+}
+
+        
 #mainnoticiasSection iframe3 {
   display: block;
   position: relative;
@@ -1193,6 +1198,11 @@
 
 
 
+ <!-- Añadir esta nueva sección al final, antes del cierre del div container -->
+<div id="mainwindSection" class="main-tab-content hidden">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Winds</h2>
+    <iframe src="WindMaps.html" style="width:100%; height:800px; border:none; border-radius:12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" allowfullscreen></iframe>
+</div>
 
 
 
@@ -1261,6 +1271,8 @@
         const tontoSection = document.getElementById('maintontoSection');
 
         const noticiasSection = document.getElementById('mainnoticiasSection');
+
+        const noticiasSection = document.getElementById('mainwindSection');
 
 
 
@@ -1602,6 +1614,7 @@ function showMainTab(tabName) {
     document.getElementById('mainGraphSection').classList.add('hidden'); // Asegurarse de ocultar
     document.getElementById('maintontoSection').classList.add('hidden'); // Asegurarse de ocultar
     document.getElementById('mainnoticiasSection').classList.add('hidden'); // Asegurarse de ocultar
+    document.getElementById('mainwindSection').classList.add('hidden'); // Asegurarse de ocultar
     
     // Eliminar el div extra si existe
     const extraTimeUnits = document.getElementById('extraTimeUnits');
@@ -1643,7 +1656,14 @@ function showMainTab(tabName) {
     } else if (tabName === 'radio') {
         document.getElementById('mainRadioSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="radio"]').classList.add('active');
-    } else if (tabName === 'stories') {
+    } else if (tabName === 'wind') {
+        document.getElementById('mainwindSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="wind"]').classList.add('active');
+    
+    
+    }
+    
+    else if (tabName === 'stories') {
         document.getElementById('mainStoriesSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="stories"]').classList.add('active');
         cargarHistorias();
@@ -3103,4 +3123,5 @@ function translateNumber() {
 
 </body>
 </html>
+
 
