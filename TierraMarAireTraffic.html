@@ -1,64 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Mapas de tráfico, marítimos y aéreos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapas de Tráfico</title>
   <style>
-    body { font-family: Arial; background-color: #f0f0f0; padding: 20px; }
-    button { margin: 5px; padding: 10px; cursor: pointer; }
-    iframe { width: 100%; height: 400px; border: 1px solid #ccc; display: none; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #selector-container {
+      margin-bottom: 10px;
+    }
+    iframe {
+      flex-grow: 1;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
   </style>
-
 </head>
 <body>
-
-  <h2>Mapas en vivo - Alicante</h2>
-  <button onclick="cambiarMapa('waze')">🚗 Tráfico (Waze)</button>
-  <button onclick="cambiarMapa('barcos pesqueros')">🎣 Marine Pesqueros</button>
-
-  <button onclick="cambiarMapa('aviones')">✈️ Aviones (ADS-B)</button>
-
-
-    <script type="text/javascript">
-        // Map appearance
-        var width="100%";         // width in pixels or percentage
-        var height="300";         // height in pixels
-        var latitude="0.00";      // center latitude (decimal degrees)
-        var longitude="0.00";     // center longitude (decimal degrees)
-        var zoom="3";             // initial zoom (between 3 and 18)
-        var names=false;          // always show ship names (defaults to false)
-    </script>
-    <script type="text/javascript" src="https://www.vesselfinder.com/aismap.js"></script>
-
-
-  <div id="contenedorMapa">
-    <iframe id="iframeMapa"></iframe>
+  <div id="selector-container">
+    <label for="map-selector">Selecciona un mapa de tráfico:</label>
+    <select id="map-selector" onchange="changeMap()">
+      <option value="https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481">Tierra (Waze)</option>
+      <option value="https://globalfishingwatch.org/map/?lat=38.345&lon=-0.481&zoom=5">Mar (GobalFish)</option>
+      <option value="https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar">Aire (ADS-B Exchange)</option>
+    </select>
   </div>
 
+  <!-- Aquí está el id que faltaba -->
+  <iframe id="https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481"></iframe>
+
   <script>
-    function cambiarMapa(tipo) {
-      const iframe = document.getElementById('iframeMapa');
-
-
-      // Oculta todos los mapas primero
-      iframe.style.display = 'none';
-
-
-      if (tipo === 'waze') {
-        iframe.src = "https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481";
-        iframe.style.display = 'block';
-
-      } else if (tipo === 'barcos pesqueros') {
-        iframe.src = "https://globalfishingwatch.org/map/?lat=38.345&lon=-0.481&zoom=5";
-        iframe.style.display = 'block';
-
-      } else if (tipo === 'aviones') {
-        iframe.src = "https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar";
-        iframe.style.display = 'block';
-
-      } 
+    function changeMap() {
+      const selector = document.getElementById('map-selector');
+      const iframe = document.getElementById('traffic-map-iframe');
+      iframe.src = selector.value;
     }
   </script>
-
-
 </body>
 </html>
+
