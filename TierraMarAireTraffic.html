@@ -1,51 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapas de Trafico</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        #selector-container {
-            margin-bottom: 10px;
-        }
-        iframe {
-            flex-grow: 1;
-            border: 1px solid #ccc;
-            width: 100%;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapas de Tráfico</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #selector-container {
+      margin-bottom: 10px;
+    }
+    iframe {
+      flex-grow: 1;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-    <div id="selector-container">
-        <label for="map-selector">Selecciona un mapa de trafico:</label>
-        <select id="map-selector" onchange="changeMap()">
+  <div id="selector-container">
+    <label for="map-selector">Selecciona un mapa de tráfico:</label>
+    <select id="map-selector" onchange="changeMap()">
+      <option value="https://www.openstreetmap.org/export/embed.html?bbox=-3.7,40.4,-3.6,40.5&layer=mapnik">Tierra (OpenStreetMap)</option>
+      <option value="https://map.openseamap.org/?zoom=10&lat=38.3&lon=-0.5&layers=BFT">Mar (OpenSeaMap)</option>
+      <option value="https://globe.adsbexchange.com/?hideSidebar">Aire (ADS-B Exchange)</option>
+    </select>
+  </div>
 
-            <option value="https://www.openstreetmap.org/export/embed.html?bbox=-3.7,40.4,-3.6,40.5&layer=mapnik">Tierra (OpenStreetMap)</option>
+  <!-- Aquí está el id que faltaba -->
+  <iframe id="traffic-map-iframe" width="100%" height="400" src="https://www.openstreetmap.org/export/embed.html?bbox=-3.7,40.4,-3.6,40.5&layer=mapnik"></iframe>
 
-            <option value="https://map.openseamap.org/?zoom=10&lat=38.3&lon=-0.5&layers=BFT">Mar (OpenSeaMap)</option>
-
-          <option value="https://globe.adsbexchange.com/?hideSidebar">ADS-B Exchange (FlightRadar24)</option>
-
-        </select>
-    </div>
-
-    <iframe width="100%" height="400" src="https://www.openstreetmap.org/export/embed.html?bbox=-3.7,40.4,-3.6,40.5&layer=mapnik"></iframe>
-
-
-    <script>
-        function changeMap() {
-            const selector = document.getElementById('map-selector');
-            const iframe = document.getElementById('traffic-map-iframe');
-            iframe.src = selector.value;
-        }
-    </script>
+  <script>
+    function changeMap() {
+      const selector = document.getElementById('map-selector');
+      const iframe = document.getElementById('traffic-map-iframe');
+      iframe.src = selector.value;
+    }
+  </script>
 </body>
 </html>
