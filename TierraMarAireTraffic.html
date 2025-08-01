@@ -18,7 +18,7 @@
 
   <div id="contenedorMapa">
     <iframe id="iframeMapa"></iframe>
-    <div id="aismap"></div> <!-- Contenedor obligatorio para VesselFinder -->
+    <div id="aismap"></div>
   </div>
 
   <script>
@@ -26,7 +26,6 @@
       const iframe = document.getElementById('iframeMapa');
       const vesselDiv = document.getElementById('aismap');
 
-      // Ocultar todo primero
       iframe.style.display = 'none';
       vesselDiv.style.display = 'none';
 
@@ -40,21 +39,33 @@
         iframe.src = "https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar";
         iframe.style.display = 'block';
       } else if (tipo === 'barcos') {
+        // Evita recargar el mapa si ya está cargado
+        if (!window.vesselfinderCargado) {
+          window.vesselfinderCargado = true;
+
+          // Variables de configuración
+          window.width = "100%";
+          window.height = "400";
+          window.latitude = "38.345";
+          window.longitude = "-0.481";
+          window.zoom = "10";
+          window.names = true;
+
+          // Fleet opcional
+          window.fleet = "e48ab3d80a0e2a9bf28930f2dd08800c";
+          window.fleet_name = "Carnival";
+          window.fleet_timespan = "1440";
+
+          // Carga del script
+          const script = document.createElement('script');
+          script.src = "https://www.vesselfinder.com/aismap.js";
+          document.body.appendChild(script);
+        }
+
         vesselDiv.style.display = 'block';
       }
     }
   </script>
-
-  <!-- Configuración del mapa AIS de VesselFinder -->
-  <script type="text/javascript">
-    var width="100%";
-    var height="400";
-    var latitude="38.345";
-    var longitude="-0.481";
-    var zoom="10";
-    var names=true;
-  </script>
-  <script type="text/javascript" src="https://www.vesselfinder.com/aismap.js"></script>
 
 </body>
 </html>
