@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mapas de Tráfico</title>
+  <title>Mapas de Tráfico en Alicante</title>
   <style>
     body {
       font-family: sans-serif;
@@ -25,16 +25,21 @@
 </head>
 <body>
   <div id="selector-container">
-    <label for="map-selector">Selecciona un mapa de tráfico:</label>
+    <label for="map-selector">Selecciona un mapa de tráfico en Alicante:</label>
     <select id="map-selector" onchange="changeMap()">
-      <option value="https://www.openstreetmap.org/export/embed.html?bbox=-3.7,40.4,-3.6,40.5&layer=mapnik">Tierra (OpenStreetMap)</option>
-      <option value="https://map.openseamap.org/?zoom=10&lat=38.3&lon=-0.5&layers=BFT">Mar (OpenSeaMap)</option>
-      <option value="https://globe.adsbexchange.com/?hideSidebar">Aire (ADS-B Exchange)</option>
+      <!-- OpenStreetMap con capa de tráfico -->
+      <option value="https://www.openstreetmap.org/export/embed.html?bbox=-0.5,38.3,-0.4,38.4&layer=mapnik">Tierra (OpenStreetMap + Tráfico)</option>
+
+      <!-- MarineTraffic para ver barcos en tiempo real -->
+      <option value="https://www.marinetraffic.com/en/ais/home/centerx:-0.5/centery:38.3/zoom:10">Mar (MarineTraffic)</option>
+
+      <!-- ADS-B Exchange para visualizar vuelos sobre Alicante -->
+      <option value="https://globe.adsbexchange.com/?zoom=10&lat=38.3&lon=-0.5&hideSidebar">Aire (ADS-B Exchange)</option>
     </select>
   </div>
 
-  <!-- Aquí está el id que faltaba -->
-  <iframe id="traffic-map-iframe" width="100%" height="400" src="https://www.openstreetmap.org/export/embed.html?bbox=-3.7,40.4,-3.6,40.5&layer=mapnik"></iframe>
+  <!-- iframe con id para manejar los cambios -->
+  <iframe id="traffic-map-iframe" width="100%" height="400" src="https://www.openstreetmap.org/export/embed.html?bbox=-0.5,38.3,-0.4,38.4&layer=mapnik"></iframe>
 
   <script>
     function changeMap() {
