@@ -15,7 +15,7 @@
   <h2>Mapas en vivo - Alicante</h2>
   <button onclick="cambiarMapa('waze')">🚗 Tráfico (Waze)</button>
   <button onclick="cambiarMapa('barcos pesqueros')">🎣 Marine Pesqueros</button>
-  <button onclick="cambiarMapa('barcos')">🚢 VesselFinder</button>
+
   <button onclick="cambiarMapa('aviones')">✈️ Aviones (ADS-B)</button>
 
   <div id="contenedorMapa">
@@ -26,11 +26,11 @@
   <script>
     function cambiarMapa(tipo) {
       const iframe = document.getElementById('iframeMapa');
-      const vesselDiv = document.getElementById('aismap');
+
 
       // Ocultar todo primero
       iframe.style.display = 'none';
-      vesselDiv.style.display = 'none';
+
 
       if (tipo === 'waze') {
         iframe.src = "https://embed.waze.com/iframe?zoom=13&lat=38.345&lon=-0.481";
@@ -41,8 +41,6 @@
       } else if (tipo === 'aviones') {
         iframe.src = "https://globe.adsbexchange.com/?zoom=10&lat=38.345&lon=-0.481&hideSidebar";
         iframe.style.display = 'block';
-      } else if (tipo === 'barcos') {
-        vesselDiv.style.display = 'block';
       }
     }
   </script>
