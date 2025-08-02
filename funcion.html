@@ -192,7 +192,7 @@
 
                 let currentPathColor = '';
 
-                // Start drawing paths
+                // Start drawing paths for filled areas
                 ctx.beginPath();
                 ctx.moveTo(meta.data[0].x, y.getPixelForValue(0)); // Start from the x-axis at the first point's x
 
@@ -203,7 +203,7 @@
 
                     // Only fill for y >= 0
                     if (dataY >= 0) {
-                        const newPathColor = dataX < 0 ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 255, 0.2)';
+                        const newPathColor = dataX < 0 ? 'rgba(255, 0, 0, 0.7)' : 'rgba(0, 0, 255, 0.7)';
 
                         if (currentPathColor !== newPathColor && i > 0) {
                             // If color changes, close the current path and start a new one
@@ -234,6 +234,62 @@
                     ctx.fill();
                 }
 
+                ctx.restore();
+
+                // --- Draw the yellow line at x = 0 for y > 0 ---
+                ctx.save();
+                ctx.strokeStyle = 'gold'; // Yellow color for the line
+                ctx.lineWidth = 3; // Line thickness
+                ctx.beginPath();
+
+                let firstPointForLine = true;
+
+                for (let i = 0; i < dataset.data.length; i++) {
+                    const dataX = dataset.data[i].x;
+                    const dataY = dataset.data[i].y;
+
+                    // Draw the line only where x is approximately 0 and y > 0
+                    // We need to find the points where the function crosses x=0
+                    // or gets very close to it.
+                    if (dataY > 0 && ((dataX <= 0 && dataset.data[i+1]?.x > 0) || (dataX >= 0 && dataset.data[i-1]?.x < 0) || Math.abs(dataX) < 0.1)) {
+                        const pixelX = x.getPixelForValue(dataX);
+                        const pixelY = y.getPixelForValue(dataY);
+
+                        if (firstPointForLine) {
+                            ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(0)); // Start from (0,0)
+                            firstPointForLine = false;
+                        }
+
+                        // We want the line to follow the curve where x=0, up to the curve's y
+                        // Find the y-value on the curve where x is closest to 0
+                        const yAtXZero = Math.sqrt(variableSlider.value / 2); // y = sqrt(variable/2) when x=0
+
+                        if (!isNaN(yAtXZero) && yAtXZero >= 0) {
+                            ctx.lineTo(x.getPixelForValue(0), y.getPixelForValue(yAtXZero));
+                        } else {
+                            // If there's no real y for x=0 (e.g., variable is negative), just draw to the top of the canvas from (0,0)
+                            ctx.lineTo(x.getPixelForValue(0), chartArea.top);
+                        }
+                        break; // Only need to draw this segment once, it's a vertical line from (0,0) to curve at x=0
+                    }
+                }
+
+                // If the entire curve is to one side of x=0 (e.g., variable=0), just draw the y-axis itself as the boundary
+                const variableValue = parseFloat(variableSlider.value);
+                if (variableValue >= 0) { // When x = y^2 - var/2, the parabola starts at x = -var/2
+                    ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(0));
+                    const yAtXZero = Math.sqrt(variableValue / 2);
+                    if (!isNaN(yAtXZero) && yAtXZero >= 0) {
+                        ctx.lineTo(x.getPixelForValue(0), y.getPixelForValue(yAtXZero));
+                    } else {
+                         // If yAtXZero is NaN (e.g., variable/2 is negative, not possible with min=0 for variable)
+                         // or if the curve doesn't reach x=0 within the positive y range,
+                         // draw the y-axis up to a reasonable height
+                         ctx.lineTo(x.getPixelForValue(0), chartArea.top);
+                    }
+                }
+
+                ctx.stroke();
                 ctx.restore();
             }
         };
