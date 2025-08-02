@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfica de x = y² - variable/2 con y>0</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+        .title {
+            text-align: center;
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(5deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-label {
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .slider {
+            width: 300px;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.3);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .value-display {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            min-width: 60px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .graph-container {
+            position: relative;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .equation-display {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        .info-panel {
+            background: linear-gradient(5deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🌊 La Función Mundo Azul</h1>
+
+        <div class="controls">
+
+            <div class="control-group">
+                <label class="control-label">Variable:</label>
+                <input type="range" id="variableSlider" class="slider"
+                       min="0" max="500" step="1" value="0">
+                <input type="number" id="variableInput" class="value-display"
+                       min="0" max="500" step="0.1" value="0" style="width: 80px; text-align: center;">
+            </div>
+        </div>
+
+        <div class="equation-display" id="equationDisplay">
+            x = y² - var/2 con y > 0
+        </div>
+
+        <div class="graph-container">
+            <canvas id="mathChart"></canvas>
+        </div>
+
+        <div class="info-panel">
+            <p><strong>🎯 Instrucciones:</strong> Mueve el deslizador para cambiar el valor de la variable y observar cómo se transforma la parábola horizontal.</p>
+            <p><strong>Zoom:</strong> Usa la rueda del ratón para hacer zoom. Arrastra para mover la gráfica.</p>
+            <button class="button" onclick="resetGraph()">🔄 Reiniciar</button>
+            <button class="button" onclick="animateVariable()">✨ Animación</button>
+            <button class="button" onclick="resetZoom()">🔍 Reiniciar Zoom</button>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+        let isAnimating = false;
+
+        // Custom plugin for Chart.js to draw background regions between function and x-axis
+        const fillFunctionAreaPlugin = {
+            id: 'fillFunctionArea',
+            beforeDatasetsDraw(chart, args, options) {
+                const {ctx, chartArea, scales: {x, y}} = chart;
+                ctx.save();
+
+                const dataset = chart.data.datasets[0];
+                const meta = chart.getDatasetMeta(0);
+
+                if (!meta.data || meta.data.length === 0) {
+                    ctx.restore();
+                    return;
+                }
+
+                let currentPathColor = '';
+
+                // Start drawing paths for filled areas
+                ctx.beginPath();
+                ctx.moveTo(meta.data[0].x, y.getPixelForValue(0)); // Start from the x-axis at the first point's x
+
+                for (let i = 0; i < meta.data.length; i++) {
+                    const point = meta.data[i];
+                    const dataX = dataset.data[i].x; // Get the actual data x-value
+                    const dataY = dataset.data[i].y; // Get the actual data y-value
+
+                    // Only fill for y >= 0
+                    if (dataY >= 0) {
+                        const newPathColor = dataX < 0 ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 255, 0.2)';
+
+                        if (currentPathColor !== newPathColor && i > 0) {
+                            // If color changes, close the current path and start a new one
+                            ctx.lineTo(point.x, y.getPixelForValue(0)); // Go to x-axis at current point's x
+                            ctx.closePath();
+                            ctx.fillStyle = currentPathColor;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(point.x, y.getPixelForValue(0)); // Start new path from x-axis
+                        }
+                        currentPathColor = newPathColor;
+                        ctx.lineTo(point.x, point.y); // Draw to the curve point
+                    } else if (currentPathColor !== '' && i > 0) { // If y becomes negative, close current path
+                        ctx.lineTo(meta.data[i-1].x, y.getPixelForValue(0)); // Go to x-axis at previous valid x
+                        ctx.closePath();
+                        ctx.fillStyle = currentPathColor;
+                        ctx.fill();
+                        ctx.beginPath(); // Start a new path, implicitly for the next positive y segment
+                        currentPathColor = ''; // Reset color
+                    }
+                }
+
+                // Close and fill the last path segment if there was one
+                if (currentPathColor !== '') {
+                    ctx.lineTo(meta.data[meta.data.length - 1].x, y.getPixelForValue(0)); // Go to x-axis at last point's x
+                    ctx.closePath();
+                    ctx.fillStyle = currentPathColor;
+                    ctx.fill();
+                }
+
+                ctx.restore();
+
+                // --- Draw the yellow line at x = 0 for y > 0 ---
+                ctx.save();
+                ctx.strokeStyle = 'gold'; // Yellow color for the line
+                ctx.lineWidth = 3; // Line thickness
+                ctx.beginPath();
+
+                let firstPointForLine = true;
+
+                for (let i = 0; i < dataset.data.length; i++) {
+                    const dataX = dataset.data[i].x;
+                    const dataY = dataset.data[i].y;
+
+                    // Draw the line only where x is approximately 0 and y > 0
+                    // We need to find the points where the function crosses x=0
+                    // or gets very close to it.
+                    if (dataY > 0 && ((dataX <= 0 && dataset.data[i+1]?.x > 0) || (dataX >= 0 && dataset.data[i-1]?.x < 0) || Math.abs(dataX) < 0.1)) {
+                        const pixelX = x.getPixelForValue(dataX);
+                        const pixelY = y.getPixelForValue(dataY);
+
+                        if (firstPointForLine) {
+                            ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(0)); // Start from (0,0)
+                            firstPointForLine = false;
+                        }
+
+                        // We want the line to follow the curve where x=0, up to the curve's y
+                        // Find the y-value on the curve where x is closest to 0
+                        const yAtXZero = Math.sqrt(variableSlider.value / 2); // y = sqrt(variable/2) when x=0
+
+                        if (!isNaN(yAtXZero) && yAtXZero >= 0) {
+                            ctx.lineTo(x.getPixelForValue(0), y.getPixelForValue(yAtXZero));
+                        } else {
+                            // If there's no real y for x=0 (e.g., variable is negative), just draw to the top of the canvas from (0,0)
+                            ctx.lineTo(x.getPixelForValue(0), chartArea.top);
+                        }
+                        break; // Only need to draw this segment once, it's a vertical line from (0,0) to curve at x=0
+                    }
+                }
+
+                // If the entire curve is to one side of x=0 (e.g., variable=0), just draw the y-axis itself as the boundary
+                const variableValue = parseFloat(variableSlider.value);
+                if (variableValue >= 0) { // When x = y^2 - var/2, the parabola starts at x = -var/2
+                    ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(0));
+                    const yAtXZero = Math.sqrt(variableValue / 2);
+                    if (!isNaN(yAtXZero) && yAtXZero >= 0) {
+                        ctx.lineTo(x.getPixelForValue(0), y.getPixelForValue(yAtXZero));
+                    } else {
+                         // If yAtXZero is NaN (e.g., variable/2 is negative, not possible with min=0 for variable)
+                         // or if the curve doesn't reach x=0 within the positive y range,
+                         // draw the y-axis up to a reasonable height
+                         ctx.lineTo(x.getPixelForValue(0), chartArea.top);
+                    }
+                }
+
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+
+        function generateGraphData(variable) {
+            const data = [];
+            // Generate points only for positive y values
+            // Adjusted y range to go higher for a larger visible curve
+            for (let y = 0; y <= 200; y += 0.05) { // Start y from 0 for positive values
+                const x = Math.pow(y, 2) - (variable / 2);
+                data.push({x: x, y: y});
+            }
+            return data;
+        }
+
+
+
+
+
+        // Referencias a los elementos
+        const variableSlider = document.getElementById('variableSlider');
+        const variableInput = document.getElementById('variableInput'); // Nuevo elemento
+        const equationDisplay = document.getElementById('equationDisplay'); // Ya existente
+        
+        function updateGraph(variable) {
+            const roundedVariable = Math.round(variable * 10) / 10;
+            variableInput.value = roundedVariable.toFixed(1); // Actualiza el input de texto
+            equationDisplay.textContent = `x = y² - ${roundedVariable.toFixed(1)}/2 con y > 0`;
+        
+            const data = generateGraphData(variable);
+        
+            if (chart) {
+                chart.data.datasets[0].data = data;
+                chart.data.datasets[0].label = `x = y² - ${roundedVariable.toFixed(1)}/2, y>0`;
+                chart.update('none');
+            } else {
+                createChart(data, roundedVariable);
+            }
+        }
+        
+        // Event listener para el deslizador (ya lo tienes)
+        variableSlider.addEventListener('input', function(e) {
+            if (!isAnimating) {
+                updateGraph(parseFloat(e.target.value));
+            }
+        });
+        
+        // Nuevo event listener para el campo de texto
+        variableInput.addEventListener('change', function(e) { // 'change' se dispara cuando el valor cambia y el elemento pierde el foco
+            let value = parseFloat(e.target.value);
+            // Asegúrate de que el valor esté dentro del rango min/max del deslizador
+            value = Math.max(parseFloat(variableSlider.min), Math.min(parseFloat(variableSlider.max), value));
+            variableSlider.value = value; // Sincroniza el deslizador
+            updateGraph(value); // Actualiza el gráfico
+        });
+        
+        // También puedes añadir un listener para la tecla 'Enter' si quieres una actualización más inmediata
+        variableInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                let value = parseFloat(e.target.value);
+                value = Math.max(parseFloat(variableSlider.min), Math.min(parseFloat(variableSlider.max), value));
+                variableSlider.value = value;
+                updateGraph(value);
+                e.target.blur(); // Quita el foco del input después de presionar Enter
+            }
+        });
+        
+        
+        function resetGraph() {
+            variableSlider.value = 0;
+            updateGraph(0);
+            resetZoom();
+        }
+        
+        function animateVariable() {
+            if (isAnimating) return;
+        
+            isAnimating = true;
+            let direction = 1;
+            let currentValue = parseFloat(variableSlider.value);
+        
+            const animate = () => {
+                currentValue += direction * 1;
+        
+                if (currentValue >= 100) {
+                    direction = -1;
+                    currentValue = 100;
+                } else if (currentValue <= 0) {
+                    direction = 1;
+                    currentValue = 0;
+                }
+        
+                variableSlider.value = currentValue;
+                updateGraph(currentValue);
+        
+                if (currentValue === 0 && direction === 1) {
+                    isAnimating = false;
+                    return;
+                }
+        
+                setTimeout(animate, 50);
+            };
+        
+            animate();
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGraph(0);
+        });
+
+
+
+
+        
+
+        // Removed the misplaced plugins block here. It belongs inside createChart options.
+        function createChart(data, variable) {
+            const ctx = document.getElementById('mathChart').getContext('2d');
+
+            // Create gradient for the line
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+
+            chart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: `x = y² - ${variable.toFixed(1)}/2`,
+                        data: data,
+                        borderColor: gradient,
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 5,
+                        pointRadius: 0,
+                        showLine: true,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Asegúrate de que esto esté en false para permitir que las escalas se ajusten libremente
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#2d3748'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(45, 55, 72, 0.9)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: '#667eea',
+                            borderWidth: 2,
+                            callbacks: {
+                                label: function(context) {
+                                    return `x: ${context.parsed.x.toFixed(2)}, y: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'xy',
+                                modifierKey: 'shift',
+                                onPanComplete: function({ chart }) {
+                                    const xScale = chart.scales.x;
+                                    const yScale = chart.scales.y;
+
+                                    // Calcula el rango actual del eje X
+                                    const xRange = xScale.max - xScale.min;
+
+                                    // Calcula el nuevo rango del eje Y basado en la relación 2x = y
+                                    const newYRange = xRange * 0.1;
+
+                                    // Ajusta los límites del eje Y. Dado que y >= 0, el mínimo es 0.
+                                    // Y el máximo es el nuevo rango.
+                                    yScale.max = newYRange;
+                                    yScale.min = 0;
+
+                                    chart.update('none');
+                                }
+                            },
+                            zoom: {
+                                wheel: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                },
+                                mode: 'xy',
+                                onZoomComplete: function({ chart }) {
+                                    const xScale = chart.scales.x;
+                                    const yScale = chart.scales.y;
+
+                                    // Calcula el rango actual del eje X
+                                    const xRange = xScale.max - xScale.min;
+
+                                    // Calcula el nuevo rango del eje Y basado en la relación 2x = y
+                                    const newYRange = xRange * 0.1;
+
+                                    // Ajusta los límites del eje Y. Dado que y >= 0, el mínimo es 0.
+                                    // Y el máximo es el nuevo rango.
+                                    yScale.max = newYRange;
+                                    yScale.min = 0;
+
+                                    chart.update('none');
+                                }
+                            }
+                        },
+                        fillFunctionArea: {}
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: '← x (intenciones) →',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#2d3748'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: '#4a5568',
+                                font: {
+                                    weight: '600'
+                                }
+                            },
+                            min: -50, // Rango inicial de x más amplio para ver más de la parábola
+                            max: 50
+                        },
+                        y: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: '← y (acciones) →',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#2d3748'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: '#4a5568',
+                                font: {
+                                    weight: '600'
+                                }
+                            },
+                            min: -2,
+                            max: 10 // Max inicial de y (2 * (50 - (-50)) = 200)
+                        }
+                    },
+                    animation: {
+                        duration: 0
+                    }
+                },
+                plugins: [fillFunctionAreaPlugin, ChartZoom]
+            });
+        }
+
+        function resetZoom() {
+            if (chart) {
+                // Manually reset scales to initial values if resetZoom() doesn't restore custom logic
+              //  chart.options.scales.x.min = -50; // Valores iniciales para x
+               // chart.options.scales.x.max = 50;
+
+                // Restablecer el eje y a la proporción 2x del rango inicial de x
+                chart.options.scales.y.min = 0;
+                chart.options.scales.y.max = (50 - (-50)) * 0.1; // (max_x - min_x) * 2
+
+                chart.update('none');
+            }
+        }
+
+        function resetGraph() {
+            const slider = document.getElementById('variableSlider');
+            slider.value = 0;
+            updateGraph(0);
+            resetZoom(); // Also reset zoom when graph is reset
+        }
+
+
+
+        function animateVariable() {
+            if (isAnimating) return;
+
+            isAnimating = true;
+            const slider = document.getElementById('variableSlider');
+            let direction = 1;
+            let currentValue = parseFloat(slider.value); // Start animation from current slider value
+
+            const animate = () => {
+                currentValue += direction * 1;
+
+                if (currentValue >= 100) {
+                    direction = -1;
+                    currentValue = 100; // Cap at max
+                } else if (currentValue <= 0) {
+                    direction = 1;
+                    currentValue = 0; // Cap at min
+                }
+
+                slider.value = currentValue;
+                updateGraph(currentValue);
+
+                if (currentValue === 0 && direction === 1) { // Stop when it reaches 0 and moving up
+                    isAnimating = false;
+                    return;
+                }
+
+                setTimeout(animate, 50);
+            };
+
+            animate();
+        }
+
+        // Event listeners
+        document.getElementById('variableSlider').addEventListener('input', function(e) {
+            if (!isAnimating) {
+                updateGraph(parseFloat(e.target.value));
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGraph(0);
+        });
+    </script>
+</body>
+</html>
