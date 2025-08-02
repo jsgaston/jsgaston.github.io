@@ -168,6 +168,7 @@
             <button class="button" onclick="resetGraph()">🔄 Reiniciar</button>
             <button class="button" onclick="animateVariable()">✨ Animación</button>
             <button class="button" onclick="resetZoom()">🔍 Reiniciar Zoom</button>
+            <button class="button" onclick="toggleLegend()">👁️/─ Legend</button>
         </div>
     </div>
 
@@ -592,6 +593,14 @@
             slider.value = 0;
             updateGraph(0);
             resetZoom(); // Also reset zoom when graph is reset
+        }
+
+
+        function toggleLegend() {
+            if (chart) {
+                chart.options.plugins.legend.display = !chart.options.plugins.legend.display;
+                chart.update();
+            }
         }
 
 
