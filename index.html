@@ -928,7 +928,7 @@
                 
                         <h3 class="text-lg font-semibold mb-2">Equivalencias:</h3>
         <ul class="list-disc pl-5 space-y-1">
-            <li>10 tiradas = 17 segundos</li>
+            <li>10 tiradas = 18.3 segundos</li>
             <li>1 :-_ = 0.432 segundos</li>
             <li>1 tirada ≈ 3.935 unidades pequeñas ( :-_ )</li>
             <li>1 o = 1 dia </li>
@@ -2055,8 +2055,8 @@ function updateElapsedTime() {
   const CUCHUFLUS_GRANDES_PER_CUCHUFLUS_MEDIANO = 1 / 100; // 1 : = 100 :- => 1 :- = 1/100 :
   const SOLES_PER_CUCHUFLUS_GRANDE = 1 / 20; // 1 o = 20 : => 1 : = 1/20 o
 
-  // Factor para "tiradas" (1 tirada = 1.7 segundos)
-  const TIRADAS_PER_SECOND = 1 / 1.7;
+  // Factor para "tiradas" (1 tirada = 1.83 segundos)
+  const TIRADAS_PER_SECOND = 1 / 1.83;
 
 
   // For demonstration, let's just display these values
@@ -2928,15 +2928,15 @@ function convertTime() {
     const conversionRates = {
         // "tiradas" (rolls) conversions
         tiradas: {
-            segundos: 1.7, // 10 tiradas = 17 segundos => 1 tirada = 1.7 segundos
-            // Derived from: 1 tirada = 1.7 segundos and 1 :-_ = 0.432 segundos
-            ":-_": 1.7 / 0.432, // 1 tirada = 3.935185185 :-_ (from image: 1/0.2541176471)
-            ":-": (1.7 / 0.432) / 100, // 1 :- = 100 :-_
-            ":": ((1.7 / 0.432) / 100) / 100, // 1 : = 100 :-
-            o: 1.7 / 86400, // 1 'o' = 86400 segundos
-            minutos: 1.7 / 60,
-            horas: 1.7 / 3600,
-            dias: 1.7 / 86400
+            segundos: 1.83, // 10 tiradas = 17 segundos => 1 tirada = 1.83 segundos
+            // Derived from: 1 tirada = 1.83 segundos and 1 :-_ = 0.432 segundos
+            ":-_": 1.83 / 0.432, // 1 tirada = 3.935185185 :-_ (from image: 1/0.2541176471)
+            ":-": (1.83 / 0.432) / 100, // 1 :- = 100 :-_
+            ":": ((1.83 / 0.432) / 100) / 100, // 1 : = 100 :-
+            o: 1.83 / 86400, // 1 'o' = 86400 segundos
+            minutos: 1.83 / 60,
+            horas: 1.83 / 3600,
+            dias: 1.83 / 86400
         },
         // "segundos" (seconds) conversions
         segundos: {
@@ -2952,7 +2952,7 @@ function convertTime() {
         // "o" (soles/days) conversions
         o: {
             segundos: 86400, // 1 dia = 86400 segundos (from image)
-            tiradas: 86400 / 1.7, // Derived from segundos to tiradas
+            tiradas: 86400 / 1.83, // Derived from segundos to tiradas
             ":-_": 200000, // 1 'o' = 200000 ':-_' (from image)
             ":-": 200000 / 100, // 1 :- = 100 :-_
             ":": 20, // 1 'o' = 20 ':' (from image)
@@ -2963,7 +2963,7 @@ function convertTime() {
         // ":" (large sun portions) conversions
         ":": {
             segundos: 86400 / 20, // 1 o = 20 : and 1 o = 86400 segundos
-            tiradas: (86400 / 20) / 1.7, // Derived from segundos to tiradas
+            tiradas: (86400 / 20) / 1.83, // Derived from segundos to tiradas
             ":-_": 10000, // 1 : = 100 :- = 100 * 100 :-_ = 10000 :-_ (derived from image: 1 : = 100 :- and 1 :- = 100 :-_)
             ":-": 100, // 1 : = 100 :- (from image)
             o: 1 / 20, // 20 : = 1 o => 1 : = 1/20 o (from image)
@@ -2974,7 +2974,7 @@ function convertTime() {
         // ":-" (medium sun portions) conversions
         ":-": {
             segundos: 43.2, // 1 :- = 100 :-_ and 1 :-_ = 0.432 segundos
-            tiradas: 43.2 / 1.7, // Derived from segundos to tiradas
+            tiradas: 43.2 / 1.83, // Derived from segundos to tiradas
             ":-_": 100, // 1 :- = 100 :-_ (from image)
             ":": 1 / 100, // 1 : = 100 :- => 1 :- = 1/100 : (from image)
             o: (1 / 20) / 100, // 1 o = 20 : and 1 : = 100 :- => 1 o = 2000 :- => 1 :- = 1/2000 o
@@ -2999,7 +2999,7 @@ function convertTime() {
             h: 24, // From image
             min: 60 * 24, // 1 dia = 24h, 1h = 60min
             o: 1, // 1 dia = 1 o (implied)
-            tiradas: 86400 / 1.7,
+            tiradas: 86400 / 1.83,
             ":-_": 200000, // From image
             ":-": 200000 / 100,
             ":": 20
@@ -3010,7 +3010,7 @@ function convertTime() {
             sec: 3600, // 1h = 60min, 1min = 60sec
             dia: 1 / 24, // From image
             segundos: 3600,
-            tiradas: 3600 / 1.7,
+            tiradas: 3600 / 1.83,
             ":-_": 3600 / 0.432,
             ":-": 3600 / 43.2,
             ":": 3600 / 4320,
@@ -3022,7 +3022,7 @@ function convertTime() {
             h: 1 / 60, // From image
             dia: 1 / (24 * 60), // Derived from dia to h to min
             segundos: 60,
-            tiradas: 60 / 1.7,
+            tiradas: 60 / 1.83,
             ":-_": 60 / 0.432,
             ":-": 60 / 43.2,
             ":": 60 / 4320,
@@ -3138,6 +3138,7 @@ function translateNumber() {
 
 </body>
 </html>
+
 
 
 
