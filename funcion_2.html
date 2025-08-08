@@ -72,7 +72,7 @@
             width: 25px;
             height: 25px;
             border-radius: 50%;
-            background: white;
+            background: yellow;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
@@ -85,7 +85,7 @@
             width: 25px;
             height: 25px;
             border-radius: 50%;
-            background: white;
+            background: blue;
             cursor: pointer;
             border: none;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
@@ -140,6 +140,12 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
+
+        /* Estilo para el slider de víctimas noveles (azul) */
+
+
+
+        
     </style>
 </head>
 <body>
@@ -159,13 +165,13 @@
             </div>
             <div class="control-group">
                 <label class="control-label" for="actoresSlider">Número de actores:</label>
-                <input type="range" id="actoresSlider" class="slider" min="0" max="100" step="1" value="0">
+                <input type="range" id="actoresSlider" class="slider" min="0" max="1000" step="1" value="0">
                 <input type="number" id="actoresInput" class="value-display" min="0" max="100" step="1" value="0">
             </div>
             <div class="control-group">
                 <label class="control-label" for="ilegalSlider">Número de ilegal:</label>
                 <input type="range" id="ilegalSlider" class="slider" min="0" max="100" step="1" value="0">
-                <input type="number" id="ilegalInput" class="value-display" min="0" max="100" step="1" value="0">
+                <input type="number" id="ilegalInput" class="value-display" min="0" max="100000000" step="1" value="0">
             </div>
         </div>
 
