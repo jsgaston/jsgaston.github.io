@@ -288,11 +288,11 @@
             const ilegal = parseFloat(document.getElementById('ilegalSlider').value);
             
             const data = [];
-            const divisor = victimas * (actores + 1) * (ilegal + 1);
+            const divisor = ((victimas + (errores + 1))*3);
             let constant = 0;
             
             if (divisor !== 0) {
-                constant = errores / divisor;
+                constant = ((victimas + (errores + 1))*3);
             } else {
                 constant = (errores === 0) ? 0 : Infinity; // Evitar division por cero, caso especial si errores es 0
             }
@@ -322,8 +322,8 @@
             document.getElementById('actoresInput').value = actores;
             document.getElementById('ilegalInput').value = ilegal;
             
-            const divisor = (victimas + (errores + 1))*3 ;
-            const constant = divisor !== 0 ? (errores / divisor).toFixed(2);
+            const divisor = ((victimas + (errores + 1))*3) ;
+            const constant = divisor !== 0 ? ((victimas + (errores + 1))*3).toFixed(2);
             const equationText = `x = y² - (${errores}) / ((${victimas} + (${errores}) +1)*3  ) = y² - ${constant} con y > 0`;
             document.getElementById('equationDisplay').textContent = equationText;
 
