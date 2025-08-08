@@ -324,7 +324,7 @@
             
             const divisor = victimas * (actores + 1) * (ilegal + 1);
             const constant = divisor !== 0 ? (errores / divisor).toFixed(2) : (errores === 0 ? "0" : "∞");
-            const equationText = `x = y² - (${errores}) / (${victimas} * (${actores} + 1) * (${ilegal} + 1)) = y² - ${constant} con y > 0`;
+            const equationText = `x = y² - (${errores}) / (${victimas} * (${actores} + 1) ) = y² - ${constant} con y > 0`;
             document.getElementById('equationDisplay').textContent = equationText;
 
             const data = generateGraphData();
