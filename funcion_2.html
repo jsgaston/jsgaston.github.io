@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfica de x = y² - variable/2 con y>0</title>
+    <title>Gráfica de x = y² - (numero de personas errores)/ (numero de victimas novelas * (numero de actores + 1) * (numero de ilegal +1)) con y>0</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
     <style>
@@ -146,7 +146,51 @@
         <div class="controls">
 
             <div class="control-group">
-                <label class="control-label">Variable:</label>
+                <label class="control-label">Suma total de personas errores:</label>
+                <input type="range" id="variableSlider" class="slider"
+                       min="0" max="500" step="1" value="0">
+                <input type="number" id="variableInput" class="value-display"
+                       min="0" max="500" step="0.1" value="0" style="width: 80px; text-align: center;">
+            </div>
+        </div>
+
+                <div class="controls">
+
+            <div class="control-group">
+                <label class="control-label">Suma total de numero victimas de las personas errores:</label>
+                <input type="range" id="variableSlider" class="slider"
+                       min="0" max="500" step="1" value="0">
+                <input type="number" id="variableInput" class="value-display"
+                       min="0" max="500" step="0.1" value="0" style="width: 80px; text-align: center;">
+            </div>
+        </div>
+
+                <div class="controls">
+
+            <div class="control-group">
+                <label class="control-label">Suma total de personas errores:</label>
+                <input type="range" id="variableSlider" class="slider"
+                       min="0" max="500" step="1" value="0">
+                <input type="number" id="variableInput" class="value-display"
+                       min="0" max="500" step="0.1" value="0" style="width: 80px; text-align: center;">
+            </div>
+        </div>
+
+                <div class="controls">
+
+            <div class="control-group">
+                <label class="control-label">Suma total de personas actores:</label>
+                <input type="range" id="variableSlider" class="slider"
+                       min="0" max="500" step="1" value="0">
+                <input type="number" id="variableInput" class="value-display"
+                       min="0" max="500" step="0.1" value="0" style="width: 80px; text-align: center;">
+            </div>
+        </div>
+
+                <div class="controls">
+
+            <div class="control-group">
+                <label class="control-label">Numero de ilegal:</label>
                 <input type="range" id="variableSlider" class="slider"
                        min="0" max="500" step="1" value="0">
                 <input type="number" id="variableInput" class="value-display"
@@ -155,7 +199,7 @@
         </div>
 
         <div class="equation-display" id="equationDisplay">
-            x = y² - var/2 con y > 0
+            x = y² -  ( var1 )/ ( var2 * ( var3 + 1 ) * ( var4 + 1 )) con y > 0
         </div>
 
         <div class="graph-container">
