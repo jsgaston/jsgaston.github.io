@@ -262,8 +262,8 @@
                 const actores = parseFloat(document.getElementById('actoresSlider').value);
                 const ilegal = parseFloat(document.getElementById('ilegalSlider').value);
 
-                const divisor = victimas * (actores + 1) * (ilegal + 1);
-                const constant = divisor !== 0 ? errores / divisor : (errores === 0 ? 0 : NaN);
+                const divisor = ((victimas + (errores + 1))*3);
+                const constant = divisor !== 0 ? ((victimas + (errores + 1))*3) : (errores === 0 ? 0 : NaN);
 
                 if (!isNaN(constant) && constant >= 0) {
                     const yAtXZero = Math.sqrt(constant);
@@ -357,10 +357,10 @@
         });
 
         function resetGraph() {
-            document.getElementById('erroresSlider').value = 0;
+            document.getElementById('erroresSlider').value = 1;
             document.getElementById('victimasSlider').value = 1;
-            document.getElementById('actoresSlider').value = 0;
-            document.getElementById('ilegalSlider').value = 0;
+            document.getElementById('actoresSlider').value = 1;
+            document.getElementById('ilegalSlider').value = 1;
             updateGraph();
             resetZoom();
         }
