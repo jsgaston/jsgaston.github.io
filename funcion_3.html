@@ -247,8 +247,8 @@
 
                 // The logic for roba, pega, niega, and mata being equal to personasErrores is a conceptual part of the function,
                 // but for the graph's formula, we use the two main variables.
-                const divisor = ((personasVictimas + (personasErrores + 1))*3);
-                const constant = divisor !== 0 ? ((personasVictimas + (personasErrores + 1))*3) : (personasErrores === 0 ? 0 : NaN);
+                const divisor = ((personasErrores + 1)/(personasVictimas + (personasErrores + 1)));
+                const constant = divisor !== 0 ? ((personasErrores + 1)/(personasVictimas + (personasErrores + 1))) : (personasErrores === 0 ? 0 : NaN);
 
                 if (!isNaN(constant) && constant >= 0) {
                     const yAtXZero = Math.sqrt(constant);
@@ -271,11 +271,11 @@
             const personasVictimas = parseFloat(document.getElementById('personasVictimasSlider').value);
             
             const data = [];
-            const divisor = ((personasVictimas + (personasErrores + 1))*3);
+            const divisor = ((personasErrores + 1)/(personasVictimas + (personasErrores + 1)));
             let constant = 0;
             
             if (divisor !== 0) {
-                constant = ((personasVictimas + (personasErrores + 1))*3);
+                constant = ((personasErrores + 1)/(personasVictimas + (personasErrores + 1)));
             } else {
                 constant = (personasErrores === 0) ? 0 : Infinity; // Evitar division por cero, caso especial si personasErrores es 0
             }
@@ -306,9 +306,10 @@
             const niega = personasErrores;
             const mata = personasErrores;
 
+            const multiplicador = roba + pega + niega + mata;
             const divisor = ((personasVictimas + (personasErrores + 1))*3);
-            const constant = divisor !== 0 ? ((personasVictimas + (personasErrores + 1))*3).toFixed(2) : 'Infinity';
-            const equationText = `x = y² - (${roba}) / ((${pega} + (${niega} + 1)) * ${mata}) = y² - ${constant} con y > 0`;
+            const constant = divisor !== 0 ? ((personasVictimas + multiplicador +0.1).toFixed(2) : 'Infinity';
+            const equationText = `x = y² - ((${multiplicador}) +1) / ((${personasVictimas} + (${multiplicador} + 0.1)) = y² - ${constant} con y > 0`;
             document.getElementById('equationDisplay').textContent = equationText;
 
             const data = generateGraphData();
