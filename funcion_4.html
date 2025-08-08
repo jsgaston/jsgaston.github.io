@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfica de la Función Roba, Pega, Niega y Mata</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 100%;
+        }
+        .title {
+            text-align: center;
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(5deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .control-label {
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            min-width: 250px;
+        }
+        .slider {
+            flex-grow: 1;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.3);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: yellow;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: blue;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .value-display {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            min-width: 80px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+        .graph-container {
+            position: relative;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .equation-display {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        .info-panel {
+            background: linear-gradient(5deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🌊 La Función roba, pega, niega y mata</h1>
+
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label" for="personasErroresSlider">Número de personas errores:</label>
+                <input type="range" id="personasErroresSlider" class="slider" min="0" max="100" step="1" value="0">
+                <input type="number" id="personasErroresInput" class="value-display" min="0" max="100" step="1" value="0">
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="personasVictimasSlider">Número de personas víctimas:</label>
+                <input type="range" id="personasVictimasSlider" class="slider" min="0" max="100" step="1" value="1">
+                <input type="number" id="personasVictimasInput" class="value-display" min="0" max="100" step="1" value="1">
+            </div>
+        </div>
+
+        <div class="equation-display" id="equationDisplay"></div>
+        <div class="equation-display" id="equationDisplay1"></div>
+        <div class="equation-display" id="equationDisplay2"></div>
+        <div class="equation-display" id="equationDisplay3"></div>
+        <div class="equation-display" id="equationDisplay4"></div>
+
+        <div class="graph-container">
+            <canvas id="mathChart"></canvas>
+        </div>
+
+        <div class="info-panel">
+            <p><strong>🎯 Instrucciones:</strong> Mueve los deslizadores para cambiar las variables y observar cómo se transforma la parábola horizontal.</p>
+            <p><strong>Zoom:</strong> Usa la rueda del ratón para hacer zoom. Arrastra para mover la gráfica.</p>
+            <button class="button" onclick="resetGraph()">🔄 Reiniciar</button>
+            <button class="button" onclick="animateVariable()">✨ Animación</button>
+            <button class="button" onclick="resetZoom()">🔍 Reiniciar Zoom</button>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+        let isAnimating = false;
+
+        const fillFunctionAreaPlugin = {
+            id: 'fillFunctionArea',
+            beforeDatasetsDraw(chart, args, options) {
+                const {ctx, chartArea, scales: {x, y}} = chart;
+                ctx.save();
+
+                const dataset = chart.data.datasets[0];
+                const meta = chart.getDatasetMeta(0);
+
+                if (!meta.data || meta.data.length === 0) {
+                    ctx.restore();
+                    return;
+                }
+
+                let currentPathColor = '';
+
+                ctx.beginPath();
+                ctx.moveTo(meta.data[0].x, y.getPixelForValue(0));
+
+                for (let i = 0; i < meta.data.length; i++) {
+                    const point = meta.data[i];
+                    const dataX = dataset.data[i].x;
+                    const dataY = dataset.data[i].y;
+
+                    if (dataY >= 0) {
+                        const newPathColor = dataX < 0 ? 'rgba(255, 0, 0, 0.7)' : 'rgba(0, 0, 255, 0.7)';
+
+                        if (currentPathColor !== newPathColor && i > 0) {
+                            ctx.lineTo(point.x, y.getPixelForValue(0));
+                            ctx.closePath();
+                            ctx.fillStyle = currentPathColor;
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(point.x, y.getPixelForValue(0));
+                        }
+                        currentPathColor = newPathColor;
+                        ctx.lineTo(point.x, point.y);
+                    } else if (currentPathColor !== '' && i > 0) {
+                        ctx.lineTo(meta.data[i-1].x, y.getPixelForValue(0));
+                        ctx.closePath();
+                        ctx.fillStyle = currentPathColor;
+                        ctx.fill();
+                        ctx.beginPath();
+                        currentPathColor = '';
+                    }
+                }
+
+                if (currentPathColor !== '') {
+                    ctx.lineTo(meta.data[meta.data.length - 1].x, y.getPixelForValue(0));
+                    ctx.closePath();
+                    ctx.fillStyle = currentPathColor;
+                    ctx.fill();
+                }
+
+                ctx.restore();
+
+                ctx.save();
+                ctx.strokeStyle = 'gold';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+
+                const personasErrores = parseFloat(document.getElementById('personasErroresSlider').value);
+                const personasVictimas = parseFloat(document.getElementById('personasVictimasSlider').value);
+
+                const constant = ((personasVictimas + (personasErrores + 1)) * 3);
+
+                if (!isNaN(constant) && constant >= 0) {
+                    const yAtXZero = Math.sqrt(constant);
+                    if (!isNaN(yAtXZero) && yAtXZero >= 0) {
+                        ctx.moveTo(x.getPixelForValue(0), y.getPixelForValue(0));
+                        ctx.lineTo(x.getPixelForValue(0), y.getPixelForValue(yAtXZero));
+                    }
+                } else if (!isNaN(constant)) {
+                }
+
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+        function generateGraphData() {
+            const personasErrores = parseFloat(document.getElementById('personasErroresSlider').value);
+            const personasVictimas = parseFloat(document.getElementById('personasVictimasSlider').value);
+            
+            const data = [];
+            const constant = ((personasVictimas + (personasErrores + 1)) * 3);
+            
+            for (let y = 0; y <= 20; y += 0.05) {
+                if (constant !== Infinity) {
+                    const x = Math.pow(y, 2) - constant;
+                    data.push({x: x, y: y});
+                }
+            }
+            return data;
+        }
+
+        const sliders = ['personasErrores', 'personasVictimas'];
+
+        function updateGraph() {
+            if (isAnimating) return;
+
+            const personasErrores = parseFloat(document.getElementById('personasErroresSlider').value);
+            const personasVictimas = parseFloat(document.getElementById('personasVictimasSlider').value);
+
+            document.getElementById('personasErroresInput').value = personasErrores;
+            document.getElementById('personasVictimasInput').value = personasVictimas;
+            
+            const roba = personasErrores;
+            const pega = personasErrores;
+            const niega = personasErrores;
+            const mata = personasErrores;
+
+            const constant = ((personasVictimas + (personasErrores + 1)) * 3);
+            const equationText = `x = y² - (constante) = y² - ${constant.toFixed(2)} con y > 0`;
+            const equationText1 = `Numero personas implicadas Roba: ${roba} Ladrones`;
+            const equationText2 = `Numero personas implicadas Pega: ${pega} Chulos`;
+            const equationText3 = `Numero personas implicadas Niega: ${niega} Jueces`;
+            const equationText4 = `Numero personas implicadas Mata: ${mata} Asesinos`;
+            
+            document.getElementById('equationDisplay').textContent = equationText;
+            document.getElementById('equationDisplay1').textContent = equationText1;
+            document.getElementById('equationDisplay2').textContent = equationText2;
+            document.getElementById('equationDisplay3').textContent = equationText3;
+            document.getElementById('equationDisplay4').textContent = equationText4;
+
+            const data = generateGraphData();
+
+            if (chart) {
+                chart.data.datasets[0].data = data;
+                chart.data.datasets[0].label = equationText;
+                chart.update('none');
+            } else {
+                createChart(data, equationText);
+            }
+        }
+        
+        sliders.forEach(name => {
+            const slider = document.getElementById(`${name}Slider`);
+            const input = document.getElementById(`${name}Input`);
+
+            slider.addEventListener('input', () => updateGraph());
+            input.addEventListener('change', (e) => {
+                let value = parseFloat(e.target.value);
+                value = Math.max(parseFloat(slider.min), Math.min(parseFloat(slider.max), value));
+                slider.value = value;
+                updateGraph();
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            });
+        });
+
+        function resetGraph() {
+            document.getElementById('personasErroresSlider').value = 1;
+            document.getElementById('personasVictimasSlider').value = 1;
+            updateGraph();
+            resetZoom();
+        }
+        
+        function animateVariable() {
+            if (isAnimating) return;
+        
+            isAnimating = true;
+            const slider = document.getElementById('personasErroresSlider');
+            let direction = 1;
+            let currentValue = parseFloat(slider.value);
+        
+            const animate = () => {
+                if (!isAnimating) {
+                    slider.value = currentValue;
+                    updateGraph();
+                    return;
+                }
+        
+                currentValue += direction * 1;
+        
+                if (currentValue >= 100) {
+                    direction = -1;
+                    currentValue = 100;
+                } else if (currentValue <= 0) {
+                    direction = 1;
+                    currentValue = 0;
+                }
+        
+                slider.value = currentValue;
+                updateGraph();
+        
+                setTimeout(animate, 50);
+            };
+        
+            animate();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateGraph();
+        });
+
+        function createChart(data, label) {
+            const ctx = document.getElementById('mathChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+
+            chart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: gradient,
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 5,
+                        pointRadius: 0,
+                        showLine: true,
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
+                    },
+                    plugins: {
+                        legend: { display: true },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `x: ${context.parsed.x.toFixed(2)}, y: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        },
+                        zoom: {
+                            pan: { enabled: true, mode: 'xy' },
+                            zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'xy' }
+                        },
+                        fillFunctionArea: {}
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: { display: true, text: '← x (intenciones) →' },
+                            grid: { color: 'rgba(0,0,0,0.1)' },
+                            min: -50,
+                            max: 50
+                        },
+                        y: {
+                            type: 'linear',
+                            title: { display: true, text: '← y (acciones) →' },
+                            grid: { color: 'rgba(0,0,0,0.1)' },
+                            min: 0,
+                            max: 10
+                        }
+                    },
+                    animation: { duration: 0 }
+                },
+                plugins: [fillFunctionAreaPlugin]
+            });
+        }
+
+        function resetZoom() {
+            if (chart) {
+                chart.options.scales.x.min = -50;
+                chart.options.scales.x.max = 50;
+                chart.options.scales.y.min = 0;
+                chart.options.scales.y.max = 10;
+                chart.update('none');
+            }
+        }
+    </script>
+</body>
+</html>
