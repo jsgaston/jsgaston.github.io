@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Cuentos e Historias con Quill</title>
-    
+    <title>Editor de Cuentos e Historias (estilo Medium)</title>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     
@@ -12,12 +11,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
         .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
         h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
+        h2 { font-size: 1.5rem; color: #1f2937; margin-bottom: 1rem; }
         .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
         .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
         .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
@@ -55,63 +54,24 @@
         .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
         .btn-tab.active { background-color: #4f46e5; color: white; }
         .download-btn { background-color: #10b981; }
-
-        /* Estilos de la barra de herramientas personalizada tipo Medium */
-        #editor-container {
-            height: 300px;
-        }
-        #editor-container, #toolbar-container {
-            border: 1px solid #d1d5db;
-        }
-        #toolbar-container {
-            border-bottom: none;
-            background-color: #f9fafb;
-            padding: 5px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        .ql-container {
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-        .ql-toolbar.ql-snow {
-            border: none;
-            padding: 0;
-        }
-        .ql-snow.ql-toolbar button, .ql-snow .ql-toolbar button {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-            height: 32px;
-            width: 32px;
-            text-align: center;
-            padding: 0;
-        }
-        .ql-snow.ql-toolbar button svg, .ql-snow .ql-toolbar button svg {
-            width: 18px;
-            height: 18px;
-        }
-        .ql-snow .ql-editor blockquote {
-            border-left: 4px solid #ccc;
-            margin-bottom: 5px;
-            margin-top: 5px;
-            padding-left: 16px;
-        }
+        #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
+        
+        /* Estilos de Medium del PDF */
+        blockquote { border-left: 4px solid #ccc; margin: 1.5em 10px; padding: 0.5em 10px; }
+        blockquote p { display: inline; }
+        hr { border: none; height: 1px; background-color: #ccc; margin: 20px 0; }
+        .ql-snow .ql-editor h1 { font-size: 2em; line-height: 1.5em; font-weight: 700; margin-bottom: 0.5em; }
+        .ql-snow .ql-editor h2 { font-size: 1.5em; line-height: 1.5em; font-weight: 600; margin-bottom: 0.5em; }
+        .tweet { margin: 1.5em 0; }
     </style>
 </head>
 <body>
-    
     <div class="container">
         <h1>Editor de Cuentos e Historias</h1>
         <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
             <button class="btn-tab active" data-tab="create">Crear Nuevo Cuento</button>
             <button class="btn-tab" data-tab="view">Ver Todos los Cuentos</button>
         </nav>
-        
         <div id="create-tab" class="tab-content active">
             <form id="cuentoForm">
                 <div style="margin-bottom: 1rem;">
@@ -120,21 +80,6 @@
                 </div>
                 <div style="margin-bottom: 1rem;">
                     <label class="form-label">Contenido:</label>
-                    
-                    <div id="toolbar-container">
-                        <button type="button" class="ql-bold"><i class="fa fa-bold"></i></button>
-                        <button type="button" class="ql-italic"><i class="fa fa-italic"></i></button>
-                        <button type="button" class="ql-underline"><i class="fa fa-underline"></i></button>
-                        <button type="button" class="ql-link"><i class="fa fa-link"></i></button>
-                        <button type="button" class="ql-blockquote"><i class="fa fa-quote-right"></i></button>
-                        <button type="button" class="ql-header" value="1"><i class="fa fa-header"><sup>1</sup></i></button>
-                        <button type="button" class="ql-header" value="2"><i class="fa fa-header"><sup>2</sup></i></button>
-                        <button type="button" class="ql-list" value="ordered"><i class="fa fa-list-ol"></i></button>
-                        <button type="button" class="ql-list" value="bullet"><i class="fa fa-list-ul"></i></button>
-                        <button type="button" id="insert-image-button"><i class="fa fa-image"></i></button>
-                        <button type="button" id="insert-video-button"><i class="fa fa-video"></i></button>
-                        <button type="button" class="ql-divider"><i class="fa fa-minus"></i></button>
-                    </div>
                     <div id="editor-container"></div>
                 </div>
                 <button type="submit" class="btn">
@@ -151,147 +96,121 @@
             </div>
         </div>
     </div>
-    
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script>
+        // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
-        let quill = null;
 
-        // Registrar el Blot personalizado
-        const { BlockEmbed } = Quill.import('parchment');
+        // Definiciones de los Blots personalizados de Parchment
+        const Block = Quill.import('blots/block');
+        const BlockEmbed = Quill.import('blots/block/embed');
+        
+        class HeaderBlot extends Block {
+            static blotName = 'header';
+            static tagName = ['H1', 'H2'];
+            static formats(node) {
+                return HeaderBlot.tagName.indexOf(node.tagName) + 1;
+            }
+        }
+        class BlockquoteBlot extends Block {
+            static blotName = 'blockquote';
+            static tagName = 'blockquote';
+        }
         class DividerBlot extends BlockEmbed {
             static blotName = 'divider';
             static tagName = 'hr';
         }
+        class ImageBlot extends BlockEmbed {
+            static blotName = 'image';
+            static tagName = 'img';
+            static create(value) {
+                const node = super.create();
+                node.setAttribute('alt', value.alt);
+                node.setAttribute('src', value.url);
+                return node;
+            }
+            static value(node) {
+                return {
+                    alt: node.getAttribute('alt'),
+                    url: node.getAttribute('src')
+                };
+            }
+        }
+        class VideoBlot extends BlockEmbed {
+            static blotName = 'video';
+            static tagName = 'iframe';
+            static create(url) {
+                const node = super.create();
+                node.setAttribute('src', url);
+                node.setAttribute('frameborder', '0');
+                node.setAttribute('allowfullscreen', true);
+                return node;
+            }
+            static formats(node) {
+                const format = {};
+                if (node.hasAttribute('height')) {
+                    format.height = node.getAttribute('height');
+                }
+                if (node.hasAttribute('width')) {
+                    format.width = node.getAttribute('width');
+                }
+                return format;
+            }
+            static value(node) {
+                return node.getAttribute('src');
+            }
+        }
+        class TweetBlot extends BlockEmbed {
+            static blotName = 'tweet';
+            static tagName = 'div';
+            static className = 'tweet';
+            static create(id) {
+                const node = super.create();
+                node.dataset.id = id;
+                twttr.widgets.createTweet(id, node);
+                return node;
+            }
+            static value(domNode) {
+                return domNode.dataset.id;
+            }
+        }
+
+        // Registrar los Blots personalizados con Quill
+        Quill.register(HeaderBlot);
+        Quill.register(BlockquoteBlot);
         Quill.register(DividerBlot);
+        Quill.register(ImageBlot);
+        Quill.register(VideoBlot);
+        Quill.register(TweetBlot);
 
-        function initializeQuill() {
-            if (quill) return;
-
-            try {
-                quill = new Quill('#editor-container', {
-                    theme: 'snow',
-                    placeholder: 'Escribe tu historia aquí...',
-                    modules: {
-                        toolbar: {
-                            container: '#toolbar-container'
-                        }
-                    }
-                });
-                console.log("Quill inicializado correctamente.");
-            } catch (e) {
-                console.error("Error al inicializar Quill:", e);
-                alert("Hubo un error al iniciar el editor. Por favor, revisa la consola para más detalles.");
-                return;
+        // Inicializar Quill con la barra de herramientas ampliada
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Escribe tu historia aquí...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'font': [] }],
+                    [{ 'align': [] }],
+                    ['link', 'image', 'video', 'divider', 'tweet'], // Nuevos formatos
+                    ['clean']
+                ]
             }
-            
-            // Manejadores de eventos para los botones personalizados
-            document.querySelector('#insert-image-button').addEventListener('click', () => {
-                const input = document.createElement('input');
-                input.setAttribute('type', 'file');
-                input.setAttribute('accept', 'image/*');
-                input.addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const base64data = e.target.result;
-                            const formData = new FormData();
-                            formData.append('action', 'subirImagenBase64');
-                            formData.append('imagen', base64data);
-                            
-                            const range = quill.getSelection(true);
-                            quill.insertText(range.index, ' ', 'user');
-                            quill.setSelection(range.index + 1);
-                            quill.insertEmbed(range.index, 'image', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
-                            
-                            fetch(APP_SCRIPT_URL, { method: 'POST', body: formData })
-                                .then(response => response.json())
-                                .then(result => {
-                                    if (result.estado === 'éxito') {
-                                        const blot = Quill.find(quill.getSelection().index - 1);
-                                        if (blot) {
-                                            blot.domNode.src = result.url;
-                                        }
-                                    } else {
-                                        alert('Error al subir la imagen: ' + result.mensaje);
-                                        quill.deleteText(quill.getSelection().index - 1, 1);
-                                    }
-                                })
-                                .catch(error => {
-                                    alert('Fallo en la comunicación con el servidor: ' + error.message);
-                                    quill.deleteText(quill.getSelection().index - 1, 1);
-                                });
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-                input.click();
-            });
-            
-            document.querySelector('#insert-video-button').addEventListener('click', () => {
-                const url = prompt("Introduce la URL del video de YouTube:");
-                if (url) {
-                    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                    const match = url.match(youtubeRegex);
-                    if (match && match[1]) {
-                        const videoId = match[1];
-                        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                        const range = quill.getSelection(true);
-                        quill.insertText(range.index, '\n', 'silent');
-                        quill.insertEmbed(range.index + 1, 'video', embedUrl, 'user');
-                        quill.setSelection(range.index + 2, 'silent');
-                    } else {
-                        alert("URL de YouTube no válida.");
-                    }
-                }
-            });
+        });
 
-            quill.root.addEventListener('paste', handleImagePaste);
-        }
-        
-        function handleImagePaste(event) {
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                if (item.type.indexOf('image') === 0) {
-                    const blob = item.getAsFile();
-                    if (blob) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const base64data = e.target.result;
-                            const formData = new FormData();
-                            formData.append('action', 'subirImagenBase64');
-                            formData.append('imagen', base64data);
-                            const range = quill.getSelection();
-                            quill.insertEmbed(range.index, 'text', 'Cargando imagen...');
-                            fetch(APP_SCRIPT_URL, {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(result => {
-                                quill.deleteText(range.index, 18);
-                                if (result.estado === 'éxito') {
-                                    quill.insertEmbed(range.index, 'image', result.url);
-                                } else {
-                                    alert('Error al subir la imagen: ' + result.mensaje);
-                                }
-                            })
-                            .catch(error => {
-                                alert('Fallo en la comunicación con el servidor: ' + error.message);
-                            });
-                        };
-                        reader.readAsDataURL(blob);
-                    }
-                }
-            }
-        }
-
-        // --- LÓGICA DE TABS, FORMULARIO Y PDF ---
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
-            const contenido = quill.root.innerHTML;
+            const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const messageBox = document.getElementById('messageBox');
@@ -324,14 +243,12 @@
                 loadingSpinner.style.display = 'none';
             });
         });
-
         function showMessage(type, message) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
             messageBox.className = 'message-box ' + type;
             messageBox.style.display = 'block';
         }
-        
         function embedYouTubeVideos(htmlContent) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
@@ -390,7 +307,6 @@
                     cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
                 });
         }
-        
         function generarPDF(storyId) {
             const element = document.getElementById(storyId);
             if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
@@ -416,14 +332,12 @@
                 console.error("Error generando PDF:", error);
             });
         }
-        
         document.getElementById('cuentos-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
                 const storyId = e.target.dataset.storyId;
                 generarPDF(storyId);
             }
         });
-        
         document.querySelectorAll('.btn-tab').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
@@ -431,15 +345,49 @@
                 this.classList.add('active');
                 const tabId = this.dataset.tab;
                 document.getElementById(`${tabId}-tab`).classList.add('active');
-                if (tabId === 'create') {
-                    initializeQuill();
-                } else if (tabId === 'view') {
+                if (tabId === 'view') {
                     cargarCuentos();
                 }
             });
         });
-        
         document.querySelector('.btn-tab').click();
+        quill.root.addEventListener('paste', (event) => {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            const range = quill.getSelection();
+                            quill.insertEmbed(range.index, 'text', 'Cargando imagen...');
+                            fetch(APP_SCRIPT_URL, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                quill.deleteText(range.index, 18);
+                                if (result.estado === 'éxito') {
+                                    quill.insertEmbed(range.index, 'image', result.url);
+                                } else {
+                                    alert('Error al subir la imagen: ' + result.mensaje);
+                                }
+                            })
+                            .catch(error => {
+                                alert('Fallo en la comunicación con el servidor: ' + error.message);
+                            });
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
