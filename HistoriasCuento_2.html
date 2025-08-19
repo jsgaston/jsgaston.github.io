@@ -35,160 +35,30 @@
         .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
         .btn-tab.active { background-color: #4f46e5; color: white; }
         .download-btn { background-color: #10b981; }
-        
-        /* Estilos de Medium del PDF */
         blockquote { border-left: 4px solid #ccc; margin: 1.5em 10px; padding: 0.5em 10px; }
         blockquote p { display: inline; }
         hr { border: none; height: 1px; background-color: #ccc; margin: 20px 0; }
         .ql-snow .ql-editor h1 { font-size: 2em; line-height: 1.5em; font-weight: 700; margin-bottom: 0.5em; }
         .ql-snow .ql-editor h2 { font-size: 1.5em; line-height: 1.5em; font-weight: 600; margin-bottom: 0.5em; }
         .tweet { margin: 1.5em 0; }
-        
-        /* Estilos para el nuevo editor y la barra de herramientas */
-        #editor-container {
-            border: none !important;
-            padding: 2.5rem 0;
-            line-height: 1.75rem;
-            font-size: 1.125rem;
-            color: #333;
-        }
-        #editor-container .ql-editor:focus {
-            outline: none;
-        }
-        
-        .floating-toolbar {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: #292929;
-            color: white;
-            padding: 5px;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            z-index: 10;
-        }
-        
-        .floating-toolbar button, .floating-toolbar input {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1rem;
-            padding: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            line-height: 1;
-        }
-        
-        .floating-toolbar button:hover, .floating-toolbar input:hover {
-            background: #555;
-            border-radius: 3px;
-        }
-        
-        .floating-toolbar .ql-picker {
-            color: #fff;
-            margin: 0 5px;
-        }
-        
-        .floating-toolbar .ql-picker-label {
-            font-size: 1rem;
-            padding: 0 5px;
-        }
-        
-        .floating-toolbar .ql-link-input {
-            width: 150px;
-            padding: 5px;
-            border: 1px solid #555;
-            background: #333;
-            color: white;
-            margin-right: 5px;
-        }
-
-        .ql-snow {
-            border: 1px solid #d1d5db;
-        }
-
-        /* Botón de añadir nuevo bloque */
-        .add-block-btn {
-            position: absolute;
-            left: -35px;
-            top: 0;
-            display: none;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 5;
-        }
-        .add-block-btn i {
-            color: #ccc;
-            font-size: 16px;
-        }
-
-        .add-block-menu {
-            position: absolute;
-            left: 0;
-            top: 35px;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            z-index: 6;
-            display: none;
-            padding: 5px;
-        }
-        .add-block-menu button {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 8px 12px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .add-block-menu button:hover {
-            background: #f0f0f0;
-        }
-
-        .ql-container.ql-snow {
-            border: none;
-        }
-
-        .ql-snow .ql-editor {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.125rem;
-            line-height: 1.75rem;
-            color: #333;
-        }
-
-        /* Estilos para el embed de video, para que sea responsivo */
-        .ql-video {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 */
-            height: 0;
-            overflow: hidden;
-        }
-        .ql-video iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .ql-editor img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 1.5em auto;
-            border-radius: 8px;
-        }
+        #editor-container { border: none !important; padding: 2.5rem 0; line-height: 1.75rem; font-size: 1.125rem; color: #333; }
+        #editor-container .ql-editor:focus { outline: none; }
+        .floating-toolbar { display: none; position: absolute; top: 0; left: 0; background: #292929; color: white; padding: 5px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; }
+        .floating-toolbar button { background: none; border: none; color: #fff; font-size: 1rem; padding: 8px; cursor: pointer; transition: background 0.2s; line-height: 1; }
+        .floating-toolbar button:hover { background: #555; border-radius: 3px; }
+        .ql-snow { border: 1px solid #d1d5db; }
+        .add-block-btn { position: absolute; left: -35px; top: 0; display: none; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 30px; height: 30px; text-align: center; line-height: 30px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; }
+        .add-block-btn i { color: #ccc; font-size: 16px; }
+        .add-block-menu { position: absolute; left: 0; top: 35px; background: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 6; display: none; padding: 10px; }
+        .add-block-menu button, .add-block-menu .input-group button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer; transition: background 0.2s; }
+        .add-block-menu button:hover, .add-block-menu .input-group button:hover { background: #f0f0f0; }
+        .add-block-menu .input-group { margin-top: 10px; display: flex; align-items: center; }
+        .add-block-menu input { flex-grow: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 5px; }
+        .ql-container.ql-snow { border: none; }
+        .ql-snow .ql-editor { font-family: 'Inter', sans-serif; font-size: 1.125rem; line-height: 1.75rem; color: #333; }
+        .ql-video { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .ql-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .ql-editor img { max-width: 100%; height: auto; display: block; margin: 1.5em auto; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -211,7 +81,7 @@
                     <div id="floating-toolbar" class="floating-toolbar">
                         <button class="ql-bold"><i class="fas fa-bold"></i></button>
                         <button class="ql-italic"><i class="fas fa-italic"></i></button>
-                        <button class="ql-link"><i class="fas fa-link"></i></button>
+                        <button class="ql-link-btn" id="link-btn"><i class="fas fa-link"></i></button>
                         <button class="ql-header" value="1"><i class="fas fa-h1"></i></button>
                         <button class="ql-header" value="2"><i class="fas fa-h2"></i></button>
                         <button class="ql-blockquote"><i class="fas fa-quote-right"></i></button>
@@ -222,12 +92,21 @@
                     </div>
 
                     <div id="add-block-menu" class="add-block-menu">
-                        <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
-                        <button id="insert-video-btn"><i class="fas fa-video"></i> Video de YouTube</button>
-                        <button id="insert-divider-btn"><i class="fas fa-minus"></i> Divisor</button>
-                        <button id="insert-tweet-btn"><i class="fab fa-twitter"></i> Tweet</button>
+                        <div id="initial-menu">
+                            <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
+                            <button id="show-video-input"><i class="fas fa-video"></i> Video de YouTube</button>
+                            <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
+                            <button id="insert-divider-btn"><i class="fas fa-minus"></i> Divisor</button>
+                        </div>
+                        <div id="video-input-group" style="display:none;">
+                            <input type="text" id="video-url-input" placeholder="URL de YouTube">
+                            <button id="insert-video-submit"><i class="fas fa-check"></i></button>
+                        </div>
+                        <div id="tweet-input-group" style="display:none;">
+                            <input type="text" id="tweet-id-input" placeholder="ID del Tweet">
+                            <button id="insert-tweet-submit"><i class="fas fa-check"></i></button>
+                        </div>
                     </div>
-
                 </div>
                 <button type="submit" class="btn">
                     <span id="buttonText">Guardar Cuento</span>
@@ -253,9 +132,7 @@
         class HeaderBlot extends Block {
             static blotName = 'header';
             static tagName = ['H1', 'H2'];
-            static formats(node) {
-                return HeaderBlot.tagName.indexOf(node.tagName) + 1;
-            }
+            static formats(node) { return HeaderBlot.tagName.indexOf(node.tagName) + 1; }
         }
         class BlockquoteBlot extends Block {
             static blotName = 'blockquote';
@@ -275,10 +152,7 @@
                 return node;
             }
             static value(node) {
-                return {
-                    alt: node.getAttribute('alt'),
-                    url: node.getAttribute('src')
-                };
+                return { alt: node.getAttribute('alt'), url: node.getAttribute('src') };
             }
         }
         class VideoBlot extends BlockEmbed {
@@ -293,17 +167,11 @@
             }
             static formats(node) {
                 const format = {};
-                if (node.hasAttribute('height')) {
-                    format.height = node.getAttribute('height');
-                }
-                if (node.hasAttribute('width')) {
-                    format.width = node.getAttribute('width');
-                }
+                if (node.hasAttribute('height')) { format.height = node.getAttribute('height'); }
+                if (node.hasAttribute('width')) { format.width = node.getAttribute('width'); }
                 return format;
             }
-            static value(node) {
-                return node.getAttribute('src');
-            }
+            static value(node) { return node.getAttribute('src'); }
         }
         class TweetBlot extends BlockEmbed {
             static blotName = 'tweet';
@@ -315,9 +183,7 @@
                 twttr.widgets.createTweet(id, node);
                 return node;
             }
-            static value(domNode) {
-                return domNode.dataset.id;
-            }
+            static value(domNode) { return domNode.dataset.id; }
         }
         
         Quill.register(HeaderBlot);
@@ -330,17 +196,16 @@
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
-            modules: {
-                toolbar: {
-                    container: '#floating-toolbar'
-                }
-            }
+            modules: { toolbar: false }
         });
 
         const editorContainer = document.getElementById('editor-container');
         const floatingToolbar = document.getElementById('floating-toolbar');
         const addBlockBtn = document.getElementById('add-block-btn');
         const addBlockMenu = document.getElementById('add-block-menu');
+        const initialMenu = document.getElementById('initial-menu');
+        const videoInputGroup = document.getElementById('video-input-group');
+        const tweetInputGroup = document.getElementById('tweet-input-group');
         let currentSelectionRange = null;
 
         quill.on('selection-change', function(range) {
@@ -353,8 +218,6 @@
                     floatingToolbar.style.left = `${rect.left + rect.width / 2 - floatingToolbar.offsetWidth / 2}px`;
                 } else {
                     floatingToolbar.style.display = 'none';
-                    addBlockBtn.style.display = 'none';
-                    addBlockMenu.style.display = 'none';
                 }
                 
                 const bounds = quill.getBounds(range.index);
@@ -371,7 +234,7 @@
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
-            const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
+            const contenido = quill.root.innerHTML;
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const messageBox = document.getElementById('messageBox');
@@ -404,7 +267,7 @@
                 loadingSpinner.style.display = 'none';
             });
         });
-        
+
         function showMessage(type, message) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
@@ -434,7 +297,7 @@
             });
             return tempDiv.innerHTML;
         }
-        
+
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
             cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
@@ -519,6 +382,7 @@
         
         document.querySelector('.btn-tab').click();
         
+        // --- Lógica del editor mejorada ---
         addBlockBtn.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -532,92 +396,132 @@
                 addBlockMenu.style.display = 'none';
             }
         });
-        
-        document.getElementById('insert-image-btn').addEventListener('click', () => {
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection();
-            if (range) {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = () => {
-                    const file = input.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const base64data = e.target.result;
-                            const formData = new FormData();
-                            formData.append('action', 'subirImagenBase64');
-                            formData.append('imagen', base64data);
-                            
-                            const startIndex = range.index === 0 ? 0 : range.index;
-                            quill.insertText(startIndex, '\n', Quill.sources.USER);
-                            const placeholderIndex = startIndex + 1;
-                            quill.insertEmbed(placeholderIndex, 'text', 'Cargando imagen...');
-                            quill.setSelection(placeholderIndex + 1, Quill.sources.SILENT);
 
-                            fetch(APP_SCRIPT_URL, {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(result => {
-                                quill.deleteText(placeholderIndex, 18); // 'Cargando imagen...' length
-                                if (result.estado === 'éxito' && result.url) {
-                                    quill.insertEmbed(placeholderIndex, 'image', { url: result.url, alt: 'Imagen subida' });
-                                } else {
-                                    alert('Error al subir la imagen: ' + (result.mensaje || 'URL no recibida.'));
-                                }
-                            })
-                            .catch(error => {
-                                quill.deleteText(placeholderIndex, 18);
-                                alert('Fallo en la comunicación con el servidor: ' + error.message);
-                            });
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-                input.click();
+        document.getElementById('link-btn').addEventListener('click', () => {
+            const url = prompt("Introduce la URL:");
+            if (url && currentSelectionRange.length > 0) {
+                quill.format('link', url);
             }
         });
-        
-        document.getElementById('insert-video-btn').addEventListener('click', () => {
+
+        document.querySelectorAll('.ql-header, .ql-blockquote, .ql-bold, .ql-italic').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const format = btn.classList[0].substring(4);
+                let value = btn.value || true;
+                if (format === 'header') {
+                    const currentFormat = quill.getFormat(currentSelectionRange.index, 1);
+                    value = currentFormat.header === parseInt(value) ? null : parseInt(value);
+                }
+                quill.format(format, value);
+            });
+        });
+
+        document.getElementById('insert-image-btn').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
             addBlockMenu.style.display = 'none';
-            const range = quill.getSelection();
-            if (range) {
-                const url = prompt("Introduce la URL del video de YouTube:");
-                if (url) {
-                    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                    const match = url.match(youtubeRegex);
-                    if (match && match[1]) {
-                        const embedUrl = `https://www.youtube.com/embed/${match[1]}`;
-                        quill.insertEmbed(range.index, 'video', embedUrl);
-                        quill.setSelection(range.index + 1);
-                    } else {
-                        alert("Por favor, introduce una URL de YouTube válida.");
-                    }
+            const range = quill.getSelection(true);
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = () => {
+                const file = input.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64data = e.target.result;
+                        const formData = new FormData();
+                        formData.append('action', 'subirImagenBase64');
+                        formData.append('imagen', base64data);
+                        
+                        const startIndex = range.index;
+                        quill.insertText(startIndex, '\n', Quill.sources.USER);
+                        const placeholderIndex = startIndex + 1;
+                        quill.insertEmbed(placeholderIndex, 'text', 'Cargando imagen...');
+                        quill.setSelection(placeholderIndex + 1, 0, Quill.sources.SILENT);
+
+                        fetch(APP_SCRIPT_URL, { method: 'POST', body: formData })
+                        .then(response => response.json())
+                        .then(result => {
+                            quill.deleteText(placeholderIndex, 18);
+                            if (result.estado === 'éxito' && result.url) {
+                                quill.insertEmbed(placeholderIndex, 'image', { url: result.url, alt: 'Imagen subida' });
+                            } else {
+                                alert('Error al subir la imagen: ' + (result.mensaje || 'URL no recibida.'));
+                            }
+                        })
+                        .catch(error => {
+                            quill.deleteText(placeholderIndex, 18);
+                            alert('Fallo en la comunicación con el servidor: ' + error.message);
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        });
+        
+        document.getElementById('show-video-input').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            initialMenu.style.display = 'none';
+            videoInputGroup.style.display = 'flex';
+        });
+
+        document.getElementById('insert-video-submit').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const url = document.getElementById('video-url-input').value;
+            const range = quill.getSelection(true);
+            if (url) {
+                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                const match = url.match(youtubeRegex);
+                if (match && match[1]) {
+                    const embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                    quill.insertEmbed(range.index, 'video', embedUrl);
+                    quill.setSelection(range.index + 1);
+                } else {
+                    alert("Por favor, introduce una URL de YouTube válida.");
                 }
             }
+            document.getElementById('video-url-input').value = '';
+            initialMenu.style.display = 'block';
+            videoInputGroup.style.display = 'none';
+            addBlockMenu.style.display = 'none';
+        });
+
+        document.getElementById('show-tweet-input').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            initialMenu.style.display = 'none';
+            tweetInputGroup.style.display = 'flex';
+        });
+
+        document.getElementById('insert-tweet-submit').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const id = document.getElementById('tweet-id-input').value;
+            const range = quill.getSelection(true);
+            if (id) {
+                quill.insertEmbed(range.index, 'tweet', id);
+                quill.setSelection(range.index + 1);
+            }
+            document.getElementById('tweet-id-input').value = '';
+            initialMenu.style.display = 'block';
+            tweetInputGroup.style.display = 'none';
+            addBlockMenu.style.display = 'none';
         });
         
-        document.getElementById('insert-divider-btn').addEventListener('click', () => {
+        document.getElementById('insert-divider-btn').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
             addBlockMenu.style.display = 'none';
-            const range = quill.getSelection();
+            const range = quill.getSelection(true);
             if (range) {
                 quill.insertEmbed(range.index, 'divider', true);
                 quill.setSelection(range.index + 1);
-            }
-        });
-
-        document.getElementById('insert-tweet-btn').addEventListener('click', () => {
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection();
-            if (range) {
-                const id = prompt("Introduce el ID del tweet:");
-                if (id) {
-                    quill.insertEmbed(range.index, 'tweet', id);
-                    quill.setSelection(range.index + 1);
-                }
             }
         });
 
