@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Cuentos e Historias (estilo Medium)</title>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
+        .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
+        h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
+        h2 { font-size: 1.5rem; color: #1f2937; margin-bottom: 1rem; }
+        .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
+        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
+        .btn:hover { transform: scale(1.02); }
+        .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
+        .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .story-list { list-style: none; padding: 0; }
+        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin-top: 15px; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+        .btn-tab.active { background-color: #4f46e5; color: white; }
+        .download-btn { background-color: #10b981; }
+        blockquote { border-left: 4px solid #ccc; margin: 1.5em 10px; padding: 0.5em 10px; }
+        blockquote p { display: inline; }
+        hr { border: none; height: 1px; background-color: #ccc; margin: 20px 0; }
+        .ql-snow .ql-editor h1 { font-size: 2em; line-height: 1.5em; font-weight: 700; margin-bottom: 0.5em; }
+        .ql-snow .ql-editor h2 { font-size: 1.5em; line-height: 1.5em; font-weight: 600; margin-bottom: 0.5em; }
+        .tweet { margin: 1.5em 0; }
+        #editor-container { border: none !important; padding: 2.5rem 0; line-height: 1.75rem; font-size: 1.125rem; color: #333; }
+        #editor-container .ql-editor:focus { outline: none; }
+        .floating-toolbar { display: none; position: absolute; top: 0; left: 0; background: #292929; color: white; padding: 5px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; }
+        .floating-toolbar button { background: none; border: none; color: #fff; font-size: 1rem; padding: 8px; cursor: pointer; transition: background 0.2s; line-height: 1; }
+        .floating-toolbar button:hover { background: #555; border-radius: 3px; }
+        .ql-snow { border: 1px solid #d1d5db; }
+        .add-block-btn { position: absolute; left: -35px; top: 0; display: none; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 30px; height: 30px; text-align: center; line-height: 30px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; }
+        .add-block-btn i { color: #ccc; font-size: 16px; }
+        .add-block-menu { position: absolute; left: 0; top: 35px; background: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 6; display: none; padding: 10px; }
+        .add-block-menu button, .add-block-menu .input-group button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer; transition: background 0.2s; }
+        .add-block-menu button:hover, .add-block-menu .input-group button:hover { background: #f0f0f0; }
+        .add-block-menu .input-group { margin-top: 10px; display: flex; align-items: center; }
+        .add-block-menu input { flex-grow: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 5px; }
+        .ql-container.ql-snow { border: none; }
+        .ql-snow .ql-editor { font-family: 'Inter', sans-serif; font-size: 1.125rem; line-height: 1.75rem; color: #333; }
+        .ql-video { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .ql-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .ql-editor img { max-width: 100%; height: auto; display: block; margin: 1.5em auto; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Editor de Cuentos e Historias</h1>
+        <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-tab active" data-tab="create">Crear Nuevo Cuento</button>
+            <button class="btn-tab" data-tab="view">Ver Todos los Cuentos</button>
+        </nav>
+        <div id="create-tab" class="tab-content active">
+            <form id="cuentoForm">
+                <div style="margin-bottom: 1rem;">
+                    <label for="titulo" class="form-label">Título:</label>
+                    <input type="text" id="titulo" name="titulo" class="form-input" required>
+                </div>
+                <div style="margin-bottom: 1rem; position: relative;">
+                    <label class="form-label">Contenido:</label>
+                    <div id="editor-container"></div>
+                    
+                    <div id="floating-toolbar" class="floating-toolbar">
+                        <button class="ql-bold"><i class="fas fa-bold"></i></button>
+                        <button class="ql-italic"><i class="fas fa-italic"></i></button>
+                        <button class="ql-underline"><i class="fas fa-underline"></i></button>
+                        <button class="ql-strike"><i class="fas fa-strikethrough"></i></button>
+                        <button class="ql-link-btn" id="link-btn"><i class="fas fa-link"></i></button>
+                        <button class="ql-header" value="1"><i class="fas fa-h1"></i></button>
+                        <button class="ql-header" value="2"><i class="fas fa-h2"></i></button>
+                        <button class="ql-blockquote"><i class="fas fa-quote-right"></i></button>
+                        <button class="ql-align" value=""><i class="fas fa-align-left"></i></button>
+                        <button class="ql-align" value="center"><i class="fas fa-align-center"></i></button>
+                        <button class="ql-align" value="right"><i class="fas fa-align-right"></i></button>
+                        <button class="ql-align" value="justify"><i class="fas fa-align-justify"></i></button>
+                        <button class="ql-list" value="bullet"><i class="fas fa-list-ul"></i></button>
+                        <button class="ql-list" value="ordered"><i class="fas fa-list-ol"></i></button>
+                    </div>
+
+                    <div id="add-block-btn" class="add-block-btn">
+                        <i class="fas fa-plus"></i>
+                    </div>
+
+                    <div id="add-block-menu" class="add-block-menu">
+                        <div id="initial-menu">
+                            <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
+                            <button id="show-video-input"><i class="fas fa-video"></i> Video de YouTube</button>
+                            <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
+                            <button id="insert-divider-btn"><i class="fas fa-minus"></i> Divisor</button>
+                        </div>
+                        <div id="video-input-group" style="display:none;">
+                            <input type="text" id="video-url-input" placeholder="URL de YouTube">
+                            <button id="insert-video-submit"><i class="fas fa-check"></i></button>
+                        </div>
+                        <div id="tweet-input-group" style="display:none;">
+                            <input type="text" id="tweet-id-input" placeholder="ID del Tweet">
+                            <button id="insert-tweet-submit"><i class="fas fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn">
+                    <span id="buttonText">Guardar Cuento</span>
+                    <div id="loadingSpinner" class="loading-spinner"></div>
+                </button>
+                <div id="messageBox" class="message-box"></div>
+            </form>
+        </div>
+        <div id="view-tab" class="tab-content">
+            <h2>Cuentos Publicados</h2>
+            <div id="cuentos-list" class="story-list">
+                <p>Cargando cuentos...</p>
+            </div>
+        </div>
+    </div>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script>
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
+
+        const Block = Quill.import('blots/block');
+        const BlockEmbed = Quill.import('blots/block/embed');
+        
+        class HeaderBlot extends Block {
+            static blotName = 'header';
+            static tagName = ['H1', 'H2'];
+            static formats(node) { return HeaderBlot.tagName.indexOf(node.tagName) + 1; }
+        }
+        class BlockquoteBlot extends Block {
+            static blotName = 'blockquote';
+            static tagName = 'blockquote';
+        }
+        class DividerBlot extends BlockEmbed {
+            static blotName = 'divider';
+            static tagName = 'hr';
+        }
+        class ImageBlot extends BlockEmbed {
+            static blotName = 'image';
+            static tagName = 'img';
+            static create(value) {
+                const node = super.create();
+                node.setAttribute('src', value.url);
+                node.setAttribute('alt', value.alt);
+                return node;
+            }
+            static value(node) {
+                return { alt: node.getAttribute('alt'), url: node.getAttribute('src') };
+            }
+        }
+        class VideoBlot extends BlockEmbed {
+            static blotName = 'video';
+            static tagName = 'iframe';
+            static create(url) {
+                const node = super.create();
+                node.setAttribute('src', url);
+                node.setAttribute('frameborder', '0');
+                node.setAttribute('allowfullscreen', true);
+                return node;
+            }
+            static formats(node) {
+                const format = {};
+                if (node.hasAttribute('height')) { format.height = node.getAttribute('height'); }
+                if (node.hasAttribute('width')) { format.width = node.getAttribute('width'); }
+                return format;
+            }
+            static value(node) { return node.getAttribute('src'); }
+        }
+        class TweetBlot extends BlockEmbed {
+            static blotName = 'tweet';
+            static tagName = 'div';
+            static className = 'tweet';
+            static create(id) {
+                const node = super.create();
+                node.dataset.id = id;
+                twttr.widgets.createTweet(id, node);
+                return node;
+            }
+            static value(domNode) { return domNode.dataset.id; }
+        }
+        
+        Quill.register(HeaderBlot);
+        Quill.register(BlockquoteBlot);
+        Quill.register(DividerBlot);
+        Quill.register(ImageBlot);
+        Quill.register(VideoBlot);
+        Quill.register(TweetBlot);
+
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['link', 'blockquote'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'align': [] }],
+            [{ 'header': [1, 2, false] }]
+        ];
+        
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Escribe tu historia aquí...',
+            modules: {
+                toolbar: toolbarOptions
+            }
+        });
+
+        const editorContainer = document.getElementById('editor-container');
+        const floatingToolbar = document.getElementById('floating-toolbar');
+        const addBlockBtn = document.getElementById('add-block-btn');
+        const addBlockMenu = document.getElementById('add-block-menu');
+        const initialMenu = document.getElementById('initial-menu');
+        const videoInputGroup = document.getElementById('video-input-group');
+        const tweetInputGroup = document.getElementById('tweet-input-group');
+        let currentSelectionRange = null;
+
+        quill.on('selection-change', function(range) {
+            if (range) {
+                currentSelectionRange = range;
+                if (range.length > 0) {
+                    const rect = quill.getBounds(range.index, range.length);
+                    floatingToolbar.style.display = 'block';
+                    floatingToolbar.style.top = `${rect.top + editorContainer.scrollTop - floatingToolbar.offsetHeight - 10}px`;
+                    floatingToolbar.style.left = `${rect.left + rect.width / 2 - floatingToolbar.offsetWidth / 2}px`;
+                } else {
+                    floatingToolbar.style.display = 'none';
+                }
+                
+                const bounds = quill.getBounds(range.index);
+                addBlockBtn.style.display = 'block';
+                addBlockBtn.style.top = `${bounds.top + editorContainer.scrollTop}px`;
+                addBlockBtn.style.left = `0`;
+            } else {
+                floatingToolbar.style.display = 'none';
+                addBlockBtn.style.display = 'none';
+                addBlockMenu.style.display = 'none';
+            }
+        });
+
+        document.getElementById('cuentoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const titulo = document.getElementById('titulo').value;
+            const contenido = quill.root.innerHTML;
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const messageBox = document.getElementById('messageBox');
+            buttonText.textContent = 'Guardando...';
+            loadingSpinner.style.display = 'inline-block';
+            messageBox.style.display = 'none';
+            const formData = new FormData();
+            formData.append('action', 'guardarCuento');
+            formData.append('titulo', titulo);
+            formData.append('contenido', contenido);
+            fetch(APP_SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.estado === 'éxito') {
+                    showMessage('success', result.mensaje);
+                    document.getElementById('cuentoForm').reset();
+                    quill.setContents([]);
+                } else {
+                    showMessage('error', result.mensaje);
+                }
+            })
+            .catch(error => {
+                showMessage('error', 'Fallo al guardar: ' + error.message);
+            })
+            .finally(() => {
+                buttonText.textContent = 'Guardar Cuento';
+                loadingSpinner.style.display = 'none';
+            });
+        });
+
+        function showMessage(type, message) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = 'message-box ' + type;
+            messageBox.style.display = 'block';
+        }
+        
+        function embedYouTubeVideos(htmlContent) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const links = tempDiv.querySelectorAll('a');
+            links.forEach(link => {
+                const url = link.href;
+                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                const match = url.match(youtubeRegex);
+                if (match && match[1]) {
+                    const videoId = match[1];
+                    const iframe = document.createElement('iframe');
+                    iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
+                    iframe.setAttribute('frameborder', '0');
+                    iframe.setAttribute('allowfullscreen', '');
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'video-wrapper';
+                    wrapper.appendChild(iframe);
+                    link.parentNode.replaceChild(wrapper, link);
+                }
+            });
+            return tempDiv.innerHTML;
+        }
+
+        function cargarCuentos() {
+            const cuentosList = document.getElementById('cuentos-list');
+            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
+            const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.estado === 'éxito') {
+                        cuentosList.innerHTML = '';
+                        if (result.cuentos && result.cuentos.length > 0) {
+                            result.cuentos.forEach((cuento, index) => {
+                                const storyId = `story-${index}`;
+                                const storyDiv = document.createElement('div');
+                                storyDiv.id = storyId;
+                                storyDiv.className = 'story-item';
+                                const contenidoConVideos = embedYouTubeVideos(cuento.contenido);
+                                storyDiv.innerHTML = `
+                                    <h3>${cuento.titulo}</h3>
+                                    <p style="font-size: 0.9rem; color: #6b7280;">Publicado el: ${new Date(cuento.fecha).toLocaleString()}</p>
+                                    <div class="story-content">${contenidoConVideos}</div>
+                                    <button class="btn download-btn" data-story-id="${storyId}" style="margin-top: 15px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                `;
+                                cuentosList.appendChild(storyDiv);
+                            });
+                        } else {
+                            cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
+                        }
+                    } else {
+                        cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
+                    }
+                })
+                .catch(error => {
+                    cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                });
+        }
+        
+        function generarPDF(storyId) {
+            const element = document.getElementById(storyId);
+            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const filename = `${element.querySelector('h3').textContent}.pdf`;
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgProps = doc.getImageProperties(imgData);
+                const pdfWidth = doc.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                let y = 0;
+                while (y < pdfHeight) {
+                    if (y > 0) { doc.addPage(); }
+                    const heightLeft = pdfHeight - y;
+                    const newHeight = Math.min(doc.internal.pageSize.getHeight(), heightLeft);
+                    doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
+                    y += newHeight;
+                }
+                doc.save(filename);
+            }).catch(error => {
+                alert("Hubo un error al generar el PDF: " + error.message);
+                console.error("Error generando PDF:", error);
+            });
+        }
+        
+        document.getElementById('cuentos-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('download-btn')) {
+                const storyId = e.target.dataset.storyId;
+                generarPDF(storyId);
+            }
+        });
+        
+        document.querySelectorAll('.btn-tab').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                if (tabId === 'view') {
+                    cargarCuentos();
+                }
+            });
+        });
+        
+        document.querySelector('.btn-tab').click();
+        
+        // --- Lógica del editor mejorada ---
+        addBlockBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            addBlockMenu.style.display = addBlockMenu.style.display === 'block' ? 'none' : 'block';
+            addBlockMenu.style.top = `${addBlockBtn.offsetTop + addBlockBtn.offsetHeight}px`;
+            addBlockMenu.style.left = `${addBlockBtn.offsetLeft}px`;
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!addBlockBtn.contains(event.target) && !addBlockMenu.contains(event.target)) {
+                addBlockMenu.style.display = 'none';
+            }
+        });
+
+        document.getElementById('link-btn').addEventListener('click', () => {
+            const url = prompt("Introduce la URL:");
+            if (url && currentSelectionRange.length > 0) {
+                quill.format('link', url);
+            }
+        });
+
+        document.querySelectorAll('.ql-header, .ql-blockquote, .ql-bold, .ql-italic, .ql-underline, .ql-strike, .ql-align, .ql-list').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const format = btn.classList[0].substring(4);
+                let value = btn.value || true;
+                if (format === 'header') {
+                    const currentFormat = quill.getFormat(currentSelectionRange.index, 1);
+                    value = currentFormat.header === parseInt(value) ? null : parseInt(value);
+                } else if (format === 'list' || format === 'align') {
+                    value = btn.value;
+                }
+                quill.format(format, value);
+            });
+        });
+
+        document.getElementById('insert-image-btn').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            addBlockMenu.style.display = 'none';
+            const range = quill.getSelection(true);
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = () => {
+                const file = input.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const base64data = e.target.result;
+                        const formData = new FormData();
+                        formData.append('action', 'subirImagenBase64');
+                        formData.append('imagen', base64data);
+                        
+                        const startIndex = range.index;
+                        quill.insertText(startIndex, '\n', Quill.sources.USER);
+                        const placeholderIndex = startIndex + 1;
+                        quill.insertEmbed(placeholderIndex, 'text', 'Cargando imagen...');
+                        quill.setSelection(placeholderIndex + 1, 0, Quill.sources.SILENT);
+
+                        fetch(APP_SCRIPT_URL, { method: 'POST', body: formData })
+                        .then(response => response.json())
+                        .then(result => {
+                            quill.deleteText(placeholderIndex, 18);
+                            if (result.estado === 'éxito' && result.url) {
+                                quill.insertEmbed(placeholderIndex, 'image', { url: result.url, alt: 'Imagen subida' });
+                            } else {
+                                alert('Error al subir la imagen: ' + (result.mensaje || 'URL no recibida.'));
+                            }
+                        })
+                        .catch(error => {
+                            quill.deleteText(placeholderIndex, 18);
+                            alert('Fallo en la comunicación con el servidor: ' + error.message);
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        });
+        
+        document.getElementById('show-video-input').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            initialMenu.style.display = 'none';
+            videoInputGroup.style.display = 'flex';
+        });
+
+        document.getElementById('insert-video-submit').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const url = document.getElementById('video-url-input').value;
+            const range = quill.getSelection(true);
+            if (url) {
+                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                const match = url.match(youtubeRegex);
+                if (match && match[1]) {
+                    const embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                    quill.insertEmbed(range.index, 'video', embedUrl);
+                    quill.setSelection(range.index + 1);
+                } else {
+                    alert("Por favor, introduce una URL de YouTube válida.");
+                }
+            }
+            document.getElementById('video-url-input').value = '';
+            initialMenu.style.display = 'block';
+            videoInputGroup.style.display = 'none';
+            addBlockMenu.style.display = 'none';
+        });
+
+        document.getElementById('show-tweet-input').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            initialMenu.style.display = 'none';
+            tweetInputGroup.style.display = 'flex';
+        });
+
+        document.getElementById('insert-tweet-submit').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const id = document.getElementById('tweet-id-input').value;
+            const range = quill.getSelection(true);
+            if (id) {
+                quill.insertEmbed(range.index, 'tweet', id);
+                quill.setSelection(range.index + 1);
+            }
+            document.getElementById('tweet-id-input').value = '';
+            initialMenu.style.display = 'block';
+            tweetInputGroup.style.display = 'none';
+            addBlockMenu.style.display = 'none';
+        });
+        
+        document.getElementById('insert-divider-btn').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            addBlockMenu.style.display = 'none';
+            const range = quill.getSelection(true);
+            if (range) {
+                quill.insertEmbed(range.index, 'divider', true);
+                quill.setSelection(range.index + 1);
+            }
+        });
+
+    </script>
+</body>
+</html>
