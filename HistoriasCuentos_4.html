@@ -6,6 +6,10 @@
     <title>Editor de Cuentos e Historias (estilo Medium)</title>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/monokai-sublime.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -43,14 +47,18 @@
         .tweet { margin: 1.5em 0; }
         #editor-container { border: none !important; padding: 2.5rem 0; line-height: 1.75rem; font-size: 1.125rem; color: #333; }
         #editor-container .ql-editor:focus { outline: none; }
-        .floating-toolbar { display: none; position: absolute; top: 0; left: 0; background: #292929; color: white; padding: 5px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; }
+        /* Barra flotante mejorada */
+        .floating-toolbar { display: none; position: absolute; background: #292929; color: white; padding: 5px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; }
         .floating-toolbar button { background: none; border: none; color: #fff; font-size: 1rem; padding: 8px; cursor: pointer; transition: background 0.2s; line-height: 1; }
         .floating-toolbar button:hover { background: #555; border-radius: 3px; }
         .ql-snow { border: 1px solid #d1d5db; }
-        .add-block-btn { position: absolute; left: -35px; top: 0; display: none; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 30px; height: 30px; text-align: center; line-height: 30px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; }
+        /* Botón '+' en la misma línea del cursor */
+        .add-block-container { position: relative; }
+        .add-block-btn { position: absolute; top: 0; left: -35px; display: none; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 30px; height: 30px; text-align: center; line-height: 30px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; }
         .add-block-btn i { color: #ccc; font-size: 16px; }
-        .add-block-menu { position: absolute; left: 0; top: 35px; background: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 6; display: none; padding: 10px; }
-        .add-block-menu button, .add-block-menu .input-group button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer; transition: background 0.2s; }
+        /* Menú desplegable de opciones */
+        .add-block-menu { position: absolute; left: -35px; top: 35px; background: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 6; display: none; padding: 10px; }
+        .add-block-menu button, .add-block-menu .input-group button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer; transition: background 0.2s; }
         .add-block-menu button:hover, .add-block-menu .input-group button:hover { background: #f0f0f0; }
         .add-block-menu .input-group { margin-top: 10px; display: flex; align-items: center; }
         .add-block-menu input { flex-grow: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 5px; }
@@ -76,8 +84,31 @@
                 </div>
                 <div style="margin-bottom: 1rem; position: relative;">
                     <label class="form-label">Contenido:</label>
-                    <div id="editor-container"></div>
-                    
+                    <div class="add-block-container">
+                        <div id="editor-container"></div>
+                        <div id="add-block-btn" class="add-block-btn">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div id="add-block-menu" class="add-block-menu">
+                            <div id="initial-menu">
+                                <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
+                                <button id="show-video-input"><i class="fas fa-video"></i> Video</button>
+                                <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
+                                <button id="insert-code-btn"><i class="fas fa-code"></i> Código</button>
+                                <button id="insert-formula-btn"><i class="fas fa-superscript"></i> Fórmula</button>
+                                <button id="insert-divider-btn"><i class="fas fa-minus"></i> Divisor</button>
+                                <button id="close-menu-btn"><i class="fas fa-times"></i> Cerrar</button>
+                            </div>
+                            <div id="video-input-group" style="display:none;">
+                                <input type="text" id="video-url-input" placeholder="URL de YouTube">
+                                <button id="insert-video-submit"><i class="fas fa-check"></i></button>
+                            </div>
+                            <div id="tweet-input-group" style="display:none;">
+                                <input type="text" id="tweet-id-input" placeholder="ID del Tweet">
+                                <button id="insert-tweet-submit"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+                    </div>
                     <div id="floating-toolbar" class="floating-toolbar">
                         <button class="ql-bold"><i class="fas fa-bold"></i></button>
                         <button class="ql-italic"><i class="fas fa-italic"></i></button>
@@ -93,31 +124,6 @@
                         <button class="ql-align" value="justify"><i class="fas fa-align-justify"></i></button>
                         <button class="ql-list" value="bullet"><i class="fas fa-list-ul"></i></button>
                         <button class="ql-list" value="ordered"><i class="fas fa-list-ol"></i></button>
-                        <button class="ql-size" value="+1"><i class="fas fa-plus"></i>A</button>
-                        <button class="ql-size" value="-1"><i class="fas fa-minus"></i>A</button>
-                    </div>
-
-                    <div id="add-block-btn" class="add-block-btn">
-                        <i class="fas fa-plus"></i>
-                    </div>
-
-                    <div id="add-block-menu" class="add-block-menu">
-                        <div id="initial-menu">
-                            <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
-                            <button id="show-video-input"><i class="fas fa-video"></i> Video de YouTube</button>
-                            <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
-                            <button id="insert-code-btn"><i class="fas fa-code"></i> Código</button>
-                            <button id="insert-formula-btn"><i class="fas fa-superscript"></i> Fórmula</button>
-                            <button id="insert-divider-btn"><i class="fas fa-minus"></i> Divisor</button>
-                        </div>
-                        <div id="video-input-group" style="display:none;">
-                            <input type="text" id="video-url-input" placeholder="URL de YouTube">
-                            <button id="insert-video-submit"><i class="fas fa-check"></i></button>
-                        </div>
-                        <div id="tweet-input-group" style="display:none;">
-                            <input type="text" id="tweet-id-input" placeholder="ID del Tweet">
-                            <button id="insert-tweet-submit"><i class="fas fa-check"></i></button>
-                        </div>
                     </div>
                 </div>
                 <button type="submit" class="btn">
@@ -135,9 +141,6 @@
         </div>
     </div>
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/quill-delta-to-html@0.12.0/dist/quill-delta-to-html.min.js"></script>
     <script>
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
 
@@ -210,23 +213,14 @@
         Quill.register(Quill.import('attributors/style/color'), true);
         Quill.register(Quill.import('attributors/style/size'), true);
 
-        const toolbarOptions = [
-            ['bold', 'italic', 'underline', 'strike'],
-            ['link', 'blockquote', 'code-block'],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            [{ 'align': [] }],
-            [{ 'header': [1, 2, false] }],
-            [{ 'color': [] }],
-            [{ 'size': ['small', false, 'large', 'huge'] }],
-            ['formula']
-        ];
-        
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
-            modules: {
+            modules: { 
                 toolbar: false,
-                syntax: true,
+                syntax: {
+                    highlight: text => hljs.highlightAuto(text).value
+                },
                 formula: true
             }
         });
@@ -239,11 +233,7 @@
         const videoInputGroup = document.getElementById('video-input-group');
         const tweetInputGroup = document.getElementById('tweet-input-group');
         let currentSelectionRange = null;
-
-        const sizeOptions = {
-            '+1': 'large',
-            '-1': 'small'
-        };
+        let isEditing = false; // Flag para controlar si se está editando
 
         quill.on('selection-change', function(range) {
             if (range) {
@@ -255,16 +245,14 @@
                     floatingToolbar.style.left = `${rect.left + rect.width / 2 - floatingToolbar.offsetWidth / 2}px`;
                 } else {
                     floatingToolbar.style.display = 'none';
+                    addBlockBtn.style.display = 'none';
+
+                    // Lógica para mostrar el botón '+' al inicio de un párrafo vacío
                     const [leaf, offset] = quill.getLeaf(range.index);
-                    const isNewLine = quill.getContents(range.index - 1, 1).ops[0].insert === '\n';
-                    if (leaf && leaf.domNode.localName === 'p' && offset === 0 && isNewLine) {
-                         const bounds = quill.getBounds(range.index);
-                         addBlockBtn.style.display = 'block';
-                         addBlockBtn.style.top = `${bounds.top + editorContainer.scrollTop}px`;
-                         addBlockBtn.style.left = `0`;
-                    } else {
-                         addBlockBtn.style.display = 'none';
-                         addBlockMenu.style.display = 'none';
+                    if (leaf && leaf.domNode.localName === 'p' && quill.getText(range.index - 1, 1) === '\n') {
+                        const bounds = quill.getBounds(range.index);
+                        addBlockBtn.style.display = 'block';
+                        addBlockBtn.style.top = `${bounds.top + editorContainer.scrollTop}px`;
                     }
                 }
             } else {
@@ -431,7 +419,11 @@
             event.stopPropagation();
             addBlockMenu.style.display = addBlockMenu.style.display === 'block' ? 'none' : 'block';
             addBlockMenu.style.top = `${addBlockBtn.offsetTop + addBlockBtn.offsetHeight}px`;
-            addBlockMenu.style.left = `${addBlockBtn.offsetLeft}px`;
+        });
+
+        document.getElementById('close-menu-btn').addEventListener('click', (event) => {
+            event.preventDefault();
+            addBlockMenu.style.display = 'none';
         });
 
         document.addEventListener('click', (event) => {
@@ -447,19 +439,21 @@
             }
         });
 
-        document.querySelectorAll('.ql-header, .ql-blockquote, .ql-bold, .ql-italic, .ql-underline, .ql-strike, .ql-align, .ql-list').forEach(btn => {
+        document.querySelectorAll('#floating-toolbar button').forEach(btn => {
             btn.addEventListener('click', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                const format = btn.classList[0].substring(4);
+                if (currentSelectionRange.length === 0) return;
+                const format = btn.classList.contains('ql-header') ? 'header' : btn.classList.contains('ql-blockquote') ? 'blockquote' : btn.classList.contains('ql-align') ? 'align' : btn.classList.contains('ql-list') ? 'list' : btn.classList[0].substring(4);
                 let value = btn.value || true;
                 if (format === 'header') {
                     const currentFormat = quill.getFormat(currentSelectionRange.index, 1);
-                    value = currentFormat.header === parseInt(value) ? null : parseInt(value);
+                    value = currentFormat.header === parseInt(value) ? false : parseInt(value);
                 } else if (format === 'list' || format === 'align') {
-                    value = btn.value;
+                    const currentFormat = quill.getFormat(currentSelectionRange.index, 1);
+                    value = currentFormat[format] === btn.value ? false : btn.value;
                 }
-                quill.format(format, value);
+                quill.format(format, value, Quill.sources.USER);
             });
         });
 
@@ -590,32 +584,6 @@
                 quill.format('formula', true);
                 quill.setSelection(range.index + 1);
             }
-        });
-        
-        document.querySelectorAll('.ql-size').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (currentSelectionRange && currentSelectionRange.length > 0) {
-                    const value = btn.value;
-                    let newSize;
-                    const format = quill.getFormat(currentSelectionRange.index, currentSelectionRange.length);
-                    const currentSize = format.size || 'normal';
-
-                    if (value === '+1') {
-                        if (currentSize === 'small') newSize = false;
-                        else if (currentSize === 'normal' || !currentSize) newSize = 'large';
-                        else if (currentSize === 'large') newSize = 'huge';
-                        else newSize = 'huge';
-                    } else if (value === '-1') {
-                        if (currentSize === 'huge') newSize = 'large';
-                        else if (currentSize === 'large') newSize = false;
-                        else if (currentSize === 'normal' || !currentSize) newSize = 'small';
-                        else newSize = 'small';
-                    }
-                    quill.format('size', newSize, Quill.sources.USER);
-                }
-            });
         });
 
     </script>
