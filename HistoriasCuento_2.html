@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Cuentos e Historias</title>
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <title>La Cueva de los Dinosaurios</title>
+    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
         .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
@@ -26,11 +27,31 @@
         .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
         .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .story-list { list-style: none; padding: 0; }
-        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
-        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
         
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+        .btn-tab.active { background-color: #4f46e5; color: white; }
+        .download-btn { background-color: #10b981; }
+        #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
+
+        /* Estilos de la nueva interfaz */
+        .story-list-container { padding-top: 20px; }
+        .story-card { background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e5e7eb; cursor: pointer; transition: background-color 0.2s; }
+        .story-card:hover { background-color: #f3f4f6; }
+        .story-card h3 { font-size: 1.25rem; font-weight: 600; color: #1f2937; margin: 0; }
+        .story-card p { font-size: 0.875rem; color: #6b7280; margin: 5px 0 0; }
+        .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        #searchInput { flex-grow: 1; }
+        
+        #single-story-view .story-content {
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            background-color: #fff;
+        }
+
         /* Estilos para hacer el video responsivo */
         .video-wrapper {
             position: relative;
@@ -49,69 +70,28 @@
             height: 100%;
         }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
-        .btn-tab.active { background-color: #4f46e5; color: white; }
-        .download-btn { background-color: #10b981; }
-        #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
-
-#editor {
-  border: 1px solid #ccc;
-  font-family: 'Open Sans', Helvetica, sans-serif;
-  font-size: 1.2em;
-  height: 180px;
-  margin: 0 auto;
-  width: 450px;
-}
-
-#tooltip-controls, #sidebar-controls {
-  text-align: center;
-}
-
-button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: inline-block;
-  font-size: 18px;
-  padding: 0;
-  height: 32px;
-  width: 32px;
-  text-align: center;
-}
-button:active, button:focus {
-  outline: none;
-}
-
-
-#editor h1 + p,
-#editor h2 + p {
-  margin-top: 0.5em; 
-}
-#editor blockquote {
-  border-left: 4px solid #111;
-  padding-left: 1em;
-}
     </style>
 </head>
 <body>
-
-
-    
     <div class="container">
-        <h1>Editor de Cuentos e Historias</h1>
+        <h1>La Cueva de los Dinosaurios</h1>
+
         <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn-tab active" data-tab="create">Crear Nuevo Cuento</button>
-            <button class="btn-tab" data-tab="view">Ver Todos los Cuentos</button>
+            <button class="btn-tab active" data-tab="list-view">Ver Cuentos</button>
+            <button class="btn-tab" data-tab="create-view">Crear Cuento</button>
         </nav>
 
-
-
-
-<script type="module" src="/index.js"></script>
+        <div id="list-view" class="tab-content active">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="form-input" placeholder="Buscar por título o contenido...">
+                <button id="searchButton" class="btn" style="width: auto;">Buscar</button>
+            </div>
+            <div id="cuentos-list" class="story-list-container">
+                <p>Cargando cuentos...</p>
+            </div>
+        </div>
         
-        <div id="create-tab" class="tab-content active">
+        <div id="create-view" class="tab-content">
             <form id="cuentoForm">
                 <div style="margin-bottom: 1rem;">
                     <label for="titulo" class="form-label">Título:</label>
@@ -119,33 +99,7 @@ button:active, button:focus {
                 </div>
                 <div style="margin-bottom: 1rem;">
                     <label class="form-label">Contenido:</label>
-
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.js"></script>
-
-<link href="/styles.css" rel="stylesheet">
-
-<div id="tooltip-controls">
-  <button id="bold-button"><i class="fa fa-bold"></i></button>
-  <button id="italic-button"><i class="fa fa-italic"></i></button>
-  <button id="link-button"><i class="fa fa-link"></i></button>
-  <button id="blockquote-button"><i class="fa fa-quote-right"></i></button>
-  <button id="header-1-button"><i class="fa fa-header"><sub>1</sub></i></button>
-  <button id="header-2-button"><i class="fa fa-header"><sub>2</sub></i></button>
-</div>
-<div id="sidebar-controls">
-  <button id="image-button"><i class="fa fa-camera"></i></button>
-  <button id="video-button"><i class="fa fa-play"></i></button>
-  <button id="tweet-button"><i class="fa fa-twitter"></i></button>
-  <button id="divider-button"><i class="fa fa-minus"></i></button>
-</div>
-
-<div id="editor">Tell your story...</div>
-
-<script type="module" src="/index.js"></script>
-
-
-                    
+                    <div id="editor-container"></div>
                 </div>
                 <button type="submit" class="btn">
                     <span id="buttonText">Guardar Cuento</span>
@@ -154,49 +108,87 @@ button:active, button:focus {
                 <div id="messageBox" class="message-box"></div>
             </form>
         </div>
-        <div id="view-tab" class="tab-content">
-            <h2>Cuentos Publicados</h2>
-            <div id="cuentos-list" class="story-list">
-                <p>Cargando cuentos...</p>
-            </div>
+
+        <div id="single-story-view" class="tab-content">
+            <button id="backToListBtn" class="btn" style="width: auto; margin-bottom: 20px;">
+                <i class="fa-solid fa-arrow-left"></i> Volver a la lista
+            </button>
+            <div id="story-details">
+                </div>
         </div>
+
     </div>
+
     <script>
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
 
-        document.querySelectorAll('button').forEach((button) => {
-  button.addEventListener('click', () => {
-    alert('Click!');
-  });
-});
-
-const quill = new Quill('#editor');
-
-        // Inicializar Quill
-        const quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'Escribe tu historia aquí...',
-            modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline', 'strike'],        // Estilos de texto
-                    ['blockquote', 'code-block'],
-                    [{ 'header': 1 }, { 'header': 2 }],               // Títulos
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'script': 'sub'}, { 'script': 'super' }],      // Sub/superíndice
-                    [{ 'indent': '-1'}, { 'indent': '+1' }],          // Sangría
-                    [{ 'direction': 'rtl' }],                         // Dirección del texto
-                    [{ 'size': ['small', false, 'large', 'huge'] }],  // Tamaños
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    [{ 'color': [] }, { 'background': [] }],          // Colores
-                    [{ 'font': [] }],
-                    [{ 'align': [] }],
-                    ['link', 'image', 'video'],                        // Enlaces, imágenes y vídeos
-                    ['clean']                                         // Limpiar formato
-                ]
+        let quill = null; // La instancia del editor se inicializa solo si se necesita.
+        
+        // Función para inicializar Quill si la vista de creación está activa
+        function initializeQuill() {
+            if (!quill) {
+                quill = new Quill('#editor-container', {
+                    theme: 'snow',
+                    placeholder: 'Escribe tu historia aquí...',
+                    modules: {
+                        toolbar: [
+                            [{ 'font': [] }],
+                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                            [{ 'align': [] }],
+                            'bold', 'italic', 'underline', 'strike',
+                            { 'color': [] }, { 'background': [] },
+                            'blockquote', 'code-block',
+                            { 'list': 'ordered'}, { 'list': 'bullet' },
+                            { 'indent': '-1'}, { 'indent': '+1' },
+                            'link', 'image', 'video',
+                            'clean'
+                        ]
+                    }
+                });
+                quill.root.addEventListener('paste', handleImagePaste);
             }
-        });
+        }
+        
+        function handleImagePaste(event) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            const range = quill.getSelection();
+                            quill.insertEmbed(range.index, 'text', 'Cargando imagen...');
+                            fetch(APP_SCRIPT_URL, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                quill.deleteText(range.index, 18);
+                                if (result.estado === 'éxito') {
+                                    quill.insertEmbed(range.index, 'image', result.url);
+                                } else {
+                                    alert('Error al subir la imagen: ' + result.mensaje);
+                                }
+                            })
+                            .catch(error => {
+                                alert('Fallo en la comunicación con el servidor: ' + error.message);
+                            });
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        }
 
+        // Manejar el envío del formulario
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
@@ -233,12 +225,19 @@ const quill = new Quill('#editor');
                 loadingSpinner.style.display = 'none';
             });
         });
+
         function showMessage(type, message) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
             messageBox.className = 'message-box ' + type;
             messageBox.style.display = 'block';
         }
+        
+        function formatFecha(fechaISO) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(fechaISO).toLocaleDateString('es-ES', options);
+        }
+
         // Nueva función para convertir enlaces de YouTube en iframes
         function embedYouTubeVideos(htmlContent) {
             const tempDiv = document.createElement('div');
@@ -264,10 +263,16 @@ const quill = new Quill('#editor');
             return tempDiv.innerHTML;
         }
 
-        function cargarCuentos() {
+        // Manejar la carga de cuentos
+        function cargarCuentos(keyword = '') {
             const cuentosList = document.getElementById('cuentos-list');
             cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
-            const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
+
+            let url = `${APP_SCRIPT_URL}?action=listarCuentos`;
+            if (keyword) {
+                url = `${APP_SCRIPT_URL}?action=buscarCuentos&keyword=${encodeURIComponent(keyword)}`;
+            }
+            
             fetch(url)
                 .then(response => response.json())
                 .then(result => {
@@ -275,22 +280,17 @@ const quill = new Quill('#editor');
                         cuentosList.innerHTML = '';
                         if (result.cuentos && result.cuentos.length > 0) {
                             result.cuentos.forEach((cuento, index) => {
-                                const storyId = `story-${index}`;
-                                const storyDiv = document.createElement('div');
-                                storyDiv.id = storyId;
-                                storyDiv.className = 'story-item';
-                                // Convertir enlaces de YouTube a iframes antes de mostrar el contenido
-                                const contenidoConVideos = embedYouTubeVideos(cuento.contenido);
-                                storyDiv.innerHTML = `
+                                const storyCard = document.createElement('div');
+                                storyCard.className = 'story-card';
+                                storyCard.innerHTML = `
                                     <h3>${cuento.titulo}</h3>
-                                    <p style="font-size: 0.9rem; color: #6b7280;">Publicado el: ${new Date(cuento.fecha).toLocaleString()}</p>
-                                    <div class="story-content">${contenidoConVideos}</div>
-                                    <button class="btn download-btn" data-story-id="${storyId}" style="margin-top: 15px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                    <p>${formatFecha(cuento.fecha)}</p>
                                 `;
-                                cuentosList.appendChild(storyDiv);
+                                storyCard.addEventListener('click', () => mostrarHistoria(cuento));
+                                cuentosList.appendChild(storyCard);
                             });
                         } else {
-                            cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
+                            cuentosList.innerHTML = '<p>No se encontraron cuentos.</p>';
                         }
                     } else {
                         cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
@@ -300,12 +300,34 @@ const quill = new Quill('#editor');
                     cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
                 });
         }
-        function generarPDF(storyId) {
-            const element = document.getElementById(storyId);
-            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
+        
+        function mostrarHistoria(cuento) {
+            const storyDetails = document.getElementById('story-details');
+            const contenidoConVideos = embedYouTubeVideos(cuento.contenido);
+            storyDetails.innerHTML = `
+                <h2>${cuento.titulo}</h2>
+                <p style="font-size: 0.9rem; color: #6b7280;">Publicado el: ${new Date(cuento.fecha).toLocaleString()}</p>
+                <div class="story-content">${contenidoConVideos}</div>
+                <button id="downloadPdfBtn" class="btn download-btn" style="margin-top: 20px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
+            `;
+            document.getElementById('downloadPdfBtn').addEventListener('click', () => generarPDF(storyDetails));
+            
+            // Cambiar a la vista detallada
+            document.getElementById('list-view').classList.remove('active');
+            document.getElementById('create-view').classList.remove('active');
+            document.getElementById('single-story-view').classList.add('active');
+        }
+
+        document.getElementById('backToListBtn').addEventListener('click', () => {
+            document.getElementById('list-view').classList.add('active');
+            document.getElementById('single-story-view').classList.remove('active');
+            cargarCuentos(); // Recargar la lista
+        });
+
+        function generarPDF(element) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
-            const filename = `${element.querySelector('h3').textContent}.pdf`;
+            const filename = `${element.querySelector('h2').textContent}.pdf`;
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const imgProps = doc.getImageProperties(imgData);
@@ -325,140 +347,31 @@ const quill = new Quill('#editor');
                 console.error("Error generando PDF:", error);
             });
         }
-        document.getElementById('cuentos-list').addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('download-btn')) {
-                const storyId = e.target.dataset.storyId;
-                generarPDF(storyId);
-            }
-        });
+        
+        // Manejar el cambio de pestañas
         document.querySelectorAll('.btn-tab').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 this.classList.add('active');
                 const tabId = this.dataset.tab;
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                if (tabId === 'view') {
+                document.getElementById(tabId).classList.add('active');
+                if (tabId === 'list-view') {
                     cargarCuentos();
+                } else if (tabId === 'create-view') {
+                    initializeQuill();
                 }
             });
         });
-        document.querySelector('.btn-tab').click();
-        quill.root.addEventListener('paste', (event) => {
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                if (item.type.indexOf('image') === 0) {
-                    const blob = item.getAsFile();
-                    if (blob) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const base64data = e.target.result;
-                            const formData = new FormData();
-                            formData.append('action', 'subirImagenBase64');
-                            formData.append('imagen', base64data);
-                            const range = quill.getSelection();
-                            quill.insertEmbed(range.index, 'text', 'Cargando imagen...');
-                            fetch(APP_SCRIPT_URL, {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(result => {
-                                quill.deleteText(range.index, 18);
-                                if (result.estado === 'éxito') {
-                                    quill.insertEmbed(range.index, 'image', result.url);
-                                } else {
-                                    alert('Error al subir la imagen: ' + result.mensaje);
-                                }
-                            })
-                            .catch(error => {
-                                alert('Fallo en la comunicación con el servidor: ' + error.message);
-                            });
-                        };
-                        reader.readAsDataURL(blob);
-                    }
-                }
-            }
+
+        // Manejar el botón de búsqueda
+        document.getElementById('searchButton').addEventListener('click', () => {
+            const keyword = document.getElementById('searchInput').value;
+            cargarCuentos(keyword);
         });
-
-import './formats/boldBlot.js';
-import './formats/italicBlot.js';
-import './formats/linkBlot.js';
-import './formats/blockquoteBlot.js';
-import './formats/headerBlot.js';
-import './formats/dividerBlot.js';
-import './formats/imageBlot.js';
-import './formats/videoBlot.js';
-import './formats/tweetBlot.js';
-
-const onClick = (selector, callback) => {
-  document.querySelector(selector).addEventListener('click', callback);
-};
-
-onClick('#bold-button', () => {
-  quill.format('bold', true);
-});
-
-onClick('#italic-button', () => {
-  quill.format('italic', true);
-});
-
-onClick('#link-button', () => {
-  const value = prompt('Enter link URL');
-  quill.format('link', value);
-});
-
-onClick('#blockquote-button', () => {
-  quill.format('blockquote', true);
-});
-
-onClick('#header-1-button', () => {
-  quill.format('header', 1);
-});
-
-onClick('#header-2-button', () => {
-  quill.format('header', 2);
-});
-
-onClick('#divider-button', () => {
-  const range = quill.getSelection(true);
-  quill.insertText(range.index, '\n', Quill.sources.USER);
-  quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
-  quill.setSelection(range.index + 2, Quill.sources.SILENT);
-});
-
-onClick('#image-button', () => {
-  const range = quill.getSelection(true);
-  quill.insertText(range.index, '\n', Quill.sources.USER);
-  quill.insertEmbed(range.index + 1, 'image', {
-    alt: 'Quill Cloud',
-    url: 'https://quilljs.com/0.20/assets/images/cloud.png'
-  }, Quill.sources.USER);
-  quill.setSelection(range.index + 2, Quill.sources.SILENT);
-});
-
-onClick('#video-button', () => {
-  let range = quill.getSelection(true);
-  quill.insertText(range.index, '\n', Quill.sources.USER);
-  let url = 'https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0';
-  quill.insertEmbed(range.index + 1, 'video', url, Quill.sources.USER);
-  quill.formatText(range.index + 1, 1, { height: '170', width: '400' });
-  quill.setSelection(range.index + 2, Quill.sources.SILENT);
-});
-
-onClick('#tweet-button', () => {
-  const range = quill.getSelection(true);
-  const id = '464454167226904576';
-  quill.insertText(range.index, '\n', Quill.sources.USER);
-  quill.insertEmbed(range.index + 1, 'tweet', id, Quill.sources.USER);
-  quill.setSelection(range.index + 2, Quill.sources.SILENT);
-});
-
-const quill = new Quill('#editor');
-
-
         
+        // Cargar la lista de cuentos al inicio
+        document.querySelector('.btn-tab[data-tab="list-view"]').click();
     </script>
 </body>
 </html>
