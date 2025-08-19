@@ -594,7 +594,7 @@
         <nav class="flex border-b border-gray-200 -mt-8 mb-8 overflow-x-auto">
           <button class="main-tab-button" data-main-tab="home">Inicio</button>
           <button class="main-tab-button" data-main-tab="diary">Anotaciones</button>
-            <button class="main-tab-button" data-main-tab="stories">Stories</button>
+            <button class="main-tab-button" data-main-tab="Ensayos">Ensayos</button>
           <button class="main-tab-button" data-main-tab="noticias">Noticias Fecha</button>
             <button class="main-tab-button" data-main-tab="wind">Winds</button>
             <button class="main-tab-button" data-main-tab="traffic">Traffic</button>
@@ -1034,7 +1034,7 @@
 
 
         <!--  Sección para Ensayos -->
-        <div id="mainStoriesSection" class="main-tab-content hidden">
+        <div id="mainEnsayosSection" class="main-tab-content hidden">
               <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mis Ensayos</h2>
             
               <input type="text" id="storyTitle" placeholder="Título de la borador" class="form-input mb-4">
@@ -1622,7 +1622,7 @@ function showMainTab(tabName) {
     mainProjectsSection.classList.add('hidden');
     document.getElementById('mainProfileSection').classList.add('hidden');
     document.getElementById('mainRadioSection').classList.add('hidden');
-    document.getElementById('mainStoriesSection').classList.add('hidden');
+    document.getElementById('mainEnsayosSection').classList.add('hidden');
     document.getElementById('mainTimeConverterSection').classList.add('hidden');
     document.getElementById('mainTimeElapsedSection').classList.add('hidden');
     document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
@@ -1678,9 +1678,9 @@ function showMainTab(tabName) {
     }  else if (tabName === 'traffic') {
         document.getElementById('maintrafficSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="traffic"]').classList.add('active');
-    } else if (tabName === 'stories') {
-        document.getElementById('mainStoriesSection').classList.remove('hidden');
-        document.querySelector('[data-main-tab="stories"]').classList.add('active');
+    } else if (tabName === 'Ensayos') {
+        document.getElementById('mainEnsayosSection').classList.remove('hidden');
+        document.querySelector('[data-main-tab="Ensayos"]').classList.add('active');
         cargarEnsayos();
     } else if (tabName === 'time-converter') {
         document.getElementById('mainTimeConverterSection').classList.remove('hidden');
@@ -1828,7 +1828,7 @@ function showMainTab(tabName) {
   latestStoryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última Ensayos...</p>';
   
   try {
-    const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL_STORIES}?action=listarEnsayos`);
+    const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL_Ensayos}?action=listarEnsayos`);
     const result = await response.json();
 
     if (result.status === 'success' && result.Ensayos.length > 0) {
@@ -2706,11 +2706,11 @@ dropZone.addEventListener("drop", e => {
 </script>
 
        
-        <!-- Scripts necesarios (Quill y funcionalidad) Stories -->
+        <!-- Scripts necesarios (Quill y funcionalidad) Ensayos -->
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <script>
-     const GOOGLE_APPS_SCRIPT_URL_STORIES = 'https://script.google.com/macros/s/AKfycbxlsi6XOluJVVmmZ-qwAN_1QlEPg-6qEuaBSKoUwiMiPGHzCHY_H-QD34Fg-Ita2Bli/exec'; 
+     const GOOGLE_APPS_SCRIPT_URL_Ensayos = 'https://script.google.com/macros/s/AKfycbxlsi6XOluJVVmmZ-qwAN_1QlEPg-6qEuaBSKoUwiMiPGHzCHY_H-QD34Fg-Ita2Bli/exec'; 
 
 let quill;
 document.addEventListener("DOMContentLoaded", () => {
@@ -2733,7 +2733,7 @@ document.addEventListener("DOMContentLoaded", () => {
         form.append('action', 'subirImagen');
         form.append('imagen', base64);
 
-        const res = await fetch(GOOGLE_APPS_SCRIPT_URL_STORIES, {
+        const res = await fetch(GOOGLE_APPS_SCRIPT_URL_Ensayos, {
           method: 'POST',
           body: form
         });
@@ -2755,7 +2755,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     
-  document.querySelector('[data-main-tab="stories"]').addEventListener('click', cargarEnsayos);
+  document.querySelector('[data-main-tab="Ensayos"]').addEventListener('click', cargarEnsayos);
 });
 
 function mostrarMensajeEnsayos(msg, tipo) {
@@ -2811,7 +2811,7 @@ function guardarEnsayos() {
   form.append("titulo", titulo);
   form.append("contenido", contenido);
 
-  fetch(GOOGLE_APPS_SCRIPT_URL_STORIES, { method: 'POST', body: form })
+  fetch(GOOGLE_APPS_SCRIPT_URL_Ensayos, { method: 'POST', body: form })
     .then(res => res.json())
     .then(data => {
       if (data.status === 'success') {
@@ -2833,7 +2833,7 @@ async function cargarEnsayos() {
   contenedor.innerHTML = '<p class="text-center text-gray-500">Cargando títulos de Ensayos...</p>';
 
   try {
-    const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL_STORIES}?action=listarEnsayos`);
+    const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL_Ensayos}?action=listarEnsayos`);
     const result = await response.json();
 
     if (result.status === 'success') {
@@ -2881,7 +2881,7 @@ async function cargarEnsayos() {
 
   contenedor.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
 
-  const url = `${GOOGLE_APPS_SCRIPT_URL_STORIES}?action=buscarEnsayos&keyword=${encodeURIComponent(keyword)}&desde=${desde}&hasta=${hasta}`;
+  const url = `${GOOGLE_APPS_SCRIPT_URL_Ensayos}?action=buscarEnsayos&keyword=${encodeURIComponent(keyword)}&desde=${desde}&hasta=${hasta}`;
 
   try {
     const res = await fetch(url);
@@ -3138,6 +3138,7 @@ function translateNumber() {
 
 </body>
 </html>
+
 
 
 
