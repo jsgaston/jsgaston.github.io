@@ -156,37 +156,42 @@
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
         let quill = null;
 
+        // --- LÓGICA DE QUIlLL ---
+        // Se ejecuta una vez para asegurar que Quill se inicialice correctamente
         function initializeQuill() {
-            if (!quill) {
-                // Registrar los Blots personalizados para Quill 2.0.3
-                const { BlockEmbed } = Quill.import('parchment');
+            if (quill) return;
 
-                class DividerBlot extends BlockEmbed {
-                    static blotName = 'divider';
-                    static tagName = 'hr';
-                }
+            // Importar y registrar Blots personalizados para Quill 2.0.3
+            const { BlockEmbed } = Quill.import('parchment');
 
-                class VideoBlot extends BlockEmbed {
-                    static blotName = 'video';
-                    static tagName = 'iframe';
-                    
-                    static create(value) {
-                        const node = super.create();
-                        node.setAttribute('src', value);
-                        node.setAttribute('frameborder', '0');
-                        node.setAttribute('allowfullscreen', true);
-                        return node;
-                    }
-                    static value(domNode) {
-                        return domNode.getAttribute('src');
-                    }
-                }
+            class DividerBlot extends BlockEmbed {
+                static blotName = 'divider';
+                static tagName = 'hr';
+            }
 
-                Quill.register({
-                    'formats/divider': DividerBlot,
-                    'formats/video': VideoBlot
-                });
+            class VideoBlot extends BlockEmbed {
+                static blotName = 'video';
+                static tagName = 'iframe';
                 
+                static create(value) {
+                    const node = super.create();
+                    node.setAttribute('src', value);
+                    node.setAttribute('frameborder', '0');
+                    node.setAttribute('allowfullscreen', true);
+                    return node;
+                }
+                static value(domNode) {
+                    return domNode.getAttribute('src');
+                }
+            }
+
+            Quill.register({
+                'formats/divider': DividerBlot,
+                'formats/video': VideoBlot
+            });
+            
+            // Inicializar el editor de Quill
+            try {
                 quill = new Quill('#editor-container', {
                     theme: 'snow',
                     placeholder: 'Escribe tu historia aquí...',
@@ -196,70 +201,76 @@
                         }
                     }
                 });
-                
-                document.querySelector('#insert-image-button').addEventListener('click', () => {
-                    const input = document.createElement('input');
-                    input.setAttribute('type', 'file');
-                    input.setAttribute('accept', 'image/*');
-                    input.addEventListener('change', (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                const base64data = e.target.result;
-                                const formData = new FormData();
-                                formData.append('action', 'subirImagenBase64');
-                                formData.append('imagen', base64data);
-                                
-                                const range = quill.getSelection(true);
-                                quill.insertText(range.index, ' ', Quill.sources.USER);
-                                quill.setSelection(range.index + 1);
-                                quill.insertEmbed(range.index, 'image', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
-                                
-                                fetch(APP_SCRIPT_URL, { method: 'POST', body: formData })
-                                    .then(response => response.json())
-                                    .then(result => {
-                                        if (result.estado === 'éxito') {
-                                            const blot = Quill.find(quill.getSelection().index - 1);
-                                            if (blot) {
-                                                blot.domNode.src = result.url;
-                                            }
-                                        } else {
-                                            alert('Error al subir la imagen: ' + result.mensaje);
-                                            quill.deleteText(quill.getSelection().index - 1, 1);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        alert('Fallo en la comunicación con el servidor: ' + error.message);
-                                        quill.deleteText(quill.getSelection().index - 1, 1);
-                                    });
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
-                    input.click();
-                });
-                
-                document.querySelector('#insert-video-button').addEventListener('click', () => {
-                    const url = prompt("Introduce la URL del video de YouTube:");
-                    if (url) {
-                        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                        const match = url.match(youtubeRegex);
-                        if (match && match[1]) {
-                            const videoId = match[1];
-                            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                console.log("Quill inicializado correctamente.");
+            } catch (e) {
+                console.error("Error al inicializar Quill:", e);
+                alert("Hubo un error al iniciar el editor. Por favor, revisa la consola para más detalles.");
+                return; // Detener la ejecución si falla
+            }
+            
+            // Manejadores de eventos para los botones personalizados
+            document.querySelector('#insert-image-button').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            
                             const range = quill.getSelection(true);
-                            quill.insertText(range.index, '\n', 'silent');
-                            quill.insertEmbed(range.index + 1, 'video', embedUrl, 'user');
-                            quill.setSelection(range.index + 2, 'silent');
-                        } else {
-                            alert("URL de YouTube no válida.");
-                        }
+                            quill.insertText(range.index, ' ', 'user');
+                            quill.setSelection(range.index + 1);
+                            quill.insertEmbed(range.index, 'image', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+                            
+                            fetch(APP_SCRIPT_URL, { method: 'POST', body: formData })
+                                .then(response => response.json())
+                                .then(result => {
+                                    if (result.estado === 'éxito') {
+                                        const blot = Quill.find(quill.getSelection().index - 1);
+                                        if (blot) {
+                                            blot.domNode.src = result.url;
+                                        }
+                                    } else {
+                                        alert('Error al subir la imagen: ' + result.mensaje);
+                                        quill.deleteText(quill.getSelection().index - 1, 1);
+                                    }
+                                })
+                                .catch(error => {
+                                    alert('Fallo en la comunicación con el servidor: ' + error.message);
+                                    quill.deleteText(quill.getSelection().index - 1, 1);
+                                });
+                        };
+                        reader.readAsDataURL(file);
                     }
                 });
+                input.click();
+            });
+            
+            document.querySelector('#insert-video-button').addEventListener('click', () => {
+                const url = prompt("Introduce la URL del video de YouTube:");
+                if (url) {
+                    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                    const match = url.match(youtubeRegex);
+                    if (match && match[1]) {
+                        const videoId = match[1];
+                        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                        const range = quill.getSelection(true);
+                        quill.insertText(range.index, '\n', 'silent');
+                        quill.insertEmbed(range.index + 1, 'video', embedUrl, 'user');
+                        quill.setSelection(range.index + 2, 'silent');
+                    } else {
+                        alert("URL de YouTube no válida.");
+                    }
+                }
+            });
 
-                quill.root.addEventListener('paste', handleImagePaste);
-            }
+            quill.root.addEventListener('paste', handleImagePaste);
         }
         
         function handleImagePaste(event) {
@@ -300,6 +311,7 @@
             }
         }
 
+        // --- LÓGICA DE TABS, FORMULARIO Y PDF (sin cambios significativos) ---
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
@@ -443,14 +455,15 @@
                 this.classList.add('active');
                 const tabId = this.dataset.tab;
                 document.getElementById(`${tabId}-tab`).classList.add('active');
-                if (tabId === 'view') {
-                    cargarCuentos();
-                } else if (tabId === 'create') {
+                if (tabId === 'create') {
                     initializeQuill();
+                } else if (tabId === 'view') {
+                    cargarCuentos();
                 }
             });
         });
         
+        // Inicializar el editor cuando la página carga
         document.querySelector('.btn-tab').click();
     </script>
 </body>
