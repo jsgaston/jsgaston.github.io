@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Cuentos e Historias (estilo Medium)</title>
+    <title>Editor de Cuentos e Historias (estilo Medium mejorado)</title>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
@@ -15,58 +15,371 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
-        .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
-        h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
-        h2 { font-size: 1.5rem; color: #1f2937; margin-bottom: 1rem; }
-        .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
-        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
-        .btn:hover { transform: scale(1.02); }
-        .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
-        .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
-        .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
-        .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .story-list { list-style: none; padding: 0; }
-        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
-        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin-top: 15px; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
-        .btn-tab.active { background-color: #4f46e5; color: white; }
-        .download-btn { background-color: #10b981; }
-        blockquote { border-left: 4px solid #ccc; margin: 1.5em 10px; padding: 0.5em 10px; }
-        blockquote p { display: inline; }
-        hr { border: none; height: 1px; background-color: #ccc; margin: 20px 0; }
-        .ql-snow .ql-editor h1 { font-size: 2em; line-height: 1.5em; font-weight: 700; margin-bottom: 0.5em; }
-        .ql-snow .ql-editor h2 { font-size: 1.5em; line-height: 1.5em; font-weight: 600; margin-bottom: 0.5em; }
-        .tweet { margin: 1.5em 0; }
-        #editor-container { border: none !important; padding: 2.5rem 0; line-height: 1.75rem; font-size: 1.125rem; color: #333; }
-        #editor-container .ql-editor:focus { outline: none; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f3f4f6; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .container { 
+            background-color: #ffffff; 
+            padding: 2.5rem; 
+            border-radius: 0.75rem; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
+            max-width: 800px; 
+            margin: 0 auto;
+            border: 1px solid #e5e7eb; 
+        }
+        h1 { 
+            color: #1a202c; 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-bottom: 1.5rem; 
+            text-align: center; 
+        }
+        h2 { 
+            font-size: 1.5rem; 
+            color: #1f2937; 
+            margin-bottom: 1rem; 
+        }
+        .form-label { 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            display: block; 
+            color: #374151; 
+        }
+        .form-input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            color: #1f2937; 
+            background-color: #f9fafb; 
+        }
+        .btn { 
+            background-color: #4f46e5; 
+            color: white; 
+            padding: 14px 24px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background-color 0.2s, transform 0.1s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            width: 100%; 
+            margin-top: 1.5rem; 
+            border: none;
+        }
+        .btn:hover { 
+            transform: scale(1.02); 
+        }
+        .message-box { 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            margin-top: 20px; 
+            font-weight: 500; 
+            display: none; 
+        }
+        .message-box.success { 
+            background-color: #d1fae5; 
+            color: #065f46; 
+            border: 1px solid #10b981; 
+        }
+        .message-box.error { 
+            background-color: #fee2e2; 
+            color: #991b1b; 
+            border: 1px solid #ef4444; 
+        }
+        .loading-spinner { 
+            border: 4px solid rgba(255, 255, 255, 0.3); 
+            border-top: 4px solid #ffffff; 
+            border-radius: 50%; 
+            width: 24px; 
+            height: 24px; 
+            animation: spin 1s linear infinite; 
+            display: none; 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        .story-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .story-item { 
+            background-color: #fafafa; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+        }
+        .story-item h3 { 
+            font-size: 1.5rem; 
+            font-weight: 600; 
+            color: #1f2937; 
+            margin-bottom: 10px; 
+        }
+        .story-content img { 
+            max-width: 100%; 
+            height: auto; 
+            display: block; 
+            margin: 15px auto; 
+            border-radius: 8px; 
+        }
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            overflow: hidden; 
+            max-width: 100%; 
+            background: #000; 
+            margin-top: 15px; 
+        }
+        .video-wrapper iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+        }
+        .tab-content { 
+            display: none; 
+        }
+        .tab-content.active { 
+            display: block; 
+        }
+        .btn-tab { 
+            background-color: #e5e7eb; 
+            color: #4b5563; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: background-color 0.2s; 
+        }
+        .btn-tab.active { 
+            background-color: #4f46e5; 
+            color: white; 
+        }
+        .download-btn { 
+            background-color: #10b981; 
+        }
+        blockquote { 
+            border-left: 4px solid #ccc; 
+            margin: 1.5em 10px; 
+            padding: 0.5em 10px; 
+            font-style: italic;
+            color: #555;
+        }
+        blockquote p { 
+            display: inline; 
+        }
+        hr { 
+            border: none; 
+            height: 1px; 
+            background-color: #ccc; 
+            margin: 20px 0; 
+        }
+        .ql-snow .ql-editor h1 { 
+            font-size: 2em; 
+            line-height: 1.5em; 
+            font-weight: 700; 
+            margin-bottom: 0.5em; 
+        }
+        .ql-snow .ql-editor h2 { 
+            font-size: 1.5em; 
+            line-height: 1.5em; 
+            font-weight: 600; 
+            margin-bottom: 0.5em; 
+        }
+        .tweet { 
+            margin: 1.5em 0; 
+        }
+        #editor-container { 
+            border: none !important; 
+            padding: 2.5rem 0; 
+            line-height: 1.75rem; 
+            font-size: 1.125rem; 
+            color: #333; 
+            min-height: 300px;
+        }
+        #editor-container .ql-editor:focus { 
+            outline: none; 
+        }
         /* Barra flotante mejorada */
-        .floating-toolbar { display: none; position: absolute; background: #292929; color: white; padding: 5px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; }
-        .floating-toolbar button { background: none; border: none; color: #fff; font-size: 1rem; padding: 8px; cursor: pointer; transition: background 0.2s; line-height: 1; }
-        .floating-toolbar button:hover { background: #555; border-radius: 3px; }
-        .ql-snow { border: 1px solid #d1d5db; }
+        .floating-toolbar { 
+            position: fixed; 
+            background: #292929; 
+            color: white; 
+            padding: 8px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+            z-index: 1000; 
+            display: none;
+            transform: translateX(-50%);
+        }
+        .floating-toolbar button { 
+            background: none; 
+            border: none; 
+            color: #fff; 
+            font-size: 1rem; 
+            padding: 8px; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            line-height: 1; 
+            border-radius: 4px;
+            width: 36px;
+            height: 36px;
+        }
+        .floating-toolbar button:hover { 
+            background: #555; 
+        }
+        .ql-snow { 
+            border: 1px solid #d1d5db; 
+        }
         /* Botón '+' en la misma línea del cursor */
-        .add-block-container { position: relative; }
-        .add-block-btn { position: absolute; top: 0; left: -35px; display: none; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 30px; height: 30px; text-align: center; line-height: 30px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; }
-        .add-block-btn i { color: #ccc; font-size: 16px; }
+        .add-block-container { 
+            position: relative; 
+        }
+        .add-block-btn { 
+            position: absolute; 
+            top: 0; 
+            left: -40px; 
+            display: none; 
+            background: #fff; 
+            border: 1px solid #ccc; 
+            border-radius: 50%; 
+            width: 30px; 
+            height: 30px; 
+            text-align: center; 
+            line-height: 30px; 
+            cursor: pointer; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            z-index: 5; 
+        }
+        .add-block-btn i { 
+            color: #666; 
+            font-size: 14px; 
+        }
+        .add-block-btn:hover {
+            background: #f0f0f0;
+        }
         /* Menú desplegable de opciones */
-        .add-block-menu { position: absolute; left: -35px; top: 35px; background: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 6; display: none; padding: 10px; }
-        .add-block-menu button, .add-block-menu .input-group button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer; transition: background 0.2s; }
-        .add-block-menu button:hover, .add-block-menu .input-group button:hover { background: #f0f0f0; }
-        .add-block-menu .input-group { margin-top: 10px; display: flex; align-items: center; }
-        .add-block-menu input { flex-grow: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 5px; }
-        .ql-container.ql-snow { border: none; }
-        .ql-snow .ql-editor { font-family: 'Inter', sans-serif; font-size: 1.125rem; line-height: 1.75rem; color: #333; }
-        .ql-video { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .ql-video iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .ql-editor img { max-width: 100%; height: auto; display: block; margin: 1.5em auto; border-radius: 8px; }
+        .add-block-menu { 
+            position: absolute; 
+            left: -35px; 
+            top: 35px; 
+            background: #fff; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            z-index: 100; 
+            display: none; 
+            padding: 10px; 
+            width: 200px;
+        }
+        .add-block-menu button, .add-block-menu .input-group button { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            width: 100%; 
+            text-align: left; 
+            padding: 8px 12px; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            border-radius: 4px;
+            color: #333;
+            font-size: 14px;
+        }
+        .add-block-menu button:hover, .add-block-menu .input-group button:hover { 
+            background: #f0f0f0; 
+        }
+        .add-block-menu .input-group { 
+            margin-top: 10px; 
+            display: flex; 
+            align-items: center; 
+        }
+        .add-block-menu input { 
+            flex-grow: 1; 
+            padding: 8px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 4px; 
+            margin-right: 5px; 
+            font-size: 14px;
+        }
+        .ql-container.ql-snow { 
+            border: none; 
+        }
+        .ql-snow .ql-editor { 
+            font-family: 'Inter', sans-serif; 
+            font-size: 1.125rem; 
+            line-height: 1.75rem; 
+            color: #333; 
+            padding: 0;
+        }
+        .ql-video { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            overflow: hidden; 
+            margin: 1.5em 0;
+        }
+        .ql-video iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+        }
+        .ql-editor img { 
+            max-width: 100%; 
+            height: auto; 
+            display: block; 
+            margin: 1.5em auto; 
+            border-radius: 8px; 
+        }
+        .editor-wrapper {
+            position: relative;
+        }
+        .ql-toolbar.ql-snow {
+            border: none;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .editor-actions .btn {
+            width: auto;
+            margin-top: 0;
+        }
+        .code-block {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        .formula-block {
+            padding: 15px;
+            margin: 1.5em 0;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -82,7 +395,7 @@
                     <label for="titulo" class="form-label">Título:</label>
                     <input type="text" id="titulo" name="titulo" class="form-input" required>
                 </div>
-                <div style="margin-bottom: 1rem; position: relative;">
+                <div class="editor-wrapper">
                     <label class="form-label">Contenido:</label>
                     <div class="add-block-container">
                         <div id="editor-container"></div>
@@ -94,9 +407,10 @@
                                 <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
                                 <button id="show-video-input"><i class="fas fa-video"></i> Video</button>
                                 <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
-                                <button id="insert-code-btn"><i class="fas fa-code"></i> Código</button>
-                                <button id="insert-formula-btn"><i class="fas fa-superscript"></i> Fórmula</button>
-                                <button id="insert-divider-btn"><i class="fas fa-minus"></i> Divisor</button>
+                                <button id="insert-code-btn"><i class="fas fa-code"></i> Bloque de código</button>
+                                <button id="insert-formula-btn"><i class="fas fa-superscript"></i> Fórmula matemática</button>
+                                <button id="insert-divider-btn"><i class="fas fa-minus"></i> Línea divisora</button>
+                                <button id="insert-quote-btn"><i class="fas fa-quote-right"></i> Cita</button>
                                 <button id="close-menu-btn"><i class="fas fa-times"></i> Cerrar</button>
                             </div>
                             <div id="video-input-group" style="display:none;">
@@ -110,26 +424,33 @@
                         </div>
                     </div>
                     <div id="floating-toolbar" class="floating-toolbar">
-                        <button class="ql-bold"><i class="fas fa-bold"></i></button>
-                        <button class="ql-italic"><i class="fas fa-italic"></i></button>
-                        <button class="ql-underline"><i class="fas fa-underline"></i></button>
-                        <button class="ql-strike"><i class="fas fa-strikethrough"></i></button>
-                        <button class="ql-link-btn" id="link-btn"><i class="fas fa-link"></i></button>
-                        <button class="ql-header" value="1"><i class="fas fa-h1"></i></button>
-                        <button class="ql-header" value="2"><i class="fas fa-h2"></i></button>
-                        <button class="ql-blockquote"><i class="fas fa-quote-right"></i></button>
-                        <button class="ql-align" value=""><i class="fas fa-align-left"></i></button>
-                        <button class="ql-align" value="center"><i class="fas fa-align-center"></i></button>
-                        <button class="ql-align" value="right"><i class="fas fa-align-right"></i></button>
-                        <button class="ql-align" value="justify"><i class="fas fa-align-justify"></i></button>
-                        <button class="ql-list" value="bullet"><i class="fas fa-list-ul"></i></button>
-                        <button class="ql-list" value="ordered"><i class="fas fa-list-ol"></i></button>
+                        <button class="ql-bold" title="Negrita"><i class="fas fa-bold"></i></button>
+                        <button class="ql-italic" title="Cursiva"><i class="fas fa-italic"></i></button>
+                        <button class="ql-underline" title="Subrayado"><i class="fas fa-underline"></i></button>
+                        <button class="ql-strike" title="Tachado"><i class="fas fa-strikethrough"></i></button>
+                        <button class="ql-link-btn" id="link-btn" title="Enlace"><i class="fas fa-link"></i></button>
+                        <button class="ql-header" value="1" title="Título 1"><i class="fas fa-heading"></i><sup>1</sup></button>
+                        <button class="ql-header" value="2" title="Título 2"><i class="fas fa-heading"></i><sup>2</sup></button>
+                        <button class="ql-blockquote" title="Cita"><i class="fas fa-quote-right"></i></button>
+                        <button class="ql-code-block" title="Bloque de código"><i class="fas fa-code"></i></button>
+                        <button class="ql-formula" title="Fórmula"><i class="fas fa-superscript"></i></button>
+                        <button class="ql-align" value="" title="Alinear izquierda"><i class="fas fa-align-left"></i></button>
+                        <button class="ql-align" value="center" title="Centrar"><i class="fas fa-align-center"></i></button>
+                        <button class="ql-align" value="right" title="Alinear derecha"><i class="fas fa-align-right"></i></button>
+                        <button class="ql-align" value="justify" title="Justificar"><i class="fas fa-align-justify"></i></button>
+                        <button class="ql-list" value="bullet" title="Lista con viñetas"><i class="fas fa-list-ul"></i></button>
+                        <button class="ql-list" value="ordered" title="Lista numerada"><i class="fas fa-list-ol"></i></button>
                     </div>
                 </div>
-                <button type="submit" class="btn">
-                    <span id="buttonText">Guardar Cuento</span>
-                    <div id="loadingSpinner" class="loading-spinner"></div>
-                </button>
+                <div class="editor-actions">
+                    <button type="submit" class="btn">
+                        <span id="buttonText">Guardar Cuento</span>
+                        <div id="loadingSpinner" class="loading-spinner"></div>
+                    </button>
+                    <button type="button" id="preview-btn" class="btn" style="background-color: #6b7280;">
+                        <i class="fas fa-eye"></i> Vista previa
+                    </button>
+                </div>
                 <div id="messageBox" class="message-box"></div>
             </form>
         </div>
@@ -140,26 +461,43 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para vista previa -->
+    <div id="preview-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 10px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="preview-title" style="margin: 0;"></h2>
+                <button id="close-preview" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="preview-content"></div>
+        </div>
+    </div>
+
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script>
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
 
+        // Registrar componentes personalizados de Quill
         const Block = Quill.import('blots/block');
         const BlockEmbed = Quill.import('blots/block/embed');
+        const Inline = Quill.import('blots/inline');
         
         class HeaderBlot extends Block {
             static blotName = 'header';
             static tagName = ['H1', 'H2'];
             static formats(node) { return HeaderBlot.tagName.indexOf(node.tagName) + 1; }
         }
+        
         class BlockquoteBlot extends Block {
             static blotName = 'blockquote';
             static tagName = 'blockquote';
         }
+        
         class DividerBlot extends BlockEmbed {
             static blotName = 'divider';
             static tagName = 'hr';
         }
+        
         class ImageBlot extends BlockEmbed {
             static blotName = 'image';
             static tagName = 'img';
@@ -167,30 +505,33 @@
                 const node = super.create();
                 node.setAttribute('src', value.url);
                 node.setAttribute('alt', value.alt);
+                node.setAttribute('style', 'max-width: 100%; height: auto; display: block; margin: 1.5em auto; border-radius: 8px;');
                 return node;
             }
             static value(node) {
                 return { alt: node.getAttribute('alt'), url: node.getAttribute('src') };
             }
         }
+        
         class VideoBlot extends BlockEmbed {
             static blotName = 'video';
-            static tagName = 'iframe';
+            static tagName = 'div';
+            static className = 'video-wrapper';
             static create(url) {
                 const node = super.create();
-                node.setAttribute('src', url);
-                node.setAttribute('frameborder', '0');
-                node.setAttribute('allowfullscreen', true);
+                const iframe = document.createElement('iframe');
+                iframe.setAttribute('src', url);
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allowfullscreen', 'true');
+                node.appendChild(iframe);
                 return node;
             }
-            static formats(node) {
-                const format = {};
-                if (node.hasAttribute('height')) { format.height = node.getAttribute('height'); }
-                if (node.hasAttribute('width')) { format.width = node.getAttribute('width'); }
-                return format;
+            static value(node) { 
+                const iframe = node.querySelector('iframe');
+                return iframe ? iframe.getAttribute('src') : '';
             }
-            static value(node) { return node.getAttribute('src'); }
         }
+        
         class TweetBlot extends BlockEmbed {
             static blotName = 'tweet';
             static tagName = 'div';
@@ -198,21 +539,68 @@
             static create(id) {
                 const node = super.create();
                 node.dataset.id = id;
-                twttr.widgets.createTweet(id, node);
+                // Cargar el tweet usando la API de Twitter
+                if (window.twttr) {
+                    window.twttr.widgets.createTweet(id, node);
+                } else {
+                    node.innerHTML = `<p>Tweet: ${id}</p>`;
+                }
                 return node;
             }
             static value(domNode) { return domNode.dataset.id; }
         }
         
+        class CodeBlockBlot extends Block {
+            static blotName = 'code-block';
+            static tagName = 'pre';
+            static className = 'code-block';
+            static create(value) {
+                const node = super.create();
+                node.setAttribute('spellcheck', 'false');
+                if (value) {
+                    node.innerHTML = hljs.highlightAuto(value).value;
+                }
+                return node;
+            }
+            static value(node) {
+                return node.textContent;
+            }
+        }
+        
+        class FormulaBlot extends BlockEmbed {
+            static blotName = 'formula';
+            static tagName = 'div';
+            static className = 'formula-block';
+            static create(value) {
+                const node = super.create();
+                try {
+                    katex.render(value, node, {
+                        throwOnError: false,
+                        displayMode: true
+                    });
+                } catch (e) {
+                    node.innerHTML = `<span style="color: red;">Error en fórmula: ${e.message}</span>`;
+                }
+                return node;
+            }
+            static value(node) {
+                return node.getAttribute('data-value');
+            }
+        }
+
+        // Registrar todos los blots personalizados
         Quill.register(HeaderBlot);
         Quill.register(BlockquoteBlot);
         Quill.register(DividerBlot);
         Quill.register(ImageBlot);
         Quill.register(VideoBlot);
         Quill.register(TweetBlot);
+        Quill.register(CodeBlockBlot);
+        Quill.register(FormulaBlot);
         Quill.register(Quill.import('attributors/style/color'), true);
         Quill.register(Quill.import('attributors/style/size'), true);
 
+        // Inicializar Quill con más módulos habilitados
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
@@ -221,10 +609,38 @@
                 syntax: {
                     highlight: text => hljs.highlightAuto(text).value
                 },
-                formula: true
+                formula: true,
+                keyboard: {
+                    bindings: {
+                        'code-block': {
+                            key: 'E',
+                            shiftKey: true,
+                            handler: function() {
+                                const range = this.quill.getSelection();
+                                if (range) {
+                                    this.quill.format('code-block', true);
+                                }
+                            }
+                        },
+                        'formula': {
+                            key: 'M',
+                            shiftKey: true,
+                            handler: function() {
+                                const range = this.quill.getSelection();
+                                if (range) {
+                                    const value = prompt('Introduce la fórmula LaTeX:');
+                                    if (value) {
+                                        this.quill.insertEmbed(range.index, 'formula', value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
 
+        // Elementos DOM
         const editorContainer = document.getElementById('editor-container');
         const floatingToolbar = document.getElementById('floating-toolbar');
         const addBlockBtn = document.getElementById('add-block-btn');
@@ -233,26 +649,38 @@
         const videoInputGroup = document.getElementById('video-input-group');
         const tweetInputGroup = document.getElementById('tweet-input-group');
         let currentSelectionRange = null;
-        let isEditing = false; // Flag para controlar si se está editando
 
+        // Mejorar la detección de selección para mostrar herramientas
         quill.on('selection-change', function(range) {
             if (range) {
                 currentSelectionRange = range;
+                
+                // Mostrar barra flotante cuando hay texto seleccionado
                 if (range.length > 0) {
-                    const rect = quill.getBounds(range.index, range.length);
-                    floatingToolbar.style.display = 'block';
-                    floatingToolbar.style.top = `${rect.top + editorContainer.scrollTop - floatingToolbar.offsetHeight - 10}px`;
-                    floatingToolbar.style.left = `${rect.left + rect.width / 2 - floatingToolbar.offsetWidth / 2}px`;
+                    const bounds = quill.getBounds(range.index, range.length);
+                    const editorRect = editorContainer.getBoundingClientRect();
+                    
+                    floatingToolbar.style.display = 'flex';
+                    floatingToolbar.style.top = (bounds.top + editorRect.top - floatingToolbar.offsetHeight - 10) + 'px';
+                    floatingToolbar.style.left = (bounds.left + editorRect.left + bounds.width/2) + 'px';
+                    
+                    addBlockBtn.style.display = 'none';
                 } else {
                     floatingToolbar.style.display = 'none';
-                    addBlockBtn.style.display = 'none';
-
-                    // Lógica para mostrar el botón '+' al inicio de un párrafo vacío
+                    
+                    // Mostrar botón + al inicio de líneas vacías
                     const [leaf, offset] = quill.getLeaf(range.index);
-                    if (leaf && leaf.domNode.localName === 'p' && quill.getText(range.index - 1, 1) === '\n') {
+                    if (leaf && leaf.domNode && 
+                        (leaf.domNode.tagName === 'P' || leaf.domNode.tagName === 'DIV') && 
+                        quill.getText(range.index, 1) === '\n') {
+                        
                         const bounds = quill.getBounds(range.index);
+                        const editorRect = editorContainer.getBoundingClientRect();
+                        
                         addBlockBtn.style.display = 'block';
-                        addBlockBtn.style.top = `${bounds.top + editorContainer.scrollTop}px`;
+                        addBlockBtn.style.top = (bounds.top + editorRect.top) + 'px';
+                    } else {
+                        addBlockBtn.style.display = 'none';
                     }
                 }
             } else {
@@ -262,6 +690,194 @@
             }
         });
 
+        // Manejar el clic fuera del menú para cerrarlo
+        document.addEventListener('click', function(e) {
+            if (!addBlockBtn.contains(e.target) && !addBlockMenu.contains(e.target)) {
+                addBlockMenu.style.display = 'none';
+                initialMenu.style.display = 'block';
+                videoInputGroup.style.display = 'none';
+                tweetInputGroup.style.display = 'none';
+            }
+        });
+
+        // Botón para abrir/cerrar menú de inserción
+        addBlockBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            addBlockMenu.style.display = addBlockMenu.style.display === 'block' ? 'none' : 'block';
+            
+            // Posicionar el menú correctamente
+            const btnRect = addBlockBtn.getBoundingClientRect();
+            addBlockMenu.style.top = (btnRect.bottom + window.scrollY) + 'px';
+            addBlockMenu.style.left = (btnRect.left + window.scrollX) + 'px';
+        });
+
+        // Botones de la barra flotante
+        document.querySelectorAll('#floating-toolbar button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!currentSelectionRange || currentSelectionRange.length === 0) return;
+                
+                const format = this.classList[0].substring(3);
+                let value = this.value || true;
+                
+                // Manejar formatos especiales
+                if (format === 'header') {
+                    const currentFormat = quill.getFormat(currentSelectionRange.index);
+                    value = currentFormat.header === parseInt(value) ? false : parseInt(value);
+                } else if (format === 'list' || format === 'align') {
+                    const currentFormat = quill.getFormat(currentSelectionRange.index);
+                    value = currentFormat[format] === this.value ? false : this.value;
+                } else if (format === 'link-btn') {
+                    const url = prompt('Introduce la URL:');
+                    if (url) {
+                        quill.format('link', url);
+                    }
+                    return;
+                } else if (format === 'code-block') {
+                    quill.format('code-block', true);
+                    return;
+                } else if (format === 'formula') {
+                    const formula = prompt('Introduce la fórmula LaTeX:');
+                    if (formula) {
+                        quill.insertEmbed(currentSelectionRange.index, 'formula', formula);
+                    }
+                    return;
+                }
+                
+                quill.format(format, value);
+            });
+        });
+
+        // Insertar imagen
+        document.getElementById('insert-image-btn').addEventListener('click', function() {
+            addBlockMenu.style.display = 'none';
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function() {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const range = quill.getSelection();
+                        if (range) {
+                            quill.insertEmbed(range.index, 'image', {
+                                url: e.target.result,
+                                alt: 'Imagen subida'
+                            });
+                        }
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            };
+            input.click();
+        });
+
+        // Insertar video
+        document.getElementById('show-video-input').addEventListener('click', function() {
+            initialMenu.style.display = 'none';
+            videoInputGroup.style.display = 'flex';
+        });
+
+        document.getElementById('insert-video-submit').addEventListener('click', function() {
+            const url = document.getElementById('video-url-input').value;
+            if (url) {
+                const range = quill.getSelection();
+                if (range) {
+                    quill.insertEmbed(range.index, 'video', url);
+                }
+            }
+            document.getElementById('video-url-input').value = '';
+            initialMenu.style.display = 'block';
+            videoInputGroup.style.display = 'none';
+            addBlockMenu.style.display = 'none';
+        });
+
+        // Insertar tweet
+        document.getElementById('show-tweet-input').addEventListener('click', function() {
+            initialMenu.style.display = 'none';
+            tweetInputGroup.style.display = 'flex';
+        });
+
+        document.getElementById('insert-tweet-submit').addEventListener('click', function() {
+            const id = document.getElementById('tweet-id-input').value;
+            if (id) {
+                const range = quill.getSelection();
+                if (range) {
+                    quill.insertEmbed(range.index, 'tweet', id);
+                }
+            }
+            document.getElementById('tweet-id-input').value = '';
+            initialMenu.style.display = 'block';
+            tweetInputGroup.style.display = 'none';
+            addBlockMenu.style.display = 'none';
+        });
+
+        // Insertar divisor
+        document.getElementById('insert-divider-btn').addEventListener('click', function() {
+            addBlockMenu.style.display = 'none';
+            const range = quill.getSelection();
+            if (range) {
+                quill.insertEmbed(range.index, 'divider', true);
+            }
+        });
+
+        // Insertar bloque de código
+        document.getElementById('insert-code-btn').addEventListener('click', function() {
+            addBlockMenu.style.display = 'none';
+            const range = quill.getSelection();
+            if (range) {
+                quill.format('code-block', true);
+            }
+        });
+
+        // Insertar fórmula
+        document.getElementById('insert-formula-btn').addEventListener('click', function() {
+            addBlockMenu.style.display = 'none';
+            const formula = prompt('Introduce la fórmula LaTeX:');
+            if (formula) {
+                const range = quill.getSelection();
+                if (range) {
+                    quill.insertEmbed(range.index, 'formula', formula);
+                }
+            }
+        });
+
+        // Insertar cita
+        document.getElementById('insert-quote-btn').addEventListener('click', function() {
+            addBlockMenu.style.display = 'none';
+            const range = quill.getSelection();
+            if (range) {
+                quill.format('blockquote', true);
+            }
+        });
+
+        // Cerrar menú
+        document.getElementById('close-menu-btn').addEventListener('click', function() {
+            addBlockMenu.style.display = 'none';
+        });
+
+        // Vista previa
+        document.getElementById('preview-btn').addEventListener('click', function() {
+            const title = document.getElementById('titulo').value || 'Sin título';
+            const content = quill.root.innerHTML;
+            
+            document.getElementById('preview-title').textContent = title;
+            document.getElementById('preview-content').innerHTML = content;
+            document.getElementById('preview-modal').style.display = 'flex';
+        });
+
+        document.getElementById('close-preview').addEventListener('click', function() {
+            document.getElementById('preview-modal').style.display = 'none';
+        });
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('preview-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        // Enviar formulario
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
@@ -269,13 +885,16 @@
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const messageBox = document.getElementById('messageBox');
+            
             buttonText.textContent = 'Guardando...';
             loadingSpinner.style.display = 'inline-block';
             messageBox.style.display = 'none';
+            
             const formData = new FormData();
             formData.append('action', 'guardarCuento');
             formData.append('titulo', titulo);
             formData.append('contenido', contenido);
+            
             fetch(APP_SCRIPT_URL, {
                 method: 'POST',
                 body: formData
@@ -305,33 +924,12 @@
             messageBox.className = 'message-box ' + type;
             messageBox.style.display = 'block';
         }
-        
-        function embedYouTubeVideos(htmlContent) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
-            const links = tempDiv.querySelectorAll('a');
-            links.forEach(link => {
-                const url = link.href;
-                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                const match = url.match(youtubeRegex);
-                if (match && match[1]) {
-                    const videoId = match[1];
-                    const iframe = document.createElement('iframe');
-                    iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
-                    iframe.setAttribute('frameborder', '0');
-                    iframe.setAttribute('allowfullscreen', '');
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'video-wrapper';
-                    wrapper.appendChild(iframe);
-                    link.parentNode.replaceChild(wrapper, link);
-                }
-            });
-            return tempDiv.innerHTML;
-        }
 
+        // Funciones para la pestaña de visualización
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
             cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
+            
             const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
             fetch(url)
                 .then(response => response.json())
@@ -344,11 +942,10 @@
                                 const storyDiv = document.createElement('div');
                                 storyDiv.id = storyId;
                                 storyDiv.className = 'story-item';
-                                const contenidoConVideos = embedYouTubeVideos(cuento.contenido);
                                 storyDiv.innerHTML = `
                                     <h3>${cuento.titulo}</h3>
                                     <p style="font-size: 0.9rem; color: #6b7280;">Publicado el: ${new Date(cuento.fecha).toLocaleString()}</p>
-                                    <div class="story-content">${contenidoConVideos}</div>
+                                    <div class="story-content">${cuento.contenido}</div>
                                     <button class="btn download-btn" data-story-id="${storyId}" style="margin-top: 15px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
                                 `;
                                 cuentosList.appendChild(storyDiv);
@@ -364,40 +961,8 @@
                     cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
                 });
         }
-        
-        function generarPDF(storyId) {
-            const element = document.getElementById(storyId);
-            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const filename = `${element.querySelector('h3').textContent}.pdf`;
-            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgProps = doc.getImageProperties(imgData);
-                const pdfWidth = doc.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                let y = 0;
-                while (y < pdfHeight) {
-                    if (y > 0) { doc.addPage(); }
-                    const heightLeft = pdfHeight - y;
-                    const newHeight = Math.min(doc.internal.pageSize.getHeight(), heightLeft);
-                    doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
-                    y += newHeight;
-                }
-                doc.save(filename);
-            }).catch(error => {
-                alert("Hubo un error al generar el PDF: " + error.message);
-                console.error("Error generando PDF:", error);
-            });
-        }
-        
-        document.getElementById('cuentos-list').addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('download-btn')) {
-                const storyId = e.target.dataset.storyId;
-                generarPDF(storyId);
-            }
-        });
-        
+
+        // Cambio de pestañas
         document.querySelectorAll('.btn-tab').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
@@ -410,182 +975,9 @@
                 }
             });
         });
-        
-        document.querySelector('.btn-tab').click();
-        
-        // --- Lógica del editor mejorada ---
-        addBlockBtn.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            addBlockMenu.style.display = addBlockMenu.style.display === 'block' ? 'none' : 'block';
-            addBlockMenu.style.top = `${addBlockBtn.offsetTop + addBlockBtn.offsetHeight}px`;
-        });
 
-        document.getElementById('close-menu-btn').addEventListener('click', (event) => {
-            event.preventDefault();
-            addBlockMenu.style.display = 'none';
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!addBlockBtn.contains(event.target) && !addBlockMenu.contains(event.target)) {
-                addBlockMenu.style.display = 'none';
-            }
-        });
-
-        document.getElementById('link-btn').addEventListener('click', () => {
-            const url = prompt("Introduce la URL:");
-            if (url && currentSelectionRange.length > 0) {
-                quill.format('link', url);
-            }
-        });
-
-        document.querySelectorAll('#floating-toolbar button').forEach(btn => {
-            btn.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (currentSelectionRange.length === 0) return;
-                const format = btn.classList.contains('ql-header') ? 'header' : btn.classList.contains('ql-blockquote') ? 'blockquote' : btn.classList.contains('ql-align') ? 'align' : btn.classList.contains('ql-list') ? 'list' : btn.classList[0].substring(4);
-                let value = btn.value || true;
-                if (format === 'header') {
-                    const currentFormat = quill.getFormat(currentSelectionRange.index, 1);
-                    value = currentFormat.header === parseInt(value) ? false : parseInt(value);
-                } else if (format === 'list' || format === 'align') {
-                    const currentFormat = quill.getFormat(currentSelectionRange.index, 1);
-                    value = currentFormat[format] === btn.value ? false : btn.value;
-                }
-                quill.format(format, value, Quill.sources.USER);
-            });
-        });
-
-        document.getElementById('insert-image-btn').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection(true);
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = () => {
-                const file = input.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const base64data = e.target.result;
-                        const formData = new FormData();
-                        formData.append('action', 'subirImagenBase64');
-                        formData.append('imagen', base64data);
-                        
-                        const startIndex = range.index;
-                        quill.insertText(startIndex, '\n', Quill.sources.USER);
-                        const placeholderIndex = startIndex + 1;
-                        quill.insertEmbed(placeholderIndex, 'text', 'Cargando imagen...');
-                        quill.setSelection(placeholderIndex + 1, 0, Quill.sources.SILENT);
-
-                        fetch(APP_SCRIPT_URL, { method: 'POST', body: formData })
-                        .then(response => response.json())
-                        .then(result => {
-                            quill.deleteText(placeholderIndex, 18);
-                            if (result.estado === 'éxito' && result.url) {
-                                quill.insertEmbed(placeholderIndex, 'image', { url: result.url, alt: 'Imagen subida' });
-                            } else {
-                                alert('Error al subir la imagen: ' + (result.mensaje || 'URL no recibida.'));
-                            }
-                        })
-                        .catch(error => {
-                            quill.deleteText(placeholderIndex, 18);
-                            alert('Fallo en la comunicación con el servidor: ' + error.message);
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        });
-        
-        document.getElementById('show-video-input').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            initialMenu.style.display = 'none';
-            videoInputGroup.style.display = 'flex';
-        });
-
-        document.getElementById('insert-video-submit').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const url = document.getElementById('video-url-input').value;
-            const range = quill.getSelection(true);
-            if (url) {
-                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                const match = url.match(youtubeRegex);
-                if (match && match[1]) {
-                    const embedUrl = `https://www.youtube.com/embed/${match[1]}`;
-                    quill.insertEmbed(range.index, 'video', embedUrl);
-                    quill.setSelection(range.index + 1);
-                } else {
-                    alert("Por favor, introduce una URL de YouTube válida.");
-                }
-            }
-            document.getElementById('video-url-input').value = '';
-            initialMenu.style.display = 'block';
-            videoInputGroup.style.display = 'none';
-            addBlockMenu.style.display = 'none';
-        });
-
-        document.getElementById('show-tweet-input').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            initialMenu.style.display = 'none';
-            tweetInputGroup.style.display = 'flex';
-        });
-
-        document.getElementById('insert-tweet-submit').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            const id = document.getElementById('tweet-id-input').value;
-            const range = quill.getSelection(true);
-            if (id) {
-                quill.insertEmbed(range.index, 'tweet', id);
-                quill.setSelection(range.index + 1);
-            }
-            document.getElementById('tweet-id-input').value = '';
-            initialMenu.style.display = 'block';
-            tweetInputGroup.style.display = 'none';
-            addBlockMenu.style.display = 'none';
-        });
-        
-        document.getElementById('insert-divider-btn').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection(true);
-            if (range) {
-                quill.insertEmbed(range.index, 'divider', true);
-                quill.setSelection(range.index + 1);
-            }
-        });
-        
-        document.getElementById('insert-code-btn').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection(true);
-            if (range) {
-                quill.format('code-block', true);
-                quill.setSelection(range.index + 1);
-            }
-        });
-
-        document.getElementById('insert-formula-btn').addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection(true);
-            if (range) {
-                quill.format('formula', true);
-                quill.setSelection(range.index + 1);
-            }
-        });
-
+        // Inicializar
+        document.querySelector('.btn-tab.active').click();
     </script>
 </body>
 </html>
