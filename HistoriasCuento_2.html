@@ -56,8 +56,8 @@
         .download-btn { background-color: #10b981; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
 
-        #editor {
-  display: block;
+#editor {
+  border: 1px solid #ccc;
   font-family: 'Open Sans', Helvetica, sans-serif;
   font-size: 1.2em;
   height: 180px;
@@ -83,6 +83,16 @@ button {
 button:active, button:focus {
   outline: none;
 }
+
+
+#editor h1 + p,
+#editor h2 + p {
+  margin-top: 0.5em; 
+}
+#editor blockquote {
+  border-left: 4px solid #111;
+  padding-left: 1em;
+}
     </style>
 </head>
 <body>
@@ -95,6 +105,22 @@ button:active, button:focus {
             <button class="btn-tab active" data-tab="create">Crear Nuevo Cuento</button>
             <button class="btn-tab" data-tab="view">Ver Todos los Cuentos</button>
         </nav>
+
+
+
+
+<script type="module" src="/index.js"></script>
+        
+        <div id="create-tab" class="tab-content active">
+            <form id="cuentoForm">
+                <div style="margin-bottom: 1rem;">
+                    <label for="titulo" class="form-label">Título:</label>
+                    <input type="text" id="titulo" name="titulo" class="form-input" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label class="form-label">Contenido:</label>
+
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.js"></script>
 
 <link href="/styles.css" rel="stylesheet">
@@ -114,19 +140,12 @@ button:active, button:focus {
   <button id="divider-button"><i class="fa fa-minus"></i></button>
 </div>
 
-
+<div id="editor">Tell your story...</div>
 
 <script type="module" src="/index.js"></script>
-        
-        <div id="create-tab" class="tab-content active">
-            <form id="cuentoForm">
-                <div style="margin-bottom: 1rem;">
-                    <label for="titulo" class="form-label">Título:</label>
-                    <input type="text" id="titulo" name="titulo" class="form-input" required>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label class="form-label">Contenido:</label>
-                    <div id="editor">Tell your story...</div>
+
+
+                    
                 </div>
                 <button type="submit" class="btn">
                     <span id="buttonText">Guardar Cuento</span>
@@ -363,11 +382,80 @@ const quill = new Quill('#editor');
             }
         });
 
-                document.querySelectorAll('button').forEach((button) => {
-  button.addEventListener('click', () => {
-    alert('Click!');
-  });
+import './formats/boldBlot.js';
+import './formats/italicBlot.js';
+import './formats/linkBlot.js';
+import './formats/blockquoteBlot.js';
+import './formats/headerBlot.js';
+import './formats/dividerBlot.js';
+import './formats/imageBlot.js';
+import './formats/videoBlot.js';
+import './formats/tweetBlot.js';
+
+const onClick = (selector, callback) => {
+  document.querySelector(selector).addEventListener('click', callback);
+};
+
+onClick('#bold-button', () => {
+  quill.format('bold', true);
 });
+
+onClick('#italic-button', () => {
+  quill.format('italic', true);
+});
+
+onClick('#link-button', () => {
+  const value = prompt('Enter link URL');
+  quill.format('link', value);
+});
+
+onClick('#blockquote-button', () => {
+  quill.format('blockquote', true);
+});
+
+onClick('#header-1-button', () => {
+  quill.format('header', 1);
+});
+
+onClick('#header-2-button', () => {
+  quill.format('header', 2);
+});
+
+onClick('#divider-button', () => {
+  const range = quill.getSelection(true);
+  quill.insertText(range.index, '\n', Quill.sources.USER);
+  quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
+  quill.setSelection(range.index + 2, Quill.sources.SILENT);
+});
+
+onClick('#image-button', () => {
+  const range = quill.getSelection(true);
+  quill.insertText(range.index, '\n', Quill.sources.USER);
+  quill.insertEmbed(range.index + 1, 'image', {
+    alt: 'Quill Cloud',
+    url: 'https://quilljs.com/0.20/assets/images/cloud.png'
+  }, Quill.sources.USER);
+  quill.setSelection(range.index + 2, Quill.sources.SILENT);
+});
+
+onClick('#video-button', () => {
+  let range = quill.getSelection(true);
+  quill.insertText(range.index, '\n', Quill.sources.USER);
+  let url = 'https://www.youtube.com/embed/QHH3iSeDBLo?showinfo=0';
+  quill.insertEmbed(range.index + 1, 'video', url, Quill.sources.USER);
+  quill.formatText(range.index + 1, 1, { height: '170', width: '400' });
+  quill.setSelection(range.index + 2, Quill.sources.SILENT);
+});
+
+onClick('#tweet-button', () => {
+  const range = quill.getSelection(true);
+  const id = '464454167226904576';
+  quill.insertText(range.index, '\n', Quill.sources.USER);
+  quill.insertEmbed(range.index + 1, 'tweet', id, Quill.sources.USER);
+  quill.setSelection(range.index + 2, Quill.sources.SILENT);
+});
+
+const quill = new Quill('#editor');
 
 
         
