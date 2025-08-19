@@ -11,6 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.css" rel="stylesheet" />
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
         .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
@@ -53,15 +55,69 @@
         .btn-tab.active { background-color: #4f46e5; color: white; }
         .download-btn { background-color: #10b981; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
+
+        #editor {
+  display: block;
+  font-family: 'Open Sans', Helvetica, sans-serif;
+  font-size: 1.2em;
+  height: 180px;
+  margin: 0 auto;
+  width: 450px;
+}
+
+#tooltip-controls, #sidebar-controls {
+  text-align: center;
+}
+
+button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 18px;
+  padding: 0;
+  height: 32px;
+  width: 32px;
+  text-align: center;
+}
+button:active, button:focus {
+  outline: none;
+}
     </style>
 </head>
 <body>
+
+
+    
     <div class="container">
         <h1>Editor de Cuentos e Historias</h1>
         <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
             <button class="btn-tab active" data-tab="create">Crear Nuevo Cuento</button>
             <button class="btn-tab" data-tab="view">Ver Todos los Cuentos</button>
         </nav>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.core.js"></script>
+
+<link href="/styles.css" rel="stylesheet">
+
+<div id="tooltip-controls">
+  <button id="bold-button"><i class="fa fa-bold"></i></button>
+  <button id="italic-button"><i class="fa fa-italic"></i></button>
+  <button id="link-button"><i class="fa fa-link"></i></button>
+  <button id="blockquote-button"><i class="fa fa-quote-right"></i></button>
+  <button id="header-1-button"><i class="fa fa-header"><sub>1</sub></i></button>
+  <button id="header-2-button"><i class="fa fa-header"><sub>2</sub></i></button>
+</div>
+<div id="sidebar-controls">
+  <button id="image-button"><i class="fa fa-camera"></i></button>
+  <button id="video-button"><i class="fa fa-play"></i></button>
+  <button id="tweet-button"><i class="fa fa-twitter"></i></button>
+  <button id="divider-button"><i class="fa fa-minus"></i></button>
+</div>
+
+
+
+<script type="module" src="/index.js"></script>
+        
         <div id="create-tab" class="tab-content active">
             <form id="cuentoForm">
                 <div style="margin-bottom: 1rem;">
@@ -70,7 +126,7 @@
                 </div>
                 <div style="margin-bottom: 1rem;">
                     <label class="form-label">Contenido:</label>
-                    <div id="editor-container"></div>
+                    <div id="editor">Tell your story...</div>
                 </div>
                 <button type="submit" class="btn">
                     <span id="buttonText">Guardar Cuento</span>
@@ -89,6 +145,14 @@
     <script>
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
+
+        document.querySelectorAll('button').forEach((button) => {
+  button.addEventListener('click', () => {
+    alert('Click!');
+  });
+});
+
+const quill = new Quill('#editor');
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
@@ -298,6 +362,15 @@
                 }
             }
         });
+
+                document.querySelectorAll('button').forEach((button) => {
+  button.addEventListener('click', () => {
+    alert('Click!');
+  });
+});
+
+
+        
     </script>
 </body>
 </html>
