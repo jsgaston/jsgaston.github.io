@@ -637,7 +637,7 @@
 
             <hr class="my-6">
             <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Ensayos Publicada:</h3>
-            <div id="latestStoryContent" class="text-gray-700">
+            <div id="latestEnsayosContent" class="text-gray-700">
                 <p class="text-center text-gray-500">Cargando última Ensayos...</p>
             </div>
             <div>
@@ -1037,11 +1037,11 @@
         <div id="mainEnsayosSection" class="main-tab-content hidden">
               <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mis Ensayos</h2>
             
-              <input type="text" id="storyTitle" placeholder="Título de la borador" class="form-input mb-4">
-              <div id="storyEditor" style="height: 300px;" class="mb-4 border border-gray-300 rounded-md p-4 bg-white"></div>
+              <input type="text" id="EnsayosTitle" placeholder="Título de la borador" class="form-input mb-4">
+              <div id="EnsayosEditor" style="height: 300px;" class="mb-4 border border-gray-300 rounded-md p-4 bg-white"></div>
             
               <button class="btn" onclick="guardarEnsayos()">Guardar Ensayos</button>
-              <div id="storyMessage" class="message-box mt-4 hidden"></div>
+              <div id="EnsayosMessage" class="message-box mt-4 hidden"></div>
             
               <hr class="my-6">
             
@@ -1064,13 +1064,13 @@
               </div>
             </div>
             
-            <div id="searchStoryResults">
+            <div id="searchEnsayosResults">
               <p class="text-center text-gray-500">Usa el buscador para encontrar Ensayos.</p>
             </div>
             
             <hr class="my-6">
             <h3 class="text-xl font-semibold text-gray-700 mb-4">Ensayos Guardadas</h3>
-            <div id="storyList"></div>
+            <div id="EnsayosList"></div>
         
         
         
@@ -1646,7 +1646,7 @@ function showMainTab(tabName) {
         mainHomeSection.classList.remove('hidden');
         document.querySelector('[data-main-tab="home"]').classList.add('active');
         loadLatestEntry();
-        loadLatestStory();
+        loadLatestEnsayos();
     } else if (tabName === 'diary') {
         mainDiarySection.classList.remove('hidden');
         document.querySelector('[data-main-tab="diary"]').classList.add('active');
@@ -1823,9 +1823,9 @@ function showMainTab(tabName) {
         }
 
 
-        async function loadLatestStory() {
-  const latestStoryContent = document.getElementById('latestStoryContent');
-  latestStoryContent.innerHTML = '<p class="text-center text-gray-500">Cargando última Ensayos...</p>';
+        async function loadLatestEnsayos() {
+  const latestEnsayosContent = document.getElementById('latestEnsayosContent');
+  latestEnsayosContent.innerHTML = '<p class="text-center text-gray-500">Cargando última Ensayos...</p>';
   
   try {
     const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL_Ensayos}?action=listarEnsayos`);
@@ -1840,14 +1840,14 @@ function showMainTab(tabName) {
         <p class='text-sm text-gray-500'>${new Date(Ensayos.fecha).toLocaleString()}</p>
         <div class='prose max-w-none mt-2 bg-white p-4 rounded-md shadow-sm border'>${Ensayos.contenido}</div>
       `;
-      latestStoryContent.innerHTML = '';
-      latestStoryContent.appendChild(card);
+      latestEnsayosContent.innerHTML = '';
+      latestEnsayosContent.appendChild(card);
     } else {
-      latestStoryContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay Ensayos disponibles.'}</p>`;
+      latestEnsayosContent.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay Ensayos disponibles.'}</p>`;
     }
   } catch (error) {
     console.error('Error al cargar la última Ensayos:', error);
-    latestStoryContent.innerHTML = '<p class="text-center text-red-500">Error al cargar la Ensayos.</p>';
+    latestEnsayosContent.innerHTML = '<p class="text-center text-red-500">Error al cargar la Ensayos.</p>';
   }
 }
 
@@ -2714,9 +2714,9 @@ dropZone.addEventListener("drop", e => {
 
 let quill;
 document.addEventListener("DOMContentLoaded", () => {
-  quill = new Quill('#storyEditor', { theme: 'snow' });
+  quill = new Quill('#EnsayosEditor', { theme: 'snow' });
 
-    document.querySelector('#storyEditor').addEventListener('paste', async function (e) {
+    document.querySelector('#EnsayosEditor').addEventListener('paste', async function (e) {
   const clipboard = e.clipboardData;
   if (!clipboard || !clipboard.items) return;
 
@@ -2759,7 +2759,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function mostrarMensajeEnsayos(msg, tipo) {
-  const box = document.getElementById("storyMessage");
+  const box = document.getElementById("EnsayosMessage");
   box.className = `message-box ${tipo}`;
   box.textContent = msg;
   box.style.display = 'block';
@@ -2799,7 +2799,7 @@ function procesarVideos(html) {
     
 
 function guardarEnsayos() {
-  const titulo = document.getElementById('storyTitle').value.trim();
+  const titulo = document.getElementById('EnsayosTitle').value.trim();
   let contenido = quill.root.innerHTML;
 
   if (!titulo || !contenido) return mostrarMensajeEnsayos("Faltan datos.", "error");
@@ -2816,7 +2816,7 @@ function guardarEnsayos() {
     .then(data => {
       if (data.status === 'success') {
         mostrarMensajeEnsayos("✅ Guardada", "success");
-        document.getElementById("storyTitle").value = "";
+        document.getElementById("EnsayosTitle").value = "";
         quill.setContents([]);
         cargarEnsayos();
       } else {
@@ -2829,7 +2829,7 @@ function guardarEnsayos() {
     
 
 async function cargarEnsayos() {
-  const contenedor = document.getElementById('storyList');
+  const contenedor = document.getElementById('EnsayosList');
   contenedor.innerHTML = '<p class="text-center text-gray-500">Cargando títulos de Ensayos...</p>';
 
   try {
@@ -2877,7 +2877,7 @@ async function cargarEnsayos() {
   const keyword = document.getElementById('searchKeyword').value.trim();
   const desde = document.getElementById('searchStartDate').value;
   const hasta = document.getElementById('searchEndDate').value;
-  const contenedor = document.getElementById('searchStoryResults');
+  const contenedor = document.getElementById('searchEnsayosResults');
 
   contenedor.innerHTML = '<p class="text-center text-gray-500">Buscando...</p>';
 
@@ -3138,6 +3138,7 @@ function translateNumber() {
 
 </body>
 </html>
+
 
 
 
