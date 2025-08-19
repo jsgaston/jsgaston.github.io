@@ -200,13 +200,15 @@
         Quill.register(ImageBlot);
         Quill.register(VideoBlot);
         Quill.register(TweetBlot);
+        Quill.register(Quill.import('attributors/style/color'), true);
 
         const toolbarOptions = [
             ['bold', 'italic', 'underline', 'strike'],
             ['link', 'blockquote'],
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
             [{ 'align': [] }],
-            [{ 'header': [1, 2, false] }]
+            [{ 'header': [1, 2, false] }],
+            [{ 'color': [] }]
         ];
         
         const quill = new Quill('#editor-container', {
