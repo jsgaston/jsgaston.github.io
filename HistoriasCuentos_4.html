@@ -93,6 +93,8 @@
                         <button class="ql-align" value="justify"><i class="fas fa-align-justify"></i></button>
                         <button class="ql-list" value="bullet"><i class="fas fa-list-ul"></i></button>
                         <button class="ql-list" value="ordered"><i class="fas fa-list-ol"></i></button>
+                        <button class="ql-size" value="+1"><i class="fas fa-plus"></i>A</button>
+                        <button class="ql-size" value="-1"><i class="fas fa-minus"></i>A</button>
                     </div>
 
                     <div id="add-block-btn" class="add-block-btn">
@@ -104,6 +106,8 @@
                             <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
                             <button id="show-video-input"><i class="fas fa-video"></i> Video de YouTube</button>
                             <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
+                            <button id="insert-code-btn"><i class="fas fa-code"></i> Código</button>
+                            <button id="insert-formula-btn"><i class="fas fa-superscript"></i> Fórmula</button>
                             <button id="insert-divider-btn"><i class="fas fa-minus"></i> Divisor</button>
                         </div>
                         <div id="video-input-group" style="display:none;">
@@ -131,6 +135,9 @@
         </div>
     </div>
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/quill-delta-to-html@0.12.0/dist/quill-delta-to-html.min.js"></script>
     <script>
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
 
@@ -201,21 +208,26 @@
         Quill.register(VideoBlot);
         Quill.register(TweetBlot);
         Quill.register(Quill.import('attributors/style/color'), true);
+        Quill.register(Quill.import('attributors/style/size'), true);
 
         const toolbarOptions = [
             ['bold', 'italic', 'underline', 'strike'],
-            ['link', 'blockquote'],
+            ['link', 'blockquote', 'code-block'],
             [{ 'list': 'ordered'}, { 'list': 'bullet' }],
             [{ 'align': [] }],
             [{ 'header': [1, 2, false] }],
-            [{ 'color': [] }]
+            [{ 'color': [] }],
+            [{ 'size': ['small', false, 'large', 'huge'] }],
+            ['formula']
         ];
         
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
             modules: {
-                toolbar: toolbarOptions
+                toolbar: false,
+                syntax: true,
+                formula: true
             }
         });
 
@@ -228,6 +240,11 @@
         const tweetInputGroup = document.getElementById('tweet-input-group');
         let currentSelectionRange = null;
 
+        const sizeOptions = {
+            '+1': 'large',
+            '-1': 'small'
+        };
+
         quill.on('selection-change', function(range) {
             if (range) {
                 currentSelectionRange = range;
@@ -238,12 +255,18 @@
                     floatingToolbar.style.left = `${rect.left + rect.width / 2 - floatingToolbar.offsetWidth / 2}px`;
                 } else {
                     floatingToolbar.style.display = 'none';
+                    const [leaf, offset] = quill.getLeaf(range.index);
+                    const isNewLine = quill.getContents(range.index - 1, 1).ops[0].insert === '\n';
+                    if (leaf && leaf.domNode.localName === 'p' && offset === 0 && isNewLine) {
+                         const bounds = quill.getBounds(range.index);
+                         addBlockBtn.style.display = 'block';
+                         addBlockBtn.style.top = `${bounds.top + editorContainer.scrollTop}px`;
+                         addBlockBtn.style.left = `0`;
+                    } else {
+                         addBlockBtn.style.display = 'none';
+                         addBlockMenu.style.display = 'none';
+                    }
                 }
-                
-                const bounds = quill.getBounds(range.index);
-                addBlockBtn.style.display = 'block';
-                addBlockBtn.style.top = `${bounds.top + editorContainer.scrollTop}px`;
-                addBlockBtn.style.left = `0`;
             } else {
                 floatingToolbar.style.display = 'none';
                 addBlockBtn.style.display = 'none';
@@ -545,6 +568,54 @@
                 quill.insertEmbed(range.index, 'divider', true);
                 quill.setSelection(range.index + 1);
             }
+        });
+        
+        document.getElementById('insert-code-btn').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            addBlockMenu.style.display = 'none';
+            const range = quill.getSelection(true);
+            if (range) {
+                quill.format('code-block', true);
+                quill.setSelection(range.index + 1);
+            }
+        });
+
+        document.getElementById('insert-formula-btn').addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            addBlockMenu.style.display = 'none';
+            const range = quill.getSelection(true);
+            if (range) {
+                quill.format('formula', true);
+                quill.setSelection(range.index + 1);
+            }
+        });
+        
+        document.querySelectorAll('.ql-size').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (currentSelectionRange && currentSelectionRange.length > 0) {
+                    const value = btn.value;
+                    let newSize;
+                    const format = quill.getFormat(currentSelectionRange.index, currentSelectionRange.length);
+                    const currentSize = format.size || 'normal';
+
+                    if (value === '+1') {
+                        if (currentSize === 'small') newSize = false;
+                        else if (currentSize === 'normal' || !currentSize) newSize = 'large';
+                        else if (currentSize === 'large') newSize = 'huge';
+                        else newSize = 'huge';
+                    } else if (value === '-1') {
+                        if (currentSize === 'huge') newSize = 'large';
+                        else if (currentSize === 'large') newSize = false;
+                        else if (currentSize === 'normal' || !currentSize) newSize = 'small';
+                        else newSize = 'small';
+                    }
+                    quill.format('size', newSize, Quill.sources.USER);
+                }
+            });
         });
 
     </script>
