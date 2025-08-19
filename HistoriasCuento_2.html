@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Cueva de los Dinosaurios</title>
     
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -33,9 +33,8 @@
         .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
         .btn-tab.active { background-color: #4f46e5; color: white; }
         .download-btn { background-color: #10b981; }
-        #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
-
-        /* Estilos de la nueva interfaz */
+        
+        /* Estilos para la nueva interfaz */
         .story-list-container { padding-top: 20px; }
         .story-card { background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e5e7eb; cursor: pointer; transition: background-color 0.2s; }
         .story-card:hover { background-color: #f3f4f6; }
@@ -70,6 +69,38 @@
             height: 100%;
         }
 
+        /* Estilos para la barra de herramientas personalizada */
+        #toolbar-container {
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            border-bottom: none;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 5px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        #toolbar-container button {
+            background: none;
+            border: none;
+            color: #4b5563;
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 4px;
+        }
+        #toolbar-container button:hover {
+            background-color: #e5e7eb;
+        }
+        #toolbar-container button i {
+            font-size: 1.2rem;
+        }
+        #editor-container {
+            height: 300px;
+            border: 1px solid #d1d5db;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -99,6 +130,20 @@
                 </div>
                 <div style="margin-bottom: 1rem;">
                     <label class="form-label">Contenido:</label>
+                    <div id="toolbar-container">
+                        <button type="button" id="bold-button"><i class="fa fa-bold"></i></button>
+                        <button type="button" id="italic-button"><i class="fa fa-italic"></i></button>
+                        <button type="button" id="underline-button"><i class="fa fa-underline"></i></button>
+                        <button type="button" id="link-button"><i class="fa fa-link"></i></button>
+                        <button type="button" id="blockquote-button"><i class="fa fa-quote-right"></i></button>
+                        <button type="button" id="header-1-button"><i class="fa fa-header"><sup>1</sup></i></button>
+                        <button type="button" id="header-2-button"><i class="fa fa-header"><sup>2</sup></i></button>
+                        <button type="button" id="list-ordered-button"><i class="fa fa-list-ol"></i></button>
+                        <button type="button" id="list-bullet-button"><i class="fa fa-list-ul"></i></button>
+                        <button type="button" id="image-button"><i class="fa fa-image"></i></button>
+                        <button type="button" id="video-button"><i class="fa fa-video"></i></button>
+                        <button type="button" id="divider-button"><i class="fa fa-minus"></i></button>
+                    </div>
                     <div id="editor-container"></div>
                 </div>
                 <button type="submit" class="btn">
@@ -120,34 +165,114 @@
     </div>
 
     <script>
-        // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec';
+        let quill = null;
 
-        let quill = null; // La instancia del editor se inicializa solo si se necesita.
-        
-        // Función para inicializar Quill si la vista de creación está activa
         function initializeQuill() {
             if (!quill) {
+                const BlockEmbed = Quill.import('blots/block/embed');
+                class DividerBlot extends BlockEmbed {
+                  static blotName = 'divider';
+                  static tagName = 'hr';
+                }
+                Quill.register(DividerBlot);
+                
                 quill = new Quill('#editor-container', {
-                    theme: 'snow',
+                    theme: 'snow', // Mantener 'snow' para los estilos, pero usaremos el toolbar personalizado
                     placeholder: 'Escribe tu historia aquí...',
                     modules: {
-                        toolbar: [
-                            [{ 'font': [] }],
-                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                            [{ 'align': [] }],
-                            'bold', 'italic', 'underline', 'strike',
-                            { 'color': [] }, { 'background': [] },
-                            'blockquote', 'code-block',
-                            { 'list': 'ordered'}, { 'list': 'bullet' },
-                            { 'indent': '-1'}, { 'indent': '+1' },
-                            'link', 'image', 'video',
-                            'clean'
-                        ]
+                        toolbar: {
+                            container: '#toolbar-container' // Enlazar a nuestro nuevo toolbar
+                        }
                     }
                 });
+                
                 quill.root.addEventListener('paste', handleImagePaste);
+                setupCustomToolbarButtons();
             }
+        }
+        
+        function setupCustomToolbarButtons() {
+            document.getElementById('bold-button').addEventListener('click', () => quill.format('bold', true));
+            document.getElementById('italic-button').addEventListener('click', () => quill.format('italic', true));
+            document.getElementById('underline-button').addEventListener('click', () => quill.format('underline', true));
+            document.getElementById('blockquote-button').addEventListener('click', () => quill.format('blockquote', true));
+            document.getElementById('header-1-button').addEventListener('click', () => quill.format('header', 1));
+            document.getElementById('header-2-button').addEventListener('click', () => quill.format('header', 2));
+            document.getElementById('list-ordered-button').addEventListener('click', () => quill.format('list', 'ordered'));
+            document.getElementById('list-bullet-button').addEventListener('click', () => quill.format('list', 'bullet'));
+            
+            document.getElementById('link-button').addEventListener('click', () => {
+                const url = prompt("Introduce la URL:");
+                if (url) {
+                    quill.format('link', url);
+                }
+            });
+            
+            document.getElementById('divider-button').addEventListener('click', () => {
+                const range = quill.getSelection(true);
+                quill.insertText(range.index, '\n', Quill.sources.USER);
+                quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
+                quill.setSelection(range.index + 2, Quill.sources.SILENT);
+            });
+
+            document.getElementById('image-button').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            const range = quill.getSelection(true);
+                            quill.insertText(range.index, ' ', Quill.sources.USER); // Añadir espacio para que funcione bien
+                            quill.setSelection(range.index + 1);
+                            quill.insertEmbed(range.index, 'text', 'Cargando imagen...');
+                            
+                            fetch(APP_SCRIPT_URL, { method: 'POST', body: formData })
+                                .then(response => response.json())
+                                .then(result => {
+                                    quill.deleteText(range.index, 18); // Borrar el texto de carga
+                                    if (result.estado === 'éxito') {
+                                        quill.insertEmbed(range.index, 'image', result.url);
+                                    } else {
+                                        alert('Error al subir la imagen: ' + result.mensaje);
+                                    }
+                                })
+                                .catch(error => {
+                                    quill.deleteText(range.index, 18);
+                                    alert('Fallo en la comunicación con el servidor: ' + error.message);
+                                });
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                input.click();
+            });
+
+            document.getElementById('video-button').addEventListener('click', () => {
+                const url = prompt("Introduce la URL del video de YouTube:");
+                if (url) {
+                    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                    const match = url.match(youtubeRegex);
+                    if (match && match[1]) {
+                        const videoId = match[1];
+                        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                        const range = quill.getSelection(true);
+                        quill.insertText(range.index, '\n', Quill.sources.USER);
+                        quill.insertEmbed(range.index + 1, 'video', embedUrl, Quill.sources.USER);
+                        quill.setSelection(range.index + 2, Quill.sources.SILENT);
+                    } else {
+                        alert("URL de YouTube no válida.");
+                    }
+                }
+            });
+
         }
         
         function handleImagePaste(event) {
@@ -188,11 +313,10 @@
             }
         }
 
-        // Manejar el envío del formulario
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
-            const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
+            const contenido = quill.root.innerHTML; // Usar quill.root.innerHTML
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const messageBox = document.getElementById('messageBox');
@@ -238,7 +362,6 @@
             return new Date(fechaISO).toLocaleDateString('es-ES', options);
         }
 
-        // Nueva función para convertir enlaces de YouTube en iframes
         function embedYouTubeVideos(htmlContent) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
@@ -256,14 +379,12 @@
                     const wrapper = document.createElement('div');
                     wrapper.className = 'video-wrapper';
                     wrapper.appendChild(iframe);
-                    // Reemplazar el enlace con el iframe
                     link.parentNode.replaceChild(wrapper, link);
                 }
             });
             return tempDiv.innerHTML;
         }
 
-        // Manejar la carga de cuentos
         function cargarCuentos(keyword = '') {
             const cuentosList = document.getElementById('cuentos-list');
             cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
@@ -279,7 +400,7 @@
                     if (result.estado === 'éxito') {
                         cuentosList.innerHTML = '';
                         if (result.cuentos && result.cuentos.length > 0) {
-                            result.cuentos.forEach((cuento, index) => {
+                            result.cuentos.forEach((cuento) => {
                                 const storyCard = document.createElement('div');
                                 storyCard.className = 'story-card';
                                 storyCard.innerHTML = `
@@ -312,7 +433,6 @@
             `;
             document.getElementById('downloadPdfBtn').addEventListener('click', () => generarPDF(storyDetails));
             
-            // Cambiar a la vista detallada
             document.getElementById('list-view').classList.remove('active');
             document.getElementById('create-view').classList.remove('active');
             document.getElementById('single-story-view').classList.add('active');
@@ -321,7 +441,7 @@
         document.getElementById('backToListBtn').addEventListener('click', () => {
             document.getElementById('list-view').classList.add('active');
             document.getElementById('single-story-view').classList.remove('active');
-            cargarCuentos(); // Recargar la lista
+            cargarCuentos();
         });
 
         function generarPDF(element) {
@@ -348,7 +468,6 @@
             });
         }
         
-        // Manejar el cambio de pestañas
         document.querySelectorAll('.btn-tab').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
@@ -364,13 +483,11 @@
             });
         });
 
-        // Manejar el botón de búsqueda
         document.getElementById('searchButton').addEventListener('click', () => {
             const keyword = document.getElementById('searchInput').value;
             cargarCuentos(keyword);
         });
         
-        // Cargar la lista de cuentos al inicio
         document.querySelector('.btn-tab[data-tab="list-view"]').click();
     </script>
 </body>
