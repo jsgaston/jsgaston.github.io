@@ -3,24 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Cuentos e Historias (estilo Medium mejorado)</title>
+    <title>Editor de Cuentos e Historias (estilo Medium)</title>
+    <!-- Librerías necesarias -->
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/monokai-sublime.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body { 
             font-family: 'Inter', sans-serif; 
             background-color: #f3f4f6; 
             padding: 20px; 
-            margin: 0;
+            color: #333;
+            line-height: 1.6;
         }
+        
         .container { 
             background-color: #ffffff; 
             padding: 2.5rem; 
@@ -30,6 +37,7 @@
             margin: 0 auto;
             border: 1px solid #e5e7eb; 
         }
+        
         h1 { 
             color: #1a202c; 
             font-size: 2rem; 
@@ -37,17 +45,20 @@
             margin-bottom: 1.5rem; 
             text-align: center; 
         }
+        
         h2 { 
             font-size: 1.5rem; 
             color: #1f2937; 
             margin-bottom: 1rem; 
         }
+        
         .form-label { 
             font-weight: 600; 
             margin-bottom: 8px; 
             display: block; 
             color: #374151; 
         }
+        
         .form-input { 
             width: 100%; 
             padding: 12px; 
@@ -56,313 +67,257 @@
             font-size: 1rem; 
             color: #1f2937; 
             background-color: #f9fafb; 
+            margin-bottom: 1.5rem;
         }
+        
         .btn { 
             background-color: #4f46e5; 
             color: white; 
-            padding: 14px 24px; 
+            padding: 12px 20px; 
             border-radius: 8px; 
             font-weight: 600; 
             cursor: pointer; 
-            transition: background-color 0.2s, transform 0.1s; 
-            display: flex; 
+            transition: background-color 0.2s; 
+            display: inline-flex; 
             align-items: center; 
             justify-content: center; 
             gap: 8px; 
-            width: 100%; 
-            margin-top: 1.5rem; 
             border: none;
+            text-decoration: none;
         }
+        
         .btn:hover { 
-            transform: scale(1.02); 
+            background-color: #4338ca; 
         }
-        .message-box { 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            margin-top: 20px; 
-            font-weight: 500; 
-            display: none; 
+        
+        .btn-tab {
+            background-color: #e5e7eb;
+            color: #4b5563;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .message-box.success { 
-            background-color: #d1fae5; 
-            color: #065f46; 
-            border: 1px solid #10b981; 
+        
+        .btn-tab.active {
+            background-color: #4f46e5;
+            color: white;
         }
-        .message-box.error { 
-            background-color: #fee2e2; 
-            color: #991b1b; 
-            border: 1px solid #ef4444; 
+        
+        .btn-secondary {
+            background-color: #6b7280;
         }
-        .loading-spinner { 
-            border: 4px solid rgba(255, 255, 255, 0.3); 
-            border-top: 4px solid #ffffff; 
-            border-radius: 50%; 
-            width: 24px; 
-            height: 24px; 
-            animation: spin 1s linear infinite; 
-            display: none; 
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
         }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .story-list { 
-            list-style: none; 
-            padding: 0; 
-        }
-        .story-item { 
-            background-color: #fafafa; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 8px; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-        }
-        .story-item h3 { 
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            color: #1f2937; 
-            margin-bottom: 10px; 
-        }
-        .story-content img { 
-            max-width: 100%; 
-            height: auto; 
-            display: block; 
-            margin: 15px auto; 
-            border-radius: 8px; 
-        }
-        .video-wrapper { 
-            position: relative; 
-            padding-bottom: 56.25%; 
-            height: 0; 
-            overflow: hidden; 
-            max-width: 100%; 
-            background: #000; 
-            margin-top: 15px; 
-        }
-        .video-wrapper iframe { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-        }
+        
         .tab-content { 
             display: none; 
         }
+        
         .tab-content.active { 
             display: block; 
         }
-        .btn-tab { 
-            background-color: #e5e7eb; 
-            color: #4b5563; 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: background-color 0.2s; 
-        }
-        .btn-tab.active { 
-            background-color: #4f46e5; 
-            color: white; 
-        }
-        .download-btn { 
-            background-color: #10b981; 
-        }
-        blockquote { 
-            border-left: 4px solid #ccc; 
-            margin: 1.5em 10px; 
-            padding: 0.5em 10px; 
-            font-style: italic;
-            color: #555;
-        }
-        blockquote p { 
-            display: inline; 
-        }
-        hr { 
-            border: none; 
-            height: 1px; 
-            background-color: #ccc; 
-            margin: 20px 0; 
-        }
-        .ql-snow .ql-editor h1 { 
-            font-size: 2em; 
-            line-height: 1.5em; 
-            font-weight: 700; 
-            margin-bottom: 0.5em; 
-        }
-        .ql-snow .ql-editor h2 { 
-            font-size: 1.5em; 
-            line-height: 1.5em; 
-            font-weight: 600; 
-            margin-bottom: 0.5em; 
-        }
-        .tweet { 
-            margin: 1.5em 0; 
-        }
-        #editor-container { 
-            border: none !important; 
-            padding: 2.5rem 0; 
-            line-height: 1.75rem; 
-            font-size: 1.125rem; 
-            color: #333; 
+        
+        .editor-container {
             min-height: 300px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
-        #editor-container .ql-editor:focus { 
-            outline: none; 
+        
+        .editor-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
         }
-        /* Barra flotante mejorada */
-        .floating-toolbar { 
-            position: fixed; 
-            background: #292929; 
-            color: white; 
-            padding: 8px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
-            z-index: 1000; 
-            display: none;
-            transform: translateX(-50%);
+        
+        .add-block-btn {
+            position: absolute;
+            left: -40px;
+            top: 10px;
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
         }
-        .floating-toolbar button { 
-            background: none; 
-            border: none; 
-            color: #fff; 
-            font-size: 1rem; 
-            padding: 8px; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-            line-height: 1; 
-            border-radius: 4px;
-            width: 36px;
-            height: 36px;
-        }
-        .floating-toolbar button:hover { 
-            background: #555; 
-        }
-        .ql-snow { 
-            border: 1px solid #d1d5db; 
-        }
-        /* Botón '+' en la misma línea del cursor */
-        .add-block-container { 
-            position: relative; 
-        }
-        .add-block-btn { 
-            position: absolute; 
-            top: 0; 
-            left: -40px; 
-            display: none; 
-            background: #fff; 
-            border: 1px solid #ccc; 
-            border-radius: 50%; 
-            width: 30px; 
-            height: 30px; 
-            text-align: center; 
-            line-height: 30px; 
-            cursor: pointer; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            z-index: 5; 
-        }
-        .add-block-btn i { 
-            color: #666; 
-            font-size: 14px; 
-        }
+        
         .add-block-btn:hover {
-            background: #f0f0f0;
+            background-color: #f9fafb;
         }
-        /* Menú desplegable de opciones */
-        .add-block-menu { 
-            position: absolute; 
-            left: -35px; 
-            top: 35px; 
-            background: #fff; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            z-index: 100; 
-            display: none; 
-            padding: 10px; 
+        
+        .editor-wrapper {
+            position: relative;
+        }
+        
+        .ql-editor {
+            font-size: 1.125rem;
+            line-height: 1.75;
+            color: #333;
+            padding: 0;
+            min-height: 250px;
+        }
+        
+        .ql-editor.ql-blank::before {
+            color: #9ca3af;
+            font-style: normal;
+            left: 0;
+        }
+        
+        .floating-toolbar {
+            position: absolute;
+            background: #292929;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            gap: 5px;
+            flex-wrap: wrap;
+            width: 300px;
+        }
+        
+        .floating-toolbar button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            padding: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            line-height: 1;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .floating-toolbar button:hover {
+            background: #555;
+        }
+        
+        .add-block-menu {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            display: none;
+            padding: 10px;
             width: 200px;
+            left: -40px;
+            top: 40px;
         }
-        .add-block-menu button, .add-block-menu .input-group button { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            width: 100%; 
-            text-align: left; 
-            padding: 8px 12px; 
-            border: none; 
-            background: none; 
-            cursor: pointer; 
-            transition: background 0.2s; 
+        
+        .add-block-menu button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background 0.2s;
             border-radius: 4px;
             color: #333;
             font-size: 14px;
         }
-        .add-block-menu button:hover, .add-block-menu .input-group button:hover { 
-            background: #f0f0f0; 
+        
+        .add-block-menu button:hover {
+            background: #f3f4f6;
         }
-        .add-block-menu .input-group { 
-            margin-top: 10px; 
-            display: flex; 
-            align-items: center; 
+        
+        .input-group {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .add-block-menu input { 
-            flex-grow: 1; 
-            padding: 8px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 4px; 
-            margin-right: 5px; 
+        
+        .input-group input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
             font-size: 14px;
         }
-        .ql-container.ql-snow { 
-            border: none; 
+        
+        .input-group button {
+            width: auto;
+            padding: 8px;
         }
-        .ql-snow .ql-editor { 
-            font-family: 'Inter', sans-serif; 
-            font-size: 1.125rem; 
-            line-height: 1.75rem; 
-            color: #333; 
-            padding: 0;
+        
+        .story-list {
+            list-style: none;
         }
-        .ql-video { 
-            position: relative; 
-            padding-bottom: 56.25%; 
-            height: 0; 
-            overflow: hidden; 
-            margin: 1.5em 0;
+        
+        .story-item {
+            background-color: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .ql-video iframe { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-        }
-        .ql-editor img { 
-            max-width: 100%; 
-            height: auto; 
-            display: block; 
-            margin: 1.5em auto; 
-            border-radius: 8px; 
-        }
-        .editor-wrapper {
-            position: relative;
-        }
-        .ql-toolbar.ql-snow {
-            border: none;
-            padding: 0;
+        
+        .story-item h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
             margin-bottom: 10px;
         }
-        .editor-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
+        
+        .story-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px auto;
+            border-radius: 8px;
         }
-        .editor-actions .btn {
-            width: auto;
-            margin-top: 0;
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            margin: 15px 0;
+            border-radius: 8px;
         }
+        
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
         .code-block {
             background: #272822;
             color: #f8f8f2;
@@ -373,87 +328,156 @@
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 0.9em;
         }
+        
         .formula-block {
             padding: 15px;
             margin: 1.5em 0;
             text-align: center;
             background: #f8f9fa;
             border-radius: 5px;
+            overflow-x: auto;
+        }
+        
+        blockquote {
+            border-left: 4px solid #4f46e5;
+            margin: 1.5em 0;
+            padding: 0.5em 1em;
+            background: #f8f9fa;
+            border-radius: 0 4px 4px 0;
+            font-style: italic;
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #e5e7eb;
+            margin: 20px 0;
+        }
+        
+        .tweet {
+            margin: 1.5em 0;
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message-box {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        
+        .message-box.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .message-box.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .editor-actions {
+                flex-direction: column;
+            }
+            
+            .add-block-btn {
+                left: -35px;
+            }
+            
+            .floating-toolbar {
+                width: 250px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Editor de Cuentos e Historias</h1>
-        <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
+        
+        <div class="tabs">
             <button class="btn-tab active" data-tab="create">Crear Nuevo Cuento</button>
             <button class="btn-tab" data-tab="view">Ver Todos los Cuentos</button>
-        </nav>
+        </div>
+        
         <div id="create-tab" class="tab-content active">
             <form id="cuentoForm">
-                <div style="margin-bottom: 1rem;">
+                <div>
                     <label for="titulo" class="form-label">Título:</label>
-                    <input type="text" id="titulo" name="titulo" class="form-input" required>
+                    <input type="text" id="titulo" name="titulo" class="form-input" placeholder="Escribe el título de tu cuento" required>
                 </div>
-                <div class="editor-wrapper">
+                
+                <div>
                     <label class="form-label">Contenido:</label>
-                    <div class="add-block-container">
-                        <div id="editor-container"></div>
+                    <div class="editor-wrapper">
                         <div id="add-block-btn" class="add-block-btn">
                             <i class="fas fa-plus"></i>
                         </div>
-                        <div id="add-block-menu" class="add-block-menu">
-                            <div id="initial-menu">
-                                <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
-                                <button id="show-video-input"><i class="fas fa-video"></i> Video</button>
-                                <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
-                                <button id="insert-code-btn"><i class="fas fa-code"></i> Bloque de código</button>
-                                <button id="insert-formula-btn"><i class="fas fa-superscript"></i> Fórmula matemática</button>
-                                <button id="insert-divider-btn"><i class="fas fa-minus"></i> Línea divisora</button>
-                                <button id="insert-quote-btn"><i class="fas fa-quote-right"></i> Cita</button>
-                                <button id="close-menu-btn"><i class="fas fa-times"></i> Cerrar</button>
-                            </div>
-                            <div id="video-input-group" style="display:none;">
+                        <div id="editor-container" class="editor-container">
+                            <!-- Editor de Quill se insertará aquí -->
+                        </div>
+                        <div id="floating-toolbar" class="floating-toolbar">
+                            <button class="ql-bold" title="Negrita"><i class="fas fa-bold"></i></button>
+                            <button class="ql-italic" title="Cursiva"><i class="fas fa-italic"></i></button>
+                            <button class="ql-underline" title="Subrayado"><i class="fas fa-underline"></i></button>
+                            <button class="ql-strike" title="Tachado"><i class="fas fa-strikethrough"></i></button>
+                            <button class="ql-link" title="Enlace"><i class="fas fa-link"></i></button>
+                            <button class="ql-header" value="1" title="Título 1"><i class="fas fa-heading"></i><small>1</small></button>
+                            <button class="ql-header" value="2" title="Título 2"><i class="fas fa-heading"></i><small>2</small></button>
+                            <button class="ql-blockquote" title="Cita"><i class="fas fa-quote-right"></i></button>
+                            <button class="ql-code-block" title="Bloque de código"><i class="fas fa-code"></i></button>
+                            <button class="ql-list" value="bullet" title="Lista con viñetas"><i class="fas fa-list-ul"></i></button>
+                            <button class="ql-list" value="ordered" title="Lista numerada"><i class="fas fa-list-ol"></i></button>
+                        </div>
+                        <div id="add-block-menu" class="add-block-menu hidden">
+                            <button id="insert-image-btn"><i class="fas fa-image"></i> Imagen</button>
+                            <button id="show-video-input"><i class="fas fa-video"></i> Video</button>
+                            <button id="show-tweet-input"><i class="fab fa-twitter"></i> Tweet</button>
+                            <button id="insert-code-btn"><i class="fas fa-code"></i> Bloque de código</button>
+                            <button id="insert-formula-btn"><i class="fas fa-superscript"></i> Fórmula matemática</button>
+                            <button id="insert-divider-btn"><i class="fas fa-minus"></i> Línea divisora</button>
+                            <button id="insert-quote-btn"><i class="fas fa-quote-right"></i> Cita</button>
+                            <button id="close-menu-btn"><i class="fas fa-times"></i> Cerrar</button>
+                            
+                            <div id="video-input-group" class="input-group hidden">
                                 <input type="text" id="video-url-input" placeholder="URL de YouTube">
                                 <button id="insert-video-submit"><i class="fas fa-check"></i></button>
                             </div>
-                            <div id="tweet-input-group" style="display:none;">
+                            
+                            <div id="tweet-input-group" class="input-group hidden">
                                 <input type="text" id="tweet-id-input" placeholder="ID del Tweet">
                                 <button id="insert-tweet-submit"><i class="fas fa-check"></i></button>
                             </div>
                         </div>
                     </div>
-                    <div id="floating-toolbar" class="floating-toolbar">
-                        <button class="ql-bold" title="Negrita"><i class="fas fa-bold"></i></button>
-                        <button class="ql-italic" title="Cursiva"><i class="fas fa-italic"></i></button>
-                        <button class="ql-underline" title="Subrayado"><i class="fas fa-underline"></i></button>
-                        <button class="ql-strike" title="Tachado"><i class="fas fa-strikethrough"></i></button>
-                        <button class="ql-link-btn" id="link-btn" title="Enlace"><i class="fas fa-link"></i></button>
-                        <button class="ql-header" value="1" title="Título 1"><i class="fas fa-heading"></i><sup>1</sup></button>
-                        <button class="ql-header" value="2" title="Título 2"><i class="fas fa-heading"></i><sup>2</sup></button>
-                        <button class="ql-blockquote" title="Cita"><i class="fas fa-quote-right"></i></button>
-                        <button class="ql-code-block" title="Bloque de código"><i class="fas fa-code"></i></button>
-                        <button class="ql-formula" title="Fórmula"><i class="fas fa-superscript"></i></button>
-                        <button class="ql-align" value="" title="Alinear izquierda"><i class="fas fa-align-left"></i></button>
-                        <button class="ql-align" value="center" title="Centrar"><i class="fas fa-align-center"></i></button>
-                        <button class="ql-align" value="right" title="Alinear derecha"><i class="fas fa-align-right"></i></button>
-                        <button class="ql-align" value="justify" title="Justificar"><i class="fas fa-align-justify"></i></button>
-                        <button class="ql-list" value="bullet" title="Lista con viñetas"><i class="fas fa-list-ul"></i></button>
-                        <button class="ql-list" value="ordered" title="Lista numerada"><i class="fas fa-list-ol"></i></button>
-                    </div>
                 </div>
+                
                 <div class="editor-actions">
                     <button type="submit" class="btn">
-                        <span id="buttonText">Guardar Cuento</span>
-                        <div id="loadingSpinner" class="loading-spinner"></div>
+                        <i class="fas fa-save"></i> Guardar Cuento
                     </button>
-                    <button type="button" id="preview-btn" class="btn" style="background-color: #6b7280;">
+                    <button type="button" id="preview-btn" class="btn btn-secondary">
                         <i class="fas fa-eye"></i> Vista previa
                     </button>
                 </div>
-                <div id="messageBox" class="message-box"></div>
+                
+                <div id="messageBox" class="message-box hidden"></div>
             </form>
         </div>
+        
         <div id="view-tab" class="tab-content">
             <h2>Cuentos Publicados</h2>
             <div id="cuentos-list" class="story-list">
@@ -463,7 +487,7 @@
     </div>
 
     <!-- Modal para vista previa -->
-    <div id="preview-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center;">
+    <div id="preview-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; justify-content: center; align-items: center;">
         <div style="background: white; padding: 30px; border-radius: 10px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 id="preview-title" style="margin: 0;"></h2>
@@ -473,511 +497,381 @@
         </div>
     </div>
 
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <script>
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
-
-        // Registrar componentes personalizados de Quill
-        const Block = Quill.import('blots/block');
-        const BlockEmbed = Quill.import('blots/block/embed');
-        const Inline = Quill.import('blots/inline');
-        
-        class HeaderBlot extends Block {
-            static blotName = 'header';
-            static tagName = ['H1', 'H2'];
-            static formats(node) { return HeaderBlot.tagName.indexOf(node.tagName) + 1; }
-        }
-        
-        class BlockquoteBlot extends Block {
-            static blotName = 'blockquote';
-            static tagName = 'blockquote';
-        }
-        
-        class DividerBlot extends BlockEmbed {
-            static blotName = 'divider';
-            static tagName = 'hr';
-        }
-        
-        class ImageBlot extends BlockEmbed {
-            static blotName = 'image';
-            static tagName = 'img';
-            static create(value) {
-                const node = super.create();
-                node.setAttribute('src', value.url);
-                node.setAttribute('alt', value.alt);
-                node.setAttribute('style', 'max-width: 100%; height: auto; display: block; margin: 1.5em auto; border-radius: 8px;');
-                return node;
-            }
-            static value(node) {
-                return { alt: node.getAttribute('alt'), url: node.getAttribute('src') };
-            }
-        }
-        
-        class VideoBlot extends BlockEmbed {
-            static blotName = 'video';
-            static tagName = 'div';
-            static className = 'video-wrapper';
-            static create(url) {
-                const node = super.create();
-                const iframe = document.createElement('iframe');
-                iframe.setAttribute('src', url);
-                iframe.setAttribute('frameborder', '0');
-                iframe.setAttribute('allowfullscreen', 'true');
-                node.appendChild(iframe);
-                return node;
-            }
-            static value(node) { 
-                const iframe = node.querySelector('iframe');
-                return iframe ? iframe.getAttribute('src') : '';
-            }
-        }
-        
-        class TweetBlot extends BlockEmbed {
-            static blotName = 'tweet';
-            static tagName = 'div';
-            static className = 'tweet';
-            static create(id) {
-                const node = super.create();
-                node.dataset.id = id;
-                // Cargar el tweet usando la API de Twitter
-                if (window.twttr) {
-                    window.twttr.widgets.createTweet(id, node);
-                } else {
-                    node.innerHTML = `<p>Tweet: ${id}</p>`;
-                }
-                return node;
-            }
-            static value(domNode) { return domNode.dataset.id; }
-        }
-        
-        class CodeBlockBlot extends Block {
-            static blotName = 'code-block';
-            static tagName = 'pre';
-            static className = 'code-block';
-            static create(value) {
-                const node = super.create();
-                node.setAttribute('spellcheck', 'false');
-                if (value) {
-                    node.innerHTML = hljs.highlightAuto(value).value;
-                }
-                return node;
-            }
-            static value(node) {
-                return node.textContent;
-            }
-        }
-        
-        class FormulaBlot extends BlockEmbed {
-            static blotName = 'formula';
-            static tagName = 'div';
-            static className = 'formula-block';
-            static create(value) {
-                const node = super.create();
-                try {
-                    katex.render(value, node, {
-                        throwOnError: false,
-                        displayMode: true
-                    });
-                } catch (e) {
-                    node.innerHTML = `<span style="color: red;">Error en fórmula: ${e.message}</span>`;
-                }
-                return node;
-            }
-            static value(node) {
-                return node.getAttribute('data-value');
-            }
-        }
-
-        // Registrar todos los blots personalizados
-        Quill.register(HeaderBlot);
-        Quill.register(BlockquoteBlot);
-        Quill.register(DividerBlot);
-        Quill.register(ImageBlot);
-        Quill.register(VideoBlot);
-        Quill.register(TweetBlot);
-        Quill.register(CodeBlockBlot);
-        Quill.register(FormulaBlot);
-        Quill.register(Quill.import('attributors/style/color'), true);
-        Quill.register(Quill.import('attributors/style/size'), true);
-
-        // Inicializar Quill con más módulos habilitados
-        const quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'Escribe tu historia aquí...',
-            modules: { 
-                toolbar: false,
-                syntax: {
-                    highlight: text => hljs.highlightAuto(text).value
-                },
-                formula: true,
-                keyboard: {
-                    bindings: {
-                        'code-block': {
-                            key: 'E',
-                            shiftKey: true,
-                            handler: function() {
-                                const range = this.quill.getSelection();
-                                if (range) {
-                                    this.quill.format('code-block', true);
-                                }
-                            }
-                        },
-                        'formula': {
-                            key: 'M',
-                            shiftKey: true,
-                            handler: function() {
-                                const range = this.quill.getSelection();
-                                if (range) {
-                                    const value = prompt('Introduce la fórmula LaTeX:');
-                                    if (value) {
-                                        this.quill.insertEmbed(range.index, 'formula', value);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Quill editor
+            const quill = new Quill('#editor-container', {
+                theme: 'snow',
+                placeholder: 'Escribe tu historia aquí...',
+                modules: {
+                    toolbar: false,
+                    keyboard: {
+                        bindings: {
+                            'code-block': {
+                                key: 'E',
+                                shiftKey: true,
+                                handler: function() {
+                                    const range = this.quill.getSelection();
+                                    if (range) {
+                                        this.quill.format('code-block', true);
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-        });
-
-        // Elementos DOM
-        const editorContainer = document.getElementById('editor-container');
-        const floatingToolbar = document.getElementById('floating-toolbar');
-        const addBlockBtn = document.getElementById('add-block-btn');
-        const addBlockMenu = document.getElementById('add-block-menu');
-        const initialMenu = document.getElementById('initial-menu');
-        const videoInputGroup = document.getElementById('video-input-group');
-        const tweetInputGroup = document.getElementById('tweet-input-group');
-        let currentSelectionRange = null;
-
-        // Mejorar la detección de selección para mostrar herramientas
-        quill.on('selection-change', function(range) {
-            if (range) {
-                currentSelectionRange = range;
-                
-                // Mostrar barra flotante cuando hay texto seleccionado
-                if (range.length > 0) {
-                    const bounds = quill.getBounds(range.index, range.length);
-                    const editorRect = editorContainer.getBoundingClientRect();
+            });
+            
+            // Elementos DOM
+            const addBlockBtn = document.getElementById('add-block-btn');
+            const addBlockMenu = document.getElementById('add-block-menu');
+            const floatingToolbar = document.getElementById('floating-toolbar');
+            const initialMenuItems = addBlockMenu.querySelectorAll('button:not(.input-group button)');
+            const videoInputGroup = document.getElementById('video-input-group');
+            const tweetInputGroup = document.getElementById('tweet-input-group');
+            const videoUrlInput = document.getElementById('video-url-input');
+            const tweetIdInput = document.getElementById('tweet-id-input');
+            let currentSelectionRange = null;
+            
+            // Mostrar botón + al hacer clic en el editor
+            quill.on('selection-change', function(range) {
+                if (range) {
+                    currentSelectionRange = range;
                     
-                    floatingToolbar.style.display = 'flex';
-                    floatingToolbar.style.top = (bounds.top + editorRect.top - floatingToolbar.offsetHeight - 10) + 'px';
-                    floatingToolbar.style.left = (bounds.left + editorRect.left + bounds.width/2) + 'px';
-                    
-                    addBlockBtn.style.display = 'none';
+                    // Mostrar barra flotante cuando hay texto seleccionado
+                    if (range.length > 0) {
+                        const bounds = quill.getBounds(range.index, range.length);
+                        const editorRect = quill.container.getBoundingClientRect();
+                        
+                        floatingToolbar.style.display = 'flex';
+                        floatingToolbar.style.top = (bounds.top + editorRect.top - floatingToolbar.offsetHeight - 10) + 'px';
+                        floatingToolbar.style.left = (bounds.left + editorRect.left + bounds.width/2 - floatingToolbar.offsetWidth/2) + 'px';
+                        
+                        addBlockBtn.style.display = 'none';
+                    } else {
+                        floatingToolbar.style.display = 'none';
+                        
+                        // Mostrar botón + al inicio de líneas vacías
+                        const [leaf, offset] = quill.getLeaf(range.index);
+                        if (leaf && leaf.domNode && 
+                            (leaf.domNode.tagName === 'P' || leaf.domNode.tagName === 'DIV') && 
+                            quill.getText(range.index, 1) === '\n') {
+                            
+                            const bounds = quill.getBounds(range.index);
+                            const editorRect = quill.container.getBoundingClientRect();
+                            
+                            addBlockBtn.style.display = 'flex';
+                            addBlockBtn.style.top = (bounds.top + editorRect.top) + 'px';
+                        } else {
+                            addBlockBtn.style.display = 'none';
+                        }
+                    }
                 } else {
                     floatingToolbar.style.display = 'none';
+                    addBlockBtn.style.display = 'none';
+                    addBlockMenu.classList.add('hidden');
+                }
+            });
+            
+            // Botón para abrir/cerrar menú de inserción
+            addBlockBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                addBlockMenu.classList.toggle('hidden');
+                
+                // Ocultar grupos de entrada al mostrar el menú
+                videoInputGroup.classList.add('hidden');
+                tweetInputGroup.classList.add('hidden');
+                
+                // Posicionar el menú correctamente
+                const btnRect = addBlockBtn.getBoundingClientRect();
+                addBlockMenu.style.top = (btnRect.bottom + window.scrollY) + 'px';
+                addBlockMenu.style.left = (btnRect.left + window.scrollX) + 'px';
+            });
+            
+            // Cerrar menú al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!addBlockBtn.contains(e.target) && !addBlockMenu.contains(e.target)) {
+                    addBlockMenu.classList.add('hidden');
+                    videoInputGroup.classList.add('hidden');
+                    tweetInputGroup.classList.add('hidden');
+                }
+            });
+            
+            // Botones de la barra flotante
+            floatingToolbar.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!currentSelectionRange || currentSelectionRange.length === 0) return;
                     
-                    // Mostrar botón + al inicio de líneas vacías
-                    const [leaf, offset] = quill.getLeaf(range.index);
-                    if (leaf && leaf.domNode && 
-                        (leaf.domNode.tagName === 'P' || leaf.domNode.tagName === 'DIV') && 
-                        quill.getText(range.index, 1) === '\n') {
-                        
-                        const bounds = quill.getBounds(range.index);
-                        const editorRect = editorContainer.getBoundingClientRect();
-                        
-                        addBlockBtn.style.display = 'block';
-                        addBlockBtn.style.top = (bounds.top + editorRect.top) + 'px';
-                    } else {
-                        addBlockBtn.style.display = 'none';
-                    }
-                }
-            } else {
-                floatingToolbar.style.display = 'none';
-                addBlockBtn.style.display = 'none';
-                addBlockMenu.style.display = 'none';
-            }
-        });
-
-        // Manejar el clic fuera del menú para cerrarlo
-        document.addEventListener('click', function(e) {
-            if (!addBlockBtn.contains(e.target) && !addBlockMenu.contains(e.target)) {
-                addBlockMenu.style.display = 'none';
-                initialMenu.style.display = 'block';
-                videoInputGroup.style.display = 'none';
-                tweetInputGroup.style.display = 'none';
-            }
-        });
-
-        // Botón para abrir/cerrar menú de inserción
-        addBlockBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            addBlockMenu.style.display = addBlockMenu.style.display === 'block' ? 'none' : 'block';
-            
-            // Posicionar el menú correctamente
-            const btnRect = addBlockBtn.getBoundingClientRect();
-            addBlockMenu.style.top = (btnRect.bottom + window.scrollY) + 'px';
-            addBlockMenu.style.left = (btnRect.left + window.scrollX) + 'px';
-        });
-
-        // Botones de la barra flotante
-        document.querySelectorAll('#floating-toolbar button').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (!currentSelectionRange || currentSelectionRange.length === 0) return;
-                
-                const format = this.classList[0].substring(3);
-                let value = this.value || true;
-                
-                // Manejar formatos especiales
-                if (format === 'header') {
-                    const currentFormat = quill.getFormat(currentSelectionRange.index);
-                    value = currentFormat.header === parseInt(value) ? false : parseInt(value);
-                } else if (format === 'list' || format === 'align') {
-                    const currentFormat = quill.getFormat(currentSelectionRange.index);
-                    value = currentFormat[format] === this.value ? false : this.value;
-                } else if (format === 'link-btn') {
-                    const url = prompt('Introduce la URL:');
-                    if (url) {
-                        quill.format('link', url);
-                    }
-                    return;
-                } else if (format === 'code-block') {
-                    quill.format('code-block', true);
-                    return;
-                } else if (format === 'formula') {
-                    const formula = prompt('Introduce la fórmula LaTeX:');
-                    if (formula) {
-                        quill.insertEmbed(currentSelectionRange.index, 'formula', formula);
-                    }
-                    return;
-                }
-                
-                quill.format(format, value);
-            });
-        });
-
-        // Insertar imagen
-        document.getElementById('insert-image-btn').addEventListener('click', function() {
-            addBlockMenu.style.display = 'none';
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = function() {
-                if (input.files && input.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const range = quill.getSelection();
-                        if (range) {
-                            quill.insertEmbed(range.index, 'image', {
-                                url: e.target.result,
-                                alt: 'Imagen subida'
-                            });
+                    const format = this.classList[0].substring(3);
+                    let value = this.value || true;
+                    
+                    // Manejar formatos especiales
+                    if (format === 'header') {
+                        const currentFormat = quill.getFormat(currentSelectionRange.index);
+                        value = currentFormat.header === parseInt(value) ? false : parseInt(value);
+                    } else if (format === 'list') {
+                        const currentFormat = quill.getFormat(currentSelectionRange.index);
+                        value = currentFormat[format] === this.value ? false : this.value;
+                    } else if (format === 'link') {
+                        const url = prompt('Introduce la URL:');
+                        if (url) {
+                            quill.format('link', url);
                         }
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            };
-            input.click();
-        });
-
-        // Insertar video
-        document.getElementById('show-video-input').addEventListener('click', function() {
-            initialMenu.style.display = 'none';
-            videoInputGroup.style.display = 'flex';
-        });
-
-        document.getElementById('insert-video-submit').addEventListener('click', function() {
-            const url = document.getElementById('video-url-input').value;
-            if (url) {
-                const range = quill.getSelection();
-                if (range) {
-                    quill.insertEmbed(range.index, 'video', url);
-                }
-            }
-            document.getElementById('video-url-input').value = '';
-            initialMenu.style.display = 'block';
-            videoInputGroup.style.display = 'none';
-            addBlockMenu.style.display = 'none';
-        });
-
-        // Insertar tweet
-        document.getElementById('show-tweet-input').addEventListener('click', function() {
-            initialMenu.style.display = 'none';
-            tweetInputGroup.style.display = 'flex';
-        });
-
-        document.getElementById('insert-tweet-submit').addEventListener('click', function() {
-            const id = document.getElementById('tweet-id-input').value;
-            if (id) {
-                const range = quill.getSelection();
-                if (range) {
-                    quill.insertEmbed(range.index, 'tweet', id);
-                }
-            }
-            document.getElementById('tweet-id-input').value = '';
-            initialMenu.style.display = 'block';
-            tweetInputGroup.style.display = 'none';
-            addBlockMenu.style.display = 'none';
-        });
-
-        // Insertar divisor
-        document.getElementById('insert-divider-btn').addEventListener('click', function() {
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection();
-            if (range) {
-                quill.insertEmbed(range.index, 'divider', true);
-            }
-        });
-
-        // Insertar bloque de código
-        document.getElementById('insert-code-btn').addEventListener('click', function() {
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection();
-            if (range) {
-                quill.format('code-block', true);
-            }
-        });
-
-        // Insertar fórmula
-        document.getElementById('insert-formula-btn').addEventListener('click', function() {
-            addBlockMenu.style.display = 'none';
-            const formula = prompt('Introduce la fórmula LaTeX:');
-            if (formula) {
-                const range = quill.getSelection();
-                if (range) {
-                    quill.insertEmbed(range.index, 'formula', formula);
-                }
-            }
-        });
-
-        // Insertar cita
-        document.getElementById('insert-quote-btn').addEventListener('click', function() {
-            addBlockMenu.style.display = 'none';
-            const range = quill.getSelection();
-            if (range) {
-                quill.format('blockquote', true);
-            }
-        });
-
-        // Cerrar menú
-        document.getElementById('close-menu-btn').addEventListener('click', function() {
-            addBlockMenu.style.display = 'none';
-        });
-
-        // Vista previa
-        document.getElementById('preview-btn').addEventListener('click', function() {
-            const title = document.getElementById('titulo').value || 'Sin título';
-            const content = quill.root.innerHTML;
-            
-            document.getElementById('preview-title').textContent = title;
-            document.getElementById('preview-content').innerHTML = content;
-            document.getElementById('preview-modal').style.display = 'flex';
-        });
-
-        document.getElementById('close-preview').addEventListener('click', function() {
-            document.getElementById('preview-modal').style.display = 'none';
-        });
-
-        // Cerrar modal al hacer clic fuera
-        document.getElementById('preview-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-            }
-        });
-
-        // Enviar formulario
-        document.getElementById('cuentoForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const titulo = document.getElementById('titulo').value;
-            const contenido = quill.root.innerHTML;
-            const buttonText = document.getElementById('buttonText');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const messageBox = document.getElementById('messageBox');
-            
-            buttonText.textContent = 'Guardando...';
-            loadingSpinner.style.display = 'inline-block';
-            messageBox.style.display = 'none';
-            
-            const formData = new FormData();
-            formData.append('action', 'guardarCuento');
-            formData.append('titulo', titulo);
-            formData.append('contenido', contenido);
-            
-            fetch(APP_SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.estado === 'éxito') {
-                    showMessage('success', result.mensaje);
-                    document.getElementById('cuentoForm').reset();
-                    quill.setContents([]);
-                } else {
-                    showMessage('error', result.mensaje);
-                }
-            })
-            .catch(error => {
-                showMessage('error', 'Fallo al guardar: ' + error.message);
-            })
-            .finally(() => {
-                buttonText.textContent = 'Guardar Cuento';
-                loadingSpinner.style.display = 'none';
-            });
-        });
-
-        function showMessage(type, message) {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.className = 'message-box ' + type;
-            messageBox.style.display = 'block';
-        }
-
-        // Funciones para la pestaña de visualización
-        function cargarCuentos() {
-            const cuentosList = document.getElementById('cuentos-list');
-            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
-            
-            const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
-            fetch(url)
-                .then(response => response.json())
-                .then(result => {
-                    if (result.estado === 'éxito') {
-                        cuentosList.innerHTML = '';
-                        if (result.cuentos && result.cuentos.length > 0) {
-                            result.cuentos.forEach((cuento, index) => {
-                                const storyId = `story-${index}`;
-                                const storyDiv = document.createElement('div');
-                                storyDiv.id = storyId;
-                                storyDiv.className = 'story-item';
-                                storyDiv.innerHTML = `
-                                    <h3>${cuento.titulo}</h3>
-                                    <p style="font-size: 0.9rem; color: #6b7280;">Publicado el: ${new Date(cuento.fecha).toLocaleString()}</p>
-                                    <div class="story-content">${cuento.contenido}</div>
-                                    <button class="btn download-btn" data-story-id="${storyId}" style="margin-top: 15px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
-                                `;
-                                cuentosList.appendChild(storyDiv);
-                            });
-                        } else {
-                            cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
-                        }
-                    } else {
-                        cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
+                        return;
+                    } else if (format === 'code-block') {
+                        quill.format('code-block', true);
+                        return;
                     }
-                })
-                .catch(error => {
-                    cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                    
+                    quill.format(format, value);
                 });
-        }
-
-        // Cambio de pestañas
-        document.querySelectorAll('.btn-tab').forEach(button => {
-            button.addEventListener('click', function() {
-                document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                this.classList.add('active');
-                const tabId = this.dataset.tab;
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                if (tabId === 'view') {
-                    cargarCuentos();
+            });
+            
+            // Insertar imagen
+            document.getElementById('insert-image-btn').addEventListener('click', function() {
+                addBlockMenu.classList.add('hidden');
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = function() {
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const range = quill.getSelection();
+                            if (range) {
+                                quill.insertEmbed(range.index, 'image', e.target.result);
+                            }
+                        };
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                };
+                input.click();
+            });
+            
+            // Mostrar input para video
+            document.getElementById('show-video-input').addEventListener('click', function() {
+                videoInputGroup.classList.remove('hidden');
+                tweetInputGroup.classList.add('hidden');
+            });
+            
+            // Insertar video
+            document.getElementById('insert-video-submit').addEventListener('click', function() {
+                const url = videoUrlInput.value;
+                if (url) {
+                    const range = quill.getSelection();
+                    if (range) {
+                        // Extraer ID de YouTube
+                        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                        const match = url.match(youtubeRegex);
+                        
+                        if (match && match[1]) {
+                            const videoId = match[1];
+                            const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                            
+                            // Crear iframe para el video
+                            const iframe = document.createElement('iframe');
+                            iframe.setAttribute('src', embedUrl);
+                            iframe.setAttribute('frameborder', '0');
+                            iframe.setAttribute('allowfullscreen', 'true');
+                            iframe.setAttribute('width', '100%');
+                            iframe.setAttribute('height', '400');
+                            
+                            // Insertar en el editor
+                            const div = document.createElement('div');
+                            div.className = 'video-wrapper';
+                            div.appendChild(iframe);
+                            
+                            quill.clipboard.dangerouslyPasteHTML(range.index, div.outerHTML);
+                        } else {
+                            alert('Por favor, introduce una URL válida de YouTube');
+                        }
+                    }
+                }
+                videoUrlInput.value = '';
+                videoInputGroup.classList.add('hidden');
+                addBlockMenu.classList.add('hidden');
+            });
+            
+            // Mostrar input para tweet
+            document.getElementById('show-tweet-input').addEventListener('click', function() {
+                tweetInputGroup.classList.remove('hidden');
+                videoInputGroup.classList.add('hidden');
+            });
+            
+            // Insertar tweet
+            document.getElementById('insert-tweet-submit').addEventListener('click', function() {
+                const id = tweetIdInput.value;
+                if (id) {
+                    const range = quill.getSelection();
+                    if (range) {
+                        const tweetDiv = document.createElement('div');
+                        tweetDiv.className = 'tweet';
+                        tweetDiv.innerHTML = `<p>Tweet: ${id}</p>`;
+                        
+                        quill.clipboard.dangerouslyPasteHTML(range.index, tweetDiv.outerHTML);
+                    }
+                }
+                tweetIdInput.value = '';
+                tweetInputGroup.classList.add('hidden');
+                addBlockMenu.classList.add('hidden');
+            });
+            
+            // Insertar bloque de código
+            document.getElementById('insert-code-btn').addEventListener('click', function() {
+                addBlockMenu.classList.add('hidden');
+                const range = quill.getSelection();
+                if (range) {
+                    quill.format('code-block', true);
+                }
+            });
+            
+            // Insertar fórmula
+            document.getElementById('insert-formula-btn').addEventListener('click', function() {
+                addBlockMenu.classList.add('hidden');
+                const formula = prompt('Introduce la fórmula LaTeX:');
+                if (formula) {
+                    const range = quill.getSelection();
+                    if (range) {
+                        const formulaDiv = document.createElement('div');
+                        formulaDiv.className = 'formula-block';
+                        formulaDiv.textContent = formula;
+                        
+                        quill.clipboard.dangerouslyPasteHTML(range.index, formulaDiv.outerHTML);
+                    }
+                }
+            });
+            
+            // Insertar divisor
+            document.getElementById('insert-divider-btn').addEventListener('click', function() {
+                addBlockMenu.classList.add('hidden');
+                const range = quill.getSelection();
+                if (range) {
+                    const hr = document.createElement('hr');
+                    quill.clipboard.dangerouslyPasteHTML(range.index, hr.outerHTML);
+                }
+            });
+            
+            // Insertar cita
+            document.getElementById('insert-quote-btn').addEventListener('click', function() {
+                addBlockMenu.classList.add('hidden');
+                const range = quill.getSelection();
+                if (range) {
+                    quill.format('blockquote', true);
+                }
+            });
+            
+            // Cerrar menú
+            document.getElementById('close-menu-btn').addEventListener('click', function() {
+                addBlockMenu.classList.add('hidden');
+            });
+            
+            // Vista previa
+            document.getElementById('preview-btn').addEventListener('click', function() {
+                const title = document.getElementById('titulo').value || 'Sin título';
+                const content = quill.root.innerHTML;
+                
+                document.getElementById('preview-title').textContent = title;
+                document.getElementById('preview-content').innerHTML = content;
+                document.getElementById('preview-modal').classList.remove('hidden');
+            });
+            
+            document.getElementById('close-preview').addEventListener('click', function() {
+                document.getElementById('preview-modal').classList.add('hidden');
+            });
+            
+            // Cerrar modal al hacer clic fuera
+            document.getElementById('preview-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+            
+            // Cambio de pestañas
+            document.querySelectorAll('.btn-tab').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabId = this.dataset.tab;
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Enviar formulario
+            document.getElementById('cuentoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const titulo = document.getElementById('titulo').value;
+                const contenido = quill.root.innerHTML;
+                const messageBox = document.getElementById('messageBox');
+                
+                if (!titulo) {
+                    messageBox.textContent = 'Por favor, escribe un título';
+                    messageBox.className = 'message-box error';
+                    messageBox.classList.remove('hidden');
+                    return;
+                }
+                
+                if (quill.getText().trim().length < 10) {
+                    messageBox.textContent = 'El contenido del cuento es demasiado corto';
+                    messageBox.className = 'message-box error';
+                    messageBox.classList.remove('hidden');
+                    return;
+                }
+                
+                // Simular guardado exitoso
+                messageBox.textContent = '¡Cuento guardado con éxito!';
+                messageBox.className = 'message-box success';
+                messageBox.classList.remove('hidden');
+                
+                // Limpiar formulario
+                document.getElementById('titulo').value = '';
+                quill.setText('');
+                
+                // Ocultar mensaje después de 3 segundos
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 3000);
+            });
+            
+            // Cargar cuentos de ejemplo en la pestaña de visualización
+            document.querySelector('[data-bab="view"]').addEventListener('click', function() {
+                const cuentosList = document.getElementById('cuentos-list');
+                cuentosList.innerHTML = '';
+                
+                // Cuentos de ejemplo
+                const cuentos = [
+                    {
+                        titulo: 'El bosque encantado',
+                        fecha: '2023-10-15',
+                        contenido: '<p>Había una vez un bosque encantado donde los árboles susurraban secretos ancestrales. Los animales hablaban entre sí y las flores brillaban con luz propia durante la noche.</p><p>Un día, un joven aventurero decidió adentrarse en el bosque para descubrir sus misterios...</p>'
+                    },
+                    {
+                        titulo: 'La ciudad bajo el mar',
+                        fecha: '2023-09-22',
+                        contenido: '<p>En las profundidades del océano existía una ciudad maravillosa habitada por seres que respiraban bajo el agua. Sus edificios estaban hechos de coral y perlas, y sus calles eran de arena fina y dorada.</p><p>La leyenda cuenta que la ciudad solo aparece cada cien años durante la luna llena...</p>'
+                    }
+                ];
+                
+                if (cuentos.length > 0) {
+                    cuentos.forEach((cuento, index) => {
+                        const storyDiv = document.createElement('div');
+                        storyDiv.className = 'story-item';
+                        storyDiv.innerHTML = `
+                            <h3>${cuento.titulo}</h3>
+                            <p style="font-size: 0.9rem; color: #6b7280;">Publicado el: ${cuento.fecha}</p>
+                            <div class="story-content">${cuento.contenido}</div>
+                            <button class="btn btn-secondary" style="margin-top: 15px;">
+                                <i class="fas fa-download"></i> Descargar en PDF
+                            </button>
+                        `;
+                        cuentosList.appendChild(storyDiv);
+                    });
+                } else {
+                    cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
                 }
             });
         });
-
-        // Inicializar
-        document.querySelector('.btn-tab.active').click();
     </script>
 </body>
 </html>
