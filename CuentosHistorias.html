@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Cuentos e Historias</title>
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <title>Editor de Cuentos e Historias con Quill</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -145,6 +148,12 @@
         .download-btn {
             background-color: #10b981;
         }
+
+        #editor-container {
+            height: 300px; /* Altura del editor */
+            margin-bottom: 20px;
+            border: 1px solid #d1d5db;
+        }
     </style>
 </head>
 <body>
@@ -163,8 +172,8 @@
                     <input type="text" id="titulo" name="titulo" class="form-input" required>
                 </div>
                 <div style="margin-bottom: 1rem;">
-                    <label for="editor" class="form-label">Contenido:</label>
-                    <textarea id="editor"></textarea>
+                    <label class="form-label">Contenido:</label>
+                    <div id="editor-container"></div>
                 </div>
                 <button type="submit" class="btn">
                     <span id="buttonText">Guardar Cuento</span>
@@ -186,51 +195,35 @@
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
 
-        // Inicializar TinyMCE
-        tinymce.init({
-            selector: '#editor',
-            plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak nonbreaking anchor insertdatetime media table code help wordcount',
-            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | removeformat | help',
-            height: 500,
-            menubar: false,
-            // Configurar la carga de imágenes
-            images_upload_handler: function (blobInfo, success, failure) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const base64data = e.target.result;
-                    
-                    const formData = new FormData();
-                    formData.append('action', 'subirImagenBase64');
-                    formData.append('imagen', base64data);
-                    
-                    fetch(APP_SCRIPT_URL, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.estado === 'éxito') {
-                            success(result.url); // Usar la URL de Google Drive
-                        } else {
-                            failure('Error al subir la imagen: ' + result.mensaje);
-                        }
-                    })
-                    .catch(error => {
-                        failure('Fallo en la comunicación con el servidor: ' + error.message);
-                    });
-                };
-                reader.readAsDataURL(blobInfo.blob());
-            },
-            // Deshabilitar la carga de imágenes automática de TinyMCE para usar nuestro propio gestor
-            automatic_uploads: true,
-            paste_data_images: true,
+        // Inicializar Quill
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Escribe tu historia aquí...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],        // Estilos de texto
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],               // Títulos
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],      // Sub/superíndice
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],          // Sangría
+                    [{ 'direction': 'rtl' }],                         // Dirección del texto
+                    [{ 'size': ['small', false, 'large', 'huge'] }],  // Tamaños
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'color': [] }, { 'background': [] }],          // Colores
+                    [{ 'font': [] }],
+                    [{ 'align': [] }],
+                    ['link', 'image', 'video'],                        // Enlaces, imágenes y vídeos
+                    ['clean']                                         // Limpiar formato
+                ]
+            }
         });
 
         // Manejar el envío del formulario
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
-            const contenido = tinymce.get('editor').getContent();
+            const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
             
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
@@ -255,7 +248,7 @@
                     showMessage('success', result.mensaje);
                     // Restablecer el formulario y el editor
                     document.getElementById('cuentoForm').reset();
-                    tinymce.get('editor').setContent('');
+                    quill.setContents([]);
                     cargarCuentos(); // Recargar la lista de cuentos
                 } else {
                     showMessage('error', result.mensaje);
@@ -369,7 +362,7 @@
         document.querySelectorAll('.btn-tab').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
 
                 this.classList.add('active');
                 const tabId = this.dataset.tab;
@@ -383,6 +376,50 @@
 
         // Activar la primera pestaña por defecto al cargar la página
         document.querySelector('.btn-tab').click();
+
+        // Manejar el pegado de imágenes en Quill
+        quill.root.addEventListener('paste', (event) => {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            
+                            // Mostrar un mensaje de carga o spinner
+                            const range = quill.getSelection();
+                            quill.insertEmbed(range.index, 'text', 'Cargando imagen...');
+
+                            fetch(APP_SCRIPT_URL, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                // Eliminar el mensaje de carga
+                                quill.deleteText(range.index, 18);
+                                if (result.estado === 'éxito') {
+                                    quill.insertEmbed(range.index, 'image', result.url);
+                                } else {
+                                    alert('Error al subir la imagen: ' + result.mensaje);
+                                }
+                            })
+                            .catch(error => {
+                                alert('Fallo en la comunicación con el servidor: ' + error.message);
+                            });
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
