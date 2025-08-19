@@ -156,41 +156,17 @@
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3Xqa0qV9JVuRCmSNKy9t_mkFQpVv1y_acRxdAR7syUOqUDv-5rpeMVrR_aOwIoY/exec'; 
         let quill = null;
 
-        // --- LÓGICA DE QUIlLL ---
-        // Se ejecuta una vez para asegurar que Quill se inicialice correctamente
+        // Registrar el Blot personalizado
+        const { BlockEmbed } = Quill.import('parchment');
+        class DividerBlot extends BlockEmbed {
+            static blotName = 'divider';
+            static tagName = 'hr';
+        }
+        Quill.register(DividerBlot);
+
         function initializeQuill() {
             if (quill) return;
 
-            // Importar y registrar Blots personalizados para Quill 2.0.3
-            const { BlockEmbed } = Quill.import('parchment');
-
-            class DividerBlot extends BlockEmbed {
-                static blotName = 'divider';
-                static tagName = 'hr';
-            }
-
-            class VideoBlot extends BlockEmbed {
-                static blotName = 'video';
-                static tagName = 'iframe';
-                
-                static create(value) {
-                    const node = super.create();
-                    node.setAttribute('src', value);
-                    node.setAttribute('frameborder', '0');
-                    node.setAttribute('allowfullscreen', true);
-                    return node;
-                }
-                static value(domNode) {
-                    return domNode.getAttribute('src');
-                }
-            }
-
-            Quill.register({
-                'formats/divider': DividerBlot,
-                'formats/video': VideoBlot
-            });
-            
-            // Inicializar el editor de Quill
             try {
                 quill = new Quill('#editor-container', {
                     theme: 'snow',
@@ -205,7 +181,7 @@
             } catch (e) {
                 console.error("Error al inicializar Quill:", e);
                 alert("Hubo un error al iniciar el editor. Por favor, revisa la consola para más detalles.");
-                return; // Detener la ejecución si falla
+                return;
             }
             
             // Manejadores de eventos para los botones personalizados
@@ -311,7 +287,7 @@
             }
         }
 
-        // --- LÓGICA DE TABS, FORMULARIO Y PDF (sin cambios significativos) ---
+        // --- LÓGICA DE TABS, FORMULARIO Y PDF ---
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
@@ -463,7 +439,6 @@
             });
         });
         
-        // Inicializar el editor cuando la página carga
         document.querySelector('.btn-tab').click();
     </script>
 </body>
