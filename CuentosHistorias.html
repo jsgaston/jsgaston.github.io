@@ -124,11 +124,10 @@
                                 let url = prompt('Introduce la URL del enlace:');
                                 if (url) {
                                     const range = quill.getSelection(true);
-                                    if (range.length > 0) {
-                                        quill.format('link', url);
-                                    } else {
-                                        quill.insertText(range.index, url, { 'link': url });
-                                    }
+                                    // Inserta el texto "Enlace: " seguido de la URL como un enlace
+                                    quill.insertText(range.index, 'Enlace: ', { 'size': 'small' });
+                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
+                                    quill.setSelection(quill.getSelection().index);
                                 }
                             } else {
                                 quill.format('link', false);
