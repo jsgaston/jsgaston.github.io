@@ -27,6 +27,12 @@
         .story-list { list-style: none; padding: 0; }
         .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .story-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .story-item .header:hover { background-color: #f0f4f8; }
+        .story-item .arrow { transition: transform 0.3s; }
+        .story-item .arrow.expanded { transform: rotate(90deg); }
+        .story-content { display: none; margin-top: 15px; }
+        .story-content.expanded { display: block; }
         .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
         
         /* Estilos para hacer el video responsivo */
@@ -96,20 +102,20 @@
             placeholder: 'Escribe tu historia aquí...',
             modules: {
                 toolbar: [
-                    ['bold', 'italic', 'underline', 'strike'],        // Estilos de texto
+                    ['bold', 'italic', 'underline', 'strike'],
                     ['blockquote', 'code-block'],
-                    [{ 'header': 1 }, { 'header': 2 }],               // Títulos
+                    [{ 'header': 1 }, { 'header': 2 }],
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'script': 'sub'}, { 'script': 'super' }],      // Sub/superíndice
-                    [{ 'indent': '-1'}, { 'indent': '+1' }],          // Sangría
-                    [{ 'direction': 'rtl' }],                         // Dirección del texto
-                    [{ 'size': ['small', false, 'large', 'huge'] }],  // Tamaños
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
                     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    [{ 'color': [] }, { 'background': [] }],          // Colores
+                    [{ 'color': [] }, { 'background': [] }],
                     [{ 'font': [] }],
                     [{ 'align': [] }],
-                    ['link', 'image', 'video'],                        // Enlaces, imágenes y vídeos
-                    ['clean']                                         // Limpiar formato
+                    ['link', 'image', 'video'],
+                    ['clean']
                 ]
             }
         });
@@ -150,14 +156,16 @@
                 loadingSpinner.style.display = 'none';
             });
         });
+
         function showMessage(type, message) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
             messageBox.className = 'message-box ' + type;
             messageBox.style.display = 'block';
         }
-        // Nueva función para convertir enlaces de YouTube en iframes
-        function embedYouTubeVideos(htmlContent) {
+
+        // Nueva función para convertir enlaces de YouTube en enlaces de texto
+        function processVideos(htmlContent, isPDF) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             const links = tempDiv.querySelectorAll('a');
@@ -167,15 +175,21 @@
                 const match = url.match(youtubeRegex);
                 if (match && match[1]) {
                     const videoId = match[1];
-                    const iframe = document.createElement('iframe');
-                    iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
-                    iframe.setAttribute('frameborder', '0');
-                    iframe.setAttribute('allowfullscreen', '');
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'video-wrapper';
-                    wrapper.appendChild(iframe);
-                    // Reemplazar el enlace con el iframe
-                    link.parentNode.replaceChild(wrapper, link);
+                    if (isPDF) {
+                        // Para el PDF, mostrar solo el enlace de texto
+                        const textLink = document.createTextNode(url);
+                        link.parentNode.replaceChild(textLink, link);
+                    } else {
+                        // Para la vista en la página, incrustar el video
+                        const iframe = document.createElement('iframe');
+                        iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
+                        iframe.setAttribute('frameborder', '0');
+                        iframe.setAttribute('allowfullscreen', '');
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'video-wrapper';
+                        wrapper.appendChild(iframe);
+                        link.parentNode.replaceChild(wrapper, link);
+                    }
                 }
             });
             return tempDiv.innerHTML;
@@ -196,15 +210,29 @@
                                 const storyDiv = document.createElement('div');
                                 storyDiv.id = storyId;
                                 storyDiv.className = 'story-item';
-                                // Convertir enlaces de YouTube a iframes antes de mostrar el contenido
-                                const contenidoConVideos = embedYouTubeVideos(cuento.contenido);
+                                
+                                const contenidoConVideos = processVideos(cuento.contenido, false);
+                                
                                 storyDiv.innerHTML = `
-                                    <h3>${cuento.titulo}</h3>
-                                    <p style="font-size: 0.9rem; color: #6b7280;">Publicado el: ${new Date(cuento.fecha).toLocaleString()}</p>
-                                    <div class="story-content">${contenidoConVideos}</div>
-                                    <button class="btn download-btn" data-story-id="${storyId}" style="margin-top: 15px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                    <div class="header">
+                                        <h3>${cuento.titulo}</h3>
+                                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
+                                    </div>
+                                    <div class="story-content">
+                                        ${contenidoConVideos}
+                                        <button class="btn download-btn" data-story-id="${storyId}" style="margin-top: 15px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                    </div>
                                 `;
                                 cuentosList.appendChild(storyDiv);
+                            });
+
+                            document.querySelectorAll('.story-item .header').forEach(header => {
+                                header.addEventListener('click', function() {
+                                    const content = this.nextElementSibling;
+                                    const arrow = this.querySelector('.arrow');
+                                    content.classList.toggle('expanded');
+                                    arrow.classList.toggle('expanded');
+                                });
                             });
                         } else {
                             cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
@@ -217,12 +245,21 @@
                     cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
                 });
         }
+
         function generarPDF(storyId) {
             const element = document.getElementById(storyId);
             if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
+            
+            // Ocultar el botón de descarga y procesar videos para PDF
+            const downloadBtn = element.querySelector('.download-btn');
+            downloadBtn.style.display = 'none';
+            const originalContent = element.querySelector('.story-content').innerHTML;
+            element.querySelector('.story-content').innerHTML = processVideos(originalContent, true);
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
             const filename = `${element.querySelector('h3').textContent}.pdf`;
+
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const imgProps = doc.getImageProperties(imgData);
@@ -240,14 +277,20 @@
             }).catch(error => {
                 alert("Hubo un error al generar el PDF: " + error.message);
                 console.error("Error generando PDF:", error);
+            }).finally(() => {
+                // Restaurar el botón y el contenido original
+                downloadBtn.style.display = 'block';
+                element.querySelector('.story-content').innerHTML = originalContent;
             });
         }
+        
         document.getElementById('cuentos-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
                 const storyId = e.target.dataset.storyId;
                 generarPDF(storyId);
             }
         });
+
         document.querySelectorAll('.btn-tab').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
@@ -260,7 +303,9 @@
                 }
             });
         });
+
         document.querySelector('.btn-tab').click();
+
         quill.root.addEventListener('paste', (event) => {
             const items = (event.clipboardData || event.originalEvent.clipboardData).items;
             for (let i = 0; i < items.length; i++) {
