@@ -218,7 +218,7 @@
             iframes.forEach(iframe => {
                 if (iframe.src && iframe.src.match(youtubeRegex)) {
                     const videoUrl = iframe.src;
-                    const newText = document.createTextNode(`Enlace: ${videoUrl}`);
+                    const newText = document.createTextNode(`Video: ${videoUrl}`);
                     iframe.parentNode.replaceChild(newText, iframe);
                 }
             });
