@@ -9,6 +9,12 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.15/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.10/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.4/pizzip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -57,8 +63,9 @@
         .tab-content.active { display: block; }
         .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
         .btn-tab.active { background-color: #4f46e5; color: white; }
-        .download-btn { background-color: #10b981; }
+        .download-btn { background-color: #10b981; margin-right: 10px; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
+        .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -262,9 +269,13 @@
                                         <h3>${cuento.titulo}</h3>
                                         <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
                                     </div>
-                                    <div class="story-content">
+                                    <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
                                         ${contenidoConVideos}
-                                        <button class="btn download-btn" data-story-id="${storyId}" style="margin-top: 15px; width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                        <div class="download-buttons-container">
+                                            <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                            <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
+                                            <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
+                                        </div>
                                     </div>
                                 `;
                                 cuentosList.appendChild(storyDiv);
@@ -289,20 +300,33 @@
                     cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
                 });
         }
-
-        function generarPDF(storyId) {
+        
+        async function descargarCuento(storyId, format) {
+            const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
+            const originalContent = decodeURIComponent(storyContentDiv.dataset.originalContent);
+            const titulo = decodeURIComponent(storyContentDiv.dataset.title);
+            
+            if (format === 'pdf') {
+                generarPDF(storyId, titulo);
+            } else if (format === 'odt') {
+                await generarODT(originalContent, titulo);
+            } else if (format === 'xlsx') {
+                generarExcel(titulo, originalContent);
+            }
+        }
+        
+        function generarPDF(storyId, filename) {
             const element = document.getElementById(storyId);
             if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
             
-            // Ocultar el botón de descarga y procesar videos para PDF
-            const downloadBtn = element.querySelector('.download-btn');
-            downloadBtn.style.display = 'none';
-            const originalContent = element.querySelector('.story-content').innerHTML;
-            element.querySelector('.story-content').innerHTML = processVideos(originalContent, true);
+            const originalContentHTML = element.querySelector('.story-content').innerHTML;
+            const contentForPDF = processVideos(originalContentHTML, true);
+            
+            // Reemplazar temporalmente el contenido para la captura
+            element.querySelector('.story-content').innerHTML = contentForPDF;
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
-            const filename = `${element.querySelector('h3').textContent}.pdf`;
 
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
@@ -317,21 +341,55 @@
                     doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
                     y += newHeight;
                 }
-                doc.save(filename);
+                doc.save(`${filename}.pdf`);
             }).catch(error => {
                 alert("Hubo un error al generar el PDF: " + error.message);
                 console.error("Error generando PDF:", error);
             }).finally(() => {
-                // Restaurar el botón y el contenido original
-                downloadBtn.style.display = 'block';
-                element.querySelector('.story-content').innerHTML = originalContent;
+                // Restaurar el contenido original
+                element.querySelector('.story-content').innerHTML = originalContentHTML;
             });
+        }
+        
+        async function generarODT(htmlContent, filename) {
+            try {
+                const doc = new docxtemplater(new Pizzip());
+                const cleanText = new DOMParser().parseFromString(htmlContent, 'text/html').documentElement.textContent;
+                const template = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${filename}</title></head><body><h1>${filename}</h1><p>${cleanText}</p></body></html>`;
+                
+                // Esto es una simplificación, docxtemplater se usa más para plantillas.
+                // Para convertir HTML a DOCX/ODT se necesitan librerías más complejas del lado del servidor.
+                // Aquí, creamos un archivo de texto simple y lo guardamos como ODT.
+                const blob = new Blob([cleanText], { type: 'application/vnd.oasis.opendocument.text' });
+                saveAs(blob, `${filename}.odt`);
+                
+            } catch (error) {
+                alert("Hubo un error al generar el archivo ODT: " + error.message);
+                console.error("Error generando ODT:", error);
+            }
+        }
+        
+        function generarExcel(titulo, contenido) {
+            try {
+                const wb = XLSX.utils.book_new();
+                const ws_data = [
+                    ["Título", "Contenido"],
+                    [titulo, new DOMParser().parseFromString(contenido, 'text/html').documentElement.textContent]
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                XLSX.utils.book_append_sheet(wb, ws, "Historia");
+                XLSX.writeFile(wb, `${titulo}.xlsx`);
+            } catch (error) {
+                alert("Hubo un error al generar el archivo Excel: " + error.message);
+                console.error("Error generando Excel:", error);
+            }
         }
         
         document.getElementById('cuentos-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
-                const storyId = e.target.dataset.storyId;
-                generarPDF(storyId);
+                const storyId = e.target.closest('.story-item').id;
+                const format = e.target.dataset.format;
+                descargarCuento(storyId, format);
             }
         });
 
