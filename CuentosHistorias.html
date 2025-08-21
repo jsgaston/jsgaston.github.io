@@ -119,6 +119,21 @@
                         ['clean']
                     ],
                     handlers: {
+                        'link': function(value) {
+                            if (value) {
+                                let url = prompt('Introduce la URL del enlace:');
+                                if (url) {
+                                    const range = quill.getSelection(true);
+                                    if (range.length > 0) {
+                                        quill.format('link', url);
+                                    } else {
+                                        quill.insertText(range.index, url, { 'link': url });
+                                    }
+                                }
+                            } else {
+                                quill.format('link', false);
+                            }
+                        },
                         'video': function() {
                             let url = prompt('Introduce la URL del video de YouTube:');
                             if (url) {
