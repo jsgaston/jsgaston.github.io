@@ -128,8 +128,7 @@
                                     const range = quill.getSelection(true);
                                     // Inserta el enlace de texto antes del video
                                     quill.insertText(range.index, 'Enlace: ', { 'size': 'small' });
-                                    quill.insertText(range.index + 'Enlace: '.length, url, { 'link': url, 'size': 'small' });
-                                    quill.setSelection(range.index + 'Enlace: '.length + url.length);
+                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
                                     quill.insertText(quill.getSelection().index, '\n');
                                     // Inserta el video incrustado
                                     quill.insertEmbed(quill.getSelection().index, 'video', `https://www.youtube.com/embed/${match[1]}`);
@@ -187,23 +186,29 @@
             messageBox.style.display = 'block';
         }
 
-        // Nueva función para convertir enlaces de YouTube en enlaces de texto
+        // Función para convertir enlaces de YouTube en videos o texto
         function processVideos(htmlContent, isPDF) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
-            const links = tempDiv.querySelectorAll('a');
-            links.forEach(link => {
-                const url = link.href;
-                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                const match = url.match(youtubeRegex);
-                if (match && match[1]) {
-                    const videoId = match[1];
-                    if (isPDF) {
-                        // Para el PDF, mostrar el texto del enlace y la URL
-                        const newText = document.createTextNode(`${link.textContent} (${url})`);
-                        link.parentNode.replaceChild(newText, link);
-                    } else {
-                        // Para la vista en la página, incrustar el video
+            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+
+            // Reemplazar iframes por texto en el PDF
+            const iframes = tempDiv.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                if (iframe.src && iframe.src.match(youtubeRegex)) {
+                    const videoUrl = iframe.src;
+                    const newText = document.createTextNode(`Enlace: ${videoUrl}`);
+                    iframe.parentNode.replaceChild(newText, iframe);
+                }
+            });
+
+            // Procesar enlaces de video para la vista web (si no son ya iframes)
+            if (!isPDF) {
+                const links = tempDiv.querySelectorAll('a');
+                links.forEach(link => {
+                    const url = link.href;
+                    if (url.match(youtubeRegex)) {
+                        const videoId = url.match(youtubeRegex)[1];
                         const iframe = document.createElement('iframe');
                         iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
                         iframe.setAttribute('frameborder', '0');
@@ -213,10 +218,12 @@
                         wrapper.appendChild(iframe);
                         link.parentNode.replaceChild(wrapper, link);
                     }
-                }
-            });
+                });
+            }
+
             return tempDiv.innerHTML;
         }
+
 
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
