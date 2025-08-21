@@ -320,14 +320,13 @@
                             formData.append('action', 'subirImagenBase64');
                             formData.append('imagen', base64data);
                             const range = quill.getSelection();
-                            quill.insertEmbed(range.index, 'text', 'Cargando imagen...');
+                            quill.insertText(range.index, 'Cargando imagen...');
                             fetch(APP_SCRIPT_URL, {
                                 method: 'POST',
                                 body: formData
                             })
                             .then(response => response.json())
                             .then(result => {
-                                quill.deleteText(range.index, 18);
                                 if (result.estado === 'éxito') {
                                     quill.insertEmbed(range.index, 'image', result.url);
                                 } else {
@@ -336,6 +335,10 @@
                             })
                             .catch(error => {
                                 alert('Fallo en la comunicación con el servidor: ' + error.message);
+                            })
+                            .finally(() => {
+                                // Siempre elimina el texto de carga, sin importar el resultado
+                                quill.deleteText(range.index, 18); // 18 es la longitud de "Cargando imagen..."
                             });
                         };
                         reader.readAsDataURL(blob);
