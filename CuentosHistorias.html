@@ -101,22 +101,45 @@
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
             modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'header': 1 }, { 'header': 2 }],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'script': 'sub'}, { 'script': 'super' }],
-                    [{ 'indent': '-1'}, { 'indent': '+1' }],
-                    [{ 'direction': 'rtl' }],
-                    [{ 'size': ['small', false, 'large', 'huge'] }],
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'font': [] }],
-                    [{ 'align': [] }],
-                    ['link', 'image', 'video'],
-                    ['clean']
-                ]
+                toolbar: {
+                    container: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['link', 'image', 'video'],
+                        ['clean']
+                    ],
+                    handlers: {
+                        'video': function() {
+                            let url = prompt('Introduce la URL del video de YouTube:');
+                            if (url) {
+                                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                                const match = url.match(youtubeRegex);
+                                if (match) {
+                                    const range = quill.getSelection(true);
+                                    // Inserta el enlace de texto antes del video
+                                    quill.insertText(range.index, 'Enlace: ', { 'size': 'small' });
+                                    quill.insertText(range.index + 'Enlace: '.length, url, { 'link': url, 'size': 'small' });
+                                    quill.setSelection(range.index + 'Enlace: '.length + url.length);
+                                    quill.insertText(quill.getSelection().index, '\n');
+                                    // Inserta el video incrustado
+                                    quill.insertEmbed(quill.getSelection().index, 'video', `https://www.youtube.com/embed/${match[1]}`);
+                                } else {
+                                    alert('URL de video no válida. Por favor, introduce una URL de YouTube.');
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
 
