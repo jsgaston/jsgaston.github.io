@@ -9,11 +9,11 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.15/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.10/docxtemplater.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.4/pizzip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -274,6 +274,7 @@
                                         <div class="download-buttons-container">
                                             <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
                                             <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
+                                            <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
                                             <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
                                         </div>
                                     </div>
@@ -310,6 +311,8 @@
                 generarPDF(storyId, titulo);
             } else if (format === 'odt') {
                 await generarODT(originalContent, titulo);
+            } else if (format === 'docx') {
+                await generarWord(originalContent, titulo);
             } else if (format === 'xlsx') {
                 generarExcel(titulo, originalContent);
             }
@@ -353,19 +356,27 @@
         
         async function generarODT(htmlContent, filename) {
             try {
-                const doc = new docxtemplater(new Pizzip());
+                // Se crea un archivo de texto simple ya que la conversión de HTML a ODT es compleja en el navegador
                 const cleanText = new DOMParser().parseFromString(htmlContent, 'text/html').documentElement.textContent;
-                const template = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${filename}</title></head><body><h1>${filename}</h1><p>${cleanText}</p></body></html>`;
-                
-                // Esto es una simplificación, docxtemplater se usa más para plantillas.
-                // Para convertir HTML a DOCX/ODT se necesitan librerías más complejas del lado del servidor.
-                // Aquí, creamos un archivo de texto simple y lo guardamos como ODT.
                 const blob = new Blob([cleanText], { type: 'application/vnd.oasis.opendocument.text' });
                 saveAs(blob, `${filename}.odt`);
                 
             } catch (error) {
                 alert("Hubo un error al generar el archivo ODT: " + error.message);
                 console.error("Error generando ODT:", error);
+            }
+        }
+        
+        async function generarWord(htmlContent, filename) {
+            try {
+                // Se crea un archivo de texto simple ya que la conversión de HTML a DOCX es compleja en el navegador
+                const cleanText = new DOMParser().parseFromString(htmlContent, 'text/html').documentElement.textContent;
+                const blob = new Blob([cleanText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                saveAs(blob, `${filename}.docx`);
+                
+            } catch (error) {
+                alert("Hubo un error al generar el archivo de Word: " + error.message);
+                console.error("Error generando DOCX:", error);
             }
         }
         
