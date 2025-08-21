@@ -276,6 +276,7 @@
                                             <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
                                             <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
                                             <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
+                                            <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
                                         </div>
                                     </div>
                                 `;
@@ -315,6 +316,8 @@
                 await generarWord(originalContent, titulo);
             } else if (format === 'xlsx') {
                 generarExcel(titulo, originalContent);
+            } else if (format === 'txt') {
+                generarTXT(originalContent, titulo);
             }
         }
         
@@ -393,6 +396,18 @@
             } catch (error) {
                 alert("Hubo un error al generar el archivo Excel: " + error.message);
                 console.error("Error generando Excel:", error);
+            }
+        }
+
+        function generarTXT(htmlContent, filename) {
+            try {
+                // Convertir el HTML a texto plano
+                const cleanText = new DOMParser().parseFromString(htmlContent, 'text/html').documentElement.textContent;
+                const blob = new Blob([cleanText], { type: 'text/plain' });
+                saveAs(blob, `${filename}.txt`);
+            } catch (error) {
+                alert("Hubo un error al generar el archivo TXT: " + error.message);
+                console.error("Error generando TXT:", error);
             }
         }
         
