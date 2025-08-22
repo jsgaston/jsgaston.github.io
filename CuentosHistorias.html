@@ -10,12 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.10/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
@@ -23,7 +21,7 @@
         h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
         .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
         .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
-        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
+        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; border: none; }
         .btn:hover { transform: scale(1.02); }
         .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
         .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
@@ -65,6 +63,7 @@
         .download-btn { background-color: #10b981; margin-right: 10px; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
         .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .download-btn { width: auto !important; padding: 10px 20px !important; margin: 0 !important; }
     </style>
 </head>
 <body>
@@ -98,68 +97,30 @@
             </div>
         </div>
     </div>
-    <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
-    <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxexpXB0RrIgfPD3tgNKvL956FdvaRhTCKObpV7bJ9cvf13O_j4ioGeUMukp9DrPl7X/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxQfE1N2irL3EHbmzVBjDtn8t-lcyJiTPdTMZTYvvlaaS7a5VY2jTkiag5iJRVe2qV/exec'; 
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
             modules: {
-                toolbar: {
-                    container: [
-                        ['bold', 'italic', 'underline', 'strike'],
-                        ['blockquote', 'code-block'],
-                        [{ 'header': 1 }, { 'header': 2 }],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'script': 'sub'}, { 'script': 'super' }],
-                        [{ 'indent': '-1'}, { 'indent': '+1' }],
-                        [{ 'direction': 'rtl' }],
-                        [{ 'size': ['small', false, 'large', 'huge'] }],
-                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'font': [] }],
-                        [{ 'align': [] }],
-                        ['link', 'image', 'video'],
-                        ['clean'],
-                        ['table']
-                    ],
-                    handlers: {
-                        'link': function(value) {
-                            if (value) {
-                                let url = prompt('Introduce la URL del enlace:');
-                                if (url) {
-                                    const range = quill.getSelection(true);
-                                    quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
-                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
-                                    quill.setSelection(quill.getSelection().index);
-                                }
-                            } else {
-                                quill.format('link', false);
-                            }
-                        },
-                        'video': function() {
-                            let url = prompt('Introduce la URL del video de YouTube:');
-                            if (url) {
-                                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                                const match = url.match(youtubeRegex);
-                                if (match) {
-                                    const range = quill.getSelection(true);
-                                    quill.insertText(range.index, ' Video: ', { 'size': 'small' });
-                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
-                                    quill.insertText(quill.getSelection().index, '\n');
-                                    quill.insertEmbed(quill.getSelection().index, 'video', `https://www.youtube.com/embed/${match[1]}`);
-                                } else {
-                                    alert('URL de video no válida. Por favor, introduce una URL de YouTube.');
-                                }
-                            }
-                        }
-                    }
-                },
-                'table': true
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'header': 1 }, { 'header': 2 }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'font': [] }],
+                    [{ 'align': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
             }
         });
 
@@ -170,13 +131,16 @@
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const messageBox = document.getElementById('messageBox');
+            
             buttonText.textContent = 'Guardando...';
             loadingSpinner.style.display = 'inline-block';
             messageBox.style.display = 'none';
+            
             const formData = new FormData();
             formData.append('action', 'guardarCuento');
             formData.append('titulo', titulo);
             formData.append('contenido', contenido);
+            
             fetch(APP_SCRIPT_URL, {
                 method: 'POST',
                 body: formData
@@ -242,9 +206,6 @@
             return tempDiv.innerHTML;
         }
 
-        // --- FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
-
-        // Función para extraer URLs de imágenes del HTML
         function extractImageUrls(html) {
             const doc = new DOMParser().parseFromString(html, 'text/html');
             const images = doc.querySelectorAll('img');
@@ -255,51 +216,76 @@
             return imageUrls;
         }
 
-        // Función para convertir HTML a texto con marcadores de imagen
         function htmlToFormattedText(html) {
-            let doc = new DOMParser().parseFromString(html, 'text/html');
+            const doc = new DOMParser().parseFromString(html, 'text/html');
             let text = '';
             let imageCounter = 1;
-            doc.body.childNodes.forEach(node => {
+            
+            function processNode(node) {
                 if (node.nodeType === Node.TEXT_NODE) {
-                    text += node.textContent.trim();
+                    text += node.textContent.trim() + ' ';
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
-                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
-                        text += '\n\n' + node.textContent.trim();
-                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
-                        node.querySelectorAll('li').forEach(li => {
-                            text += '\n* ' + li.textContent.trim();
-                        });
-                        text += '\n';
-                    } else if (node.tagName === 'TABLE') {
-                        text += '\n\n[Tabla]\n';
-                        const rows = node.querySelectorAll('tr');
-                        rows.forEach(row => {
-                            const cells = row.querySelectorAll('td, th');
-                            cells.forEach(cell => {
-                                text += cell.textContent.trim() + '\t';
+                    switch(node.tagName) {
+                        case 'P':
+                        case 'DIV':
+                        case 'H1':
+                        case 'H2':
+                        case 'H3':
+                        case 'H4':
+                        case 'H5':
+                        case 'H6':
+                            text += '\n\n';
+                            node.childNodes.forEach(processNode);
+                            text += '\n\n';
+                            break;
+                        case 'BR':
+                            text += '\n';
+                            break;
+                        case 'UL':
+                        case 'OL':
+                            text += '\n';
+                            node.querySelectorAll('li').forEach(li => {
+                                text += '\n• ' + li.textContent.trim();
                             });
                             text += '\n';
-                        });
-                        text += '[/Tabla]\n';
-                    } else if (node.tagName === 'IMG') {
-                        const imgUrl = node.getAttribute('src');
-                        const extension = imgUrl.split('.').pop().split('?')[0]; // Obtener la extensión del archivo
-                        text += `\n[Imagen: imagen_${imageCounter}.${extension}]`;
-                        imageCounter++;
-                    } else {
-                        text += node.textContent.trim();
+                            break;
+                        case 'BLOCKQUOTE':
+                            text += '\n"' + node.textContent.trim() + '"\n';
+                            break;
+                        case 'STRONG':
+                        case 'B':
+                            text += '**' + node.textContent.trim() + '**';
+                            break;
+                        case 'EM':
+                        case 'I':
+                            text += '_' + node.textContent.trim() + '_';
+                            break;
+                        case 'IMG':
+                            const imgSrc = node.getAttribute('src');
+                            if (imgSrc) {
+                                const extension = imgSrc.includes('.') ? imgSrc.split('.').pop().split('?')[0] : 'jpg';
+                                text += `\n[Imagen: imagen_${imageCounter}.${extension}]\n`;
+                                imageCounter++;
+                            }
+                            break;
+                        case 'A':
+                            text += node.textContent.trim() + ' (' + node.getAttribute('href') + ') ';
+                            break;
+                        default:
+                            node.childNodes.forEach(processNode);
+                            break;
                     }
                 }
-            });
-            return text.replace(/\n\s*\n/g, '\n\n').trim();
+            }
+            
+            doc.body.childNodes.forEach(processNode);
+            return text.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
         }
-
-        // --- FIN DE FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
 
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
             cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
+            
             const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
             fetch(url)
                 .then(response => response.json())
@@ -323,18 +309,18 @@
                                     <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
                                         ${contenidoConVideos}
                                         <div class="download-buttons-container">
-                                            <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
-                                            <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
-                                            <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
-                                            <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
-                                            <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
-                                            <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
+                                            <button class="btn download-btn" data-format="pdf" style="background-color: #dc2626;">Descargar PDF</button>
+                                            <button class="btn download-btn" data-format="docx" style="background-color: #2563eb;">Descargar Word</button>
+                                            <button class="btn download-btn" data-format="xlsx" style="background-color: #16a34a;">Descargar Excel</button>
+                                            <button class="btn download-btn" data-format="txt" style="background-color: #64748b;">Descargar TXT</button>
+                                            <button class="btn download-btn" data-format="zip" style="background-color: #7c3aed;">Descargar Imágenes</button>
                                         </div>
                                     </div>
                                 `;
                                 cuentosList.appendChild(storyDiv);
                             });
 
+                            // Agregar event listeners para expandir/colapsar
                             document.querySelectorAll('.story-item .header').forEach(header => {
                                 header.addEventListener('click', function() {
                                     const content = this.nextElementSibling;
@@ -357,142 +343,180 @@
         
         async function descargarCuento(storyId, format) {
             const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
-            const originalContent = decodeURIComponent(storyContentDiv.dataset.original-content);
+            const originalContent = decodeURIComponent(storyContentDiv.dataset.originalContent);
             const titulo = decodeURIComponent(storyContentDiv.dataset.title);
             
-            if (format === 'pdf') {
-                generarPDF(storyId, titulo);
-            } else if (format === 'odt') {
-                generarODT(originalContent, titulo);
-            } else if (format === 'docx') {
-                generarWord(originalContent, titulo);
-            } else if (format === 'xlsx') {
-                generarExcel(titulo, originalContent);
-            } else if (format === 'txt') {
-                generarTXT(originalContent, titulo);
-            } else if (format === 'zip') {
-                descargarImagenesZIP(originalContent, titulo);
+            try {
+                switch(format) {
+                    case 'pdf':
+                        await generarPDF(storyId, titulo);
+                        break;
+                    case 'docx':
+                        await generarWord(originalContent, titulo);
+                        break;
+                    case 'xlsx':
+                        await generarExcel(titulo, originalContent);
+                        break;
+                    case 'txt':
+                        await generarTXT(originalContent, titulo);
+                        break;
+                    case 'zip':
+                        await descargarImagenesZIP(originalContent, titulo);
+                        break;
+                    default:
+                        alert('Formato no soportado');
+                }
+            } catch (error) {
+                alert(`Error al generar archivo ${format.toUpperCase()}: ${error.message}`);
+                console.error('Error:', error);
             }
         }
         
-        function generarPDF(storyId, filename) {
+        async function generarPDF(storyId, filename) {
             const element = document.getElementById(storyId);
-            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
+            if (!element) {
+                alert("No se encontró el contenido para generar el PDF.");
+                return;
+            }
             
-            const originalContentHTML = element.querySelector('.story-content').innerHTML;
-            const contentForPDF = processVideos(originalContentHTML, true);
+            const storyContent = element.querySelector('.story-content');
+            const originalHTML = storyContent.innerHTML;
             
-            element.querySelector('.story-content').innerHTML = contentForPDF;
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-
-            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgProps = doc.getImageProperties(imgData);
-                const pdfWidth = doc.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                let y = 0;
-                while (y < pdfHeight) {
-                    if (y > 0) { doc.addPage(); }
-                    const heightLeft = pdfHeight - y;
-                    const newHeight = Math.min(doc.internal.pageSize.getHeight(), heightLeft);
-                    doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
-                    y += newHeight;
-                }
-                doc.save(`${filename}.pdf`);
-            }).catch(error => {
-                alert("Hubo un error al generar el PDF: " + error.message);
-                console.error("Error generando PDF:", error);
-            }).finally(() => {
-                element.querySelector('.story-content').innerHTML = originalContentHTML;
-            });
-        }
-        
-        async function generarODT(htmlContent, filename) {
+            // Crear una copia limpia para PDF
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = processVideos(originalHTML, true);
+            tempDiv.style.padding = '20px';
+            tempDiv.style.backgroundColor = 'white';
+            tempDiv.style.fontFamily = 'Arial, sans-serif';
+            tempDiv.style.lineHeight = '1.6';
+            
+            // Ocultar botones de descarga
+            const downloadButtons = tempDiv.querySelector('.download-buttons-container');
+            if (downloadButtons) {
+                downloadButtons.style.display = 'none';
+            }
+            
+            document.body.appendChild(tempDiv);
+            
             try {
-                const formattedText = htmlToFormattedText(htmlContent);
-                const blob = new Blob([formattedText], { type: 'application/vnd.oasis.opendocument.text' });
-                saveAs(blob, `${filename}.odt`);
+                const { jsPDF } = window.jspdf;
+                const canvas = await html2canvas(tempDiv, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                });
                 
-            } catch (error) {
-                alert("Hubo un error al generar el archivo ODT: " + error.message);
-                console.error("Error generando ODT:", error);
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                
+                let heightLeft = pdfHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - pdfHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                    heightLeft -= pdf.internal.pageSize.getHeight();
+                }
+                
+                pdf.save(`${filename}.pdf`);
+            } finally {
+                document.body.removeChild(tempDiv);
             }
         }
         
         async function generarWord(htmlContent, filename) {
-            try {
-                const formattedText = htmlToFormattedText(htmlContent);
-                const blob = new Blob([formattedText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-                saveAs(blob, `${filename}.docx`);
-                
-            } catch (error) {
-                alert("Hubo un error al generar el archivo de Word: " + error.message);
-                console.error("Error generando DOCX:", error);
-            }
+            const formattedText = htmlToFormattedText(htmlContent);
+            const header = `${filename}\n${'='.repeat(filename.length)}\n\n`;
+            const fullContent = header + formattedText;
+            
+            const blob = new Blob([fullContent], {
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            });
+            
+            saveAs(blob, `${filename}.docx`);
         }
         
-        function generarExcel(titulo, contenido) {
-            try {
-                const wb = XLSX.utils.book_new();
-                const ws_data = [
-                    ["Título", "Contenido"],
-                    [titulo, htmlToFormattedText(contenido)]
-                ];
-                const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                XLSX.utils.book_append_sheet(wb, ws, "Historia");
-                XLSX.writeFile(wb, `${titulo}.xlsx`);
-            } catch (error) {
-                alert("Hubo un error al generar el archivo Excel: " + error.message);
-                console.error("Error generando Excel:", error);
-            }
+        async function generarExcel(titulo, contenido) {
+            const wb = XLSX.utils.book_new();
+            const formattedContent = htmlToFormattedText(contenido);
+            
+            const ws_data = [
+                ['Título', 'Contenido', 'Fecha'],
+                [titulo, formattedContent, new Date().toLocaleString()]
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            
+            // Ajustar ancho de columnas
+            ws['!cols'] = [
+                { width: 30 },
+                { width: 100 },
+                { width: 20 }
+            ];
+            
+            XLSX.utils.book_append_sheet(wb, ws, "Historia");
+            XLSX.writeFile(wb, `${titulo}.xlsx`);
         }
 
-        function generarTXT(htmlContent, filename) {
-            try {
-                const formattedText = htmlToFormattedText(htmlContent);
-                const blob = new Blob([formattedText], { type: 'text/plain' });
-                saveAs(blob, `${filename}.txt`);
-            } catch (error) {
-                alert("Hubo un error al generar el archivo TXT: " + error.message);
-                console.error("Error generando TXT:", error);
-            }
+        async function generarTXT(htmlContent, filename) {
+            const formattedText = htmlToFormattedText(htmlContent);
+            const header = `${filename}\n${'='.repeat(filename.length)}\n\n`;
+            const fullContent = header + formattedText;
+            
+            const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+            saveAs(blob, `${filename}.txt`);
         }
         
         async function descargarImagenesZIP(htmlContent, filename) {
             const imageUrls = extractImageUrls(htmlContent);
+            
             if (imageUrls.length === 0) {
                 alert("No hay imágenes en este cuento para descargar.");
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('action', 'zipImagenes');
-            formData.append('imageUrls', JSON.stringify(imageUrls));
-
             try {
-                const response = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
+                const zip = new JSZip();
+                const promises = [];
+                
+                imageUrls.forEach((url, index) => {
+                    const promise = fetch(url)
+                        .then(response => {
+                            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                            return response.blob();
+                        })
+                        .then(blob => {
+                            const extension = url.split('.').pop().split('?')[0] || 'jpg';
+                            const fileName = `imagen_${index + 1}.${extension}`;
+                            zip.file(fileName, blob);
+                        })
+                        .catch(error => {
+                            console.warn(`Error descargando imagen ${url}:`, error);
+                        });
+                    
+                    promises.push(promise);
                 });
-                const result = await response.json();
-                if (result.estado === 'éxito') {
-                    // Crea un enlace temporal y simula un clic para descargar el archivo ZIP
-                    const link = document.createElement('a');
-                    link.href = result.url;
-                    link.download = `${filename}_imagenes.zip`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
-                    alert('Error al crear el archivo ZIP: ' + result.mensaje);
-                }
+                
+                await Promise.all(promises);
+                
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                saveAs(zipBlob, `${filename}_imagenes.zip`);
+                
             } catch (error) {
-                alert('Fallo al comunicarse con el servidor: ' + error.message);
+                alert(`Error al crear archivo ZIP: ${error.message}`);
+                console.error('Error:', error);
             }
         }
 
+        // Event listener para botones de descarga
         document.getElementById('cuentos-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
                 const storyId = e.target.closest('.story-item').id;
@@ -501,23 +525,29 @@
             }
         });
 
+        // Event listeners para tabs
         document.querySelectorAll('.btn-tab').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
                 this.classList.add('active');
                 const tabId = this.dataset.tab;
                 document.getElementById(`${tabId}-tab`).classList.add('active');
+                
                 if (tabId === 'view') {
                     cargarCuentos();
                 }
             });
         });
 
+        // Inicializar con la primera tab activa
         document.querySelector('.btn-tab').click();
 
+        // Event listener para pegar imágenes
         quill.root.addEventListener('paste', (event) => {
             const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            
             for (let i = 0; i < items.length; i++) {
                 const item = items[i];
                 if (item.type.indexOf('image') === 0) {
@@ -529,14 +559,17 @@
                             const formData = new FormData();
                             formData.append('action', 'subirImagenBase64');
                             formData.append('imagen', base64data);
+                            
                             const range = quill.getSelection();
                             quill.insertText(range.index, 'Cargando imagen...');
+                            
                             fetch(APP_SCRIPT_URL, {
                                 method: 'POST',
                                 body: formData
                             })
                             .then(response => response.json())
                             .then(result => {
+                                quill.deleteText(range.index, 18); // Eliminar texto de carga
                                 if (result.estado === 'éxito') {
                                     quill.insertEmbed(range.index, 'image', result.url);
                                 } else {
@@ -544,10 +577,8 @@
                                 }
                             })
                             .catch(error => {
-                                alert('Fallo en la comunicación con el servidor: ' + error.message);
-                            })
-                            .finally(() => {
                                 quill.deleteText(range.index, 18);
+                                alert('Error al comunicarse con el servidor: ' + error.message);
                             });
                         };
                         reader.readAsDataURL(blob);
