@@ -137,7 +137,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9_NryPPjYNJETbhOX1Zeb2w7KMAorK8zcywmVapmqnhwifj5GAv10S8qbn3EqSY4fTg/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBksN5IpYHPipDjKlLUrHgbJKTkgAbMKrvu837Ma053TyxpkJ_NIS9YONTJAwtN2rRQA/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -230,38 +230,38 @@
         }
     });
 
-    document.getElementById('diary-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        showStatus('status', 'Guardando...');
+document.getElementById('diary-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    showStatus('status', 'Guardando...');
 
-        const form = e.target;
-        const formData = new FormData();
-        formData.append('action', 'save');
-        formData.append('titulo', form.querySelector('#title').value);
-        
-        const entryContent = editableEntry.innerHTML;
-        formData.append('entrada', entryContent);
-        
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showStatus('status', '¡Entrada guardada con éxito!');
-                clearForm();
-            } else {
-                showStatus('status', data.message);
-            }
-            setTimeout(() => hideStatus('status'), 3000);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showStatus('status', 'Error al guardar la entrada.');
-            setTimeout(() => hideStatus('status'), 3000);
-        });
+    const form = e.target;
+    const formData = new FormData();
+    formData.append('action', 'save');
+    formData.append('titulo', form.querySelector('#title').value);
+    
+    const entryContent = editableEntry.innerHTML;
+    formData.append('entrada', entryContent);
+    
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json()) // <--- Cambiado de .text() a .json()
+    .then(data => {
+        if (data.status === 'success') {
+            showStatus('status', '¡Entrada guardada con éxito!');
+            clearForm();
+        } else {
+            showStatus('status', 'Error: ' + data.message);
+        }
+        setTimeout(() => hideStatus('status'), 3000);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showStatus('status', 'Error al guardar la entrada.');
+        setTimeout(() => hideStatus('status'), 3000);
     });
+});
 
     document.getElementById('search-form').addEventListener('submit', function(e) {
         e.preventDefault();
