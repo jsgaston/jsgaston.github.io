@@ -137,7 +137,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiG6SKRAUfzAj21YnWML6AJUbsZKoPVKMCpp6JqIOFMtIgqPIJul3UINa_6q1GVzvn0w/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9_NryPPjYNJETbhOX1Zeb2w7KMAorK8zcywmVapmqnhwifj5GAv10S8qbn3EqSY4fTg/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -185,7 +185,11 @@
           body: formData
       });
       const data = await response.json();
-      return data.imageUrl;
+      if (data.status === 'success') {
+          return data.data.imageUrl;
+      } else {
+          throw new Error(data.message);
+      }
     }
 
     const editableEntry = document.getElementById('editable-entry');
@@ -216,8 +220,6 @@
                         }
                         
                         showStatus('status', '¡Imagen subida y pegada con éxito!');
-                    } else {
-                        showStatus('status', 'Error al subir la imagen. Intenta de nuevo.');
                     }
                 } catch (error) {
                     console.error('Error al subir la imagen:', error);
@@ -244,10 +246,14 @@
             method: 'POST',
             body: formData
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
-            showStatus('status', '¡Entrada guardada con éxito!');
-            clearForm();
+            if (data.status === 'success') {
+                showStatus('status', '¡Entrada guardada con éxito!');
+                clearForm();
+            } else {
+                showStatus('status', data.message);
+            }
             setTimeout(() => hideStatus('status'), 3000);
         })
         .catch(error => {
