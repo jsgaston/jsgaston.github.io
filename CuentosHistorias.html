@@ -41,10 +41,9 @@
         .story-content.expanded { display: block; }
         .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
         
-        /* Estilos para hacer el video responsivo */
         .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
             max-width: 100%;
@@ -103,7 +102,7 @@
     <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_6i82bqhNuGjBnAD4FK5hwpZ6iKYvB8RNi8OurTPJ4g9cEVUUSHDGFcHVj4XiyFRq/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPkOIozUugJK4iNWL1j5rxORpkdi383MmCXGI_hYL7uPSp0R9arufxY79LRql3XW5e/exec'; 
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
@@ -126,7 +125,7 @@
                         [{ 'align': [] }],
                         ['link', 'image', 'video'],
                         ['clean'],
-                        ['table'] // Añadido el botón de tabla
+                        ['table']
                     ],
                     handlers: {
                         'link': function(value) {
@@ -160,7 +159,7 @@
                         }
                     }
                 },
-                'table': true // Habilitar el módulo de tablas
+                'table': true
             }
         });
 
@@ -208,13 +207,11 @@
             messageBox.style.display = 'block';
         }
 
-        // Función para convertir enlaces de YouTube en videos o texto
         function processVideos(htmlContent, isPDF) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
 
-            // Reemplazar iframes por texto en el PDF
             const iframes = tempDiv.querySelectorAll('iframe');
             iframes.forEach(iframe => {
                 if (iframe.src && iframe.src.match(youtubeRegex)) {
@@ -224,7 +221,6 @@
                 }
             });
 
-            // Procesar enlaces de video para la vista web (si no son ya iframes)
             if (!isPDF) {
                 const links = tempDiv.querySelectorAll('a');
                 links.forEach(link => {
@@ -246,44 +242,60 @@
             return tempDiv.innerHTML;
         }
 
-        // Nueva función para convertir HTML a texto plano con saltos de línea y representación de tablas e imágenes
-// New function to correctly handle images in the downloaded files.
-function htmlToFormattedText(html) {
-    let doc = new DOMParser().parseFromString(html, 'text/html');
-    let text = '';
-    doc.body.childNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            text += node.textContent.trim();
-        } else if (node.nodeType === Node.ELEMENT_NODE) {
-            if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
-                text += '\n\n' + node.textContent.trim();
-            } else if (node.tagName === 'UL' || node.tagName === 'OL') {
-                node.querySelectorAll('li').forEach(li => {
-                    text += '\n* ' + li.textContent.trim();
-                });
-                text += '\n';
-            } else if (node.tagName === 'TABLE') {
-                text += '\n\n[Tabla]\n';
-                const rows = node.querySelectorAll('tr');
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td, th');
-                    cells.forEach(cell => {
-                        text += cell.textContent.trim() + '\t';
-                    });
-                    text += '\n';
-                });
-                text += '[/Tabla]\n';
-            } else if (node.tagName === 'IMG') {
-                // Get the image URL and include it in the text.
-                const imgUrl = node.getAttribute('src');
-                text += `\n[Imagen: ${imgUrl}]`;
-            } else {
-                text += node.textContent.trim();
-            }
+        // --- FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
+
+        // Función para extraer URLs de imágenes del HTML
+        function extractImageUrls(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const images = doc.querySelectorAll('img');
+            const imageUrls = [];
+            images.forEach(img => {
+                imageUrls.push(img.src);
+            });
+            return imageUrls;
         }
-    });
-    return text.replace(/\n\s*\n/g, '\n\n').trim();
-}
+
+        // Función para convertir HTML a texto con marcadores de imagen
+        function htmlToFormattedText(html) {
+            let doc = new DOMParser().parseFromString(html, 'text/html');
+            let text = '';
+            let imageCounter = 1;
+            doc.body.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    text += node.textContent.trim();
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
+                        text += '\n\n' + node.textContent.trim();
+                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
+                        node.querySelectorAll('li').forEach(li => {
+                            text += '\n* ' + li.textContent.trim();
+                        });
+                        text += '\n';
+                    } else if (node.tagName === 'TABLE') {
+                        text += '\n\n[Tabla]\n';
+                        const rows = node.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td, th');
+                            cells.forEach(cell => {
+                                text += cell.textContent.trim() + '\t';
+                            });
+                            text += '\n';
+                        });
+                        text += '[/Tabla]\n';
+                    } else if (node.tagName === 'IMG') {
+                        const imgUrl = node.getAttribute('src');
+                        const extension = imgUrl.split('.').pop().split('?')[0]; // Obtener la extensión del archivo
+                        text += `\n[Imagen: imagen_${imageCounter}.${extension}]`;
+                        imageCounter++;
+                    } else {
+                        text += node.textContent.trim();
+                    }
+                }
+            });
+            return text.replace(/\n\s*\n/g, '\n\n').trim();
+        }
+
+        // --- FIN DE FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
 
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
@@ -316,6 +328,7 @@ function htmlToFormattedText(html) {
                                             <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
                                             <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
                                             <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
+                                            <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
                                         </div>
                                     </div>
                                 `;
@@ -357,6 +370,8 @@ function htmlToFormattedText(html) {
                 generarExcel(titulo, originalContent);
             } else if (format === 'txt') {
                 generarTXT(originalContent, titulo);
+            } else if (format === 'zip') {
+                descargarImagenesZIP(originalContent, titulo);
             }
         }
         
@@ -367,7 +382,6 @@ function htmlToFormattedText(html) {
             const originalContentHTML = element.querySelector('.story-content').innerHTML;
             const contentForPDF = processVideos(originalContentHTML, true);
             
-            // Reemplazar temporalmente el contenido para la captura
             element.querySelector('.story-content').innerHTML = contentForPDF;
 
             const { jsPDF } = window.jspdf;
@@ -391,7 +405,6 @@ function htmlToFormattedText(html) {
                 alert("Hubo un error al generar el PDF: " + error.message);
                 console.error("Error generando PDF:", error);
             }).finally(() => {
-                // Restaurar el contenido original
                 element.querySelector('.story-content').innerHTML = originalContentHTML;
             });
         }
@@ -447,6 +460,39 @@ function htmlToFormattedText(html) {
             }
         }
         
+        async function descargarImagenesZIP(htmlContent, filename) {
+            const imageUrls = extractImageUrls(htmlContent);
+            if (imageUrls.length === 0) {
+                alert("No hay imágenes en este cuento para descargar.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'zipImagenes');
+            formData.append('imageUrls', JSON.stringify(imageUrls));
+
+            try {
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.estado === 'éxito') {
+                    // Crea un enlace temporal y simula un clic para descargar el archivo ZIP
+                    const link = document.createElement('a');
+                    link.href = result.url;
+                    link.download = `${filename}_imagenes.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert('Error al crear el archivo ZIP: ' + result.mensaje);
+                }
+            } catch (error) {
+                alert('Fallo al comunicarse con el servidor: ' + error.message);
+            }
+        }
+
         document.getElementById('cuentos-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
                 const storyId = e.target.closest('.story-item').id;
