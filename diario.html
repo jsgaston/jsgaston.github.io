@@ -75,6 +75,14 @@
             color: #777;
             margin-bottom: 10px;
         }
+
+        .entry-image img {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
     </style>
 </head>
 <body>
@@ -84,15 +92,18 @@
     <p>Guarda tus pensamientos y recuerdos de forma privada.</p>
 
     <h2>Nueva Entrada</h2>
-    <form id="diary-form">
-        <label for="title">Título:</label>
-        <input type="text" id="title" required>
-        
-        <label for="entry-text">Entrada:</label>
-        <textarea id="entry-text" rows="10" required></textarea>
-        
-        <button type="submit">Guardar Entrada</button>
-    </form>
+<form id="diary-form" enctype="multipart/form-data">
+    <label for="title">Título:</label>
+    <input type="text" id="title" required>
+    
+    <label for="entry-text">Entrada:</label>
+    <textarea id="entry-text" rows="10" required></textarea>
+    
+    <label for="image">Imagen (opcional):</label>
+    <input type="file" id="image" accept="image/*">
+    
+    <button type="submit">Guardar Entrada</button>
+</form>
     <div id="status" class="loading"></div>
 
     <hr>
@@ -108,7 +119,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'TU_URL_DEL_SCRIPT_AQUI'; // ¡REEMPLAZA ESTO!
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUi5t2JvNCsP86vFAp0MTnAlTynztJeh7lAnLcXEjyCE5O_5KiDsTbqdjEAlOVNC9jpw/exec'; // ¡RECUERDA REEMPLAZAR ESTO!
 
     // Lógica para guardar una nueva entrada
     document.getElementById('diary-form').addEventListener('submit', function(e) {
@@ -118,10 +129,15 @@
         statusDiv.textContent = 'Guardando...';
 
         const form = e.target;
-        const formData = new FormData();
+        const formData = new FormData(form);
         formData.append('action', 'save');
         formData.append('titulo', form.querySelector('#title').value);
         formData.append('entrada', form.querySelector('#entry-text').value);
+        
+        const imageFile = form.querySelector('#image').files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
 
         fetch(SCRIPT_URL, {
             method: 'POST',
@@ -162,7 +178,14 @@
                     data.forEach(entry => {
                         const entryDiv = document.createElement('div');
                         entryDiv.className = 'entry';
+                        
+                        let imageHtml = '';
+                        if (entry.imageUrl) {
+                             imageHtml = `<div class="entry-image"><img src="${entry.imageUrl}" alt="${entry.titulo}"></div>`;
+                        }
+
                         entryDiv.innerHTML = `
+                            ${imageHtml}
                             <div class="entry-meta">
                                 ${entry.fecha} ${entry.hora}
                             </div>
