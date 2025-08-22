@@ -137,7 +137,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU0YeKeQhbm0JQu5uRbhsZY7imTUH7KTXBePG64RxPKZ9S2ZcwXF2yhc59fUxsyMaBdw/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiG6SKRAUfzAj21YnWML6AJUbsZKoPVKMCpp6JqIOFMtIgqPIJul3UINa_6q1GVzvn0w/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -156,7 +156,6 @@
         document.getElementById('editable-entry').innerHTML = '';
     }
 
-    // Preseleccionar fechas en el formulario de rango de fechas
     window.addEventListener('load', () => {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -189,7 +188,6 @@
       return data.imageUrl;
     }
 
-    // Lógica para manejar el pegado de imágenes
     const editableEntry = document.getElementById('editable-entry');
     editableEntry.addEventListener('paste', async function(e) {
         e.preventDefault();
@@ -230,7 +228,6 @@
         }
     });
 
-    // Lógica para guardar la entrada
     document.getElementById('diary-form').addEventListener('submit', function(e) {
         e.preventDefault();
         showStatus('status', 'Guardando...');
@@ -260,7 +257,6 @@
         });
     });
 
-    // Lógica para buscar entradas por palabra clave
     document.getElementById('search-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const resultsDiv = document.getElementById('results');
@@ -302,7 +298,6 @@
             });
     });
 
-    // Lógica para buscar entradas por rango de fechas
     document.getElementById('search-date-range-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const resultsDiv = document.getElementById('results');
