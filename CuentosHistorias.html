@@ -132,7 +132,7 @@
                                 if (url) {
                                     const range = quill.getSelection(true);
                                     // Inserta el texto "Enlace: " seguido de la URL como un enlace
-                                    quill.insertText(range.index, 'Enlace: ', { 'size': 'small' });
+                                    quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
                                     quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
                                     quill.setSelection(quill.getSelection().index);
                                 }
@@ -148,7 +148,7 @@
                                 if (match) {
                                     const range = quill.getSelection(true);
                                     // Inserta el enlace de texto antes del video
-                                    quill.insertText(range.index, 'Video: ', { 'size': 'small' });
+                                    quill.insertText(range.index, ' Video: ', { 'size': 'small' });
                                     quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
                                     quill.insertText(quill.getSelection().index, '\n');
                                     // Inserta el video incrustado
@@ -218,7 +218,7 @@
             iframes.forEach(iframe => {
                 if (iframe.src && iframe.src.match(youtubeRegex)) {
                     const videoUrl = iframe.src;
-                    const newText = document.createTextNode(`Enlace: ${videoUrl}`);
+                    const newText = document.createTextNode(` Enlace: ${videoUrl}`);
                     iframe.parentNode.replaceChild(newText, iframe);
                 }
             });
