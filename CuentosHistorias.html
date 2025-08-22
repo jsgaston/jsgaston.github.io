@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor de Cuentos e Historias</title>
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -99,6 +99,8 @@
             </div>
         </div>
     </div>
+    <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
+    <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwyoW1lx6R3gkzlWrhZzo-xwI0odDFAJr3-D325umN2rBM4lDu-hDNAMwGW8rMJAlc5/exec'; 
@@ -123,7 +125,8 @@
                         [{ 'font': [] }],
                         [{ 'align': [] }],
                         ['link', 'image', 'video'],
-                        ['clean']
+                        ['clean'],
+                        ['table'] // Añadido el botón de tabla
                     ],
                     handlers: {
                         'link': function(value) {
@@ -131,7 +134,6 @@
                                 let url = prompt('Introduce la URL del enlace:');
                                 if (url) {
                                     const range = quill.getSelection(true);
-                                    // Inserta el texto "Enlace: " seguido de la URL como un enlace
                                     quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
                                     quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
                                     quill.setSelection(quill.getSelection().index);
@@ -147,11 +149,9 @@
                                 const match = url.match(youtubeRegex);
                                 if (match) {
                                     const range = quill.getSelection(true);
-                                    // Inserta el enlace de texto antes del video
                                     quill.insertText(range.index, ' Video: ', { 'size': 'small' });
                                     quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
                                     quill.insertText(quill.getSelection().index, '\n');
-                                    // Inserta el video incrustado
                                     quill.insertEmbed(quill.getSelection().index, 'video', `https://www.youtube.com/embed/${match[1]}`);
                                 } else {
                                     alert('URL de video no válida. Por favor, introduce una URL de YouTube.');
@@ -159,7 +159,8 @@
                             }
                         }
                     }
-                }
+                },
+                'table': true // Habilitar el módulo de tablas
             }
         });
 
@@ -245,7 +246,7 @@
             return tempDiv.innerHTML;
         }
 
-        // Nueva función para convertir HTML a texto plano con saltos de línea
+        // Nueva función para convertir HTML a texto plano con saltos de línea y representación de tablas e imágenes
         function htmlToFormattedText(html) {
             let doc = new DOMParser().parseFromString(html, 'text/html');
             let text = '';
@@ -254,13 +255,23 @@
                     text += node.textContent.trim();
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
                     if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
-                        // Agrega saltos de línea antes y después de estos elementos
                         text += '\n\n' + node.textContent.trim();
                     } else if (node.tagName === 'UL' || node.tagName === 'OL') {
                         node.querySelectorAll('li').forEach(li => {
                             text += '\n* ' + li.textContent.trim();
                         });
                         text += '\n';
+                    } else if (node.tagName === 'TABLE') {
+                        text += '\n\n[Tabla]\n';
+                        const rows = node.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td, th');
+                            cells.forEach(cell => {
+                                text += cell.textContent.trim() + '\t';
+                            });
+                            text += '\n';
+                        });
+                        text += '[/Tabla]\n';
                     } else if (node.tagName === 'IMG') {
                         text += '\n[Imagen]';
                     } else {
@@ -268,7 +279,6 @@
                     }
                 }
             });
-            // Limpiar múltiples saltos de línea seguidos
             return text.replace(/\n\s*\n/g, '\n\n').trim();
         }
 
@@ -385,7 +395,6 @@
         
         async function generarODT(htmlContent, filename) {
             try {
-                // Generar un archivo de texto con formato
                 const formattedText = htmlToFormattedText(htmlContent);
                 const blob = new Blob([formattedText], { type: 'application/vnd.oasis.opendocument.text' });
                 saveAs(blob, `${filename}.odt`);
@@ -398,7 +407,6 @@
         
         async function generarWord(htmlContent, filename) {
             try {
-                // Generar un archivo de texto con formato
                 const formattedText = htmlToFormattedText(htmlContent);
                 const blob = new Blob([formattedText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
                 saveAs(blob, `${filename}.docx`);
@@ -427,7 +435,6 @@
 
         function generarTXT(htmlContent, filename) {
             try {
-                // Convertir el HTML a texto plano con formato
                 const formattedText = htmlToFormattedText(htmlContent);
                 const blob = new Blob([formattedText], { type: 'text/plain' });
                 saveAs(blob, `${filename}.txt`);
@@ -491,8 +498,7 @@
                                 alert('Fallo en la comunicación con el servidor: ' + error.message);
                             })
                             .finally(() => {
-                                // Siempre elimina el texto de carga, sin importar el resultado
-                                quill.deleteText(range.index, 18); // 18 es la longitud de "Cargando imagen..."
+                                quill.deleteText(range.index, 18);
                             });
                         };
                         reader.readAsDataURL(blob);
