@@ -277,11 +277,6 @@
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         const formattedDate = `${yyyy}-${mm}-${dd}`;
-
-        // En la función saveEntry, modifica estas líneas:
-const now = new Date();
-const fecha = Utilities.formatDate(now, Session.getScriptTimeZone(), 'dd/MM/yyyy');
-const hora = Utilities.formatDate(now, Session.getScriptTimeZone(), 'HH:mm:ss');
         
         document.getElementById('end-date').value = formattedDate;
         
@@ -294,6 +289,9 @@ const hora = Utilities.formatDate(now, Session.getScriptTimeZone(), 'HH:mm:ss');
         
         document.getElementById('start-date').value = formattedDatePrev;
     });
+
+
+
 
     // Función para subir imágenes
     async function uploadImage(imageBlob) {
@@ -405,6 +403,7 @@ const hora = Utilities.formatDate(now, Session.getScriptTimeZone(), 'HH:mm:ss');
     });
 
     // Buscar entradas
+// Buscar entradas
     document.getElementById('search-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const resultsDiv = document.getElementById('results');
@@ -440,14 +439,12 @@ const hora = Utilities.formatDate(now, Session.getScriptTimeZone(), 'HH:mm:ss');
       const startDate = document.getElementById('start-date').value;
       const endDate = document.getElementById('end-date').value;
 
-// En el archivo diario (4).html - Busca esta función y modifícala
-const formatDate = (dateStr) => {
-  const [year, month, day] = dateStr.split('-');
-  // Eliminar ceros iniciales en día y mes para coincidir con el formato de tu hoja
-  const dayFormatted = parseInt(day, 10).toString();
-  const monthFormatted = parseInt(month, 10).toString();
-  return `${dayFormatted}/${monthFormatted}/${year}`;
-};
+      const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split('-');
+        const dayFormatted = parseInt(day, 10).toString();
+        const monthFormatted = parseInt(month, 10).toString();
+        return `${dayFormatted}/${monthFormatted}/${year}`;
+      };
 
       const params = new URLSearchParams({
         action: 'searchByDateRange',
@@ -468,21 +465,29 @@ const formatDate = (dateStr) => {
         });
     });
 
-    // Mostrar resultados de búsqueda
+    // MOSTRAR RESULTADOS DE BÚSQUEDA - FUNCIÓN CORREGIDA
     function displayResults(data) {
       const resultsDiv = document.getElementById('results');
       
-      if (data.length > 0) {
+      if (data && data.length > 0) {
           data.forEach(entry => {
               const entryDiv = document.createElement('div');
               entryDiv.className = 'entry';
+              
+              // Corregir las URLs de imágenes antes de mostrar el contenido
+              let entradaCorregida = entry.entrada;
+              
+              // Reemplazar &amp; por & en las URLs de imágenes
+              if (entradaCorregida) {
+                  entradaCorregida = entradaCorregida.replace(/&amp;/g, '&');
+              }
               
               entryDiv.innerHTML = `
                   <div class="entry-meta">
                       ${entry.fecha} ${entry.hora}
                   </div>
-                  <h3>${entry.titulo}</h3>
-                  <div class="entry-content">${entry.entrada}</div>
+                  <h3>${entry.titulo || 'Sin título'}</h3>
+                  <div class="entry-content">${entradaCorregida}</div>
               `;
               resultsDiv.appendChild(entryDiv);
           });
