@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Diario Personal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        .loading {
+            display: none;
+            color: #888;
+            text-align: center;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .entry {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .entry h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #007BFF;
+        }
+        .entry p {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .entry-meta {
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Mi Diario Personal</h1>
+    <p>Guarda tus pensamientos y recuerdos de forma privada.</p>
+
+    <h2>Nueva Entrada</h2>
+    <form id="diary-form">
+        <label for="title">Título:</label>
+        <input type="text" id="title" required>
+        
+        <label for="entry-text">Entrada:</label>
+        <textarea id="entry-text" rows="10" required></textarea>
+        
+        <button type="submit">Guardar Entrada</button>
+    </form>
+    <div id="status" class="loading"></div>
+
+    <hr>
+
+    <h2>Buscar Entradas</h2>
+    <form id="search-form">
+        <input type="text" id="search-query" placeholder="Buscar por fecha (DD/MM/AAAA) o palabra clave..." required>
+        <button type="submit">Buscar</button>
+    </form>
+    <div id="results"></div>
+    <div id="search-status" class="loading"></div>
+
+</div>
+
+<script>
+    const SCRIPT_URL = 'TU_URL_DEL_SCRIPT_AQUI'; // ¡REEMPLAZA ESTO!
+
+    // Lógica para guardar una nueva entrada
+    document.getElementById('diary-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const statusDiv = document.getElementById('status');
+        statusDiv.style.display = 'block';
+        statusDiv.textContent = 'Guardando...';
+
+        const form = e.target;
+        const formData = new FormData();
+        formData.append('action', 'save');
+        formData.append('titulo', form.querySelector('#title').value);
+        formData.append('entrada', form.querySelector('#entry-text').value);
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            statusDiv.textContent = '¡Entrada guardada con éxito!';
+            form.reset();
+            setTimeout(() => statusDiv.style.display = 'none', 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusDiv.textContent = 'Error al guardar la entrada.';
+        });
+    });
+
+    // Lógica para buscar entradas
+    document.getElementById('search-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const resultsDiv = document.getElementById('results');
+        const statusDiv = document.getElementById('search-status');
+        resultsDiv.innerHTML = '';
+        statusDiv.style.display = 'block';
+        statusDiv.textContent = 'Buscando...';
+
+        const query = document.getElementById('search-query').value;
+        const params = new URLSearchParams({
+            action: 'search',
+            query: query
+        });
+
+        fetch(`${SCRIPT_URL}?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                statusDiv.style.display = 'none';
+                if (data.length > 0) {
+                    data.forEach(entry => {
+                        const entryDiv = document.createElement('div');
+                        entryDiv.className = 'entry';
+                        entryDiv.innerHTML = `
+                            <div class="entry-meta">
+                                ${entry.fecha} ${entry.hora}
+                            </div>
+                            <h3>${entry.titulo}</h3>
+                            <p>${entry.entrada}</p>
+                        `;
+                        resultsDiv.appendChild(entryDiv);
+                    });
+                } else {
+                    resultsDiv.innerHTML = '<p>No se encontraron entradas.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusDiv.style.display = 'none';
+                resultsDiv.innerHTML = '<p>Error al buscar las entradas.</p>';
+            });
+    });
+</script>
+
+</body>
+</html>
