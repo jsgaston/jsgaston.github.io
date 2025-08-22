@@ -7,92 +7,183 @@
     <title>Mi Diario Personal</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
             color: #333;
+            line-height: 1.6;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
         h1, h2, h3 {
-            color: #333;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+        h2 {
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            color: #3498db;
+        }
+        h3 {
+            color: #2c3e50;
         }
         input[type="text"], input[type="date"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
+            font-size: 16px;
         }
         #editable-entry {
-            min-height: 200px;
+            min-height: 250px;
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
             background-color: #fff;
-            line-height: 1.5;
+            line-height: 1.6;
+            font-size: 16px;
         }
         #editable-entry:focus {
             outline: none;
-            border-color: #5cb85c;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
         }
         #editable-entry img {
             max-width: 100%;
             height: auto;
             display: block;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin: 10px auto;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
         }
         button {
-            background-color: #5cb85c;
+            background-color: #3498db;
             color: white;
-            padding: 10px 15px;
+            padding: 12px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #4cae4c;
+            background-color: #2980b9;
         }
         .loading {
             display: none;
-            color: #888;
+            color: #7f8c8d;
             text-align: center;
+            padding: 10px;
+            font-style: italic;
         }
         #results {
-            margin-top: 20px;
+            margin-top: 30px;
         }
         .entry {
             background: #f9f9f9;
             border: 1px solid #eee;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .entry h3 {
             margin-top: 0;
-            margin-bottom: 5px;
-            color: #007BFF;
+            margin-bottom: 10px;
+            color: #2c3e50;
         }
         .entry-meta {
             font-size: 0.9em;
-            color: #777;
-            margin-bottom: 10px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+        }
+        .entry-content {
+            line-height: 1.6;
+        }
+        .entry-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .search-section {
+            background-color: #f5f7fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .button-group button {
+            flex: 1;
+        }
+        .secondary-button {
+            background-color: #95a5a6;
+        }
+        .secondary-button:hover {
+            background-color: #7f8c8d;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -102,34 +193,47 @@
     <h1>Mi Diario Personal</h1>
     <p>Guarda tus pensamientos y recuerdos de forma privada.</p>
 
+    <div id="success-message" class="success-message"></div>
+    <div id="error-message" class="error-message"></div>
+
     <h2>Nueva Entrada</h2>
     <form id="diary-form">
-        <label for="title">Título:</label>
-        <input type="text" id="title" required>
+        <div class="form-group">
+            <label for="title">Título:</label>
+            <input type="text" id="title" required>
+        </div>
         
-        <label>Entrada (puedes pegar imágenes aquí):</label>
-        <div id="editable-entry" contenteditable="true"></div>
+        <div class="form-group">
+            <label>Entrada (puedes pegar imágenes aquí):</label>
+            <div id="editable-entry" contenteditable="true"></div>
+        </div>
         
         <button type="submit">Guardar Entrada</button>
     </form>
     <div id="status" class="loading"></div>
 
-    <hr>
-
-    <h2>Buscar Entradas</h2>
-    <form id="search-form">
-        <input type="text" id="search-query" placeholder="Buscar por palabra clave..." required>
-        <button type="submit">Buscar</button>
-    </form>
-    
-    <h3>Buscar por Rango de Fechas</h3>
-    <form id="search-date-range-form">
-        <label for="start-date">Fecha de inicio:</label>
-        <input type="date" id="start-date" required>
-        <label for="end-date">Fecha de fin:</label>
-        <input type="date" id="end-date" required>
-        <button type="submit">Buscar por Fecha</button>
-    </form>
+    <div class="search-section">
+        <h2>Buscar Entradas</h2>
+        <form id="search-form">
+            <div class="form-group">
+                <input type="text" id="search-query" placeholder="Buscar por palabra clave..." required>
+            </div>
+            <button type="submit">Buscar</button>
+        </form>
+        
+        <h3>Buscar por Rango de Fechas</h3>
+        <form id="search-date-range-form">
+            <div class="form-group">
+                <label for="start-date">Fecha de inicio:</label>
+                <input type="date" id="start-date" required>
+            </div>
+            <div class="form-group">
+                <label for="end-date">Fecha de fin:</label>
+                <input type="date" id="end-date" required>
+            </div>
+            <button type="submit">Buscar por Fecha</button>
+        </form>
+    </div>
 
     <div id="results"></div>
     <div id="search-status" class="loading"></div>
@@ -137,7 +241,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvbjvj2XFK8CyhW_odkXGyNK7r5j-kuwti5Nzxno_MvkdV8TIqfYQQ-4uZSWbQqsEVjw/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxs-VPnEU_ZP4y6Kjkxl9rDIJH5GzcRvgN5Cd63bcxXBnuer13VFgVKnaNFeRPiOmWI4w/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -151,11 +255,22 @@
         statusDiv.style.display = 'none';
     }
 
+    function showMessage(type, message) {
+        const messageDiv = document.getElementById(`${type}-message`);
+        messageDiv.textContent = message;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+
     function clearForm() {
         document.getElementById('title').value = '';
         document.getElementById('editable-entry').innerHTML = '';
     }
 
+    // Configurar fechas por defecto
     window.addEventListener('load', () => {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -175,31 +290,38 @@
         document.getElementById('start-date').value = formattedDatePrev;
     });
 
-async function uploadImage(imageBlob) {
-  // Convertir el blob a base64
-  const reader = new FileReader();
-  const base64Promise = new Promise((resolve) => {
-    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-  });
-  reader.readAsDataURL(imageBlob);
-  const base64Data = await base64Promise;
-  
-  const formData = new FormData();
-  formData.append('action', 'uploadImage');
-  formData.append('imageBlob', base64Data);
-  
-  const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: formData
-  });
-  const data = await response.json();
-  if (data.status === 'success') {
-      return data.data.imageUrl;
-  } else {
-      throw new Error(data.message);
-  }
-}
+    // Función para subir imágenes
+    async function uploadImage(imageBlob) {
+      // Convertir el blob a base64
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64data = reader.result.split(',')[1];
+          
+          const formData = new FormData();
+          formData.append('action', 'uploadImage');
+          formData.append('imageBlob', base64data);
+          
+          fetch(SCRIPT_URL, {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  resolve(data.data.imageUrl);
+              } else {
+                  reject(new Error(data.message));
+              }
+          })
+          .catch(error => reject(error));
+        };
+        reader.onerror = () => reject(new Error('Error al leer la imagen'));
+        reader.readAsDataURL(imageBlob);
+      });
+    }
 
+    // Manejar pegado de imágenes
     const editableEntry = document.getElementById('editable-entry');
     editableEntry.addEventListener('paste', async function(e) {
         e.preventDefault();
@@ -227,17 +349,23 @@ async function uploadImage(imageBlob) {
                           editableEntry.appendChild(img);
                         }
                         
-                        showStatus('status', '¡Imagen subida y pegada con éxito!');
+                        showMessage('success', '¡Imagen subida y pegada con éxito!');
                     }
                 } catch (error) {
                     console.error('Error al subir la imagen:', error);
-                    showStatus('status', 'Error al subir la imagen.');
+                    showMessage('error', 'Error al subir la imagen.');
                 }
-                setTimeout(() => hideStatus('status'), 5000);
+                hideStatus('status');
+            } else if (item.type === 'text/plain') {
+                // Manejar texto plano
+                item.getAsString((text) => {
+                    document.execCommand('insertText', false, text);
+                });
             }
         }
     });
 
+    // Guardar entrada
     document.getElementById('diary-form').addEventListener('submit', function(e) {
         e.preventDefault();
         showStatus('status', 'Guardando...');
@@ -257,20 +385,21 @@ async function uploadImage(imageBlob) {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                showStatus('status', '¡Entrada guardada con éxito!');
+                showMessage('success', '¡Entrada guardada con éxito!');
                 clearForm();
             } else {
-                showStatus('status', 'Error: ' + data.message);
+                showMessage('error', 'Error: ' + data.message);
             }
-            setTimeout(() => hideStatus('status'), 3000);
+            hideStatus('status');
         })
         .catch(error => {
             console.error('Error:', error);
-            showStatus('status', 'Error al guardar la entrada.');
-            setTimeout(() => hideStatus('status'), 3000);
+            showMessage('error', 'Error al guardar la entrada.');
+            hideStatus('status');
         });
     });
 
+    // Buscar entradas
     document.getElementById('search-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const resultsDiv = document.getElementById('results');
@@ -287,31 +416,16 @@ async function uploadImage(imageBlob) {
             .then(response => response.json())
             .then(data => {
                 hideStatus('search-status');
-                if (data.length > 0) {
-                    data.forEach(entry => {
-                        const entryDiv = document.createElement('div');
-                        entryDiv.className = 'entry';
-                        
-                        entryDiv.innerHTML = `
-                            <div class="entry-meta">
-                                ${entry.fecha} ${entry.hora}
-                            </div>
-                            <h3>${entry.titulo}</h3>
-                            <div class="entry-content">${entry.entrada}</div>
-                        `;
-                        resultsDiv.appendChild(entryDiv);
-                    });
-                } else {
-                    resultsDiv.innerHTML = '<p>No se encontraron entradas.</p>';
-                }
+                displayResults(data);
             })
             .catch(error => {
                 console.error('Error:', error);
                 hideStatus('search-status');
-                resultsDiv.innerHTML = '<p>Error al buscar las entradas.</p>';
+                resultsDiv.innerHTML = '<div class="no-results">Error al buscar las entradas.</div>';
             });
     });
 
+    // Buscar por rango de fechas
     document.getElementById('search-date-range-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const resultsDiv = document.getElementById('results');
@@ -336,8 +450,21 @@ async function uploadImage(imageBlob) {
         .then(response => response.json())
         .then(data => {
           hideStatus('search-status');
-          if (data.length > 0) {
-            data.forEach(entry => {
+          displayResults(data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          hideStatus('search-status');
+          resultsDiv.innerHTML = '<div class="no-results">Error al buscar las entradas.</div>';
+        });
+    });
+
+    // Mostrar resultados de búsqueda
+    function displayResults(data) {
+      const resultsDiv = document.getElementById('results');
+      
+      if (data.length > 0) {
+          data.forEach(entry => {
               const entryDiv = document.createElement('div');
               entryDiv.className = 'entry';
               
@@ -349,17 +476,11 @@ async function uploadImage(imageBlob) {
                   <div class="entry-content">${entry.entrada}</div>
               `;
               resultsDiv.appendChild(entryDiv);
-            });
-          } else {
-            resultsDiv.innerHTML = '<p>No se encontraron entradas en ese rango de fechas.</p>';
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          hideStatus('search-status');
-          resultsDiv.innerHTML = '<p>Error al buscar las entradas.</p>';
-        });
-    });
+          });
+      } else {
+          resultsDiv.innerHTML = '<div class="no-results">No se encontraron entradas.</div>';
+      }
+    }
 </script>
 
 </body>
