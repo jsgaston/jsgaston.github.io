@@ -20,7 +20,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        h1, h2 {
+        h1, h2, h3 {
             color: #333;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
@@ -34,7 +34,6 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
-        /* Estilos para el campo de texto editable */
         #editable-entry {
             min-height: 200px;
             width: 100%;
@@ -44,6 +43,7 @@
             border-radius: 4px;
             box-sizing: border-box;
             background-color: #fff;
+            line-height: 1.5;
         }
         #editable-entry:focus {
             outline: none;
@@ -54,6 +54,7 @@
             height: auto;
             display: block;
             margin-top: 10px;
+            margin-bottom: 10px;
         }
         button {
             background-color: #5cb85c;
@@ -87,21 +88,10 @@
             margin-bottom: 5px;
             color: #007BFF;
         }
-        .entry p {
-            margin: 0;
-            white-space: pre-wrap;
-        }
         .entry-meta {
             font-size: 0.9em;
             color: #777;
             margin-bottom: 10px;
-        }
-        .entry-content img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
         }
     </style>
 </head>
@@ -142,10 +132,11 @@
 
     <div id="results"></div>
     <div id="search-status" class="loading"></div>
+
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwOtIgUrvDyQCoBepBjAGv7cC2tCh12ays_lbvjIA1T8NHdM4H8TIx7qRqL9IHRJSz8/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1E_eG3qEN7ELF4s_7r3MQNNCgWWE4dlR0vKdtnRzufFZSlcDqzbHva4PYkndMrMU1Ew/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -160,9 +151,29 @@
     }
 
     function clearForm(formId) {
-        document.getElementById(formId).reset();
+        document.getElementById('title').value = '';
         document.getElementById('editable-entry').innerHTML = '';
     }
+
+    // Preseleccionar fechas en el formulario de rango de fechas
+    window.addEventListener('load', () => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${yyyy}-${mm}-${dd}`;
+        
+        document.getElementById('end-date').value = formattedDate;
+        
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(today.getDate() - 7);
+        const yyyyPrev = oneWeekAgo.getFullYear();
+        const mmPrev = String(oneWeekAgo.getMonth() + 1).padStart(2, '0');
+        const ddPrev = String(oneWeekAgo.getDate()).padStart(2, '0');
+        const formattedDatePrev = `${yyyyPrev}-${mmPrev}-${ddPrev}`;
+        
+        document.getElementById('start-date').value = formattedDatePrev;
+    });
 
     async function uploadImage(imageBlob) {
       const formData = new FormData();
@@ -180,29 +191,42 @@
     // Lógica para manejar el pegado de imágenes
     const editableEntry = document.getElementById('editable-entry');
     editableEntry.addEventListener('paste', async function(e) {
-      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-      for (const item of items) {
-        if (item.type.startsWith('image/')) {
-          e.preventDefault(); // Evita que la imagen se pegue por defecto
+        e.preventDefault(); // Evita que la imagen se pegue por defecto
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                const blob = item.getAsFile();
+                if (!blob) continue;
 
-          const blob = item.getAsFile();
-          showStatus('status', 'Subiendo imagen...');
-          
-          const imageUrl = await uploadImage(blob);
-          if (imageUrl) {
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            editableEntry.appendChild(img);
-            showStatus('status', 'Imagen subida y pegada con éxito!');
-          } else {
-            showStatus('status', 'Error al subir la imagen.');
-          }
-          setTimeout(() => hideStatus('status'), 3000);
+                showStatus('status', 'Subiendo imagen...');
+                
+                try {
+                    const imageUrl = await uploadImage(blob);
+                    if (imageUrl) {
+                        const img = document.createElement('img');
+                        img.src = imageUrl;
+                        
+                        // Insertar la imagen en la posición del cursor
+                        const selection = window.getSelection();
+                        const range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(img);
+                        
+                        showStatus('status', '¡Imagen subida y pegada con éxito!');
+                    } else {
+                        showStatus('status', 'Error al subir la imagen. Intenta de nuevo.');
+                    }
+                } catch (error) {
+                    console.error('Error al subir la imagen:', error);
+                    showStatus('status', 'Error al subir la imagen.');
+                }
+                setTimeout(() => hideStatus('status'), 3000);
+            }
         }
-      }
     });
 
-    // Lógica para guardar la entrada (con o sin imágenes)
+    // Lógica para guardar la entrada
     document.getElementById('diary-form').addEventListener('submit', function(e) {
         e.preventDefault();
         showStatus('status', 'Guardando...');
@@ -214,7 +238,6 @@
         
         // Obtener el contenido HTML del div editable
         const entryContent = editableEntry.innerHTML;
-        // La URL de la imagen ya está incrustada en el HTML
         formData.append('entrada', entryContent);
         
         fetch(SCRIPT_URL, {
