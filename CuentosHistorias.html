@@ -247,40 +247,43 @@
         }
 
         // Nueva función para convertir HTML a texto plano con saltos de línea y representación de tablas e imágenes
-        function htmlToFormattedText(html) {
-            let doc = new DOMParser().parseFromString(html, 'text/html');
-            let text = '';
-            doc.body.childNodes.forEach(node => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    text += node.textContent.trim();
-                } else if (node.nodeType === Node.ELEMENT_NODE) {
-                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
-                        text += '\n\n' + node.textContent.trim();
-                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
-                        node.querySelectorAll('li').forEach(li => {
-                            text += '\n* ' + li.textContent.trim();
-                        });
-                        text += '\n';
-                    } else if (node.tagName === 'TABLE') {
-                        text += '\n\n[Tabla]\n';
-                        const rows = node.querySelectorAll('tr');
-                        rows.forEach(row => {
-                            const cells = row.querySelectorAll('td, th');
-                            cells.forEach(cell => {
-                                text += cell.textContent.trim() + '\t';
-                            });
-                            text += '\n';
-                        });
-                        text += '[/Tabla]\n';
-                    } else if (node.tagName === 'IMG') {
-                        text += '\n[Imagen]';
-                    } else {
-                        text += node.textContent.trim();
-                    }
-                }
-            });
-            return text.replace(/\n\s*\n/g, '\n\n').trim();
+// New function to correctly handle images in the downloaded files.
+function htmlToFormattedText(html) {
+    let doc = new DOMParser().parseFromString(html, 'text/html');
+    let text = '';
+    doc.body.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            text += node.textContent.trim();
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
+                text += '\n\n' + node.textContent.trim();
+            } else if (node.tagName === 'UL' || node.tagName === 'OL') {
+                node.querySelectorAll('li').forEach(li => {
+                    text += '\n* ' + li.textContent.trim();
+                });
+                text += '\n';
+            } else if (node.tagName === 'TABLE') {
+                text += '\n\n[Tabla]\n';
+                const rows = node.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td, th');
+                    cells.forEach(cell => {
+                        text += cell.textContent.trim() + '\t';
+                    });
+                    text += '\n';
+                });
+                text += '[/Tabla]\n';
+            } else if (node.tagName === 'IMG') {
+                // Get the image URL and include it in the text.
+                const imgUrl = node.getAttribute('src');
+                text += `\n[Imagen: ${imgUrl}]`;
+            } else {
+                text += node.textContent.trim();
+            }
         }
+    });
+    return text.replace(/\n\s*\n/g, '\n\n').trim();
+}
 
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
