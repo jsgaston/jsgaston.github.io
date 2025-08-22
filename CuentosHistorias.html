@@ -14,6 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -101,7 +102,7 @@
     <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_NtYrHWYwWAFQwhxBXjx0kfLGr1JWasavUomvJUYoFJOErDmB8vKYwt4UMyLVO8Q/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwV6garIIFomJ-WqJBB59mO04z2ylFB9RyI5_7v0HCNRRTENDuqWhzMBQQmru32EwLJ/exec'; 
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
@@ -129,7 +130,7 @@
                     handlers: {
                         'link': function(value) {
                             if (value) {
-                                let url = window.prompt('Introduce la URL del enlace:');
+                                let url = prompt('Introduce la URL del enlace:');
                                 if (url) {
                                     const range = quill.getSelection(true);
                                     quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
@@ -141,7 +142,7 @@
                             }
                         },
                         'video': function() {
-                            let url = window.prompt('Introduce la URL del video de YouTube:');
+                            let url = prompt('Introduce la URL del video de YouTube:');
                             if (url) {
                                 const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
                                 const match = url.match(youtubeRegex);
@@ -152,7 +153,7 @@
                                     quill.insertText(quill.getSelection().index, '\n');
                                     quill.insertEmbed(quill.getSelection().index, 'video', `https://www.youtube.com/embed/${match[1]}`);
                                 } else {
-                                    showAppMessage('error', 'URL de video no válida. Por favor, introduce una URL de YouTube.');
+                                    alert('URL de video no válida. Por favor, introduce una URL de YouTube.');
                                 }
                             }
                         }
@@ -183,15 +184,15 @@
             .then(response => response.json())
             .then(result => {
                 if (result.estado === 'éxito') {
-                    showAppMessage('success', result.mensaje);
+                    showMessage('success', result.mensaje);
                     document.getElementById('cuentoForm').reset();
                     quill.setContents([]);
                 } else {
-                    showAppMessage('error', result.mensaje);
+                    showMessage('error', result.mensaje);
                 }
             })
             .catch(error => {
-                showAppMessage('error', 'Fallo al guardar: ' + error.message);
+                showMessage('error', 'Fallo al guardar: ' + error.message);
             })
             .finally(() => {
                 buttonText.textContent = 'Guardar Cuento';
@@ -199,126 +200,51 @@
             });
         });
 
-        // Modificada para usar un cuadro de mensaje en lugar de alert()
-        const uploadImageHandler = function() {
-            const input = document.createElement('input');
-            input.setAttribute('type', 'file');
-            input.setAttribute('accept', 'image/*');
-            input.click();
-
-            input.onchange = async () => {
-                const file = input.files[0];
-                if (!file) {
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = async (event) => {
-                    const base64data = event.target.result;
-                    const formData = new FormData();
-                    formData.append('action', 'subirImagenBase64');
-                    formData.append('imagen', base64data);
-                    
-                    const range = quill.getSelection();
-                    quill.insertText(range.index, 'Cargando imagen...');
-                    
-                    try {
-                        const response = await fetch(APP_SCRIPT_URL, {
-                            method: 'POST',
-                            body: formData
-                        });
-                        const result = await response.json();
-                        
-                        if (result.estado === 'éxito') {
-                            quill.deleteText(range.index, 18); // Eliminar 'Cargando imagen...'
-                            quill.insertEmbed(range.index, 'image', result.url);
-                        } else {
-                            quill.deleteText(range.index, 18);
-                            showAppMessage('error', 'Error al subir la imagen: ' + result.mensaje);
-                        }
-                    } catch (error) {
-                        quill.deleteText(range.index, 18);
-                        showAppMessage('error', 'Fallo en la comunicación con el servidor: ' + error.message);
-                    }
-                };
-                reader.readAsDataURL(file);
-            };
-        };
-
-        // Asignar el nuevo manejador de imagen
-        quill.getModule('toolbar').addHandler('image', uploadImageHandler);
-
-        function showAppMessage(type, message) {
+        function showMessage(type, message) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
             messageBox.className = 'message-box ' + type;
             messageBox.style.display = 'block';
         }
 
-        // Funcionalidad de tabs
-        document.querySelectorAll('.btn-tab').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                document.getElementById(button.dataset.tab + '-tab').classList.add('active');
+        function processVideos(htmlContent, isPDF) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
 
-                if (button.dataset.tab === 'view') {
-                    listarCuentos();
+            const iframes = tempDiv.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                if (iframe.src && iframe.src.match(youtubeRegex)) {
+                    const videoUrl = iframe.src;
+                    const newText = document.createTextNode(` Enlace: ${videoUrl}`);
+                    iframe.parentNode.replaceChild(newText, iframe);
                 }
             });
-        });
 
-        // Funciones para la visualización y descarga de cuentos
-        async function listarCuentos() {
-            const cuentosList = document.getElementById('cuentos-list');
-            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
-            try {
-                const response = await fetch(`${APP_SCRIPT_URL}?action=listarCuentos`);
-                const result = await response.json();
-
-                if (result.estado === 'éxito') {
-                    cuentosList.innerHTML = '';
-                    if (result.data && result.data.length > 0) {
-                        result.data.reverse().forEach(cuento => {
-                            const storyItem = document.createElement('li');
-                            storyItem.className = 'story-item';
-                            storyItem.innerHTML = `
-                                <div class="header">
-                                    <h3>${cuento.titulo}</h3>
-                                    <svg class="arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9 5L16 12L9 19" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <div class="story-content" style="display: none;">
-                                    <p style="font-size: 0.9rem; color: #6b7280; font-style: italic;">Publicado el ${new Date(cuento.fecha).toLocaleDateString()}</p>
-                                    <div class="ql-editor">${processVideos(cuento.contenido)}</div>
-                                    <div class="download-buttons-container">
-                                        <button class="btn download-btn" onclick="zipAndDownloadImages('${btoa(cuento.contenido)}', event)">Descargar Imágenes (ZIP)</button>
-                                    </div>
-                                </div>
-                            `;
-                            cuentosList.appendChild(storyItem);
-
-                            storyItem.querySelector('.header').addEventListener('click', () => {
-                                const content = storyItem.querySelector('.story-content');
-                                const arrow = storyItem.querySelector('.arrow');
-                                const isExpanded = content.classList.toggle('expanded');
-                                arrow.classList.toggle('expanded', isExpanded);
-                            });
-                        });
-                    } else {
-                        cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
+            if (!isPDF) {
+                const links = tempDiv.querySelectorAll('a');
+                links.forEach(link => {
+                    const url = link.href;
+                    if (url.match(youtubeRegex)) {
+                        const videoId = url.match(youtubeRegex)[1];
+                        const iframe = document.createElement('iframe');
+                        iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
+                        iframe.setAttribute('frameborder', '0');
+                        iframe.setAttribute('allowfullscreen', '');
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'video-wrapper';
+                        wrapper.appendChild(iframe);
+                        link.parentNode.replaceChild(wrapper, link);
                     }
-                } else {
-                    cuentosList.innerHTML = `<p style="color: red;">Error al cargar cuentos: ${result.mensaje}</p>`;
-                }
-            } catch (error) {
-                cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                });
             }
+
+            return tempDiv.innerHTML;
         }
 
-        // --- FUNCIONES PARA MANEJO DE DESCARGA DE IMÁGENES ---
-        // Extrae URLs de imágenes del contenido HTML
+        // --- FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
+
+        // Función para extraer URLs de imágenes del HTML
         function extractImageUrls(html) {
             const doc = new DOMParser().parseFromString(html, 'text/html');
             const images = doc.querySelectorAll('img');
@@ -329,19 +255,215 @@
             return imageUrls;
         }
 
-        // Llama al Apps Script para crear un ZIP y dispara la descarga
-        async function zipAndDownloadImages(encodedContent, event) {
-            const button = event.target;
-            button.textContent = 'Preparando...';
-            button.disabled = true;
+        // Función para convertir HTML a texto con marcadores de imagen
+        function htmlToFormattedText(html) {
+            let doc = new DOMParser().parseFromString(html, 'text/html');
+            let text = '';
+            let imageCounter = 1;
+            doc.body.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    text += node.textContent.trim();
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
+                        text += '\n\n' + node.textContent.trim();
+                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
+                        node.querySelectorAll('li').forEach(li => {
+                            text += '\n* ' + li.textContent.trim();
+                        });
+                        text += '\n';
+                    } else if (node.tagName === 'TABLE') {
+                        text += '\n\n[Tabla]\n';
+                        const rows = node.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td, th');
+                            cells.forEach(cell => {
+                                text += cell.textContent.trim() + '\t';
+                            });
+                            text += '\n';
+                        });
+                        text += '[/Tabla]\n';
+                    } else if (node.tagName === 'IMG') {
+                        const imgUrl = node.getAttribute('src');
+                        const extension = imgUrl.split('.').pop().split('?')[0]; // Obtener la extensión del archivo
+                        text += `\n[Imagen: imagen_${imageCounter}.${extension}]`;
+                        imageCounter++;
+                    } else {
+                        text += node.textContent.trim();
+                    }
+                }
+            });
+            return text.replace(/\n\s*\n/g, '\n\n').trim();
+        }
 
-            const htmlContent = atob(encodedContent);
+        // --- FIN DE FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
+
+        function cargarCuentos() {
+            const cuentosList = document.getElementById('cuentos-list');
+            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
+            const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.estado === 'éxito') {
+                        cuentosList.innerHTML = '';
+                        if (result.cuentos && result.cuentos.length > 0) {
+                            result.cuentos.forEach((cuento, index) => {
+                                const storyId = `story-${index}`;
+                                const storyDiv = document.createElement('div');
+                                storyDiv.id = storyId;
+                                storyDiv.className = 'story-item';
+                                
+                                const contenidoConVideos = processVideos(cuento.contenido, false);
+                                
+                                storyDiv.innerHTML = `
+                                    <div class="header">
+                                        <h3>${cuento.titulo}</h3>
+                                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
+                                    </div>
+                                    <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
+                                        ${contenidoConVideos}
+                                        <div class="download-buttons-container">
+                                            <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                            <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
+                                            <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
+                                            <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
+                                            <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
+                                            <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
+                                        </div>
+                                    </div>
+                                `;
+                                cuentosList.appendChild(storyDiv);
+                            });
+
+                            document.querySelectorAll('.story-item .header').forEach(header => {
+                                header.addEventListener('click', function() {
+                                    const content = this.nextElementSibling;
+                                    const arrow = this.querySelector('.arrow');
+                                    content.classList.toggle('expanded');
+                                    arrow.classList.toggle('expanded');
+                                });
+                            });
+                        } else {
+                            cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
+                        }
+                    } else {
+                        cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
+                    }
+                })
+                .catch(error => {
+                    cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                });
+        }
+        
+        async function descargarCuento(storyId, format) {
+            const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
+            const originalContent = decodeURIComponent(storyContentDiv.dataset.original-content);
+            const titulo = decodeURIComponent(storyContentDiv.dataset.title);
+            
+            if (format === 'pdf') {
+                generarPDF(storyId, titulo);
+            } else if (format === 'odt') {
+                generarODT(originalContent, titulo);
+            } else if (format === 'docx') {
+                generarWord(originalContent, titulo);
+            } else if (format === 'xlsx') {
+                generarExcel(titulo, originalContent);
+            } else if (format === 'txt') {
+                generarTXT(originalContent, titulo);
+            } else if (format === 'zip') {
+                descargarImagenesZIP(originalContent, titulo);
+            }
+        }
+        
+        function generarPDF(storyId, filename) {
+            const element = document.getElementById(storyId);
+            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
+            
+            const originalContentHTML = element.querySelector('.story-content').innerHTML;
+            const contentForPDF = processVideos(originalContentHTML, true);
+            
+            element.querySelector('.story-content').innerHTML = contentForPDF;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgProps = doc.getImageProperties(imgData);
+                const pdfWidth = doc.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                let y = 0;
+                while (y < pdfHeight) {
+                    if (y > 0) { doc.addPage(); }
+                    const heightLeft = pdfHeight - y;
+                    const newHeight = Math.min(doc.internal.pageSize.getHeight(), heightLeft);
+                    doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
+                    y += newHeight;
+                }
+                doc.save(`${filename}.pdf`);
+            }).catch(error => {
+                alert("Hubo un error al generar el PDF: " + error.message);
+                console.error("Error generando PDF:", error);
+            }).finally(() => {
+                element.querySelector('.story-content').innerHTML = originalContentHTML;
+            });
+        }
+        
+        async function generarODT(htmlContent, filename) {
+            try {
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.oasis.opendocument.text' });
+                saveAs(blob, `${filename}.odt`);
+                
+            } catch (error) {
+                alert("Hubo un error al generar el archivo ODT: " + error.message);
+                console.error("Error generando ODT:", error);
+            }
+        }
+        
+        async function generarWord(htmlContent, filename) {
+            try {
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                saveAs(blob, `${filename}.docx`);
+                
+            } catch (error) {
+                alert("Hubo un error al generar el archivo de Word: " + error.message);
+                console.error("Error generando DOCX:", error);
+            }
+        }
+        
+        function generarExcel(titulo, contenido) {
+            try {
+                const wb = XLSX.utils.book_new();
+                const ws_data = [
+                    ["Título", "Contenido"],
+                    [titulo, htmlToFormattedText(contenido)]
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                XLSX.utils.book_append_sheet(wb, ws, "Historia");
+                XLSX.writeFile(wb, `${titulo}.xlsx`);
+            } catch (error) {
+                alert("Hubo un error al generar el archivo Excel: " + error.message);
+                console.error("Error generando Excel:", error);
+            }
+        }
+
+        function generarTXT(htmlContent, filename) {
+            try {
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'text/plain' });
+                saveAs(blob, `${filename}.txt`);
+            } catch (error) {
+                alert("Hubo un error al generar el archivo TXT: " + error.message);
+                console.error("Error generando TXT:", error);
+            }
+        }
+        
+        async function descargarImagenesZIP(htmlContent, filename) {
             const imageUrls = extractImageUrls(htmlContent);
-
             if (imageUrls.length === 0) {
-                showAppMessage('error', 'No hay imágenes para descargar en este cuento.');
-                button.textContent = 'Descargar Imágenes (ZIP)';
-                button.disabled = false;
+                alert("No hay imágenes en este cuento para descargar.");
                 return;
             }
 
@@ -355,55 +477,87 @@
                     body: formData
                 });
                 const result = await response.json();
-                
-                if (result.estado === 'éxito' && result.url) {
-                    // Crea un enlace temporal y simula un clic para descargar
-                    const a = document.createElement('a');
-                    a.href = result.url;
-                    a.download = `imagenes_${new Date().getTime()}.zip`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    showAppMessage('success', 'Descarga iniciada.');
+                if (result.estado === 'éxito') {
+                    // Usar el fileId para descargar el ZIP
+                    const downloadUrl = `${APP_SCRIPT_URL}?action=descargarZip&fileId=${result.fileId}`;
+                    
+                    // Crea un enlace temporal y simula un clic para descargar el archivo ZIP
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = `${filename}_imagenes.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 } else {
-                    showAppMessage('error', 'Error al crear el archivo ZIP: ' + result.mensaje);
+                    alert('Error al crear el archivo ZIP: ' + result.mensaje);
                 }
             } catch (error) {
-                showAppMessage('error', 'Fallo al conectar con el servidor para la descarga: ' + error.message);
-            } finally {
-                button.textContent = 'Descargar Imágenes (ZIP)';
-                button.disabled = false;
+                alert('Fallo al comunicarse con el servidor: ' + error.message);
             }
         }
 
-        function processVideos(htmlContent) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
-            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-            
-            // Reemplaza los enlaces de YouTube con iframes
-            const links = tempDiv.querySelectorAll('a');
-            links.forEach(link => {
-                const url = link.href;
-                if (url.match(youtubeRegex)) {
-                    const videoId = url.match(youtubeRegex)[1];
-                    const iframe = document.createElement('iframe');
-                    iframe.setAttribute('src', `https://www.youtube.com/embed/${videoId}`);
-                    iframe.setAttribute('frameborder', '0');
-                    iframe.setAttribute('allowfullscreen', '');
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'video-wrapper';
-                    wrapper.appendChild(iframe);
-                    link.parentNode.replaceChild(wrapper, link);
+        document.getElementById('cuentos-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('download-btn')) {
+                const storyId = e.target.closest('.story-item').id;
+                const format = e.target.dataset.format;
+                descargarCuento(storyId, format);
+            }
+        });
+
+        document.querySelectorAll('.btn-tab').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                if (tabId === 'view') {
+                    cargarCuentos();
                 }
             });
-            return tempDiv.innerHTML;
-        }
+        });
 
-        window.onload = function() {
-            // Inicializa los cuentos al cargar la página
-            listarCuentos();
-        };
+        document.querySelector('.btn-tab').click();
+
+        quill.root.addEventListener('paste', (event) => {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            const range = quill.getSelection();
+                            quill.insertText(range.index, 'Cargando imagen...');
+                            fetch(APP_SCRIPT_URL, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.estado === 'éxito') {
+                                    quill.insertEmbed(range.index, 'image', result.url);
+                                } else {
+                                    alert('Error al subir la imagen: ' + result.mensaje);
+                                }
+                            })
+                            .catch(error => {
+                                alert('Fallo en la comunicación con el servidor: ' + error.message);
+                            })
+                            .finally(() => {
+                                quill.deleteText(range.index, 18);
+                            });
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
