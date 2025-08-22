@@ -10,202 +10,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.10/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-        }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--gray-100); 
-            padding: 20px; 
-            margin: 0;
-            color: var(--gray-800);
-        }
-        
-        .container { 
-            background-color: #ffffff; 
-            padding: 2.5rem; 
-            border-radius: 0.75rem; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
-            max-width: 100%; 
-            border: 1px solid var(--gray-200);
-            margin: 0 auto;
-            max-width: 1200px;
-        }
-        
-        h1 { 
-            color: var(--gray-900); 
-            font-size: 2rem; 
-            font-weight: 700; 
-            margin-bottom: 1.5rem; 
-            text-align: center; 
-        }
-        
-        .form-label { 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            display: block; 
-            color: var(--gray-700); 
-        }
-        
-        .form-input { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid var(--gray-300); 
-            border-radius: 8px; 
-            font-size: 1rem; 
-            color: var(--gray-800); 
-            background-color: var(--gray-100); 
-            box-sizing: border-box;
-        }
-        
-        .btn { 
-            background-color: var(--primary); 
-            color: white; 
-            padding: 14px 24px; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            width: 100%; 
-            margin-top: 1.5rem; 
-            border: none;
-            font-size: 1rem;
-        }
-        
-        .btn:hover { 
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
-        
-        .btn:disabled {
-            background-color: var(--gray-300);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .message-box { 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            margin-top: 20px; 
-            font-weight: 500; 
-            display: none; 
-        }
-        
-        .message-box.success { 
-            background-color: #d1fae5; 
-            color: #065f46; 
-            border: 1px solid #10b981; 
-        }
-        
-        .message-box.error { 
-            background-color: #fee2e2; 
-            color: #991b1b; 
-            border: 1px solid #ef4444; 
-        }
-        
-        .message-box.warning { 
-            background-color: #fef3c7; 
-            color: #92400e; 
-            border: 1px solid #f59e0b; 
-        }
-        
-        .loading-spinner { 
-            border: 4px solid rgba(255, 255, 255, 0.3); 
-            border-top: 4px solid #ffffff; 
-            border-radius: 50%; 
-            width: 24px; 
-            height: 24px; 
-            animation: spin 1s linear infinite; 
-            display: none; 
-        }
-        
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        
-        .story-list { 
-            list-style: none; 
-            padding: 0; 
-        }
-        
-        .story-item { 
-            background-color: #fafafa; 
-            border: 1px solid var(--gray-200); 
-            border-radius: 8px; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-        }
-        
-        .story-item h3 { 
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            color: var(--gray-800); 
-            margin-bottom: 10px; 
-        }
-        
-        .story-item .header { 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 10px;
-            border-radius: 8px;
-        }
-        
-        .story-item .header:hover { 
-            background-color: #f0f4f8; 
-        }
-        
-        .story-item .arrow { 
-            transition: transform 0.3s; 
-        }
-        
-        .story-item .arrow.expanded { 
-            transform: rotate(90deg); 
-        }
-        
-        .story-content { 
-            display: none; 
-            margin-top: 15px; 
-        }
-        
-        .story-content.expanded { 
-            display: block; 
-        }
-        
-        .story-content img { 
-            max-width: 100%; 
-            height: auto; 
-            display: block; 
-            margin: 15px auto; 
-            border-radius: 8px; 
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
+        .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
+        h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
+        .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
+        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
+        .btn:hover { transform: scale(1.02); }
+        .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
+        .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .story-list { list-style: none; padding: 0; }
+        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .story-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .story-item .header:hover { background-color: #f0f4f8; }
+        .story-item .arrow { transition: transform 0.3s; }
+        .story-item .arrow.expanded { transform: rotate(90deg); }
+        .story-content { display: none; margin-top: 15px; }
+        .story-content.expanded { display: block; }
+        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
         
         .video-wrapper {
             position: relative;
@@ -215,143 +49,31 @@
             max-width: 100%;
             background: #000;
             margin-top: 15px;
-            border-radius: 8px;
         }
-        
         .video-wrapper iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
         }
 
-        .tab-content { 
-            display: none; 
-        }
-        
-        .tab-content.active { 
-            display: block; 
-        }
-        
-        .btn-tab { 
-            background-color: var(--gray-200); 
-            color: var(--gray-600); 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: background-color 0.2s; 
-        }
-        
-        .btn-tab.active { 
-            background-color: var(--primary); 
-            color: white; 
-        }
-        
-        .download-btn { 
-            background-color: var(--success); 
-            margin-right: 10px; 
-            width: auto;
-            padding: 10px 20px;
-        }
-        
-        #editor-container { 
-            height: 300px; 
-            margin-bottom: 20px; 
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .download-buttons-container { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: 15px; 
-            flex-wrap: wrap; 
-        }
-        
-        .connection-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-        
-        .status-online {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        
-        .status-offline {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        
-        .status-online .status-dot {
-            background-color: #10b981;
-        }
-        
-        .status-offline .status-dot {
-            background-color: #ef4444;
-        }
-        
-        .offline-mode {
-            background-color: #fef3c7;
-            color: #92400e;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #f59e0b;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-            
-            .download-buttons-container {
-                flex-direction: column;
-            }
-            
-            .download-btn {
-                width: 100%;
-                margin-right: 0;
-            }
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+        .btn-tab.active { background-color: #4f46e5; color: white; }
+        .download-btn { background-color: #10b981; margin-right: 10px; }
+        #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
+        .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Editor de Cuentos e Historias</h1>
-        
-        <div id="connectionStatus" class="connection-status status-offline">
-            <span class="status-dot"></span>
-            <span id="statusText">Sin conexión al servidor</span>
-        </div>
-        
-        <div id="offlineMode" class="offline-mode" style="display: none;">
-            <strong>Modo sin conexión:</strong> Estás trabajando localmente. Los cuentos se guardarán en tu navegador pero no en el servidor.
-        </div>
-        
         <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
             <button class="btn-tab active" data-tab="create">Crear Nuevo Cuento</button>
             <button class="btn-tab" data-tab="view">Ver Todos los Cuentos</button>
         </nav>
-        
         <div id="create-tab" class="tab-content active">
             <form id="cuentoForm">
                 <div style="margin-bottom: 1rem;">
@@ -362,14 +84,13 @@
                     <label class="form-label">Contenido:</label>
                     <div id="editor-container"></div>
                 </div>
-                <button type="submit" class="btn" id="submitButton">
+                <button type="submit" class="btn">
                     <span id="buttonText">Guardar Cuento</span>
                     <div id="loadingSpinner" class="loading-spinner"></div>
                 </button>
                 <div id="messageBox" class="message-box"></div>
             </form>
         </div>
-        
         <div id="view-tab" class="tab-content">
             <h2>Cuentos Publicados</h2>
             <div id="cuentos-list" class="story-list">
@@ -377,323 +98,115 @@
             </div>
         </div>
     </div>
-
     <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
     <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
-    
     <script>
-        // URL de tu aplicación web de Google Apps Script
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbymp7y4kK_5JgfiAaOwl982wzJCG2jlBDaCjZxxQl18S23kPG9_ITH_2mQoicAiY9zM/exec';
-        
-        // Almacenamiento local para modo offline
-        const LOCAL_STORAGE_KEY = 'cuentosLocales';
-        let isOnline = false;
-        let quill;
+        // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_NtYrHWYwWAFQwhxBXjx0kfLGr1JWasavUomvJUYoFJOErDmB8vKYwt4UMyLVO8Q/exec'; 
 
-        // Inicializar la aplicación
-        document.addEventListener('DOMContentLoaded', function() {
-            initEditor();
-            checkServerConnection();
-            setupEventListeners();
-            loadLocalStories();
-        });
-
-        // Inicializar el editor Quill
-        function initEditor() {
-            quill = new Quill('#editor-container', {
-                theme: 'snow',
-                placeholder: 'Escribe tu historia aquí...',
-                modules: {
-                    toolbar: {
-                        container: [
-                            ['bold', 'italic', 'underline', 'strike'],
-                            ['blockquote', 'code-block'],
-                            [{ 'header': 1 }, { 'header': 2 }],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            [{ 'script': 'sub'}, { 'script': 'super' }],
-                            [{ 'indent': '-1'}, { 'indent': '+1' }],
-                            [{ 'direction': 'rtl' }],
-                            [{ 'size': ['small', false, 'large', 'huge'] }],
-                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                            [{ 'color': [] }, { 'background': [] }],
-                            [{ 'font': [] }],
-                            [{ 'align': [] }],
-                            ['link', 'image', 'video'],
-                            ['clean'],
-                            ['table']
-                        ],
-                        handlers: {
-                            'link': function(value) {
-                                if (value) {
-                                    let url = prompt('Introduce la URL del enlace:');
-                                    if (url) {
-                                        const range = quill.getSelection(true);
-                                        quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
-                                        quill.insertText(range.index + 9, url, { 'link': url, 'size': 'small' });
-                                        quill.setSelection(range.index + 9 + url.length);
-                                    }
-                                } else {
-                                    quill.format('link', false);
-                                }
-                            },
-                            'video': function() {
-                                let url = prompt('Introduce la URL del video de YouTube:');
+        // Inicializar Quill
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Escribe tu historia aquí...',
+            modules: {
+                toolbar: {
+                    container: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['link', 'image', 'video'],
+                        ['clean'],
+                        ['table']
+                    ],
+                    handlers: {
+                        'link': function(value) {
+                            if (value) {
+                                let url = prompt('Introduce la URL del enlace:');
                                 if (url) {
-                                    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                                    const match = url.match(youtubeRegex);
-                                    if (match) {
-                                        const videoId = match[1];
-                                        const range = quill.getSelection(true);
-                                        quill.insertText(range.index, ' Video: ', { 'size': 'small' });
-                                        quill.insertText(range.index + 8, url, { 'link': url, 'size': 'small' });
-                                        quill.insertText(range.index + 8 + url.length, '\n');
-                                        quill.insertEmbed(range.index + 9 + url.length, 'video', `https://www.youtube.com/embed/${videoId}`);
-                                    } else {
-                                        alert('URL de video no válida. Por favor, introduce una URL de YouTube.');
-                                    }
+                                    const range = quill.getSelection(true);
+                                    quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
+                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
+                                    quill.setSelection(quill.getSelection().index);
+                                }
+                            } else {
+                                quill.format('link', false);
+                            }
+                        },
+                        'video': function() {
+                            let url = prompt('Introduce la URL del video de YouTube:');
+                            if (url) {
+                                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                                const match = url.match(youtubeRegex);
+                                if (match) {
+                                    const range = quill.getSelection(true);
+                                    quill.insertText(range.index, ' Video: ', { 'size': 'small' });
+                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
+                                    quill.insertText(quill.getSelection().index, '\n');
+                                    quill.insertEmbed(quill.getSelection().index, 'video', `https://www.youtube.com/embed/${match[1]}`);
+                                } else {
+                                    alert('URL de video no válida. Por favor, introduce una URL de YouTube.');
                                 }
                             }
                         }
-                    },
-                    'table': true
-                }
-            });
-        }
-
-        // Verificar conexión al servidor
-        async function checkServerConnection() {
-            try {
-                const response = await fetch(APP_SCRIPT_URL + '?action=test');
-                if (response.ok) {
-                    setOnlineStatus(true);
-                } else {
-                    setOnlineStatus(false);
-                }
-            } catch (error) {
-                setOnlineStatus(false);
-                console.error('Error de conexión:', error);
-            }
-        }
-
-        // Establecer estado de conexión
-        function setOnlineStatus(online) {
-            isOnline = online;
-            const statusElement = document.getElementById('connectionStatus');
-            const statusText = document.getElementById('statusText');
-            const offlineMode = document.getElementById('offlineMode');
-            const submitButton = document.getElementById('submitButton');
-            
-            if (online) {
-                statusElement.className = 'connection-status status-online';
-                statusText.textContent = 'Conectado al servidor';
-                offlineMode.style.display = 'none';
-                submitButton.disabled = false;
-            } else {
-                statusElement.className = 'connection-status status-offline';
-                statusText.textContent = 'Sin conexión al servidor';
-                offlineMode.style.display = 'block';
-                submitButton.disabled = false;
-            }
-        }
-
-        // Configurar event listeners
-        function setupEventListeners() {
-            // Envío del formulario
-            document.getElementById('cuentoForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                guardarCuento();
-            });
-
-            // Navegación por pestañas
-            document.querySelectorAll('.btn-tab').forEach(button => {
-                button.addEventListener('click', function() {
-                    document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                    this.classList.add('active');
-                    const tabId = this.dataset.tab;
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                    
-                    if (tabId === 'view') {
-                        if (isOnline) {
-                            cargarCuentos();
-                        } else {
-                            loadLocalStories();
-                        }
                     }
-                });
-            });
+                },
+                'table': true
+            }
+        });
 
-            // Click en botones de descarga
-            document.getElementById('cuentos-list').addEventListener('click', function(e) {
-                if (e.target && e.target.classList.contains('download-btn')) {
-                    const storyId = e.target.closest('.story-item').id;
-                    const format = e.target.dataset.format;
-                    descargarCuento(storyId, format);
-                }
-            });
-
-            // Pegado de imágenes
-            quill.root.addEventListener('paste', handleImagePaste);
-        }
-
-        // Guardar cuento (online o offline)
-        async function guardarCuento() {
+        document.getElementById('cuentoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             const titulo = document.getElementById('titulo').value;
             const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const messageBox = document.getElementById('messageBox');
-            
-            if (!titulo.trim()) {
-                showMessage('error', 'Por favor, introduce un título para tu cuento.', messageBox);
-                return;
-            }
-            
             buttonText.textContent = 'Guardando...';
             loadingSpinner.style.display = 'inline-block';
             messageBox.style.display = 'none';
-            
-            try {
-                if (isOnline) {
-                    // Intentar guardar en el servidor
-                    const formData = new FormData();
-                    formData.append('action', 'guardarCuento');
-                    formData.append('titulo', titulo);
-                    formData.append('contenido', contenido);
-                    
-                    const response = await fetch(APP_SCRIPT_URL, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.estado === 'éxito') {
-                        showMessage('success', result.mensaje, messageBox);
-                        document.getElementById('cuentoForm').reset();
-                        quill.setContents([]);
-                    } else {
-                        showMessage('error', result.mensaje, messageBox);
-                    }
-                } else {
-                    // Guardar localmente
-                    saveStoryLocally(titulo, contenido);
-                    showMessage('success', 'Cuento guardado localmente. Se sincronizará cuando haya conexión.', messageBox);
+            const formData = new FormData();
+            formData.append('action', 'guardarCuento');
+            formData.append('titulo', titulo);
+            formData.append('contenido', contenido);
+            fetch(APP_SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.estado === 'éxito') {
+                    showMessage('success', result.mensaje);
                     document.getElementById('cuentoForm').reset();
                     quill.setContents([]);
+                } else {
+                    showMessage('error', result.mensaje);
                 }
-            } catch (error) {
-                // Fallback a almacenamiento local si el servidor falla
-                saveStoryLocally(titulo, contenido);
-                showMessage('warning', 'Error de conexión. Cuento guardado localmente.', messageBox);
-                document.getElementById('cuentoForm').reset();
-                quill.setContents([]);
-                setOnlineStatus(false);
-            } finally {
+            })
+            .catch(error => {
+                showMessage('error', 'Fallo al guardar: ' + error.message);
+            })
+            .finally(() => {
                 buttonText.textContent = 'Guardar Cuento';
                 loadingSpinner.style.display = 'none';
-            }
-        }
-
-        // Guardar cuento localmente
-        function saveStoryLocally(titulo, contenido) {
-            const stories = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
-            stories.push({
-                titulo: titulo,
-                contenido: contenido,
-                fecha: new Date().toISOString(),
-                local: true
             });
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stories));
+        });
+
+        function showMessage(type, message) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = 'message-box ' + type;
+            messageBox.style.display = 'block';
         }
 
-        // Cargar cuentos desde el servidor
-        async function cargarCuentos() {
-            const cuentosList = document.getElementById('cuentos-list');
-            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
-            
-            try {
-                const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`Error del servidor: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                if (result.estado === 'éxito') {
-                    displayStories(result.cuentos, cuentosList);
-                } else {
-                    cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
-                }
-            } catch (error) {
-                console.error('Error cargando cuentos:', error);
-                // Fallback a cuentos locales
-                loadLocalStories();
-                showMessage('warning', 'Error de conexión. Mostrando cuentos guardados localmente.', document.getElementById('messageBox'));
-                setOnlineStatus(false);
-            }
-        }
-
-        // Cargar cuentos locales
-        function loadLocalStories() {
-            const cuentosList = document.getElementById('cuentos-list');
-            const localStories = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
-            
-            if (localStories.length > 0) {
-                displayStories(localStories, cuentosList);
-            } else {
-                cuentosList.innerHTML = '<p>No hay cuentos guardados localmente.</p>';
-            }
-        }
-
-        // Mostrar cuentos en la lista
-        function displayStories(cuentos, container) {
-            container.innerHTML = '';
-            
-            if (cuentos && cuentos.length > 0) {
-                cuentos.forEach((cuento, index) => {
-                    const storyId = `story-${index}`;
-                    const storyDiv = document.createElement('div');
-                    storyDiv.id = storyId;
-                    storyDiv.className = 'story-item';
-                    
-                    const contenidoConVideos = processVideos(cuento.contenido, false);
-                    const esLocal = cuento.local ? '<span style="color: #f59e0b; margin-left: 10px;">(Guardado localmente)</span>' : '';
-                    
-                    storyDiv.innerHTML = `
-                        <div class="header">
-                            <h3>${cuento.titulo} ${esLocal}</h3>
-                            <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
-                        </div>
-                        <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
-                            ${contenidoConVideos}
-                            <div class="download-buttons-container">
-                                <button class="btn download-btn" data-format="pdf">Descargar en PDF</button>
-                                <button class="btn download-btn" data-format="docx" style="background-color: #2b579a;">Descargar en Word</button>
-                                <button class="btn download-btn" data-format="txt" style="background-color: #607d8b;">Descargar en TXT</button>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(storyDiv);
-                });
-
-                // Configurar event listeners para expandir/contraer
-                document.querySelectorAll('.story-item .header').forEach(header => {
-                    header.addEventListener('click', function() {
-                        const content = this.nextElementSibling;
-                        const arrow = this.querySelector('.arrow');
-                        content.classList.toggle('expanded');
-                        arrow.classList.toggle('expanded');
-                    });
-                });
-            } else {
-                container.innerHTML = '<p>No hay cuentos publicados aún.</p>';
-            }
-        }
-
-        // Procesar videos en el contenido
         function processVideos(htmlContent, isPDF) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
@@ -729,64 +242,142 @@
             return tempDiv.innerHTML;
         }
 
-        // Manejar pegado de imágenes
-        function handleImagePaste(event) {
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                if (item.type.indexOf('image') === 0) {
-                    event.preventDefault();
-                    const blob = item.getAsFile();
-                    
-                    if (blob) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const range = quill.getSelection();
-                            if (range) {
-                                quill.insertEmbed(range.index, 'image', e.target.result);
-                            }
-                        };
-                        reader.readAsDataURL(blob);
+        // --- FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
+
+        // Función para extraer URLs de imágenes del HTML
+        function extractImageUrls(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const images = doc.querySelectorAll('img');
+            const imageUrls = [];
+            images.forEach(img => {
+                imageUrls.push(img.src);
+            });
+            return imageUrls;
+        }
+
+        // Función para convertir HTML a texto con marcadores de imagen
+        function htmlToFormattedText(html) {
+            let doc = new DOMParser().parseFromString(html, 'text/html');
+            let text = '';
+            let imageCounter = 1;
+            doc.body.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    text += node.textContent.trim();
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
+                        text += '\n\n' + node.textContent.trim();
+                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
+                        node.querySelectorAll('li').forEach(li => {
+                            text += '\n* ' + li.textContent.trim();
+                        });
+                        text += '\n';
+                    } else if (node.tagName === 'TABLE') {
+                        text += '\n\n[Tabla]\n';
+                        const rows = node.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td, th');
+                            cells.forEach(cell => {
+                                text += cell.textContent.trim() + '\t';
+                            });
+                            text += '\n';
+                        });
+                        text += '[/Tabla]\n';
+                    } else if (node.tagName === 'IMG') {
+                        const imgUrl = node.getAttribute('src');
+                        const extension = imgUrl.split('.').pop().split('?')[0]; // Obtener la extensión del archivo
+                        text += `\n[Imagen: imagen_${imageCounter}.${extension}]`;
+                        imageCounter++;
+                    } else {
+                        text += node.textContent.trim();
                     }
                 }
-            }
+            });
+            return text.replace(/\n\s*\n/g, '\n\n').trim();
         }
 
-        // Mostrar mensajes
-        function showMessage(type, message, element) {
-            element.textContent = message;
-            element.className = 'message-box ' + type;
-            element.style.display = 'block';
-            
-            // Ocultar mensaje después de 5 segundos
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
+        // --- FIN DE FUNCIONES PARA MANEJO DE DESCARGA CON IMÁGENES SEPARADAS ---
 
-        // Descargar cuento en diferentes formatos
+        function cargarCuentos() {
+            const cuentosList = document.getElementById('cuentos-list');
+            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
+            const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.estado === 'éxito') {
+                        cuentosList.innerHTML = '';
+                        if (result.cuentos && result.cuentos.length > 0) {
+                            result.cuentos.forEach((cuento, index) => {
+                                const storyId = `story-${index}`;
+                                const storyDiv = document.createElement('div');
+                                storyDiv.id = storyId;
+                                storyDiv.className = 'story-item';
+                                
+                                const contenidoConVideos = processVideos(cuento.contenido, false);
+                                
+                                storyDiv.innerHTML = `
+                                    <div class="header">
+                                        <h3>${cuento.titulo}</h3>
+                                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
+                                    </div>
+                                    <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
+                                        ${contenidoConVideos}
+                                        <div class="download-buttons-container">
+                                            <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                            <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
+                                            <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
+                                            <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
+                                            <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
+                                            <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
+                                        </div>
+                                    </div>
+                                `;
+                                cuentosList.appendChild(storyDiv);
+                            });
+
+                            document.querySelectorAll('.story-item .header').forEach(header => {
+                                header.addEventListener('click', function() {
+                                    const content = this.nextElementSibling;
+                                    const arrow = this.querySelector('.arrow');
+                                    content.classList.toggle('expanded');
+                                    arrow.classList.toggle('expanded');
+                                });
+                            });
+                        } else {
+                            cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
+                        }
+                    } else {
+                        cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
+                    }
+                })
+                .catch(error => {
+                    cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                });
+        }
+        
         async function descargarCuento(storyId, format) {
             const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
-            const originalContent = decodeURIComponent(storyContentDiv.dataset.originalContent);
+            const originalContent = decodeURIComponent(storyContentDiv.dataset.original-content);
             const titulo = decodeURIComponent(storyContentDiv.dataset.title);
             
             if (format === 'pdf') {
                 generarPDF(storyId, titulo);
+            } else if (format === 'odt') {
+                generarODT(originalContent, titulo);
             } else if (format === 'docx') {
                 generarWord(originalContent, titulo);
+            } else if (format === 'xlsx') {
+                generarExcel(titulo, originalContent);
             } else if (format === 'txt') {
                 generarTXT(originalContent, titulo);
+            } else if (format === 'zip') {
+                descargarImagenesZIP(originalContent, titulo);
             }
         }
-
-        // Generar PDF
+        
         function generarPDF(storyId, filename) {
             const element = document.getElementById(storyId);
-            if (!element) { 
-                alert("No se encontró el contenido para generar el PDF."); 
-                return; 
-            }
+            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
             
             const originalContentHTML = element.querySelector('.story-content').innerHTML;
             const contentForPDF = processVideos(originalContentHTML, true);
@@ -801,8 +392,14 @@
                 const imgProps = doc.getImageProperties(imgData);
                 const pdfWidth = doc.internal.pageSize.getWidth();
                 const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                
-                doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                let y = 0;
+                while (y < pdfHeight) {
+                    if (y > 0) { doc.addPage(); }
+                    const heightLeft = pdfHeight - y;
+                    const newHeight = Math.min(doc.internal.pageSize.getHeight(), heightLeft);
+                    doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
+                    y += newHeight;
+                }
                 doc.save(`${filename}.pdf`);
             }).catch(error => {
                 alert("Hubo un error al generar el PDF: " + error.message);
@@ -811,55 +408,154 @@
                 element.querySelector('.story-content').innerHTML = originalContentHTML;
             });
         }
-
-        // Generar Word
+        
+        async function generarODT(htmlContent, filename) {
+            try {
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.oasis.opendocument.text' });
+                saveAs(blob, `${filename}.odt`);
+                
+            } catch (error) {
+                alert("Hubo un error al generar el archivo ODT: " + error.message);
+                console.error("Error generando ODT:", error);
+            }
+        }
+        
         async function generarWord(htmlContent, filename) {
             try {
-                // Convertir HTML a texto plano para DOCX
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlContent;
-                const textContent = tempDiv.textContent || tempDiv.innerText || '';
-                
-                // Crear un blob con el contenido
-                const blob = new Blob([textContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-                
-                // Crear un enlace de descarga
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${filename}.docx`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                saveAs(blob, `${filename}.docx`);
                 
             } catch (error) {
                 alert("Hubo un error al generar el archivo de Word: " + error.message);
                 console.error("Error generando DOCX:", error);
             }
         }
+        
+        function generarExcel(titulo, contenido) {
+            try {
+                const wb = XLSX.utils.book_new();
+                const ws_data = [
+                    ["Título", "Contenido"],
+                    [titulo, htmlToFormattedText(contenido)]
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                XLSX.utils.book_append_sheet(wb, ws, "Historia");
+                XLSX.writeFile(wb, `${titulo}.xlsx`);
+            } catch (error) {
+                alert("Hubo un error al generar el archivo Excel: " + error.message);
+                console.error("Error generando Excel:", error);
+            }
+        }
 
-        // Generar TXT
         function generarTXT(htmlContent, filename) {
             try {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlContent;
-                const textContent = tempDiv.textContent || tempDiv.innerText || '';
-                
-                const blob = new Blob([textContent], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${filename}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'text/plain' });
+                saveAs(blob, `${filename}.txt`);
             } catch (error) {
                 alert("Hubo un error al generar el archivo TXT: " + error.message);
                 console.error("Error generando TXT:", error);
             }
         }
+        
+        async function descargarImagenesZIP(htmlContent, filename) {
+            const imageUrls = extractImageUrls(htmlContent);
+            if (imageUrls.length === 0) {
+                alert("No hay imágenes en este cuento para descargar.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'zipImagenes');
+            formData.append('imageUrls', JSON.stringify(imageUrls));
+
+            try {
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.estado === 'éxito') {
+                    // Crea un enlace temporal y simula un clic para descargar el archivo ZIP
+                    const link = document.createElement('a');
+                    link.href = result.url;
+                    link.download = `${filename}_imagenes.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert('Error al crear el archivo ZIP: ' + result.mensaje);
+                }
+            } catch (error) {
+                alert('Fallo al comunicarse con el servidor: ' + error.message);
+            }
+        }
+
+        document.getElementById('cuentos-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('download-btn')) {
+                const storyId = e.target.closest('.story-item').id;
+                const format = e.target.dataset.format;
+                descargarCuento(storyId, format);
+            }
+        });
+
+        document.querySelectorAll('.btn-tab').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                if (tabId === 'view') {
+                    cargarCuentos();
+                }
+            });
+        });
+
+        document.querySelector('.btn-tab').click();
+
+        quill.root.addEventListener('paste', (event) => {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            const range = quill.getSelection();
+                            quill.insertText(range.index, 'Cargando imagen...');
+                            fetch(APP_SCRIPT_URL, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.estado === 'éxito') {
+                                    quill.insertEmbed(range.index, 'image', result.url);
+                                } else {
+                                    alert('Error al subir la imagen: ' + result.mensaje);
+                                }
+                            })
+                            .catch(error => {
+                                alert('Fallo en la comunicación con el servidor: ' + error.message);
+                            })
+                            .finally(() => {
+                                quill.deleteText(range.index, 18);
+                            });
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
+
