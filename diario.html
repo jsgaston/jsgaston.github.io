@@ -354,6 +354,10 @@
                     if (imageUrl) {
                         const img = document.createElement('img');
                         img.src = imageUrl;
+
+                        const cleanUrl = imageUrl.replace(/&amp;/g, '&');
+img.src = cleanUrl;
+
                         
                         const selection = window.getSelection();
                         if (selection.rangeCount > 0) {
@@ -390,7 +394,8 @@
         formData.append('action', 'save');
         formData.append('titulo', form.querySelector('#title').value);
         
-        const entryContent = editableEntry.innerHTML;
+        const entryContent = fixImageUrls(editableEntry.innerHTML);
+
         formData.append('entrada', entryContent);
         
         fetch(SCRIPT_URL, {
