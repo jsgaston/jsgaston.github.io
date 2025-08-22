@@ -116,6 +116,15 @@
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 1px dashed #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .entry-date {
+            font-weight: 600;
+        }
+        .entry-time {
+            font-style: italic;
         }
         .entry-content {
             line-height: 1.6;
@@ -125,6 +134,7 @@
             height: auto;
             border-radius: 4px;
             margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .search-section {
             background-color: #f5f7fa;
@@ -184,6 +194,11 @@
             .button-group {
                 flex-direction: column;
             }
+            .entry-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
         }
     </style>
 </head>
@@ -241,7 +256,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNwDPgXBcfFZ9LJVqvR3RBg1I2vTIH4pJqRpMIqOfy82GMOsrzeB3sX2wl77Y9eK90Dg/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFRs80AqtVNxZVnGu4A7gvV6cqStKQfo9Tex8RZNZ5zFFl0NW9NOMQLOkClLa1fEWchQ/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -289,9 +304,6 @@
         
         document.getElementById('start-date').value = formattedDatePrev;
     });
-
-
-
 
     // Función para subir imágenes
     async function uploadImage(imageBlob) {
@@ -402,8 +414,7 @@
         });
     });
 
-    // Buscar entradas
-// Buscar entradas
+    // Buscar entradas por texto
     document.getElementById('search-form').addEventListener('submit', function(e) {
         e.preventDefault();
         const resultsDiv = document.getElementById('results');
@@ -431,69 +442,89 @@
 
     // Buscar por rango de fechas
     document.getElementById('search-date-range-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML = '';
-      showStatus('search-status', 'Buscando por rango de fechas...');
+        e.preventDefault();
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
+        showStatus('search-status', 'Buscando por rango de fechas...');
 
-      const startDate = document.getElementById('start-date').value;
-      const endDate = document.getElementById('end-date').value;
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
 
-      const formatDate = (dateStr) => {
-        const [year, month, day] = dateStr.split('-');
-        const dayFormatted = parseInt(day, 10).toString();
-        const monthFormatted = parseInt(month, 10).toString();
-        return `${dayFormatted}/${monthFormatted}/${year}`;
-      };
+        // Convertir de formato YYYY-MM-DD a DD/MM/YYYY
+        const formatDate = (dateStr) => {
+            const [year, month, day] = dateStr.split('-');
+            return `${day}/${month}/${year}`;
+        };
 
-      const params = new URLSearchParams({
-        action: 'searchByDateRange',
-        startDate: formatDate(startDate),
-        endDate: formatDate(endDate)
-      });
-
-      fetch(`${SCRIPT_URL}?${params.toString()}`)
-        .then(response => response.json())
-        .then(data => {
-          hideStatus('search-status');
-          displayResults(data);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          hideStatus('search-status');
-          resultsDiv.innerHTML = '<div class="no-results">Error al buscar las entradas.</div>';
+        const params = new URLSearchParams({
+            action: 'searchByDateRange',
+            startDate: formatDate(startDate),
+            endDate: formatDate(endDate)
         });
+
+        console.log('Buscando entre:', formatDate(startDate), 'y', formatDate(endDate));
+
+        fetch(`${SCRIPT_URL}?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                hideStatus('search-status');
+                console.log('Resultados recibidos:', data);
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                hideStatus('search-status');
+                resultsDiv.innerHTML = '<div class="no-results">Error al buscar las entradas.</div>';
+            });
     });
 
-    // MOSTRAR RESULTADOS DE BÚSQUEDA - FUNCIÓN CORREGIDA
+    // Función para corregir URLs de imágenes y mostrar resultados
+    function fixImageUrls(htmlContent) {
+        if (!htmlContent) return '';
+        
+        // Reemplazar &amp; por & en las URLs de Google Drive
+        let correctedContent = htmlContent.replace(/&amp;/g, '&');
+        
+        // Asegurar que todas las imágenes de Google Drive tengan el formato correcto
+        correctedContent = correctedContent.replace(
+            /https:\/\/drive\.google\.com\/uc\?export=view&id=([^"&\s]+)/g,
+            'https://drive.google.com/uc?export=view&id=$1'
+        );
+        
+        return correctedContent;
+    }
+
+    // Función para mostrar resultados de búsqueda
     function displayResults(data) {
-      const resultsDiv = document.getElementById('results');
-      
-      if (data && data.length > 0) {
-          data.forEach(entry => {
-              const entryDiv = document.createElement('div');
-              entryDiv.className = 'entry';
-              
-              // Corregir las URLs de imágenes antes de mostrar el contenido
-              let entradaCorregida = entry.entrada;
-              
-              // Reemplazar &amp; por & en las URLs de imágenes
-              if (entradaCorregida) {
-                  entradaCorregida = entradaCorregida.replace(/&amp;/g, '&');
-              }
-              
-              entryDiv.innerHTML = `
-                  <div class="entry-meta">
-                      ${entry.fecha} ${entry.hora}
-                  </div>
-                  <h3>${entry.titulo || 'Sin título'}</h3>
-                  <div class="entry-content">${entradaCorregida}</div>
-              `;
-              resultsDiv.appendChild(entryDiv);
-          });
-      } else {
-          resultsDiv.innerHTML = '<div class="no-results">No se encontraron entradas.</div>';
-      }
+        const resultsDiv = document.getElementById('results');
+        
+        if (data && data.length > 0) {
+            console.log('Mostrando', data.length, 'resultados');
+            
+            data.forEach(entry => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'entry';
+                
+                // Corregir las URLs de imágenes antes de mostrar el contenido
+                const entradaCorregida = fixImageUrls(entry.entrada);
+                
+                // Mostrar fecha y hora correctamente
+                const fechaTexto = entry.fecha || 'Fecha no disponible';
+                const horaTexto = entry.hora || '';
+                
+                entryDiv.innerHTML = `
+                    <div class="entry-meta">
+                        <span class="entry-date">${fechaTexto}</span>
+                        <span class="entry-time">${horaTexto}</span>
+                    </div>
+                    <h3>${entry.titulo || 'Sin título'}</h3>
+                    <div class="entry-content">${entradaCorregida}</div>
+                `;
+                resultsDiv.appendChild(entryDiv);
+            });
+        } else {
+            resultsDiv.innerHTML = '<div class="no-results">No se encontraron entradas para los criterios especificados.</div>';
+        }
     }
 </script>
 
