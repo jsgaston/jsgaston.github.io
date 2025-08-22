@@ -241,7 +241,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1pF_kufiK0ZljkAndRgTXbi1tamHLk9leuDIZtEZNDeMmN9morI5Tfky3Yf1iDFLmuA/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjFax7pujrm9xw9gUfvozqa0Y0Tok30h1kUYLtx1VdeO14ZyGwJSF31Ix1PHYBou6Alg/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -277,6 +277,11 @@
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+        // En la función saveEntry, modifica estas líneas:
+const now = new Date();
+const fecha = Utilities.formatDate(now, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+const hora = Utilities.formatDate(now, Session.getScriptTimeZone(), 'HH:mm:ss');
         
         document.getElementById('end-date').value = formattedDate;
         
@@ -435,10 +440,14 @@
       const startDate = document.getElementById('start-date').value;
       const endDate = document.getElementById('end-date').value;
 
-      const formatDate = (dateStr) => {
-        const [year, month, day] = dateStr.split('-');
-        return `${day}/${month}/${year}`;
-      };
+// En el archivo diario (4).html - Busca esta función y modifícala
+const formatDate = (dateStr) => {
+  const [year, month, day] = dateStr.split('-');
+  // Eliminar ceros iniciales en día y mes para coincidir con el formato de tu hoja
+  const dayFormatted = parseInt(day, 10).toString();
+  const monthFormatted = parseInt(month, 10).toString();
+  return `${dayFormatted}/${monthFormatted}/${year}`;
+};
 
       const params = new URLSearchParams({
         action: 'searchByDateRange',
