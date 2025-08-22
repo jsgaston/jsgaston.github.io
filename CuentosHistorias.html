@@ -16,7 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
         .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
@@ -66,78 +66,6 @@
         .download-btn { background-color: #10b981; margin-right: 10px; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
         .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-
-
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            width: 90%;
-            max-width: 800px;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        #editor-container {
-            height: 400px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .toolbar button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .toolbar button:hover {
-            background-color: #0056b3;
-        }
-        .editor-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .editor-header h1 {
-            color: #333;
-        }
-        #export-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        #export-buttons button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        #export-buttons button:hover {
-            background-color: #218838;
-        }
-
-
-        
     </style>
 </head>
 <body>
@@ -170,23 +98,6 @@
                 <p>Cargando cuentos...</p>
             </div>
         </div>
-
-
-         <div class="container">
-        <div class="editor-header">
-            <h1>Editor de Cuentos e Historias</h1>
-        </div>
-        <div id="editor-container"></div>
-        <div id="export-buttons">
-            <button onclick="exportarTexto()">Guardar como .txt</button>
-            <button onclick="generarDocx()">Guardar como .docx</button>
-            <button onclick="generarOdt()">Guardar como .odt</button>
-            <button onclick="generarPdf()">Guardar como .pdf</button>
-        </div>
-    </div>
-
-
-        
     </div>
     <script>
         // URL de tu aplicación web de Google Apps Script. DEBES REEMPLAZAR ESTO.
@@ -251,136 +162,6 @@
                 }
             }
         });
-
-
-        
-        const toolbarOptions = [
-            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-            ['blockquote', 'code-block'],
-            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-            [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-            [{ 'direction': 'rtl' }],                         // text direction
-            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-            [{ 'font': [] }],
-            [{ 'align': [] }],
-            ['link', 'image', 'video'],                        // added image button
-            ['clean']                                         // remove formatting button
-        ];
-
-        const quill = new Quill('#editor-container', {
-            theme: 'snow',
-            modules: {
-                toolbar: {
-                    container: toolbarOptions,
-                    handlers: {
-                        'image': handleImageUpload
-                    }
-                }
-            }
-        });
-
-        function handleImageUpload() {
-            const input = document.createElement('input');
-            input.setAttribute('type', 'file');
-            input.setAttribute('accept', 'image/*');
-            input.click();
-
-            input.onchange = async () => {
-                const file = input.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const base64data = reader.result.split(',')[1];
-                        const formData = new FormData();
-                        formData.append('action', 'subirImagenBase64');
-                        formData.append('imagen', base64data);
-                        
-                        const range = quill.getSelection();
-                        quill.insertText(range.index, 'Cargando imagen...');
-                        
-                        fetch(APP_SCRIPT_URL, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.estado === 'éxito') {
-                                quill.insertEmbed(range.index, 'image', result.url);
-                            } else {
-                                alert('Error al subir la imagen: ' + result.mensaje);
-                            }
-                        })
-                        .catch(error => {
-                            alert('Fallo en la comunicación con el servidor: ' + error.message);
-                        })
-                        .finally(() => {
-                            quill.deleteText(range.index, 18);
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-        }
-
-        // Modificación de la función exportarTexto para mantener los párrafos
-        function exportarTexto() {
-            const content = quill.root.innerHTML;
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            const paragraphs = tempDiv.querySelectorAll('p, li'); // Incluir también listas
-            
-            let plainText = '';
-            if (paragraphs.length > 0) {
-                paragraphs.forEach(p => {
-                    plainText += p.innerText + '\n\n'; // Agrega dos saltos de línea para separar párrafos
-                });
-            } else {
-                plainText = quill.getText(); // Fallback si no hay etiquetas de párrafo
-            }
-
-            const blob = new Blob([plainText], { type: 'text/plain;charset=utf-8' });
-            saveAs(blob, "cuento.txt");
-        }
-
-        // Funciones de exportación (sin cambios, ya que requieren librerías o lógica más compleja)
-        function generarDocx() {
-            alert("La exportación a DOCX es compleja y requiere una librería dedicada para convertir HTML a DOCX. No se recomienda el simple uso de docxtemplater para esta tarea.");
-        }
-
-        function generarOdt() {
-            alert("La exportación a ODT no está implementada. Requiere una librería específica para manejar el formato OpenDocument.");
-        }
-        
-        function generarPdf() {
-            const editorContent = document.getElementById('editor-container');
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Usar html2canvas para capturar el contenido del editor como imagen
-            html2canvas(editorContent).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210; // A4 width in mm
-                const pageHeight = 295; // A4 height in mm
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-
-                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    doc.addPage();
-                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                doc.save('cuento.pdf');
-            });
-        }
 
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -464,6 +245,32 @@
             return tempDiv.innerHTML;
         }
 
+        // Nueva función para convertir HTML a texto plano con saltos de línea
+        function htmlToFormattedText(html) {
+            let doc = new DOMParser().parseFromString(html, 'text/html');
+            let text = '';
+            doc.body.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    text += node.textContent.trim();
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
+                        // Agrega saltos de línea antes y después de estos elementos
+                        text += '\n\n' + node.textContent.trim();
+                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
+                        node.querySelectorAll('li').forEach(li => {
+                            text += '\n* ' + li.textContent.trim();
+                        });
+                        text += '\n';
+                    } else if (node.tagName === 'IMG') {
+                        text += '\n[Imagen]';
+                    } else {
+                        text += node.textContent.trim();
+                    }
+                }
+            });
+            // Limpiar múltiples saltos de línea seguidos
+            return text.replace(/\n\s*\n/g, '\n\n').trim();
+        }
 
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
@@ -530,9 +337,9 @@
             if (format === 'pdf') {
                 generarPDF(storyId, titulo);
             } else if (format === 'odt') {
-                await generarODT(originalContent, titulo);
+                generarODT(originalContent, titulo);
             } else if (format === 'docx') {
-                await generarWord(originalContent, titulo);
+                generarWord(originalContent, titulo);
             } else if (format === 'xlsx') {
                 generarExcel(titulo, originalContent);
             } else if (format === 'txt') {
@@ -578,9 +385,9 @@
         
         async function generarODT(htmlContent, filename) {
             try {
-                // Se crea un archivo de texto simple ya que la conversión de HTML a ODT es compleja en el navegador
-                const cleanText = new DOMParser().parseFromString(htmlContent, 'text/html').documentElement.textContent;
-                const blob = new Blob([cleanText], { type: 'application/vnd.oasis.opendocument.text' });
+                // Generar un archivo de texto con formato
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.oasis.opendocument.text' });
                 saveAs(blob, `${filename}.odt`);
                 
             } catch (error) {
@@ -591,9 +398,9 @@
         
         async function generarWord(htmlContent, filename) {
             try {
-                // Se crea un archivo de texto simple ya que la conversión de HTML a DOCX es compleja en el navegador
-                const cleanText = new DOMParser().parseFromString(htmlContent, 'text/html').documentElement.textContent;
-                const blob = new Blob([cleanText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                // Generar un archivo de texto con formato
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
                 saveAs(blob, `${filename}.docx`);
                 
             } catch (error) {
@@ -607,7 +414,7 @@
                 const wb = XLSX.utils.book_new();
                 const ws_data = [
                     ["Título", "Contenido"],
-                    [titulo, new DOMParser().parseFromString(contenido, 'text/html').documentElement.textContent]
+                    [titulo, htmlToFormattedText(contenido)]
                 ];
                 const ws = XLSX.utils.aoa_to_sheet(ws_data);
                 XLSX.utils.book_append_sheet(wb, ws, "Historia");
@@ -620,9 +427,9 @@
 
         function generarTXT(htmlContent, filename) {
             try {
-                // Convertir el HTML a texto plano
-                const cleanText = new DOMParser().parseFromString(htmlContent, 'text/html').documentElement.textContent;
-                const blob = new Blob([cleanText], { type: 'text/plain' });
+                // Convertir el HTML a texto plano con formato
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'text/plain' });
                 saveAs(blob, `${filename}.txt`);
             } catch (error) {
                 alert("Hubo un error al generar el archivo TXT: " + error.message);
