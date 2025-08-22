@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Diario Personal</title>
@@ -136,7 +137,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1E_eG3qEN7ELF4s_7r3MQNNCgWWE4dlR0vKdtnRzufFZSlcDqzbHva4PYkndMrMU1Ew/exec'; // ¡REEMPLAZA ESTO!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU0YeKeQhbm0JQu5uRbhsZY7imTUH7KTXBePG64RxPKZ9S2ZcwXF2yhc59fUxsyMaBdw/exec'; // ¡REEMPLAZA ESTO!
 
     // Funciones de utilidad
     function showStatus(elementId, message) {
@@ -150,7 +151,7 @@
         statusDiv.style.display = 'none';
     }
 
-    function clearForm(formId) {
+    function clearForm() {
         document.getElementById('title').value = '';
         document.getElementById('editable-entry').innerHTML = '';
     }
@@ -178,7 +179,7 @@
     async function uploadImage(imageBlob) {
       const formData = new FormData();
       formData.append('action', 'uploadImage');
-      formData.append('imageBlob', imageBlob);
+      formData.append('imageBlob', imageBlob, 'image.png');
       
       const response = await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -191,7 +192,7 @@
     // Lógica para manejar el pegado de imágenes
     const editableEntry = document.getElementById('editable-entry');
     editableEntry.addEventListener('paste', async function(e) {
-        e.preventDefault(); // Evita que la imagen se pegue por defecto
+        e.preventDefault();
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         
         for (const item of items) {
@@ -207,11 +208,14 @@
                         const img = document.createElement('img');
                         img.src = imageUrl;
                         
-                        // Insertar la imagen en la posición del cursor
                         const selection = window.getSelection();
-                        const range = selection.getRangeAt(0);
-                        range.deleteContents();
-                        range.insertNode(img);
+                        if (selection.rangeCount > 0) {
+                          const range = selection.getRangeAt(0);
+                          range.deleteContents();
+                          range.insertNode(img);
+                        } else {
+                          editableEntry.appendChild(img);
+                        }
                         
                         showStatus('status', '¡Imagen subida y pegada con éxito!');
                     } else {
@@ -221,7 +225,7 @@
                     console.error('Error al subir la imagen:', error);
                     showStatus('status', 'Error al subir la imagen.');
                 }
-                setTimeout(() => hideStatus('status'), 3000);
+                setTimeout(() => hideStatus('status'), 5000);
             }
         }
     });
@@ -236,7 +240,6 @@
         formData.append('action', 'save');
         formData.append('titulo', form.querySelector('#title').value);
         
-        // Obtener el contenido HTML del div editable
         const entryContent = editableEntry.innerHTML;
         formData.append('entrada', entryContent);
         
@@ -247,7 +250,7 @@
         .then(response => response.text())
         .then(data => {
             showStatus('status', '¡Entrada guardada con éxito!');
-            clearForm('diary-form');
+            clearForm();
             setTimeout(() => hideStatus('status'), 3000);
         })
         .catch(error => {
@@ -309,7 +312,6 @@
       const startDate = document.getElementById('start-date').value;
       const endDate = document.getElementById('end-date').value;
 
-      // Formato yyyy-MM-dd de input type="date", necesitamos convertirlo a DD/MM/AAAA
       const formatDate = (dateStr) => {
         const [year, month, day] = dateStr.split('-');
         return `${day}/${month}/${year}`;
