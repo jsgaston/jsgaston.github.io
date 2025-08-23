@@ -145,7 +145,7 @@
                             if (url) {
                                 const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
                                 const wistiaRegex = /^(?:https?:\/\/)?(?:www\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9_-]+)/;
-                        
+                                
                                 let match = url.match(youtubeRegex);
                                 let embedUrl;
                         
@@ -240,7 +240,7 @@
                     const url = link.href;
                     let match = url.match(youtubeRegex);
                     let embedUrl;
-        
+                    
                     if (match) {
                         embedUrl = `https://www.youtube.com/embed/${match[1]}`;
                     } else {
@@ -249,7 +249,7 @@
                             embedUrl = `https://fast.wistia.net/embed/iframe/${match[1]}`;
                         }
                     }
-        
+                    
                     if (embedUrl) {
                         const iframe = document.createElement('iframe');
                         iframe.setAttribute('src', embedUrl);
