@@ -168,11 +168,8 @@
                         
                                 if (embedUrl) {
                                     const range = quill.getSelection(true);
-                                    // Insertar el iframe
+                                    // Insertar solo el iframe, no el enlace de texto
                                     quill.insertEmbed(range.index, 'video', embedUrl);
-                                    // Insertar el enlace después
-                                    quill.insertText(range.index + 1, 'Ver video: ' + url, { 'link': url });
-                                    quill.setSelection(range.index + 1);
                                 } else {
                                     alert('URL de video no válida. Por favor, introduce una URL de YouTube o Wistia.');
                                 }
@@ -250,6 +247,12 @@
                     }
                 });
             } else {
+                // Primero eliminar los iframes pequeños de Quill
+                const smallIframes = tempDiv.querySelectorAll('iframe[height="280"]');
+                smallIframes.forEach(iframe => {
+                    iframe.parentNode.removeChild(iframe);
+                });
+                
                 // Para visualización normal, buscar enlaces de video y convertirlos en iframes + enlaces
                 const links = tempDiv.querySelectorAll('a');
                 links.forEach(link => {
