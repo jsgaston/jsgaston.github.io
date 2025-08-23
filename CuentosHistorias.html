@@ -63,6 +63,7 @@
             color: #3b82f6;
             text-decoration: underline;
             font-size: 0.9rem;
+            word-break: break-all;
         }
 
         .tab-content { display: none; }
@@ -167,7 +168,11 @@
                         
                                 if (embedUrl) {
                                     const range = quill.getSelection(true);
+                                    // Insertar el iframe
                                     quill.insertEmbed(range.index, 'video', embedUrl);
+                                    // Insertar el enlace después
+                                    quill.insertText(range.index + 1, 'Ver video: ' + url, { 'link': url });
+                                    quill.setSelection(range.index + 1);
                                 } else {
                                     alert('URL de video no válida. Por favor, introduce una URL de YouTube o Wistia.');
                                 }
@@ -245,7 +250,7 @@
                     }
                 });
             } else {
-                // Para visualización normal, convertir enlaces a iframes embebidos + enlace
+                // Para visualización normal, buscar enlaces de video y convertirlos en iframes + enlaces
                 const links = tempDiv.querySelectorAll('a');
                 links.forEach(link => {
                     const url = link.href;
@@ -260,8 +265,7 @@
                         match = url.match(wistiaRegex);
                         if (match) {
                             embedUrl = `https://fast.wistia.net/embed/iframe/${match[1]}`;
-                            // Mantener la URL original de Wistia
-                            originalUrl = url;
+                            originalUrl = url; // Mantener URL original de Wistia
                         }
                     }
                     
@@ -293,7 +297,7 @@
             return tempDiv.innerHTML;
         }
 
-        // Resto del código (funciones para extraer imágenes, convertir HTML a texto, etc.)
+        // Función para extraer URLs de imágenes del HTML
         function extractImageUrls(html) {
             const doc = new DOMParser().parseFromString(html, 'text/html');
             const images = doc.querySelectorAll('img');
@@ -304,10 +308,44 @@
             return imageUrls;
         }
 
+        // Función para convertir HTML a texto con marcadores de imagen
         function htmlToFormattedText(html) {
             let doc = new DOMParser().parseFromString(html, 'text/html');
             let text = '';
             let imageCounter = 1;
+            
+            // Procesar videos primero
+            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
+            
+            // Reemplazar iframes de video con enlaces
+            const iframes = doc.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                const src = iframe.getAttribute('src');
+                let videoUrl = '';
+                
+                if (src) {
+                    let match = src.match(youtubeRegex);
+                    if (match) {
+                        videoUrl = `https://www.youtube.com/watch?v=${match[1]}`;
+                    } else {
+                        match = src.match(wistiaRegex);
+                        if (match) {
+                            // Para Wistia, intentamos reconstruir la URL original
+                            videoUrl = `https://${match.input.split('/')[2]}/medias/${match[1]}`;
+                        } else {
+                            videoUrl = src;
+                        }
+                    }
+                    
+                    const link = document.createElement('a');
+                    link.href = videoUrl;
+                    link.textContent = `Ver video: ${videoUrl}`;
+                    iframe.parentNode.replaceChild(link, iframe);
+                }
+            });
+            
+            // Procesar el resto del contenido
             doc.body.childNodes.forEach(node => {
                 if (node.nodeType === Node.TEXT_NODE) {
                     text += node.textContent.trim();
@@ -335,11 +373,15 @@
                         const extension = imgUrl.split('.').pop().split('?')[0];
                         text += `\n[Imagen: imagen_${imageCounter}.${extension}]`;
                         imageCounter++;
+                    } else if (node.tagName === 'A') {
+                        // Mantener los enlaces en el texto
+                        text += `\n[Enlace: ${node.href}]`;
                     } else {
                         text += node.textContent.trim();
                     }
                 }
             });
+            
             return text.replace(/\n\s*\n/g, '\n\n').trim();
         }
 
