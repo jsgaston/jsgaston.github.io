@@ -143,8 +143,9 @@
                         },'video': function() {
                             let url = prompt('Introduce la URL del video de YouTube o Wistia:');
                             if (url) {
+                                // Patrones actualizados para detectar URLs de Wistia
                                 const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-                                const wistiaRegex = /^(?:https?:\/\/)?(?:www\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9_-]+)/;
+                                const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
                                 
                                 let match = url.match(youtubeRegex);
                                 let embedUrl;
@@ -160,10 +161,7 @@
                         
                                 if (embedUrl) {
                                     const range = quill.getSelection(true);
-                                    quill.insertText(range.index, ' Video: ', { 'size': 'small' });
-                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
-                                    quill.insertText(quill.getSelection().index, '\n');
-                                    quill.insertEmbed(quill.getSelection().index, 'video', embedUrl);
+                                    quill.insertEmbed(range.index, 'video', embedUrl);
                                 } else {
                                     alert('URL de video no válida. Por favor, introduce una URL de YouTube o Wistia.');
                                 }
@@ -223,7 +221,7 @@
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlContent;
             const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-            const wistiaRegex = /^(?:https?:\/\/)?(?:www\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9_-]+)/;
+            const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
         
             const iframes = tempDiv.querySelectorAll('iframe');
             iframes.forEach(iframe => {
