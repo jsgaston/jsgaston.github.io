@@ -57,6 +57,14 @@
             height: 100%;
         }
 
+        .video-link {
+            display: block;
+            margin-top: 10px;
+            color: #3b82f6;
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
@@ -237,19 +245,23 @@
                     }
                 });
             } else {
-                // Para visualización normal, convertir enlaces a iframes embebidos
+                // Para visualización normal, convertir enlaces a iframes embebidos + enlace
                 const links = tempDiv.querySelectorAll('a');
                 links.forEach(link => {
                     const url = link.href;
                     let match = url.match(youtubeRegex);
                     let embedUrl;
+                    let originalUrl = url;
                     
                     if (match) {
                         embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                        originalUrl = `https://www.youtube.com/watch?v=${match[1]}`;
                     } else {
                         match = url.match(wistiaRegex);
                         if (match) {
                             embedUrl = `https://fast.wistia.net/embed/iframe/${match[1]}`;
+                            // Mantener la URL original de Wistia
+                            originalUrl = url;
                         }
                     }
                     
@@ -261,11 +273,18 @@
                         iframe.setAttribute('width', '100%');
                         iframe.setAttribute('height', '400');
                         
-                        const wrapper = document.createElement('div');
-                        wrapper.className = 'video-wrapper';
-                        wrapper.appendChild(iframe);
+                        const videoLink = document.createElement('a');
+                        videoLink.href = originalUrl;
+                        videoLink.textContent = 'Ver video original: ' + originalUrl;
+                        videoLink.target = '_blank';
+                        videoLink.className = 'video-link';
                         
-                        // Reemplazar el enlace con el iframe
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'video-container';
+                        wrapper.appendChild(iframe);
+                        wrapper.appendChild(videoLink);
+                        
+                        // Reemplazar el enlace con el contenedor de video
                         link.parentNode.replaceChild(wrapper, link);
                     }
                 });
