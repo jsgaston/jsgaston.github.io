@@ -567,6 +567,62 @@
     }
 
 
+        .story-card {
+  border: 1px solid #e5e7eb;
+}
+
+.story-images {
+  margin-top: 1.5rem;
+}
+
+.story-image img {
+  transition: transform 0.3s ease;
+}
+
+.story-image img:hover {
+  transform: scale(1.05);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.9);
+}
+
+.modal-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.modal-image {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+}
+
+.close-modal {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  color: #ccc;
+}
+
+
     </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -640,9 +696,10 @@
             
             <hr class="my-6">
             <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Cuentos/Historias Publicada:</h3>
-            <div id="latestCuentosContent" class="text-gray-700">
-                <p class="text-center text-gray-500">Este espacio se debe llenar con la última historia publicada a través de un script.</p>
-            </div>
+            <!-- Busca esta sección en tu HTML y reemplázala -->
+<div id="latestCuentosContent" class="text-gray-700">
+    <p class="text-center text-gray-500">Cargando último cuento...</p>
+</div>
 
             <div>
                     <script src="https://www.windfinder.com/widget/forecast/js/marina_alicante?unit_wave=m&unit_rain=mm&unit_temperature=c&unit_wind=kts&unit_pressure=hPa&days=4&show_day=0"></script><noscript><a rel="nofollow" href="https://www.windfinder.com/forecast/marina_alicante?utm_source=forecast&utm_medium=web&utm_campaign=homepageweather&utm_content=noscript-forecast">Wind forecast for Marina Alicante</a> provided by <a rel="nofollow" href="https://www.windfinder.com?utm_source=forecast&utm_medium=web&utm_campaign=homepageweather&utm_content=noscript-logo">windfinder.com</a></noscript>
@@ -1678,6 +1735,7 @@ function showMainTab(tabName) {
         document.querySelector('[data-main-tab="home"]').classList.add('active');
         loadLatestEntry();
         loadLatestEnsayos();
+        loadLatestStory(); // ← Añade esta línea
     } else if (tabName === 'diary') {
         mainDiarySection.classList.remove('hidden');
         document.querySelector('[data-main-tab="diary"]').classList.add('active');
@@ -3099,8 +3157,107 @@ function convertTime() {
 
 </script>
 
+    <script>
+// Agrega esta constante con la URL de tu Google Apps Script
+const STORY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_UPzLu55Z3X6gUHKa314Nm_ytMqtmNVRWOwXVkPqrZz88IFsxpDXYqBSH3dlWXtI1/exec';
 
+// Función para cargar el último cuento
+async function loadLatestStory() {
+  const container = document.getElementById('latestCuentosContent');
+  
+  try {
+    const response = await fetch(`${STORY_SCRIPT_URL}?action=getLatestStory`);
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      renderStory(result.story, result.images, container);
+    } else {
+      container.innerHTML = `<p class="text-center text-red-500">Error: ${result.message}</p>`;
+    }
+  } catch (error) {
+    console.error('Error al cargar el último cuento:', error);
+    container.innerHTML = '<p class="text-center text-red-500">Error al cargar el último cuento.</p>';
+  }
+}
 
+// Función para renderizar el cuento
+function renderStory(story, images, container) {
+  let html = `
+    <div class="story-card bg-white p-6 rounded-lg shadow-md">
+      <h3 class="text-2xl font-bold text-indigo-700 mb-4">${story.titulo || 'Sin título'}</h3>
+      <p class="text-sm text-gray-500 mb-4">Fecha: ${story.fecha ? new Date(story.fecha).toLocaleDateString() : 'No especificada'}</p>
+      <div class="prose max-w-none mb-6">${story.contenido || 'Sin contenido'}</div>
+  `;
+  
+  // Agregar imágenes si existen
+  if (images && images.length > 0) {
+    html += `<div class="story-images grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">`;
+    
+    images.forEach(image => {
+      html += `
+        <div class="story-image">
+          <img src="${image.thumbnail}" alt="${image.name}" 
+               class="w-full h-48 object-cover rounded-lg cursor-pointer"
+               onclick="openImageModal('${image.url}')">
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+  }
+  
+  html += `</div>`;
+  
+  container.innerHTML = html;
+}
+
+// Función para abrir imagen en modal (si no existe, créala)
+function openImageModal(imageUrl) {
+  let modal = document.getElementById('imageModal');
+  let modalImage = document.getElementById('modalImage');
+  
+  if (!modal) {
+    // Crear modal si no existe
+    modal = document.createElement('div');
+    modal.id = 'imageModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <span class="close-modal">&times;</span>
+      <div class="modal-content">
+        <img id="modalImage" class="modal-image" src="" alt="Imagen ampliada">
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Agregar event listeners
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  }
+  
+  if (!modalImage) {
+    modalImage = document.getElementById('modalImage');
+  }
+  
+  modalImage.src = imageUrl;
+  modal.style.display = 'block';
+}
+
+// Llamar a la función cuando se cargue la página
+document.addEventListener('DOMContentLoaded', () => {
+  // Solo cargar si estamos en la pestaña de inicio
+  if (document.getElementById('mainHomeSection') && 
+      !document.getElementById('mainHomeSection').classList.contains('hidden')) {
+    loadLatestStory();
+  }
+});
+</script>
 
 <script>
 function sanitizeNumberInput(input) {
@@ -3174,6 +3331,7 @@ function translateNumber() {
 
 </body>
 </html>
+
 
 
 
