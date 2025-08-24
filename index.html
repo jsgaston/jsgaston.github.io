@@ -677,6 +677,20 @@
      
             <p class="text-center text-gray-600 mb-8"></p>
             <p class="text-center text-gray-600 mb-8">Explora las pestañas de arriba.</p>
+
+
+                   <!-- En la sección de inicio, busca este div y reemplázalo -->
+<div id="latestDiarioContent" class="text-gray-700 mt-6">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Última entrada diario</h3>
+        <div id="diarioContainer" class="border-t pt-4">
+            <p class="text-center text-gray-500">Cargando último entrada...</p>
+        </div>
+    </div>
+</div>
+
+
+                   
             
             <h3 class="text-xl font-semibold text-gray-700 mb-4">Última entrada anotaciones:</h3>
             <div id="latestEntryContent" class="text-gray-700">
@@ -1737,6 +1751,7 @@ function showMainTab(tabName) {
     if (tabName === 'home') {
         mainHomeSection.classList.remove('hidden');
         document.querySelector('[data-main-tab="home"]').classList.add('active');
+        loadLatestDiary(); 
         loadLatestEntry();
         loadLatestEnsayos();
         loadLatestStory(); // ← Añade esta línea
@@ -3325,15 +3340,108 @@ function translateNumber() {
 }
 </script>
 
+<script>
+    // Agrega esta constante con la URL de tu Google Apps Script
+const STORY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7F5Tc9CoUZP51-A5dcxbQjCFnsOxg0E12gdVhmMbtgqYNo8WldtHMRf8Dm-IKEetW/exec';
 
+// Función para cargar el último cuento
+async function loadLatestDiary() {
+  const container = document.getElementById('diarioContainer');
+  
+  try {
+    const response = await fetch(`${STORY_SCRIPT_URL}?action=getLatestStory`);
+    const result = await response.json();
     
+    if (result.status === 'success') {
+      if (result.story) {
+        renderStory(result.story, result.images, container);
+      } else {
+        container.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas disponibles'}</p>`;
+      }
+    } else {
+      container.innerHTML = `<p class="text-center text-red-500">Error: ${result.message}</p>`;
+    }
+  } catch (error) {
+    console.error('Error al cargar el último cuento:', error);
+    container.innerHTML = '<p class="text-center text-red-500">Error al cargar el último cuento.</p>';
+  }
+}
 
+// Función para renderizar el cuento
+function renderStory(story, images, container) {
+  // Determinar qué campos usar (dependiendo de cómo tengas estructurado tu spreadsheet)
+  const title = story.Título || story.título || story.Titulo || story.title || 'Sin título';
+  const content = story.Contenido || story.contenido || story.Contenido || story.content || '';
+  const date = story.Fecha || story.fecha || story.Date || story.date || '';
+  const author = story.Autor || story.autor || story.Author || story.author || '';
+
+  let html = `
+    <h4 class="text-lg font-bold text-indigo-700 mb-2">${title}</h4>
+    <div class="text-sm text-gray-500 mb-4">
+  `;
+  
+  if (author) {
+    html += `<span class="mr-3">Por: ${author}</span>`;
+  }
+  
+  if (date) {
+    html += `<span>Fecha: ${new Date(date).toLocaleDateString()}</span>`;
+  }
+  
+  html += `</div><div class="prose max-w-none mb-4">${formatContent(content)}</div>`;
+  
+  // Agregar imágenes si existen para este cuento
+  if (images && images.length > 0) {
+    html += `<div class="story-images grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">`;
+    
+    images.forEach(image => {
+      html += `
+        <div class="story-image">
+          <img src="${image.thumbnail}" alt="${image.name}" 
+               class="w-full h-48 object-cover rounded-lg cursor-pointer"
+               onclick="openImageModal('${image.url}')">
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+  }
+  
+  container.innerHTML = html;
+}
+
+// Función para formatear contenido (detectar saltos de línea)
+function formatContent(content) {
+  if (!content) return '';
+  return content.replace(/\n/g, '<br>');
+}
+
+// Función para abrir imagen en modal
+function openImageModal(imageUrl) {
+  // Usar el modal existente para imágenes
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  
+  if (modal && modalImage) {
+    modalImage.src = imageUrl;
+    modal.style.display = 'block';
+  }
+}
+
+// Llamar a la función cuando se cargue la página
+document.addEventListener('DOMContentLoaded', () => {
+  loadLatestDiary();
+});
+
+
+</script>
 
 
     
 
 </body>
 </html>
+
 
 
 
