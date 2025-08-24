@@ -1,509 +1,652 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Diario Personal</title>
+    <title>Editor de Diario</title>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.10/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        h1, h2, h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        h1 {
-            text-align: center;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 15px;
-            margin-top: 0;
-        }
-        h2 {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            color: #3498db;
-        }
-        h3 {
-            color: #2c3e50;
-        }
-        input[type="text"], input[type="date"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        #editable-entry {
-            min-height: 250px;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            background-color: #fff;
-            line-height: 1.6;
-            font-size: 16px;
-        }
-        #editable-entry:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-        }
-        #editable-entry img {
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
+        .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
+        h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
+        .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
+        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
+        .btn:hover { transform: scale(1.02); }
+        .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
+        .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .story-list { list-style: none; padding: 0; }
+        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .story-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .story-item .header:hover { background-color: #f0f4f8; }
+        .story-item .arrow { transition: transform 0.3s; }
+        .story-item .arrow.expanded { transform: rotate(90deg); }
+        .story-content { display: none; margin-top: 15px; }
+        .story-content.expanded { display: block; }
+        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
             max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 10px auto;
-            border-radius: 4px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .loading {
-            display: none;
-            color: #7f8c8d;
-            text-align: center;
-            padding: 10px;
-            font-style: italic;
-        }
-        #results {
-            margin-top: 30px;
-        }
-        .entry {
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .entry h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        .entry-meta {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed #ddd;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .entry-date {
-            font-weight: 600;
-        }
-        .entry-time {
-            font-style: italic;
-        }
-        .entry-content {
-            line-height: 1.6;
-        }
-        .entry-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 4px;
-            margin: 10px 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .search-section {
-            background-color: #f5f7fa;
-            padding: 20px;
-            border-radius: 6px;
-            margin-top: 30px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .no-results {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
+            background: #000;
             margin-top: 15px;
         }
-        .button-group button {
-            flex: 1;
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
-        .secondary-button {
-            background-color: #95a5a6;
+
+        .video-link {
+            display: block;
+            margin-top: 10px;
+            color: #3b82f6;
+            text-decoration: underline;
+            font-size: 0.9rem;
+            word-break: break-all;
         }
-        .secondary-button:hover {
-            background-color: #7f8c8d;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            .button-group {
-                flex-direction: column;
-            }
-            .entry-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+        .btn-tab.active { background-color: #4f46e5; color: white; }
+        .download-btn { background-color: #10b981; margin-right: 10px; }
+        #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
+        .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>Mi Diario Personal</h1>
-    <p>Guarda tus pensamientos y recuerdos de forma privada.</p>
-
-    <div id="success-message" class="success-message"></div>
-    <div id="error-message" class="error-message"></div>
-
-    <h2>Nueva Entrada</h2>
-    <form id="diary-form">
-        <div class="form-group">
-            <label for="title">Título:</label>
-            <input type="text" id="title" required>
+    <div class="container">
+        <h1>Editor de entradas Diario</h1>
+        <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn-tab active" data-tab="create">Crear Nuevo Entrada</button>
+            <button class="btn-tab" data-tab="view">Ver Todos los Entradas</button>
+        </nav>
+        <div id="create-tab" class="tab-content active">
+            <form id="cuentoForm">
+                <div style="margin-bottom: 1rem;">
+                    <label for="titulo" class="form-label">Título:</label>
+                    <input type="text" id="titulo" name="titulo" class="form-input" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label class="form-label">Contenido:</label>
+                    <div id="editor-container"></div>
+                </div>
+                <button type="submit" class="btn">
+                    <span id="buttonText">Guardar Entrada</span>
+                    <div id="loadingSpinner" class="loading-spinner"></div>
+                </button>
+                <div id="messageBox" class="message-box"></div>
+            </form>
         </div>
-        
-        <div class="form-group">
-            <label>Entrada (puedes pegar imágenes aquí):</label>
-            <div id="editable-entry" contenteditable="true"></div>
+        <div id="view-tab" class="tab-content">
+            <h2>Entradas Publicados</h2>
+            <div id="cuentos-list" class="story-list">
+                <p>Cargando entradas...</p>
+            </div>
         </div>
-        
-        <button type="submit">Guardar Entrada</button>
-    </form>
-    <div id="status" class="loading"></div>
-
-    <div class="search-section">
-        <h2>Buscar Entradas</h2>
-        <form id="search-form">
-            <div class="form-group">
-                <input type="text" id="search-query" placeholder="Buscar por palabra clave..." required>
-            </div>
-            <button type="submit">Buscar</button>
-        </form>
-        
-        <h3>Buscar por Rango de Fechas</h3>
-        <form id="search-date-range-form">
-            <div class="form-group">
-                <label for="start-date">Fecha de inicio:</label>
-                <input type="date" id="start-date" required>
-            </div>
-            <div class="form-group">
-                <label for="end-date">Fecha de fin:</label>
-                <input type="date" id="end-date" required>
-            </div>
-            <button type="submit">Buscar por Fecha</button>
-        </form>
     </div>
+    <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
+    <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
+    <script>
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxrQnAuE5NgTSocO9Kp93AEQOxzAbfPeZHOIN95NlcKX-_91SrrOuCk98b-_x4i2U/exec'; 
 
-    <div id="results"></div>
-    <div id="search-status" class="loading"></div>
-
-</div>
-
-<script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUwmoknnCQO1LWgvtJLUL9ftbtxXvawUrHmBLI0abE4_qyy1ANUYy6lV8QKOHyM0f7/exec'; // ¡REEMPLAZA ESTO!
-
-    function showStatus(elementId, message) {
-        const statusDiv = document.getElementById(elementId);
-        statusDiv.style.display = 'block';
-        statusDiv.textContent = message;
-    }
-
-    function hideStatus(elementId) {
-        const statusDiv = document.getElementById(elementId);
-        statusDiv.style.display = 'none';
-    }
-
-    function showMessage(type, message) {
-        const messageDiv = document.getElementById(`${type}-message`);
-        messageDiv.textContent = message;
-        messageDiv.style.display = 'block';
-        
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 5000);
-    }
-
-    function clearForm() {
-        document.getElementById('title').value = '';
-        document.getElementById('editable-entry').innerHTML = '';
-    }
-
-    window.addEventListener('load', () => {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const formattedDate = `${yyyy}-${mm}-${dd}`;
-        
-        document.getElementById('end-date').value = formattedDate;
-        
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(today.getDate() - 7);
-        const yyyyPrev = oneWeekAgo.getFullYear();
-        const mmPrev = String(oneWeekAgo.getMonth() + 1).padStart(2, '0');
-        const ddPrev = String(oneWeekAgo.getDate()).padStart(2, '0');
-        const formattedDatePrev = `${yyyyPrev}-${mmPrev}-${ddPrev}`;
-        
-        document.getElementById('start-date').value = formattedDatePrev;
-    });
-
-    async function uploadImage(imageBlob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64data = reader.result.split(',')[1];
-          
-          const formData = new FormData();
-          formData.append('action', 'uploadImage');
-          formData.append('imageBlob', base64data);
-          
-          fetch(SCRIPT_URL, {
-              method: 'POST',
-              body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-              if (data.status === 'success') {
-                  resolve(data.data.imageUrl);
-              } else {
-                  reject(new Error(data.message));
-              }
-          })
-          .catch(error => reject(error));
-        };
-        reader.onerror = () => reject(new Error('Error al leer la imagen'));
-        reader.readAsDataURL(imageBlob);
-      });
-    }
-
-    const editableEntry = document.getElementById('editable-entry');
-    editableEntry.addEventListener('paste', async function(e) {
-        e.preventDefault();
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        
-        for (const item of items) {
-            if (item.type.startsWith('image/')) {
-                const blob = item.getAsFile();
-                if (!blob) continue;
-
-                showStatus('status', 'Subiendo imagen...');
-                
-                try {
-                    const imageUrl = await uploadImage(blob);
-                    if (imageUrl) {
-                        const img = document.createElement('img');
-                        img.src = imageUrl;
+        // Inicializar Quill
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Escribe tu historia aquí...',
+            modules: {
+                toolbar: {
+                    container: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['link', 'image', 'video'],
+                        ['clean'],
+                        ['table']
+                    ],
+                    handlers: {
+                        'link': function(value) {
+                            if (value) {
+                                let url = prompt('Introduce la URL del enlace:');
+                                if (url) {
+                                    const range = quill.getSelection(true);
+                                    quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
+                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
+                                    quill.setSelection(quill.getSelection().index);
+                                }
+                            } else {
+                                quill.format('link', false);
+                            }
+                        },
+                        'video': function() {
+                            let url = prompt('Introduce la URL del video de YouTube o Wistia:');
+                            if (url) {
+                                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                                const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
+                                
+                                let match = url.match(youtubeRegex);
+                                let embedUrl;
                         
-                        const selection = window.getSelection();
-                        if (selection.rangeCount > 0) {
-                          const range = selection.getRangeAt(0);
-                          range.deleteContents();
-                          range.insertNode(img);
-                        } else {
-                          editableEntry.appendChild(img);
+                                if (match) {
+                                    embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                                } else {
+                                    match = url.match(wistiaRegex);
+                                    if (match) {
+                                        embedUrl = `https://fast.wistia.net/embed/iframe/${match[1]}`;
+                                    }
+                                }
+                        
+                                if (embedUrl) {
+                                    const range = quill.getSelection(true);
+                                    // Insertar solo el iframe, no el enlace de texto
+                                    quill.insertEmbed(range.index, 'video', embedUrl);
+                                } else {
+                                    alert('URL de video no válida. Por favor, introduce una URL de YouTube o Wistia.');
+                                }
+                            }
                         }
-                        
-                        showMessage('success', '¡Imagen subida y pegada con éxito!');
                     }
-                } catch (error) {
-                    console.error('Error al subir la imagen:', error);
-                    showMessage('error', 'Error al subir la imagen.');
+                },
+                'table': true
+            }
+        });
+
+        document.getElementById('cuentoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const titulo = document.getElementById('titulo').value;
+            const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const messageBox = document.getElementById('messageBox');
+            buttonText.textContent = 'Guardando...';
+            loadingSpinner.style.display = 'inline-block';
+            messageBox.style.display = 'none';
+            const formData = new FormData();
+            formData.append('action', 'guardarCuento');
+            formData.append('titulo', titulo);
+            formData.append('contenido', contenido);
+            fetch(APP_SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.estado === 'éxito') {
+                    showMessage('success', result.mensaje);
+                    document.getElementById('cuentoForm').reset();
+                    quill.setContents([]);
+                } else {
+                    showMessage('error', result.mensaje);
                 }
-                hideStatus('status');
-            } else if (item.type === 'text/plain') {
-                item.getAsString((text) => {
-                    document.execCommand('insertText', false, text);
+            })
+            .catch(error => {
+                showMessage('error', 'Fallo al guardar: ' + error.message);
+            })
+            .finally(() => {
+                buttonText.textContent = 'Guardar Cuento';
+                loadingSpinner.style.display = 'none';
+            });
+        });
+
+        function showMessage(type, message) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = 'message-box ' + type;
+            messageBox.style.display = 'block';
+        }
+
+        function processVideos(htmlContent, isPDF) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            
+            // Patrones para detectar videos
+            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
+            
+            // Para PDF, reemplazar iframes con enlaces
+            if (isPDF) {
+                const iframes = tempDiv.querySelectorAll('iframe');
+                iframes.forEach(iframe => {
+                    if (iframe.src && (iframe.src.match(youtubeRegex) || iframe.src.match(wistiaRegex))) {
+                        const videoUrl = iframe.src;
+                        const link = document.createElement('a');
+                        link.href = videoUrl;
+                        link.textContent = 'Ver video: ' + videoUrl;
+                        link.target = '_blank';
+                        iframe.parentNode.replaceChild(link, iframe);
+                    }
+                });
+            } else {
+                // Primero eliminar los iframes pequeños de Quill
+                const smallIframes = tempDiv.querySelectorAll('iframe[height="280"]');
+                smallIframes.forEach(iframe => {
+                    iframe.parentNode.removeChild(iframe);
+                });
+                
+                // Para visualización normal, buscar enlaces de video y convertirlos en iframes + enlaces
+                const links = tempDiv.querySelectorAll('a');
+                links.forEach(link => {
+                    const url = link.href;
+                    let match = url.match(youtubeRegex);
+                    let embedUrl;
+                    let originalUrl = url;
+                    
+                    if (match) {
+                        embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                        originalUrl = `https://www.youtube.com/watch?v=${match[1]}`;
+                    } else {
+                        match = url.match(wistiaRegex);
+                        if (match) {
+                            embedUrl = `https://fast.wistia.net/embed/iframe/${match[1]}`;
+                            originalUrl = url; // Mantener URL original de Wistia
+                        }
+                    }
+                    
+                    if (embedUrl) {
+                        const iframe = document.createElement('iframe');
+                        iframe.setAttribute('src', embedUrl);
+                        iframe.setAttribute('frameborder', '0');
+                        iframe.setAttribute('allowfullscreen', '');
+                        iframe.setAttribute('width', '100%');
+                        iframe.setAttribute('height', '400');
+                        
+                        const videoLink = document.createElement('a');
+                        videoLink.href = originalUrl;
+                        videoLink.textContent = 'Ver video original: ' + originalUrl;
+                        videoLink.target = '_blank';
+                        videoLink.className = 'video-link';
+                        
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'video-container';
+                        wrapper.appendChild(iframe);
+                        wrapper.appendChild(videoLink);
+                        
+                        // Reemplazar el enlace con el contenedor de video
+                        link.parentNode.replaceChild(wrapper, link);
+                    }
                 });
             }
-        }
-    });
-
-    document.getElementById('diary-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        showStatus('status', 'Guardando...');
-
-        const form = e.target;
-        const formData = new FormData();
-        formData.append('action', 'save');
-        formData.append('titulo', form.querySelector('#title').value);
-        
-        const entryContent = editableEntry.innerHTML;
-        formData.append('entrada', entryContent);
-        
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showMessage('success', '¡Entrada guardada con éxito!');
-                clearForm();
-            } else {
-                showMessage('error', 'Error: ' + data.message);
-            }
-            hideStatus('status');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('error', 'Error al guardar la entrada.');
-            hideStatus('status');
-        });
-    });
-
-    document.getElementById('search-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = '';
-        showStatus('search-status', 'Buscando...');
-
-        const query = document.getElementById('search-query').value;
-        const params = new URLSearchParams({
-            action: 'search',
-            query: query
-        });
-
-        fetch(`${SCRIPT_URL}?${params.toString()}`)
-            .then(response => response.json())
-            .then(data => {
-                hideStatus('search-status');
-                displayResults(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                hideStatus('search-status');
-                resultsDiv.innerHTML = '<div class="no-results">Error al buscar las entradas.</div>';
-            });
-    });
-
-    document.getElementById('search-date-range-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = '';
-        showStatus('search-status', 'Buscando por rango de fechas...');
-
-        const startDate = document.getElementById('start-date').value;
-        const endDate = document.getElementById('end-date').value;
-
-        const formatDate = (dateStr) => {
-            const [year, month, day] = dateStr.split('-');
-            return `${day}/${month}/${year}`;
-        };
-
-        const params = new URLSearchParams({
-            action: 'searchByDateRange',
-            startDate: formatDate(startDate),
-            endDate: formatDate(endDate)
-        });
-
-        console.log('Buscando entre:', formatDate(startDate), 'y', formatDate(endDate));
-
-        fetch(`${SCRIPT_URL}?${params.toString()}`)
-            .then(response => response.json())
-            .then(data => {
-                hideStatus('search-status');
-                console.log('Resultados recibidos:', data);
-                displayResults(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                hideStatus('search-status');
-                resultsDiv.innerHTML = '<div class="no-results">Error al buscar las entradas.</div>';
-            });
-    });
-
-    function fixImageUrls(htmlContent) {
-        if (!htmlContent) return '';
-        let correctedContent = htmlContent.replace(/&amp;/g, '&');
-        return correctedContent;
-    }
-
-    function displayResults(data) {
-        const resultsDiv = document.getElementById('results');
-        
-        if (data && data.length > 0) {
-            console.log('Mostrando', data.length, 'resultados');
             
-            data.forEach(entry => {
-                const entryDiv = document.createElement('div');
-                entryDiv.className = 'entry';
-                
-                const entradaCorregida = fixImageUrls(entry.entrada);
-                
-                const fechaTexto = entry.fecha || 'Fecha no disponible';
-                const horaTexto = entry.hora || '';
-                
-                entryDiv.innerHTML = `
-                    <div class="entry-meta">
-                        <span class="entry-date">${fechaTexto}</span>
-                        <span class="entry-time">${horaTexto}</span>
-                    </div>
-                    <h3>${entry.titulo || 'Sin título'}</h3>
-                    <div class="entry-content">${entradaCorregida}</div>
-                `;
-                resultsDiv.appendChild(entryDiv);
-            });
-        } else {
-            resultsDiv.innerHTML = '<div class="no-results">No se encontraron entradas para los criterios especificados.</div>';
+            return tempDiv.innerHTML;
         }
-    }
-</script>
 
+        // Función para extraer URLs de imágenes del HTML
+        function extractImageUrls(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const images = doc.querySelectorAll('img');
+            const imageUrls = [];
+            images.forEach(img => {
+                imageUrls.push(img.src);
+            });
+            return imageUrls;
+        }
+
+        // Función para convertir HTML a texto con marcadores de imagen
+        function htmlToFormattedText(html) {
+            let doc = new DOMParser().parseFromString(html, 'text/html');
+            let text = '';
+            let imageCounter = 1;
+            
+            // Procesar videos primero
+            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
+            
+            // Reemplazar iframes de video con enlaces
+            const iframes = doc.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                const src = iframe.getAttribute('src');
+                let videoUrl = '';
+                
+                if (src) {
+                    let match = src.match(youtubeRegex);
+                    if (match) {
+                        videoUrl = `https://www.youtube.com/watch?v=${match[1]}`;
+                    } else {
+                        match = src.match(wistiaRegex);
+                        if (match) {
+                            // Para Wistia, intentamos reconstruir la URL original
+                            videoUrl = `https://${match.input.split('/')[2]}/medias/${match[1]}`;
+                        } else {
+                            videoUrl = src;
+                        }
+                    }
+                    
+                    const link = document.createElement('a');
+                    link.href = videoUrl;
+                    link.textContent = `Ver video: ${videoUrl}`;
+                    iframe.parentNode.replaceChild(link, iframe);
+                }
+            });
+            
+            // Procesar el resto del contenido
+            doc.body.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    text += node.textContent.trim();
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
+                        text += '\n\n' + node.textContent.trim();
+                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
+                        node.querySelectorAll('li').forEach(li => {
+                            text += '\n* ' + li.textContent.trim();
+                        });
+                        text += '\n';
+                    } else if (node.tagName === 'TABLE') {
+                        text += '\n\n[Tabla]\n';
+                        const rows = node.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td, th');
+                            cells.forEach(cell => {
+                                text += cell.textContent.trim() + '\t';
+                            });
+                            text += '\n';
+                        });
+                        text += '[/Tabla]\n';
+                    } else if (node.tagName === 'IMG') {
+                        const imgUrl = node.getAttribute('src');
+                        const extension = imgUrl.split('.').pop().split('?')[0];
+                        text += `\n[Imagen: imagen_${imageCounter}.${extension}]`;
+                        imageCounter++;
+                    } else if (node.tagName === 'A') {
+                        // Mantener los enlaces en el texto
+                        text += `\n[Enlace: ${node.href}]`;
+                    } else {
+                        text += node.textContent.trim();
+                    }
+                }
+            });
+            
+            return text.replace(/\n\s*\n/g, '\n\n').trim();
+        }
+
+        function cargarCuentos() {
+            const cuentosList = document.getElementById('cuentos-list');
+            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
+            const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
+            fetch(url)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.estado === 'éxito') {
+                        cuentosList.innerHTML = '';
+                        if (result.cuentos && result.cuentos.length > 0) {
+                            result.cuentos.forEach((cuento, index) => {
+                                const storyId = `story-${index}`;
+                                const storyDiv = document.createElement('div');
+                                storyDiv.id = storyId;
+                                storyDiv.className = 'story-item';
+                                
+                                const contenidoConVideos = processVideos(cuento.contenido, false);
+                                
+                                storyDiv.innerHTML = `
+                                    <div class="header">
+                                        <h3>${cuento.titulo}</h3>
+                                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
+                                    </div>
+                                    <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
+                                        ${contenidoConVideos}
+                                        <div class="download-buttons-container">
+                                            <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                            <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
+                                            <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
+                                            <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
+                                            <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
+                                            <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
+                                        </div>
+                                    </div>
+                                `;
+                                cuentosList.appendChild(storyDiv);
+                            });
+
+                            document.querySelectorAll('.story-item .header').forEach(header => {
+                                header.addEventListener('click', function() {
+                                    const content = this.nextElementSibling;
+                                    const arrow = this.querySelector('.arrow');
+                                    content.classList.toggle('expanded');
+                                    arrow.classList.toggle('expanded');
+                                });
+                            });
+                        } else {
+                            cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
+                        }
+                    } else {
+                        cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
+                    }
+                })
+                .catch(error => {
+                    cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                });
+        }
+        
+        async function descargarCuento(storyId, format) {
+            const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
+            const originalContent = decodeURIComponent(storyContentDiv.dataset.originalContent);
+            const titulo = decodeURIComponent(storyContentDiv.dataset.title);
+            
+            if (format === 'pdf') {
+                generarPDF(storyId, titulo);
+            } else if (format === 'odt') {
+                generarODT(originalContent, titulo);
+            } else if (format === 'docx') {
+                generarWord(originalContent, titulo);
+            } else if (format === 'xlsx') {
+                generarExcel(titulo, originalContent);
+            } else if (format === 'txt') {
+                generarTXT(originalContent, titulo);
+            } else if (format === 'zip') {
+                descargarImagenesZIP(originalContent, titulo);
+            }
+        }
+        
+        function generarPDF(storyId, filename) {
+            const element = document.getElementById(storyId);
+            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
+            
+            const originalContentHTML = element.querySelector('.story-content').innerHTML;
+            const contentForPDF = processVideos(originalContentHTML, true);
+            
+            element.querySelector('.story-content').innerHTML = contentForPDF;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgProps = doc.getImageProperties(imgData);
+                const pdfWidth = doc.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                let y = 0;
+                while (y < pdfHeight) {
+                    if (y > 0) { doc.addPage(); }
+                    const heightLeft = pdfHeight - y;
+                    const newHeight = Math.min(doc.internal.pageSize.getHeight(), heightLeft);
+                    doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
+                    y += newHeight;
+                }
+                doc.save(`${filename}.pdf`);
+            }).catch(error => {
+                alert("Hubo un error al generar el PDF: " + error.message);
+                console.error("Error generando PDF:", error);
+            }).finally(() => {
+                element.querySelector('.story-content').innerHTML = originalContentHTML;
+            });
+        }
+        
+        async function generarODT(htmlContent, filename) {
+            try {
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.oasis.opendocument.text' });
+                saveAs(blob, `${filename}.odt`);
+                
+            } catch (error) {
+                alert("Hubo un error al generar el archivo ODT: " + error.message);
+                console.error("Error generando ODT:", error);
+            }
+        }
+        
+        async function generarWord(htmlContent, filename) {
+            try {
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                saveAs(blob, `${filename}.docx`);
+                
+            } catch (error) {
+                alert("Hubo un error al generar el archivo de Word: " + error.message);
+                console.error("Error generando DOCX:", error);
+            }
+        }
+        
+        function generarExcel(titulo, contenido) {
+            try {
+                const wb = XLSX.utils.book_new();
+                const ws_data = [
+                    ["Título", "Contenido"],
+                    [titulo, htmlToFormattedText(contenido)]
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                XLSX.utils.book_append_sheet(wb, ws, "Historia");
+                XLSX.writeFile(wb, `${titulo}.xlsx`);
+            } catch (error) {
+                alert("Hubo un error al generar el archivo Excel: " + error.message);
+                console.error("Error generando Excel:", error);
+            }
+        }
+
+        function generarTXT(htmlContent, filename) {
+            try {
+                const formattedText = htmlToFormattedText(htmlContent);
+                const blob = new Blob([formattedText], { type: 'text/plain' });
+                saveAs(blob, `${filename}.txt`);
+            } catch (error) {
+                alert("Hubo un error al generar el archivo TXT: " + error.message);
+                console.error("Error generando TXT:", error);
+            }
+        }
+        
+        async function descargarImagenesZIP(htmlContent, filename) {
+            const imageUrls = extractImageUrls(htmlContent);
+            if (imageUrls.length === 0) {
+                alert("No hay imágenes en este cuento para descargar.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'zipImagenes');
+            formData.append('imageUrls', JSON.stringify(imageUrls));
+
+            try {
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.estado === 'éxito') {
+                    const downloadUrl = `${APP_SCRIPT_URL}?action=descargarZip&fileId=${result.fileId}`;
+                    
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = `${filename}_imagenes.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert('Error al crear el archivo ZIP: ' + result.mensaje);
+                }
+            } catch (error) {
+                alert('Fallo al comunicarse con el servidor: ' + error.message);
+            }
+        }
+
+        document.getElementById('cuentos-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('download-btn')) {
+                const storyId = e.target.closest('.story-item').id;
+                const format = e.target.dataset.format;
+                descargarCuento(storyId, format);
+            }
+        });
+
+        document.querySelectorAll('.btn-tab').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                if (tabId === 'view') {
+                    cargarCuentos();
+                }
+            });
+        });
+
+        document.querySelector('.btn-tab').click();
+
+        quill.root.addEventListener('paste', (event) => {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf('image') === 0) {
+                    const blob = item.getAsFile();
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64data = e.target.result;
+                            const formData = new FormData();
+                            formData.append('action', 'subirImagenBase64');
+                            formData.append('imagen', base64data);
+                            const range = quill.getSelection();
+                            quill.insertText(range.index, 'Cargando imagen...');
+                            fetch(APP_SCRIPT_URL, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.estado === 'éxito') {
+                                    quill.insertEmbed(range.index, 'image', result.url);
+                                } else {
+                                    alert('Error al subir la imagen: ' + result.mensaje);
+                                }
+                            })
+                            .catch(error => {
+                                alert('Fallo en la comunicación con el servidor: ' + error.message);
+                            })
+                            .finally(() => {
+                                quill.deleteText(range.index, 18);
+                            });
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
