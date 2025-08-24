@@ -73,6 +73,13 @@
         .download-btn { background-color: #10b981; margin-right: 10px; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
         .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        
+        /* Nuevos estilos para búsqueda */
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .search-input { flex: 1; min-width: 200px; }
+        .search-btn { background-color: #3b82f6; width: auto; }
+        .reset-search-btn { background-color: #6b7280; width: auto; }
+        .no-results { text-align: center; padding: 20px; color: #6b7280; }
     </style>
 </head>
 <body>
@@ -101,6 +108,15 @@
         </div>
         <div id="view-tab" class="tab-content">
             <h2>Entradas Publicados</h2>
+            
+            <!-- Contenedor de búsqueda -->
+            <div class="search-container">
+                <input type="text" id="searchText" class="form-input search-input" placeholder="Buscar por palabra...">
+                <input type="date" id="searchDate" class="form-input" style="width: auto;">
+                <button id="searchBtn" class="btn search-btn">Buscar</button>
+                <button id="resetSearchBtn" class="btn reset-search-btn">Restablecer</button>
+            </div>
+            
             <div id="cuentos-list" class="story-list">
                 <p>Cargando entradas...</p>
             </div>
@@ -181,6 +197,10 @@
             }
         });
 
+        // Variables globales para almacenar los cuentos y búsqueda
+        let allCuentos = [];
+        let filteredCuentos = [];
+
         document.getElementById('cuentoForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
@@ -205,6 +225,10 @@
                     showMessage('success', result.mensaje);
                     document.getElementById('cuentoForm').reset();
                     quill.setContents([]);
+                    // Recargar la lista de cuentos después de guardar
+                    if (document.getElementById('view-tab').classList.contains('active')) {
+                        cargarCuentos();
+                    }
                 } else {
                     showMessage('error', result.mensaje);
                 }
@@ -396,47 +420,9 @@
                 .then(response => response.json())
                 .then(result => {
                     if (result.estado === 'éxito') {
-                        cuentosList.innerHTML = '';
-                        if (result.cuentos && result.cuentos.length > 0) {
-                            result.cuentos.forEach((cuento, index) => {
-                                const storyId = `story-${index}`;
-                                const storyDiv = document.createElement('div');
-                                storyDiv.id = storyId;
-                                storyDiv.className = 'story-item';
-                                
-                                const contenidoConVideos = processVideos(cuento.contenido, false);
-                                
-                                storyDiv.innerHTML = `
-                                    <div class="header">
-                                        <h3>${cuento.titulo}</h3>
-                                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
-                                    </div>
-                                    <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
-                                        ${contenidoConVideos}
-                                        <div class="download-buttons-container">
-                                            <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
-                                            <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
-                                            <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
-                                            <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
-                                            <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
-                                            <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
-                                        </div>
-                                    </div>
-                                `;
-                                cuentosList.appendChild(storyDiv);
-                            });
-
-                            document.querySelectorAll('.story-item .header').forEach(header => {
-                                header.addEventListener('click', function() {
-                                    const content = this.nextElementSibling;
-                                    const arrow = this.querySelector('.arrow');
-                                    content.classList.toggle('expanded');
-                                    arrow.classList.toggle('expanded');
-                                });
-                            });
-                        } else {
-                            cuentosList.innerHTML = '<p>No hay cuentos publicados aún.</p>';
-                        }
+                        allCuentos = result.cuentos || [];
+                        filteredCuentos = [...allCuentos];
+                        mostrarCuentos();
                     } else {
                         cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
                     }
@@ -444,6 +430,87 @@
                 .catch(error => {
                     cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
                 });
+        }
+        
+        function mostrarCuentos() {
+            const cuentosList = document.getElementById('cuentos-list');
+            cuentosList.innerHTML = '';
+            
+            if (filteredCuentos && filteredCuentos.length > 0) {
+                filteredCuentos.forEach((cuento, index) => {
+                    const storyId = `story-${index}`;
+                    const storyDiv = document.createElement('div');
+                    storyDiv.id = storyId;
+                    storyDiv.className = 'story-item';
+                    
+                    const contenidoConVideos = processVideos(cuento.contenido, false);
+                    
+                    storyDiv.innerHTML = `
+                        <div class="header">
+                            <h3>${cuento.titulo}</h3>
+                            <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
+                        </div>
+                        <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
+                            ${contenidoConVideos}
+                            <div class="download-buttons-container">
+                                <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
+                                <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
+                                <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
+                                <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
+                                <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
+                                <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
+                            </div>
+                        </div>
+                    `;
+                    cuentosList.appendChild(storyDiv);
+                });
+
+                document.querySelectorAll('.story-item .header').forEach(header => {
+                    header.addEventListener('click', function() {
+                        const content = this.nextElementSibling;
+                        const arrow = this.querySelector('.arrow');
+                        content.classList.toggle('expanded');
+                        arrow.classList.toggle('expanded');
+                    });
+                });
+            } else {
+                cuentosList.innerHTML = '<p class="no-results">No se encontraron entradas que coincidan con tu búsqueda.</p>';
+            }
+        }
+        
+        // Función para buscar entradas
+        function buscarEntradas() {
+            const searchText = document.getElementById('searchText').value.toLowerCase();
+            const searchDate = document.getElementById('searchDate').value;
+            
+            filteredCuentos = allCuentos.filter(cuento => {
+                let matchesText = true;
+                let matchesDate = true;
+                
+                // Filtrar por texto (título o contenido)
+                if (searchText) {
+                    matchesText = cuento.titulo.toLowerCase().includes(searchText) || 
+                                 cuento.contenido.toLowerCase().includes(searchText);
+                }
+                
+                // Filtrar por fecha
+                if (searchDate) {
+                    const cuentoDate = new Date(cuento.fecha).toISOString().split('T')[0];
+                    matchesDate = cuentoDate === searchDate;
+                }
+                
+                return matchesText && matchesDate;
+            });
+            
+            mostrarCuentos();
+        }
+        
+        // Función para restablecer la búsqueda
+        function restablecerBusqueda() {
+            document.getElementById('searchText').value = '';
+            document.getElementById('searchDate').value = '';
+            filteredCuentos = [...allCuentos];
+            mostrarCuentos();
         }
         
         async function descargarCuento(storyId, format) {
@@ -585,6 +652,7 @@
             }
         }
 
+        // Event listeners
         document.getElementById('cuentos-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
                 const storyId = e.target.closest('.story-item').id;
@@ -606,6 +674,19 @@
             });
         });
 
+        // Event listeners para búsqueda
+        document.getElementById('searchBtn').addEventListener('click', buscarEntradas);
+        document.getElementById('resetSearchBtn').addEventListener('click', restablecerBusqueda);
+        
+        // Permitir búsqueda con Enter
+        document.getElementById('searchText').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarEntradas();
+            }
+        });
+
+        // Inicializar
         document.querySelector('.btn-tab').click();
 
         quill.root.addEventListener('paste', (event) => {
@@ -637,9 +718,6 @@
                             })
                             .catch(error => {
                                 alert('Fallo en la comunicación con el servidor: ' + error.message);
-                            })
-                            .finally(() => {
-                                quill.deleteText(range.index, 18);
                             });
                         };
                         reader.readAsDataURL(blob);
