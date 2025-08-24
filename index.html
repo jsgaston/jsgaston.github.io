@@ -695,10 +695,14 @@
             </div>
             
             <hr class="my-6">
-            <h3 class="text-xl font-semibold text-gray-700 mb-4">Última Cuentos/Historias Publicada:</h3>
-            <!-- Busca esta sección en tu HTML y reemplázala -->
-<div id="latestCuentosContent" class="text-gray-700">
-    <p class="text-center text-gray-500">Cargando último cuento...</p>
+<!-- En la sección de inicio, busca este div y reemplázalo -->
+<div id="latestCuentosContent" class="text-gray-700 mt-6">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Último Cuento/Historia</h3>
+        <div id="cuentoContainer" class="border-t pt-4">
+            <p class="text-center text-gray-500">Cargando último cuento...</p>
+        </div>
+    </div>
 </div>
 
             <div>
@@ -3158,19 +3162,26 @@ function convertTime() {
 </script>
 
     <script>
-// Agrega esta constante con la URL de tu Google Apps Script
-const STORY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_UPzLu55Z3X6gUHKa314Nm_ytMqtmNVRWOwXVkPqrZz88IFsxpDXYqBSH3dlWXtI1/exec';
+
+
+
+        // Agrega esta constante con la URL de tu Google Apps Script
+const STORY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMcpiNI3emNHnBvOPdg_yy-ItInMTYeG1WJL0jfFupfoM_wMIWDMciQaKRUG6ajjWS/exec';
 
 // Función para cargar el último cuento
 async function loadLatestStory() {
-  const container = document.getElementById('latestCuentosContent');
+  const container = document.getElementById('cuentoContainer');
   
   try {
     const response = await fetch(`${STORY_SCRIPT_URL}?action=getLatestStory`);
     const result = await response.json();
     
     if (result.status === 'success') {
-      renderStory(result.story, result.images, container);
+      if (result.story) {
+        renderStory(result.story, result.images, container);
+      } else {
+        container.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay cuentos disponibles'}</p>`;
+      }
     } else {
       container.innerHTML = `<p class="text-center text-red-500">Error: ${result.message}</p>`;
     }
@@ -3182,16 +3193,30 @@ async function loadLatestStory() {
 
 // Función para renderizar el cuento
 function renderStory(story, images, container) {
+  // Determinar qué campos usar (dependiendo de cómo tengas estructurado tu spreadsheet)
+  const title = story.Título || story.título || story.Titulo || story.title || 'Sin título';
+  const content = story.Contenido || story.contenido || story.Contenido || story.content || '';
+  const date = story.Fecha || story.fecha || story.Date || story.date || '';
+  const author = story.Autor || story.autor || story.Author || story.author || '';
+
   let html = `
-    <div class="story-card bg-white p-6 rounded-lg shadow-md">
-      <h3 class="text-2xl font-bold text-indigo-700 mb-4">${story.titulo || 'Sin título'}</h3>
-      <p class="text-sm text-gray-500 mb-4">Fecha: ${story.fecha ? new Date(story.fecha).toLocaleDateString() : 'No especificada'}</p>
-      <div class="prose max-w-none mb-6">${story.contenido || 'Sin contenido'}</div>
+    <h4 class="text-lg font-bold text-indigo-700 mb-2">${title}</h4>
+    <div class="text-sm text-gray-500 mb-4">
   `;
   
-  // Agregar imágenes si existen
+  if (author) {
+    html += `<span class="mr-3">Por: ${author}</span>`;
+  }
+  
+  if (date) {
+    html += `<span>Fecha: ${new Date(date).toLocaleDateString()}</span>`;
+  }
+  
+  html += `</div><div class="prose max-w-none mb-4">${formatContent(content)}</div>`;
+  
+  // Agregar imágenes si existen para este cuento
   if (images && images.length > 0) {
-    html += `<div class="story-images grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">`;
+    html += `<div class="story-images grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">`;
     
     images.forEach(image => {
       html += `
@@ -3206,57 +3231,35 @@ function renderStory(story, images, container) {
     html += `</div>`;
   }
   
-  html += `</div>`;
-  
   container.innerHTML = html;
 }
 
-// Función para abrir imagen en modal (si no existe, créala)
+// Función para formatear contenido (detectar saltos de línea)
+function formatContent(content) {
+  if (!content) return '';
+  return content.replace(/\n/g, '<br>');
+}
+
+// Función para abrir imagen en modal
 function openImageModal(imageUrl) {
-  let modal = document.getElementById('imageModal');
-  let modalImage = document.getElementById('modalImage');
+  // Usar el modal existente para imágenes
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
   
-  if (!modal) {
-    // Crear modal si no existe
-    modal = document.createElement('div');
-    modal.id = 'imageModal';
-    modal.className = 'modal';
-    modal.innerHTML = `
-      <span class="close-modal">&times;</span>
-      <div class="modal-content">
-        <img id="modalImage" class="modal-image" src="" alt="Imagen ampliada">
-      </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // Agregar event listeners
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
-    
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
+  if (modal && modalImage) {
+    modalImage.src = imageUrl;
+    modal.style.display = 'block';
   }
-  
-  if (!modalImage) {
-    modalImage = document.getElementById('modalImage');
-  }
-  
-  modalImage.src = imageUrl;
-  modal.style.display = 'block';
 }
 
 // Llamar a la función cuando se cargue la página
 document.addEventListener('DOMContentLoaded', () => {
-  // Solo cargar si estamos en la pestaña de inicio
-  if (document.getElementById('mainHomeSection') && 
-      !document.getElementById('mainHomeSection').classList.contains('hidden')) {
-    loadLatestStory();
-  }
+  loadLatestStory();
 });
+
+
+
+        
 </script>
 
 <script>
@@ -3331,6 +3334,7 @@ function translateNumber() {
 
 </body>
 </html>
+
 
 
 
