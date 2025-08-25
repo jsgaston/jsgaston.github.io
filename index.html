@@ -1779,7 +1779,7 @@ function showMainTab(tabName) {
         loadLatestEnsayos();
         loadLatestStory(); // ← Añade esta línea
             } else if (tabName === 'diario') {
-        mainDiarySection.classList.remove('hidden');
+        mainDiaro_Section.classList.remove('hidden');
         document.querySelector('[data-main-tab="diario"]').classList.add('active');
         showDiario_SubTab('write');
     } else if (tabName === 'diary') {
@@ -1835,9 +1835,7 @@ function showMainTab(tabName) {
     }  else if (tabName === 'cuentos') {
         document.getElementById('mainCuentosSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="cuentos"]').classList.add('active');
-    
-    
-    } else if (tabName === 'noticias') {
+     }   else if (tabName === 'noticias') {
         document.getElementById('mainnoticiasSection').classList.remove('hidden');
         document.querySelector('[data-main-tab="noticias"]').classList.add('active');
     
@@ -3470,6 +3468,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
