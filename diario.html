@@ -17,145 +17,28 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f3f4f6; 
-            padding: 20px; 
-            margin: 0;
-        }
-        .container { 
-            background-color: #ffffff; 
-            padding: 2.5rem; 
-            border-radius: 0.75rem; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
-            max-width: 100%; 
-            border: 1px solid #e5e7eb; 
-        }
-        h1 { 
-            color: #1a202c; 
-            font-size: 2rem; 
-            font-weight: 700; 
-            margin-bottom: 1.5rem; 
-            text-align: center; 
-        }
-        .form-label { 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            display: block; 
-            color: #374151; 
-        }
-        .form-input { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 8px; 
-            font-size: 1rem; 
-            color: #1f2937; 
-            background-color: #f9fafb; 
-            box-sizing: border-box;
-        }
-        .btn { 
-            background-color: #4f46e5; 
-            color: white; 
-            padding: 14px 24px; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: background-color 0.2s, transform: 0.1s; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            width: 100%; 
-            margin-top: 1.5rem; 
-            border: none;
-        }
-        .btn:hover { 
-            transform: scale(1.02); 
-            background-color: #4338ca;
-        }
-        .message-box { 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            margin-top: 20px; 
-            font-weight: 500; 
-            display: none; 
-        }
-        .message-box.success { 
-            background-color: #d1fae5; 
-            color: #065f46; 
-            border: 1px solid #10b981; 
-        }
-        .message-box.error { 
-            background-color: #fee2e2; 
-            color: #991b1b; 
-            border: 1px solid #ef4444; 
-        }
-        .loading-spinner { 
-            border: 4px solid rgba(255, 255, 255, 0.3); 
-            border-top: 4px solid #ffffff; 
-            border-radius: 50%; 
-            width: 24px; 
-            height: 24px; 
-            animation: spin 1s linear infinite; 
-            display: none; 
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        .story-list { 
-            list-style: none; 
-            padding: 0; 
-        }
-        .story-item { 
-            background-color: #fafafa; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 8px; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-        }
-        .story-item h3 { 
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            color: #1f2937; 
-            margin-bottom: 10px; 
-        }
-        .story-item .header { 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 10px;
-            border-radius: 6px;
-        }
-        .story-item .header:hover { 
-            background-color: #f0f4f8; 
-        }
-        .story-item .arrow { 
-            transition: transform 0.3s; 
-            margin-left: 10px;
-        }
-        .story-item .arrow.expanded { 
-            transform: rotate(90deg); 
-        }
-        .story-content { 
-            display: none; 
-            margin-top: 15px; 
-            padding: 15px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .story-content.expanded { 
-            display: block; 
-        }
-        .story-content img { 
-            max-width: 100%; 
-            height: auto; 
-            display: block; 
-            margin: 15px auto; 
-            border-radius: 8px; 
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; padding: 20px; }
+        .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
+        h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
+        .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
+        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform: 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
+        .btn:hover { transform: scale(1.02); }
+        .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
+        .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .story-list { list-style: none; padding: 0; }
+        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .story-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .story-item .header:hover { background-color: #f0f4f8; }
+        .story-item .arrow { transition: transform 0.3s; }
+        .story-item .arrow.expanded { transform: rotate(90deg); }
+        .story-content { display: none; margin-top: 15px; }
+        .story-content.expanded { display: block; }
+        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
         
         .video-wrapper {
             position: relative;
@@ -165,7 +48,6 @@
             max-width: 100%;
             background: #000;
             margin-top: 15px;
-            border-radius: 8px;
         }
         .video-wrapper iframe {
             position: absolute;
@@ -173,7 +55,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
         }
 
         .video-link {
@@ -185,110 +66,25 @@
             word-break: break-all;
         }
 
-        .tab-content { 
-            display: none; 
-        }
-        .tab-content.active { 
-            display: block; 
-        }
-        .btn-tab { 
-            background-color: #e5e7eb; 
-            color: #4b5563; 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: background-color 0.2s; 
-        }
-        .btn-tab.active { 
-            background-color: #4f46e5; 
-            color: white; 
-        }
-        .download-btn { 
-            background-color: #10b981; 
-            margin-right: 10px; 
-            width: auto;
-            padding: 10px 15px;
-        }
-        .download-btn:hover {
-            background-color: #0d966c;
-        }
-        #editor-container { 
-            height: 300px; 
-            margin-bottom: 20px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 8px;
-        }
-        .download-buttons-container { 
-            display: flex; 
-            gap: 10px; 
-            margin-top: 15px; 
-            flex-wrap: wrap; 
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn-tab { background-color: #e5e7eb; color: #4b5563; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+        .btn-tab.active { background-color: #4f46e5; color: white; }
+        .download-btn { background-color: #10b981; margin-right: 10px; }
+        #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
+        .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
         
         /* Estilos para búsqueda avanzada */
-        .search-container { 
-            margin-bottom: 20px; 
-            display: flex; 
-            gap: 10px; 
-            flex-wrap: wrap; 
-        }
-        .search-input { 
-            flex: 1; 
-            min-width: 200px; 
-        }
-        .search-date-group { 
-            display: flex; 
-            gap: 10px; 
-            align-items: center; 
-            flex-wrap: wrap;
-        }
-        .search-date-group label { 
-            white-space: nowrap; 
-        }
-        .search-btn { 
-            background-color: #3b82f6; 
-            width: auto; 
-        }
-        .search-btn:hover {
-            background-color: #2563eb;
-        }
-        .reset-search-btn { 
-            background-color: #6b7280; 
-            width: auto; 
-        }
-        .reset-search-btn:hover {
-            background-color: #4b5563;
-        }
-        .no-results { 
-            text-align: center; 
-            padding: 20px; 
-            color: #6b7280; 
-            font-style: italic;
-        }
-        .search-advanced-toggle { 
-            color: #3b82f6; 
-            cursor: pointer; 
-            text-decoration: underline; 
-            margin-top: 10px; 
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-        .search-advanced-toggle:hover {
-            color: #2563eb;
-        }
-        .search-advanced-filters { 
-            display: none; 
-            margin-top: 15px; 
-            padding: 15px; 
-            background-color: #f9fafb; 
-            border-radius: 8px; 
-            border: 1px solid #e5e7eb; 
-        }
-        .search-advanced-filters.active { 
-            display: block; 
-        }
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .search-input { flex: 1; min-width: 200px; }
+        .search-date-group { display: flex; gap: 10px; align-items: center; }
+        .search-date-group label { white-space: nowrap; }
+        .search-btn { background-color: #3b82f6; width: auto; }
+        .reset-search-btn { background-color: #6b7280; width: auto; }
+        .no-results { text-align: center; padding: 20px; color: #6b7280; }
+        .search-advanced-toggle { color: #3b82f6; cursor: pointer; text-decoration: underline; margin-top: 10px; }
+        .search-advanced-filters { display: none; margin-top: 15px; padding: 15px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .search-advanced-filters.active { display: block; }
         
         /* Estilos para la carga de imágenes */
         .image-upload-progress {
@@ -348,54 +144,6 @@
         }
         .story-content p {
             margin-bottom: 1rem;
-        }
-        
-        /* Configuración error */
-        .config-error {
-            background-color: #fef3f2;
-            border: 1px solid #fecdca;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        .config-error h3 {
-            color: #b42318;
-            margin-top: 0;
-        }
-        .config-error p {
-            color: #667085;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-            
-            .search-container {
-                flex-direction: column;
-            }
-            
-            .search-date-group {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .story-item .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .download-buttons-container {
-                flex-direction: column;
-            }
-            
-            .download-btn {
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
         }
     </style>
 </head>
@@ -460,32 +208,97 @@
             </div>
         </div>
     </div>
-
+    <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
+    <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
-        // URL de Google Apps Script - Debes reemplazar esto con tu URL correcta
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMkCdjnh-HJuUj7w_tXnpGHlD9ol-rciqZn7LyJQGaHRRWe7k3OkC7_CkFHJ1Pe-Catw/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOKWBlyME8gmp3gi3ZzyNBrmRZ_gvJ6moFRTXYicAkQjkyU_Uqa3kSjxAmeteCvnYFXg/exec'; 
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
             modules: {
-                toolbar: [
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'header': 1 }, { 'header': 2 }],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'script': 'sub'}, { 'script': 'super' }],
-                    [{ 'indent': '-1'}, { 'indent': '+1' }],
-                    [{ 'direction': 'rtl' }],
-                    [{ 'size': ['small', false, 'large', 'huge'] }],
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'font': [] }],
-                    [{ 'align': [] }],
-                    ['link', 'image', 'video'],
-                    ['clean']
-                ]
+                toolbar: {
+                    container: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'script': 'sub'}, { 'script': 'super' }],
+                        [{ 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['link', 'image', 'video'],
+                        ['clean'],
+                        ['table']
+                    ],
+                    handlers: {
+                        'image': function() {
+                            const input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/*');
+                            input.click();
+                            
+                            input.onchange = async function() {
+                                const file = input.files[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        const range = quill.getSelection(true);
+                                        quill.insertEmbed(range.index, 'image', e.target.result);
+                                        quill.setSelection(range.index + 1);
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            };
+                        },
+                        'link': function(value) {
+                            if (value) {
+                                let url = prompt('Introduce la URL del enlace:');
+                                if (url) {
+                                    const range = quill.getSelection(true);
+                                    quill.insertText(range.index, ' Enlace: ', { 'size': 'small' });
+                                    quill.insertText(quill.getSelection().index, url, { 'link': url, 'size': 'small' });
+                                    quill.setSelection(quill.getSelection().index);
+                                }
+                            } else {
+                                quill.format('link', false);
+                            }
+                        },
+                        'video': function() {
+                            let url = prompt('Introduce la URL del video de YouTube o Wistia:');
+                            if (url) {
+                                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+                                const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
+                                
+                                let match = url.match(youtubeRegex);
+                                let embedUrl;
+                        
+                                if (match) {
+                                    embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                                } else {
+                                    match = url.match(wistiaRegex);
+                                    if (match) {
+                                        embedUrl = `https://fast.wistia.net/embed/iframe/${match[1]}`;
+                                    }
+                                }
+                        
+                                if (embedUrl) {
+                                    const range = quill.getSelection(true);
+                                    // Insertar solo el iframe, no el enlace de texto
+                                    quill.insertEmbed(range.index, 'video', embedUrl);
+                                } else {
+                                    alert('URL de video no válida. Por favor, introduce una URL de YouTube o Wistia.');
+                                }
+                            }
+                        }
+                    }
+                },
+                'table': true
             }
         });
 
@@ -493,32 +306,318 @@
         let allCuentos = [];
         let filteredCuentos = [];
 
-        // Función para mostrar mensajes
+        // Función para extraer el ID de archivo de Google Drive desde una URL
+        function extraerIdDeDrive(url) {
+            // Diferentes formatos de URLs de Google Drive
+            const patrones = [
+                /\/d\/([^\/]+)/, // Formato: /d/FILE_ID/
+                /id=([^&]+)/,    // Formato: id=FILE_ID
+                /uc\?export=view&id=([^&]+)/, // Formato: uc?export=view&id=FILE_ID
+            ];
+            
+            for (const patron of patrones) {
+                const coincidencia = url.match(patron);
+                if (coincidencia && coincidencia[1]) {
+                    return coincidencia[1];
+                }
+            }
+            
+            return null;
+        }
+
+        // Función para crear una URL directa de imagen desde Google Drive
+        function crearUrlDirectaDeImagen(urlOriginal) {
+            const fileId = extraerIdDeDrive(urlOriginal);
+            if (fileId) {
+                return `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
+            return urlOriginal;
+        }
+
+        // Función para subir una imagen a Google Drive
+        async function subirImagenABase64(base64Data) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'subirImagenBase64');
+                formData.append('imagen', base64Data);
+                
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.estado === 'éxito') {
+                    return result.url;
+                } else {
+                    console.error('Error al subir imagen:', result.mensaje);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error al subir imagen:', error);
+                return null;
+            }
+        }
+
+        // Función para procesar y subir todas las imágenes en el contenido
+        async function procesarImagenesEnContenido(contenido) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contenido;
+            
+            const imagenes = tempDiv.querySelectorAll('img');
+            const totalImagenes = imagenes.length;
+            
+            if (totalImagenes === 0) {
+                return contenido;
+            }
+            
+            // Mostrar barra de progreso
+            const progressContainer = document.getElementById('imageUploadProgress');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const progressBar = document.getElementById('progressBar');
+            
+            progressContainer.style.display = 'block';
+            uploadStatus.textContent = `0/${totalImagenes}`;
+            progressBar.style.width = '0%';
+            
+            let imagenesProcesadas = 0;
+            
+            for (let img of imagenes) {
+                const src = img.src;
+                
+                // Solo procesar imágenes en base64
+                if (src.startsWith('data:image')) {
+                    try {
+                        const driveUrl = await subirImagenABase64(src);
+                        if (driveUrl) {
+                            // Reemplazar la imagen base64 con la URL de Drive
+                            img.src = driveUrl;
+                            // También actualizar el atributo srcset si existe
+                            if (img.srcset) {
+                                img.srcset = driveUrl;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error procesando imagen:', error);
+                    }
+                }
+                
+                imagenesProcesadas++;
+                uploadStatus.textContent = `${imagenesProcesadas}/${totalImagenes}`;
+                progressBar.style.width = `${(imagenesProcesadas / totalImagenes) * 100}%`;
+            }
+            
+            // Ocultar barra de progreso después de un segundo
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+            }, 1000);
+            
+            return tempDiv.innerHTML;
+        }
+
+        // Función para procesar imágenes al mostrar contenido
+        function procesarImagenesParaVisualizacion(contenido) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contenido;
+            
+            const imagenes = tempDiv.querySelectorAll('img');
+            
+            imagenes.forEach(img => {
+                const src = img.src;
+                
+                // Si la imagen es de Google Drive, asegurarnos de que use la URL directa
+                if (src.includes('drive.google.com')) {
+                    const nuevaUrl = crearUrlDirectaDeImagen(src);
+                    if (nuevaUrl !== src) {
+                        img.src = nuevaUrl;
+                    }
+                    
+                    // Añadir atributos para mejor visualización
+                    img.loading = 'lazy';
+                    img.decoding = 'async';
+                    
+                    // Añadir manejadores de eventos para errores de carga
+                    img.onerror = function() {
+                        console.error('Error al cargar la imagen:', this.src);
+                        this.style.display = 'none';
+                        
+                        // Crear un mensaje de error
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'image-error';
+                        errorDiv.innerHTML = `
+                            <strong>Error al cargar la imagen</strong><br>
+                            <small>Si el problema persiste, verifica que la imagen todavía exista en Google Drive.</small>
+                        `;
+                        
+                        this.parentNode.insertBefore(errorDiv, this.nextSibling);
+                    };
+                    
+                    // Mostrar un indicador de carga
+                    img.style.display = 'none';
+                    const loadingDiv = document.createElement('div');
+                    loadingDiv.className = 'image-loading';
+                    loadingDiv.textContent = 'Cargando imagen...';
+                    img.parentNode.insertBefore(loadingDiv, img);
+                    
+                    img.onload = function() {
+                        this.style.display = 'block';
+                        if (loadingDiv.parentNode) {
+                            loadingDiv.parentNode.removeChild(loadingDiv);
+                        }
+                    };
+                }
+            });
+            
+            return tempDiv.innerHTML;
+        }
+
+        // Función para forzar la recarga de imágenes con parámetros únicos
+        function forzarRecargaImagenes(contenido) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contenido;
+            
+            const imagenes = tempDiv.querySelectorAll('img[src*="drive.google.com"]');
+            
+            imagenes.forEach(img => {
+                const url = new URL(img.src);
+                // Añadir un parámetro único para evitar caché
+                url.searchParams.set('t', Date.now());
+                img.src = url.toString();
+            });
+            
+            return tempDiv.innerHTML;
+        }
+
+        document.getElementById('cuentoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const titulo = document.getElementById('titulo').value;
+            let contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
+            const buttonText = document.getElementById('buttonText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const messageBox = document.getElementById('messageBox');
+            
+            buttonText.textContent = 'Guardando...';
+            loadingSpinner.style.display = 'inline-block';
+            messageBox.style.display = 'none';
+            
+            try {
+                // Procesar imágenes antes de guardar (convertir base64 a URLs de Drive)
+                contenido = await procesarImagenesEnContenido(contenido);
+                
+                const formData = new FormData();
+                formData.append('action', 'guardarCuento');
+                formData.append('titulo', titulo);
+                formData.append('contenido', contenido);
+                
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.estado === 'éxito') {
+                    showMessage('success', result.mensaje);
+                    document.getElementById('cuentoForm').reset();
+                    quill.setContents([]);
+                    // Recargar la lista de cuentos después de guardar
+                    if (document.getElementById('view-tab').classList.contains('active')) {
+                        cargarCuentos();
+                    }
+                } else {
+                    showMessage('error', result.mensaje);
+                }
+            } catch (error) {
+                showMessage('error', 'Fallo al guardar: ' + error.message);
+            } finally {
+                buttonText.textContent = 'Guardar Entrada';
+                loadingSpinner.style.display = 'none';
+            }
+        });
+
         function showMessage(type, message) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
             messageBox.className = 'message-box ' + type;
             messageBox.style.display = 'block';
+        }
+
+        function processVideos(htmlContent, isPDF) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
             
-            // Ocultar mensaje después de 5 segundos
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-            }, 5000);
+            // Patrones para detectar videos
+            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+            const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
+            
+            // Para PDF, reemplazar iframes con enlaces
+            if (isPDF) {
+                const iframes = tempDiv.querySelectorAll('iframe');
+                iframes.forEach(iframe => {
+                    if (iframe.src && (iframe.src.match(youtubeRegex) || iframe.src.match(wistiaRegex))) {
+                        const videoUrl = iframe.src;
+                        const link = document.createElement('a');
+                        link.href = videoUrl;
+                        link.textContent = 'Ver video: ' + videoUrl;
+                        link.target = '_blank';
+                        iframe.parentNode.replaceChild(link, iframe);
+                    }
+                });
+            } else {
+                // Primero eliminar los iframes pequeños de Quill
+                const smallIframes = tempDiv.querySelectorAll('iframe[height="280"]');
+                smallIframes.forEach(iframe => {
+                    iframe.parentNode.removeChild(iframe);
+                });
+                
+                // Para visualización normal, buscar enlaces de video y convertirlos en iframes + enlaces
+                const links = tempDiv.querySelectorAll('a');
+                links.forEach(link => {
+                    const url = link.href;
+                    let match = url.match(youtubeRegex);
+                    let embedUrl;
+                    let originalUrl = url;
+                    
+                    if (match) {
+                        embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                        originalUrl = `https://www.youtube.com/watch?v=${match[1]}`;
+                    } else {
+                        match = url.match(wistiaRegex);
+                        if (match) {
+                            embedUrl = `https://fast.wistia.net/embed/iframe/${match[1]}`;
+                            originalUrl = url; // Mantener URL original de Wistia
+                        }
+                    }
+                    
+                    if (embedUrl) {
+                        const iframe = document.createElement('iframe');
+                        iframe.setAttribute('src', embedUrl);
+                        iframe.setAttribute('frameborder', '0');
+                        iframe.setAttribute('allowfullscreen', '');
+                        iframe.setAttribute('width', '100%');
+                        iframe.setAttribute('height', '400');
+                        
+                        const videoLink = document.createElement('a');
+                        videoLink.href = originalUrl;
+                        videoLink.textContent = 'Ver video original: ' + originalUrl;
+                        videoLink.target = '_blank';
+                        videoLink.className = 'video-link';
+                        
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'video-container';
+                        wrapper.appendChild(iframe);
+                        wrapper.appendChild(videoLink);
+                        
+                        // Reemplazar el enlace con el contenedor de video
+                        link.parentNode.replaceChild(wrapper, link);
+                    }
+                });
+            }
+            
+            return tempDiv.innerHTML;
         }
 
-        // Función para mostrar error de configuración
-        function showConfigError(message) {
-            const cuentosList = document.getElementById('cuentos-list');
-            cuentosList.innerHTML = `
-                <div class="config-error">
-                    <h3>Error de Configuración</h3>
-                    <p>${message}</p>
-                    <p>Por favor, verifica que el Google Apps Script esté correctamente configurado y publicado.</p>
-                </div>
-            `;
-        }
-
-        // Función para cargar entradas
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
             cuentosList.innerHTML = '<p>Cargando entradas...</p>';
@@ -531,16 +630,14 @@
                         filteredCuentos = [...allCuentos];
                         mostrarCuentos(filteredCuentos);
                     } else {
-                        showConfigError(result.mensaje || 'Error desconocido al cargar las entradas.');
+                        cuentosList.innerHTML = `<p>Error: ${result.mensaje}</p>`;
                     }
                 })
                 .catch(error => {
-                    showConfigError('No se pudo conectar con el servidor. Verifica la URL del Google Apps Script.');
-                    console.error('Error al cargar:', error);
+                    cuentosList.innerHTML = `<p>Error al cargar: ${error.message}</p>`;
                 });
         }
 
-        // Función para mostrar entradas
         function mostrarCuentos(cuentos) {
             const cuentosList = document.getElementById('cuentos-list');
             
@@ -563,6 +660,11 @@
                     minute: '2-digit'
                 });
                 
+                // Procesar contenido para mostrar correctamente las imágenes
+                let processedContent = procesarImagenesParaVisualizacion(cuento.contenido);
+                processedContent = forzarRecargaImagenes(processedContent); // Forzar recarga
+                processedContent = processVideos(processedContent, false);
+                
                 storyItem.innerHTML = `
                     <div class="header" onclick="toggleStoryContent(this)">
                         <h3>${cuento.titulo}</h3>
@@ -572,15 +674,15 @@
                         </div>
                     </div>
                     <div class="story-content">
-                        <div>${cuento.contenido}</div>
+                        <div>${processedContent}</div>
                         <div class="download-buttons-container">
-                            <button class="btn download-btn" onclick="descargarPDF(${cuento.id}, '${cuento.titulo.replace(/'/g, "\\'")}', '${formattedDate}')">
+                            <button class="btn download-btn" onclick="descargarPDF(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
                                 Descargar PDF
                             </button>
-                            <button class="btn download-btn" onclick="descargarWord(${cuento.id}, '${cuento.titulo.replace(/'/g, "\\'")}', '${formattedDate}')">
+                            <button class="btn download-btn" onclick="descargarWord(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
                                 Descargar Word
                             </button>
-                            <button class="btn download-btn" onclick="descargarExcel(${cuento.id}, '${cuento.titulo.replace(/'/g, "\\'")}', '${formattedDate}')">
+                            <button class="btn download-btn" onclick="descargarExcel(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
                                 Descargar Excel
                             </button>
                         </div>
@@ -588,10 +690,22 @@
                 `;
                 
                 cuentosList.appendChild(storyItem);
+                
+                // Forzar la carga de imágenes después de insertar en el DOM
+                setTimeout(() => {
+                    const images = storyItem.querySelectorAll('img');
+                    images.forEach(img => {
+                        if (img.src.includes('drive.google.com')) {
+                            // Añadir un parámetro único para evitar caché
+                            const url = new URL(img.src);
+                            url.searchParams.set('t', Date.now());
+                            img.src = url.toString();
+                        }
+                    });
+                }, 100);
             });
         }
 
-        // Función para expandir/contraer contenido
         function toggleStoryContent(element) {
             const content = element.nextElementSibling;
             const arrow = element.querySelector('.arrow');
@@ -637,12 +751,11 @@
                         filteredCuentos = result.cuentos;
                         mostrarCuentos(filteredCuentos);
                     } else {
-                        showConfigError(result.mensaje || 'Error en la búsqueda.');
+                        cuentosList.innerHTML = `<p>Error: ${result.mensaje}</p>`;
                     }
                 })
                 .catch(error => {
-                    showConfigError('Error al realizar la búsqueda.');
-                    console.error('Error al buscar:', error);
+                    cuentosList.innerHTML = `<p>Error al buscar: ${error.message}</p>`;
                 });
         }
 
@@ -652,99 +765,6 @@
             document.getElementById('searchDateEnd').value = '';
             filteredCuentos = [...allCuentos];
             mostrarCuentos(filteredCuentos);
-        }
-
-        // Funciones de descarga
-        function descargarPDF(id, titulo, fecha) {
-            const cuento = filteredCuentos.find(c => c.id === id);
-            if (!cuento) return;
-            
-            // Crear un elemento temporal para obtener el texto
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = cuento.contenido;
-            const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
-            
-            // Crear PDF
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Título
-            doc.setFontSize(20);
-            doc.text(titulo, 20, 20);
-            
-            // Fecha
-            doc.setFontSize(12);
-            doc.setTextColor(100, 100, 100);
-            doc.text(fecha, 20, 30);
-            
-            // Contenido
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            
-            // Dividir el texto en líneas
-            const lines = doc.splitTextToSize(textoPlano, 170);
-            doc.text(lines, 20, 40);
-            
-            // Guardar PDF
-            doc.save(`${titulo}.pdf`);
-        }
-
-        function descargarWord(id, titulo, fecha) {
-            const cuento = filteredCuentos.find(c => c.id === id);
-            if (!cuento) return;
-            
-            // Crear un documento HTML simple para Word
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>${titulo}</title>
-                </head>
-                <body>
-                    <h1>${titulo}</h1>
-                    <p><em>${fecha}</em></p>
-                    <div>${cuento.contenido}</div>
-                </body>
-                </html>
-            `;
-            
-            // Crear blob y descargar
-            const blob = new Blob([htmlContent], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${titulo}.doc`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function descargarExcel(id, titulo, fecha) {
-            const cuento = filteredCuentos.find(c => c.id === id);
-            if (!cuento) return;
-            
-            // Crear un elemento temporal para obtener el texto plano
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = cuento.contenido;
-            const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
-            
-            // Crear datos para Excel
-            const data = [
-                ['Título', titulo],
-                ['Fecha', fecha],
-                ['Contenido', textoPlano]
-            ];
-            
-            // Crear libro de trabajo y hoja
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Entrada');
-            
-            // Ajustar el ancho de las columnas
-            ws['!cols'] = [{ wch: 15 }, { wch: 50 }];
-            
-            // Guardar Excel
-            XLSX.writeFile(wb, `${titulo}.xlsx`);
         }
 
         // Event listeners para búsqueda
@@ -778,37 +798,10 @@
             });
         });
 
-        // Manejo del formulario
-        document.getElementById('cuentoForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const titulo = document.getElementById('titulo').value;
-            const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
-            const buttonText = document.getElementById('buttonText');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const messageBox = document.getElementById('messageBox');
-            
-            buttonText.textContent = 'Guardando...';
-            loadingSpinner.style.display = 'inline-block';
-            messageBox.style.display = 'none';
-            
-            // Simular envío (debes implementar la conexión real con Google Apps Script)
-            setTimeout(() => {
-                showMessage('success', 'Entrada guardada correctamente (modo simulación)');
-                document.getElementById('cuentoForm').reset();
-                quill.setContents([]);
-                
-                buttonText.textContent = 'Guardar Entrada';
-                loadingSpinner.style.display = 'none';
-            }, 1500);
-        });
-
-        // Inicializar la aplicación
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cargar cuentos si estamos en la pestaña de vista
-            if (document.getElementById('view-tab').classList.contains('active')) {
-                cargarCuentos();
-            }
-        });
+        // Cargar cuentos al iniciar si estamos en la pestaña de vista
+        if (document.getElementById('view-tab').classList.contains('active')) {
+            cargarCuentos();
+        }
     </script>
 </body>
 </html>
