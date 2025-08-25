@@ -211,7 +211,7 @@
     <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
     <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEjeYq7R3AvW81OjD4Y4ZI3UW8Z-dvuUl5ZnGg-XKFvaYBRvhrLgyvDm5EPUFmeWlVUQ/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMkCdjnh-HJuUj7w_tXnpGHlD9ol-rciqZn7LyJQGaHRRWe7k3OkC7_CkFHJ1Pe-Catw/exec'; 
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
@@ -798,10 +798,112 @@
             });
         });
 
-        // Cargar cuentos al iniciar si estamos en la pestaña de vista
-        if (document.getElementById('view-tab').classList.contains('active')) {
-            cargarCuentos();
+        // Funciones de descarga
+        function descargarPDF(id, titulo, fecha) {
+            const cuento = filteredCuentos.find(c => c.id === id);
+            if (!cuento) return;
+            
+            // Procesar contenido para PDF (reemplazar videos con enlaces)
+            let contenido = processVideos(cuento.contenido, true);
+            
+            // Crear un elemento temporal para obtener el texto
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contenido;
+            const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
+            
+            // Crear PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(20);
+            doc.text(titulo, 20, 20);
+            
+            // Fecha
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.text(fecha, 20, 30);
+            
+            // Contenido
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            
+            // Dividir el texto en líneas
+            const lines = doc.splitTextToSize(textoPlano, 170);
+            doc.text(lines, 20, 40);
+            
+            // Guardar PDF
+            doc.save(`${titulo}.pdf`);
         }
+
+        function descargarWord(id, titulo, fecha) {
+            const cuento = filteredCuentos.find(c => c.id === id);
+            if (!cuento) return;
+            
+            // Procesar contenido para Word (reemplazar videos con enlaces)
+            let contenido = processVideos(cuento.contenido, true);
+            
+            // Crear un documento HTML simple para Word
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${titulo}</title>
+                </head>
+                <body>
+                    <h1>${titulo}</h1>
+                    <p><em>${fecha}</em></p>
+                    <div>${contenido}</div>
+                </body>
+                </html>
+            `;
+            
+            // Crear blob y descargar
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${titulo}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function descargarExcel(id, titulo, fecha) {
+            const cuento = filteredCuentos.find(c => c.id === id);
+            if (!cuento) return;
+            
+            // Crear un elemento temporal para obtener el texto plano
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = cuento.contenido;
+            const textoPlano = tempDiv.textContent || tempDiv.innerText || '';
+            
+            // Crear datos para Excel
+            const data = [
+                ['Título', titulo],
+                ['Fecha', fecha],
+                ['Contenido', textoPlano]
+            ];
+            
+            // Crear libro de trabajo y hoja
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Entrada');
+            
+            // Ajustar el ancho de las columnas
+            ws['!cols'] = [{ wch: 15 }, { wch: 50 }];
+            
+            // Guardar Excel
+            XLSX.writeFile(wb, `${titulo}.xlsx`);
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar cuentos si estamos en la pestaña de vista
+            if (document.getElementById('view-tab').classList.contains('active')) {
+                cargarCuentos();
+            }
+        });
     </script>
 </body>
 </html>
