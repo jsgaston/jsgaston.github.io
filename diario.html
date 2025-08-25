@@ -114,6 +114,25 @@
             max-width: 100%;
             height: auto;
         }
+        
+        /* Indicador de carga para imágenes */
+        .image-loading {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .image-error {
+            padding: 15px;
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: #b91c1c;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
@@ -389,6 +408,33 @@
                     // Añadir atributos para mejor visualización
                     img.loading = 'lazy';
                     img.decoding = 'async';
+                    
+                    // Añadir manejadores de eventos para errores de carga
+                    img.onerror = function() {
+                        console.error('Error al cargar la imagen:', this.src);
+                        this.style.display = 'none';
+                        
+                        // Crear un mensaje de error
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'image-error';
+                        errorDiv.textContent = 'Error al cargar la imagen. La imagen puede haber sido eliminada o los permisos no son correctos.';
+                        
+                        this.parentNode.insertBefore(errorDiv, this.nextSibling);
+                    };
+                    
+                    // Mostrar un indicador de carga
+                    img.style.display = 'none';
+                    const loadingDiv = document.createElement('div');
+                    loadingDiv.className = 'image-loading';
+                    loadingDiv.textContent = 'Cargando imagen...';
+                    img.parentNode.insertBefore(loadingDiv, img);
+                    
+                    img.onload = function() {
+                        this.style.display = 'block';
+                        if (loadingDiv.parentNode) {
+                            loadingDiv.parentNode.removeChild(loadingDiv);
+                        }
+                    };
                 }
             });
             
