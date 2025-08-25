@@ -3395,129 +3395,167 @@ function translateNumber() {
 // Cambia esta URL por la correcta de tu Google Apps Script para el diario
 const DIARIO_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQXfFyrqW01o_bpR4Bny-hkL2x1VGihuk4iRwq4w61cQvx6ovNQ6t9bYmoRbIPmlAl/exec';
 
+
+
 // Función para cargar el último diario
-// Función para cargar el último diario
-        async function loadLatestDiario_() {
-            const container = document.getElementById('diarioPortadaContainer');
-            
-            try {
-                const response = await fetch(`${DIARIO_SCRIPT_URL}?action=getLatestDiary`);
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    if (result.story) {
-                        renderDiarioStory(result.story, result.images, container);
-                    } else {
-                        container.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas disponibles'}</p>`;
-                    }
-                } else {
-                    container.innerHTML = `<p class="text-center text-red-500">Error: ${result.message}</p>`;
-                }
-            } catch (error) {
-                console.error('Error al cargar el último diario:', error);
-                container.innerHTML = '<p class="text-center text-red-500">Error al cargar el último diario.</p>';
+async function loadLatestDiario_() {
+    const container = document.getElementById('diarioPortadaContainer');
+    
+    try {
+        const response = await fetch(`${DIARIO_SCRIPT_URL}?action=getLatestDiary`);
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            if (result.story) {
+                renderDiarioStory(result.story, result.images, container);
+            } else {
+                container.innerHTML = `<p class="text-center text-gray-500">${result.message || 'No hay entradas disponibles'}</p>`;
             }
+        } else {
+            container.innerHTML = `<p class="text-center text-red-500">Error: ${result.message}</p>`;
         }
+    } catch (error) {
+        console.error('Error al cargar el último diario:', error);
+        container.innerHTML = '<p class="text-center text-red-500">Error al cargar el último diario.</p>';
+    }
+}
 
-        // Función para renderizar el diario
-        function renderDiarioStory(story, images, container) {
-            // Determinar qué campos usar
-            const title = story.Título || story.título || story.Titulo || story.title || 'Sin título';
-            const content = story.Contenido || story.contenido || story.Contenido || story.content || '';
-            const date = story.Fecha || story.fecha || story.Date || story.date || '';
+// Función para renderizar el diario
+function renderDiarioStory(story, images, container) {
+    // Determinar qué campos usar según la estructura del spreadsheet
+    const title = story.Título || story.título || story.Titulo || story.title || 
+                 story['Título de la entrada'] || 'Sin título';
+    const content = story.Contenido || story.contenido || story.Contenido || story.content || 
+                   story['Contenido de la entrada'] || '';
+    const date = story.Fecha || story.fecha || story.Date || story.date || '';
 
-            let html = `
-                <h4 class="text-lg font-bold text-indigo-700 mb-2">${title}</h4>
-                <div class="text-sm text-gray-500 mb-4">
+    let html = `
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h4 class="text-lg font-bold text-indigo-700 mb-2">${title}</h4>
+            <div class="text-sm text-gray-500 mb-4">
+    `;
+    
+    if (date) {
+        html += `<span>Fecha: ${new Date(date).toLocaleDateString('es-ES', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })}</span>`;
+    }
+    
+    // Mostrar contenido completo en lugar de vista previa
+    html += `</div><div class="prose max-w-none mb-4">${formatContent(content)}</div>`;
+    
+    // Agregar imágenes si existen para este diario
+    if (images && images.length > 0) {
+        html += `<div class="story-images grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">`;
+        
+        images.forEach(image => {
+            html += `
+            <div class="story-image">
+                <img src="${image.thumbnail}" alt="${image.name}" 
+                    class="w-full h-48 object-cover rounded-lg cursor-pointer"
+                    onclick="openImageModal('${image.url}')">
+            </div>
             `;
-            
-            if (date) {
-                html += `<span>Fecha: ${new Date(date).toLocaleDateString()}</span>`;
-            }
-            
-            // Limitar el contenido a una vista previa
-            const previewContent = content.length > 200 ? content.substring(0, 200) + '...' : content;
-            html += `</div><div class="prose max-w-none mb-4">${formatContent(previewContent)}</div>`;
-            
-            // Agregar imágenes si existen para este diario (solo la primera)
-            if (images && images.length > 0) {
-                html += `
-                <div class="story-images mt-4">
-                    <div class="story-image">
-                        <img src="${images[0].thumbnail}" alt="${images[0].name}" 
-                            class="w-full h-48 object-cover rounded-lg cursor-pointer"
-                            onclick="openImageModal('${images[0].url}')">
-                    </div>
-                </div>
-                `;
-            }
-            
-            // Agregar enlace para ver el diario completo
-            html += `<div class="mt-4"><a href="#" onclick="showMainTab('diario_')" class="text-blue-600 hover:underline">Ver diario completo</a></div>`;
-            
-            container.innerHTML = html;
-        }
-
-        // Función para formatear contenido (detectar saltos de línea)
-        function formatContent(content) {
-            if (!content) return '';
-            return content.replace(/\n/g, '<br>');
-        }
-
-        // Llamar a la función cuando se cargue la página
-        document.addEventListener('DOMContentLoaded', () => {
-            loadLatestDiario_();
         });
+        
+        html += `</div>`;
+    }
+    
+    // Agregar enlace para ver el diario completo (solo si hay más contenido)
+    if (content.length > 500) {
+        html += `<div class="mt-4 text-center">
+            <a href="#" onclick="showMainTab('diario_')" class="text-blue-600 hover:underline font-medium">
+                Ver diario completo en la sección de diarios
+            </a>
+        </div>`;
+    }
+    
+    html += `</div>`;
+    
+    container.innerHTML = html;
+}
 
-  
-  // También asegurémonos de que el iframe del diario esté correctamente configurado
-  const diarioIframe = document.querySelector('[src="diario.html"]');
-  if (diarioIframe) {
+// Función para formatear contenido (detectar saltos de línea y crear párrafos)
+function formatContent(content) {
+    if (!content) return '';
+    
+    // Convertir saltos de línea en <br> o <p>
+    let formattedContent = content.replace(/\n/g, '<br>');
+    
+    // Si hay múltiples saltos de línea seguidos, crear párrafos
+    if (content.includes('\n\n')) {
+        const paragraphs = content.split('\n\n');
+        formattedContent = paragraphs.map(p => {
+            if (p.trim()) {
+                return `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`;
+            }
+            return '';
+        }).join('');
+    }
+    
+    return formattedContent;
+}
+
+// Función para abrir imagen en modal (si no existe, crearla)
+function openImageModal(imageUrl) {
+    let modal = document.getElementById('imageModal');
+    let modalImage = document.getElementById('modalImage');
+    
+    // Si el modal no existe, crearlo
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'imageModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <span class="close-modal">&times;</span>
+            <div class="modal-content">
+                <img id="modalImage" class="modal-image" src="" alt="Imagen ampliada">
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Agregar funcionalidad de cierre
+        const closeModal = modal.querySelector('.close-modal');
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+        
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        modalImage = document.getElementById('modalImage');
+    }
+    
+    if (modal && modalImage) {
+        modalImage.src = imageUrl;
+        modal.style.display = 'block';
+    }
+}
+
+// Llamar a la función cuando se cargue la página
+document.addEventListener('DOMContentLoaded', () => {
+    loadLatestDiario_();
+});
+
+// También asegurémonos de que el iframe del diario esté correctamente configurado
+const diarioIframe = document.querySelector('[src="diario.html"]');
+if (diarioIframe) {
     diarioIframe.onload = function() {
-      console.log('Iframe del diario cargado correctamente');
+        console.log('Iframe del diario cargado correctamente');
     };
     diarioIframe.onerror = function() {
-      console.error('Error al cargar el iframe del diario');
+        console.error('Error al cargar el iframe del diario');
     };
-  }
-
+}
 </script>
-
-
-    
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
