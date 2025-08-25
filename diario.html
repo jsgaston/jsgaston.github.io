@@ -21,24 +21,24 @@
         .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
         h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
         .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
-        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform: 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
+        .form-input, .form-select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
+        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
         .btn:hover { transform: scale(1.02); }
         .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
         .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
         .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
         .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .story-list { list-style: none; padding: 0; }
-        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
-        .story-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .story-item .header:hover { background-color: #f0f4f8; }
-        .story-item .arrow { transition: transform 0.3s; }
-        .story-item .arrow.expanded { transform: rotate(90deg); }
-        .story-content { display: none; margin-top: 15px; }
-        .story-content.expanded { display: block; }
-        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
+        .entry-list { list-style: none; padding: 0; }
+        .entry-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .entry-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .entry-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .entry-item .header:hover { background-color: #f0f4f8; }
+        .entry-item .arrow { transition: transform 0.3s; }
+        .entry-item .arrow.expanded { transform: rotate(90deg); }
+        .entry-content { display: none; margin-top: 15px; }
+        .entry-content.expanded { display: block; }
+        .entry-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
         
         .video-wrapper {
             position: relative;
@@ -73,15 +73,11 @@
         .download-btn { background-color: #10b981; margin-right: 10px; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
         .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-        
-        /* Nuevos estilos para el buscador */
-        .search-container { margin-bottom: 20px; padding: 15px; background-color: #f9fafb; border-radius: 8px; }
-        .search-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .search-field { flex: 1; min-width: 200px; }
-        .date-range { display: flex; gap: 10px; align-items: center; }
-        .date-input { width: 150px; }
-        .search-button { width: auto; padding: 10px 20px; }
-        .search-results-info { margin-top: 15px; font-style: italic; color: #6b7280; }
+        .search-form { background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; }
+        .search-btn { background-color: #3b82f6; margin-top: 0; width: auto; }
+        .reset-btn { background-color: #6b7280; margin-top: 0; width: auto; }
     </style>
 </head>
 <body>
@@ -92,7 +88,7 @@
             <button class="btn-tab" data-tab="view">Ver Entradas</button>
         </nav>
         <div id="create-tab" class="tab-content active">
-            <form id="diarioForm">
+            <form id="entradaForm">
                 <div style="margin-bottom: 1rem;">
                     <label for="titulo" class="form-label">Título:</label>
                     <input type="text" id="titulo" name="titulo" class="form-input" required>
@@ -109,29 +105,33 @@
             </form>
         </div>
         <div id="view-tab" class="tab-content">
-            <h2>Mis Entradas</h2>
+            <h2>Mis Entradas de Diario</h2>
             
-            <!-- Buscador -->
-            <div class="search-container">
-                <div class="search-row">
-                    <div class="search-field">
-                        <label for="searchTerm" class="form-label">Buscar por palabras:</label>
-                        <input type="text" id="searchTerm" class="form-input" placeholder="Escribe palabras clave...">
-                    </div>
-                    <div class="search-field">
-                        <label class="form-label">Rango de fechas:</label>
-                        <div class="date-range">
-                            <input type="date" id="startDate" class="form-input date-input">
-                            <span>a</span>
-                            <input type="date" id="endDate" class="form-input date-input">
+            <div class="search-form">
+                <h3>Buscar en el diario</h3>
+                <form id="searchForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="searchTerm" class="form-label">Palabra clave:</label>
+                            <input type="text" id="searchTerm" name="searchTerm" class="form-input" placeholder="Escribe palabras para buscar...">
+                        </div>
+                        <div class="form-group">
+                            <label for="startDate" class="form-label">Fecha desde:</label>
+                            <input type="date" id="startDate" name="startDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate" class="form-label">Fecha hasta:</label>
+                            <input type="date" id="endDate" name="endDate" class="form-input">
                         </div>
                     </div>
-                </div>
-                <button id="searchButton" class="btn search-button">Buscar Entradas</button>
-                <div id="searchResultsInfo" class="search-results-info"></div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn search-btn">Buscar</button>
+                        <button type="button" id="resetSearch" class="btn reset-btn">Limpiar</button>
+                    </div>
+                </form>
             </div>
             
-            <div id="entradas-list" class="story-list">
+            <div id="entradas-list" class="entry-list">
                 <p>Cargando entradas...</p>
             </div>
         </div>
@@ -211,7 +211,7 @@
             }
         });
 
-        document.getElementById('diarioForm').addEventListener('submit', function(e) {
+        document.getElementById('entradaForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
             const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
@@ -233,7 +233,7 @@
             .then(result => {
                 if (result.estado === 'éxito') {
                     showMessage('success', result.mensaje);
-                    document.getElementById('diarioForm').reset();
+                    document.getElementById('entradaForm').reset();
                     quill.setContents([]);
                 } else {
                     showMessage('error', result.mensaje);
@@ -418,21 +418,21 @@
             return text.replace(/\n\s*\n/g, '\n\n').trim();
         }
 
-        function cargarEntradas(filtro = '', fechaInicio = '', fechaFin = '') {
+        function cargarEntradas(filtros = {}) {
             const entradasList = document.getElementById('entradas-list');
             entradasList.innerHTML = '<p>Cargando entradas...</p>';
             
             let url = `${APP_SCRIPT_URL}?action=listarEntradas`;
             
-            // Añadir parámetros de búsqueda si existen
-            if (filtro) {
-                url += `&filtro=${encodeURIComponent(filtro)}`;
+            // Añadir filtros a la URL si existen
+            if (filtros.searchTerm) {
+                url += `&searchTerm=${encodeURIComponent(filtros.searchTerm)}`;
             }
-            if (fechaInicio) {
-                url += `&fechaInicio=${encodeURIComponent(fechaInicio)}`;
+            if (filtros.startDate) {
+                url += `&startDate=${encodeURIComponent(filtros.startDate)}`;
             }
-            if (fechaFin) {
-                url += `&fechaFin=${encodeURIComponent(fechaFin)}`;
+            if (filtros.endDate) {
+                url += `&endDate=${encodeURIComponent(filtros.endDate)}`;
             }
             
             fetch(url)
@@ -440,30 +440,21 @@
                 .then(result => {
                     if (result.estado === 'éxito') {
                         entradasList.innerHTML = '';
-                        
-                        // Mostrar información de resultados
-                        const resultsInfo = document.getElementById('searchResultsInfo');
-                        if (filtro || fechaInicio || fechaFin) {
-                            resultsInfo.textContent = `Se encontraron ${result.entradas.length} entradas que coinciden con tu búsqueda.`;
-                        } else {
-                            resultsInfo.textContent = `Tienes ${result.entradas.length} entradas en tu diario.`;
-                        }
-                        
                         if (result.entradas && result.entradas.length > 0) {
                             result.entradas.forEach((entrada, index) => {
-                                const storyId = `entrada-${index}`;
-                                const storyDiv = document.createElement('div');
-                                storyDiv.id = storyId;
-                                storyDiv.className = 'story-item';
+                                const entryId = `entry-${index}`;
+                                const entryDiv = document.createElement('div');
+                                entryDiv.id = entryId;
+                                entryDiv.className = 'entry-item';
                                 
                                 const contenidoConVideos = processVideos(entrada.contenido, false);
                                 
-                                storyDiv.innerHTML = `
+                                entryDiv.innerHTML = `
                                     <div class="header">
                                         <h3>${entrada.titulo}</h3>
                                         <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(entrada.fecha).toLocaleString()} <span class="arrow">►</span></p>
                                     </div>
-                                    <div class="story-content" data-original-content="${encodeURIComponent(entrada.contenido)}" data-title="${encodeURIComponent(entrada.titulo)}">
+                                    <div class="entry-content" data-original-content="${encodeURIComponent(entrada.contenido)}" data-title="${encodeURIComponent(entrada.titulo)}">
                                         ${contenidoConVideos}
                                         <div class="download-buttons-container">
                                             <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
@@ -475,10 +466,10 @@
                                         </div>
                                     </div>
                                 `;
-                                entradasList.appendChild(storyDiv);
+                                entradasList.appendChild(entryDiv);
                             });
 
-                            document.querySelectorAll('.story-item .header').forEach(header => {
+                            document.querySelectorAll('.entry-item .header').forEach(header => {
                                 header.addEventListener('click', function() {
                                     const content = this.nextElementSibling;
                                     const arrow = this.querySelector('.arrow');
@@ -487,7 +478,7 @@
                                 });
                             });
                         } else {
-                            entradasList.innerHTML = '<p>No hay entradas en tu diario.</p>';
+                            entradasList.innerHTML = '<p>No hay entradas en tu diario aún.</p>';
                         }
                     } else {
                         entradasList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
@@ -498,13 +489,13 @@
                 });
         }
         
-        async function descargarEntrada(storyId, format) {
-            const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
-            const originalContent = decodeURIComponent(storyContentDiv.dataset.originalContent);
-            const titulo = decodeURIComponent(storyContentDiv.dataset.title);
+        async function descargarEntrada(entryId, format) {
+            const entryContentDiv = document.getElementById(entryId).querySelector('.entry-content');
+            const originalContent = decodeURIComponent(entryContentDiv.dataset.originalContent);
+            const titulo = decodeURIComponent(entryContentDiv.dataset.title);
             
             if (format === 'pdf') {
-                generarPDF(storyId, titulo);
+                generarPDF(entryId, titulo);
             } else if (format === 'odt') {
                 generarODT(originalContent, titulo);
             } else if (format === 'docx') {
@@ -518,14 +509,14 @@
             }
         }
         
-        function generarPDF(storyId, filename) {
-            const element = document.getElementById(storyId);
+        function generarPDF(entryId, filename) {
+            const element = document.getElementById(entryId);
             if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
             
-            const originalContentHTML = element.querySelector('.story-content').innerHTML;
+            const originalContentHTML = element.querySelector('.entry-content').innerHTML;
             const contentForPDF = processVideos(originalContentHTML, true);
             
-            element.querySelector('.story-content').innerHTML = contentForPDF;
+            element.querySelector('.entry-content').innerHTML = contentForPDF;
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -548,7 +539,7 @@
                 alert("Hubo un error al generar el PDF: " + error.message);
                 console.error("Error generando PDF:", error);
             }).finally(() => {
-                element.querySelector('.story-content').innerHTML = originalContentHTML;
+                element.querySelector('.entry-content').innerHTML = originalContentHTML;
             });
         }
         
@@ -637,12 +628,11 @@
             }
         }
 
-        // Event listeners
         document.getElementById('entradas-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
-                const storyId = e.target.closest('.story-item').id;
+                const entryId = e.target.closest('.entry-item').id;
                 const format = e.target.dataset.format;
-                descargarEntrada(storyId, format);
+                descargarEntrada(entryId, format);
             }
         });
 
@@ -659,17 +649,30 @@
             });
         });
 
-        // Event listener para el botón de búsqueda
-        document.getElementById('searchButton').addEventListener('click', function() {
+        // Manejar búsqueda
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             const searchTerm = document.getElementById('searchTerm').value;
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             
-            cargarEntradas(searchTerm, startDate, endDate);
+            cargarEntradas({
+                searchTerm: searchTerm,
+                startDate: startDate,
+                endDate: endDate
+            });
         });
 
-        // Inicializar la vista de entradas al cargar la página
-        document.querySelector('.btn-tab').click();
+        // Limpiar búsqueda
+        document.getElementById('resetSearch').addEventListener('click', function() {
+            document.getElementById('searchTerm').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            cargarEntradas();
+        });
+
+        // Activar la pestaña por defecto
+        document.querySelector('.btn-tab.active').click();
 
         quill.root.addEventListener('paste', (event) => {
             const items = (event.clipboardData || event.originalEvent.clipboardData).items;
