@@ -124,6 +124,8 @@
             background-color: #f3f4f6;
             border-radius: 8px;
             margin: 15px 0;
+            color: #6b7280;
+            font-style: italic;
         }
         .image-error {
             padding: 15px;
@@ -132,6 +134,16 @@
             border-radius: 8px;
             color: #b91c1c;
             margin: 15px 0;
+            font-size: 0.9rem;
+        }
+        
+        /* Mejoras visuales para el contenido */
+        .story-content .ql-editor {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+        .story-content p {
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -294,6 +306,34 @@
         let allCuentos = [];
         let filteredCuentos = [];
 
+        // Función para extraer el ID de archivo de Google Drive desde una URL
+        function extraerIdDeDrive(url) {
+            // Diferentes formatos de URLs de Google Drive
+            const patrones = [
+                /\/d\/([^\/]+)/, // Formato: /d/FILE_ID/
+                /id=([^&]+)/,    // Formato: id=FILE_ID
+                /uc\?export=view&id=([^&]+)/, // Formato: uc?export=view&id=FILE_ID
+            ];
+            
+            for (const patron of patrones) {
+                const coincidencia = url.match(patron);
+                if (coincidencia && coincidencia[1]) {
+                    return coincidencia[1];
+                }
+            }
+            
+            return null;
+        }
+
+        // Función para crear una URL directa de imagen desde Google Drive
+        function crearUrlDirectaDeImagen(urlOriginal) {
+            const fileId = extraerIdDeDrive(urlOriginal);
+            if (fileId) {
+                return `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
+            return urlOriginal;
+        }
+
         // Función para subir una imagen a Google Drive
         async function subirImagenABase64(base64Data) {
             try {
@@ -376,7 +416,7 @@
             return tempDiv.innerHTML;
         }
 
-        // Función para procesar imágenes al mostrar contenido (reemplazar URLs problemáticas)
+        // Función para procesar imágenes al mostrar contenido
         function procesarImagenesParaVisualizacion(contenido) {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = contenido;
@@ -386,23 +426,11 @@
             imagenes.forEach(img => {
                 const src = img.src;
                 
-                // Si la imagen es de Google Drive pero no se muestra correctamente
+                // Si la imagen es de Google Drive, asegurarnos de que use la URL directa
                 if (src.includes('drive.google.com')) {
-                    // Convertir URL de visualización a URL de descarga directa
-                    if (src.includes('/uc?export=view&id=')) {
-                        // Ya está en formato correcto
-                    } else if (src.includes('/file/d/')) {
-                        // Formato: https://drive.google.com/file/d/FILE_ID/view
-                        const match = src.match(/\/file\/d\/([^/]+)/);
-                        if (match && match[1]) {
-                            img.src = `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                        }
-                    } else if (src.includes('id=')) {
-                        // Formato: https://drive.google.com/open?id=FILE_ID
-                        const match = src.match(/[?&]id=([^&]+)/);
-                        if (match && match[1]) {
-                            img.src = `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                        }
+                    const nuevaUrl = crearUrlDirectaDeImagen(src);
+                    if (nuevaUrl !== src) {
+                        img.src = nuevaUrl;
                     }
                     
                     // Añadir atributos para mejor visualización
@@ -417,7 +445,10 @@
                         // Crear un mensaje de error
                         const errorDiv = document.createElement('div');
                         errorDiv.className = 'image-error';
-                        errorDiv.textContent = 'Error al cargar la imagen. La imagen puede haber sido eliminada o los permisos no son correctos.';
+                        errorDiv.innerHTML = `
+                            <strong>Error al cargar la imagen</strong><br>
+                            <small>Si el problema persiste, verifica que la imagen todavía exista en Google Drive.</small>
+                        `;
                         
                         this.parentNode.insertBefore(errorDiv, this.nextSibling);
                     };
@@ -436,6 +467,23 @@
                         }
                     };
                 }
+            });
+            
+            return tempDiv.innerHTML;
+        }
+
+        // Función para forzar la recarga de imágenes con parámetros únicos
+        function forzarRecargaImagenes(contenido) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contenido;
+            
+            const imagenes = tempDiv.querySelectorAll('img[src*="drive.google.com"]');
+            
+            imagenes.forEach(img => {
+                const url = new URL(img.src);
+                // Añadir un parámetro único para evitar caché
+                url.searchParams.set('t', Date.now());
+                img.src = url.toString();
             });
             
             return tempDiv.innerHTML;
@@ -614,6 +662,7 @@
                 
                 // Procesar contenido para mostrar correctamente las imágenes
                 let processedContent = procesarImagenesParaVisualizacion(cuento.contenido);
+                processedContent = forzarRecargaImagenes(processedContent); // Forzar recarga
                 processedContent = processVideos(processedContent, false);
                 
                 storyItem.innerHTML = `
@@ -641,6 +690,19 @@
                 `;
                 
                 cuentosList.appendChild(storyItem);
+                
+                // Forzar la carga de imágenes después de insertar en el DOM
+                setTimeout(() => {
+                    const images = storyItem.querySelectorAll('img');
+                    images.forEach(img => {
+                        if (img.src.includes('drive.google.com')) {
+                            // Añadir un parámetro único para evitar caché
+                            const url = new URL(img.src);
+                            url.searchParams.set('t', Date.now());
+                            img.src = url.toString();
+                        }
+                    });
+                }, 100);
             });
         }
 
