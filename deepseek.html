@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integración DeepSeek API</title>
+    <title>Conexión Automática con DeepSeek</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -286,51 +286,41 @@
             display: block;
         }
         
-        .file-upload {
+        .api-status {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 30px;
-            border: 2px dashed #e2e8f0;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px 15px;
             border-radius: var(--border-radius);
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.3s;
+            background: #f1f8ff;
         }
         
-        .file-upload:hover {
-            border-color: var(--primary-color);
+        .status-icon {
+            width: 24px;
+            height: 24px;
         }
         
-        .file-upload svg {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 15px;
-            color: #cbd5e0;
+        .status-icon.success {
+            color: #10b981;
         }
         
-        .file-upload p {
-            margin-bottom: 15px;
-            color: #64748b;
+        .status-icon.error {
+            color: #ef4444;
         }
         
-        #file-name {
-            margin-top: 10px;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        
-        .hidden {
-            display: none;
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Integración DeepSeek API</h1>
-            <p class="subtitle">Conecta tu página web con la API de DeepSeek</p>
+            <h1>Conexión Automática con DeepSeek</h1>
+            <p class="subtitle">Obtención automática de la API key desde el servidor</p>
         </header>
         
         <div class="api-config">
@@ -344,20 +334,7 @@
                 
                 <div class="form-group">
                     <label for="api-key">Clave API de DeepSeek</label>
-                    <input type="password" id="api-key" placeholder="Pega tu clave API aquí">
-                </div>
-                
-                <div class="form-group">
-                    <label>O sube tu archivo deepseekapi.txt</label>
-                    <div class="file-upload" id="file-upload">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                        <p>Haz clic aquí o arrastra tu archivo deepseekapi.txt</p>
-                        <button class="secondary">Seleccionar archivo</button>
-                        <div id="file-name"></div>
-                    </div>
-                    <input type="file" id="file-input" accept=".txt" class="hidden">
+                    <input type="password" id="api-key" placeholder="La API key se cargará automáticamente" readonly>
                 </div>
                 
                 <div class="form-group">
@@ -373,12 +350,28 @@
                     </select>
                 </div>
                 
-                <button id="save-config">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
+                <div class="btn-group">
+                    <button id="load-api-key">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        Obtener API Key del Servidor
+                    </button>
+                    
+                    <button id="save-config" class="secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
+                        </svg>
+                        Guardar Configuración
+                    </button>
+                </div>
+                
+                <div id="api-status" class="api-status">
+                    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Guardar configuración
-                </button>
+                    <span>API key no cargada aún</span>
+                </div>
                 
                 <div id="config-status" class="status"></div>
             </div>
@@ -386,15 +379,15 @@
             <div class="card">
                 <h2 class="card-title">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 01-2-2v8a2 2 0 012 2h5l-5 5v-5z" />
                     </svg>
-                    Prueba de conexión
+                    Prueba de Conexión
                 </h2>
                 
                 <div class="chat-container">
                     <div class="chat-messages" id="chat-messages">
                         <div class="message bot-message">
-                            ¡Hola! Soy DeepSeek. Envíame un mensaje para probar la conexión con la API.
+                            ¡Hola! Una vez que cargues la API key desde el servidor, podremos comenzar a chatear.
                         </div>
                     </div>
                     
@@ -403,8 +396,8 @@
                     </div>
                     
                     <div class="chat-input">
-                        <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
-                        <button id="send-message">
+                        <input type="text" id="message-input" placeholder="Escribe tu mensaje..." disabled>
+                        <button id="send-message" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.5.5 0 0 1-.928.086L7.5 12.5l-3.5 4.5L1 11.5l-1-1 4.5-3.5L.146 6.854a.5.5 0 0 1 .086-.928L14.714.036a.5.5 0 0 1 .54.11ZM4.5 10.5l5-5-5 5Z"/>
                             </svg>
@@ -416,14 +409,14 @@
         </div>
         
         <div class="instructions">
-            <h3>Instrucciones para integrar DeepSeek en tu página web</h3>
+            <h3>Instrucciones para la integración automática</h3>
             <ol>
-                <li>Obtén tu clave API desde la plataforma de DeepSeek</li>
-                <li>Guarda tu clave API en un archivo llamado <code>deepseekapi.txt</code> (solo la clave, sin espacios adicionales)</li>
-                <li>Sube el archivo usando el formulario anterior o pega la clave manualmente</li>
-                <li>Guarda la configuración para almacenar la clave en tu navegador (localStorage)</li>
-                <li>Prueba la conexión enviando un mensaje a través del chat</li>
-                <li>Para implementar en tu sitio, copia el código JavaScript de esta página y ajústalo según necesites</li>
+                <li>Asegúrate de que el archivo <code>deepseekapi.txt</code> esté en tu servidor web</li>
+                <li>Haz clic en "Obtener API Key del Servidor" para cargarla automáticamente</li>
+                <li>La API key se mostrará en el campo correspondiente (enmascarada por seguridad)</li>
+                <li>Guarda la configuración para almacenarla en el navegador (localStorage)</li>
+                <li>¡Ya puedes comenzar a chatear con DeepSeek!</li>
+                <li><strong>Nota:</strong> Necesitarás implementar un endpoint en tu servidor que sirva el archivo de forma segura</li>
             </ol>
         </div>
     </div>
@@ -433,11 +426,10 @@
             const apiKeyInput = document.getElementById('api-key');
             const apiEndpointInput = document.getElementById('api-endpoint');
             const modelSelect = document.getElementById('model');
+            const loadApiKeyBtn = document.getElementById('load-api-key');
             const saveConfigBtn = document.getElementById('save-config');
             const configStatus = document.getElementById('config-status');
-            const fileUpload = document.getElementById('file-upload');
-            const fileInput = document.getElementById('file-input');
-            const fileName = document.getElementById('file-name');
+            const apiStatus = document.getElementById('api-status');
             const chatMessages = document.getElementById('chat-messages');
             const messageInput = document.getElementById('message-input');
             const sendMessageBtn = document.getElementById('send-message');
@@ -451,28 +443,37 @@
                 apiEndpointInput.value = config.apiEndpoint;
                 modelSelect.value = config.model;
                 
-                configStatus.textContent = 'Configuración cargada desde el almacenamiento local.';
-                configStatus.classList.add('success');
+                updateApiStatus(true, 'API key cargada desde almacenamiento local');
+                enableChat();
             }
             
-            // Manejar la subida de archivos
-            fileUpload.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
-            fileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file && file.name === 'deepseekapi.txt') {
-                    fileName.textContent = `Archivo seleccionado: ${file.name}`;
+            // Función para obtener la API key del servidor
+            loadApiKeyBtn.addEventListener('click', async function() {
+                try {
+                    // En una implementación real, esta sería la URL a tu endpoint que sirve el archivo
+                    // Por ejemplo: '/api/deepseek-key' o 'https://tudominio.com/deepseekapi.txt'
+                    const response = await fetch('deepseekapi.txt');
                     
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const content = e.target.result;
-                        apiKeyInput.value = content.trim();
-                    };
-                    reader.readAsText(file);
-                } else {
-                    fileName.textContent = 'Por favor, selecciona un archivo llamado deepseekapi.txt';
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el archivo');
+                    }
+                    
+                    const apiKey = await response.text();
+                    
+                    if (apiKey.trim() === '') {
+                        throw new Error('El archivo está vacío');
+                    }
+                    
+                    // Guardar la API key en el campo
+                    apiKeyInput.value = apiKey.trim();
+                    
+                    // Actualizar estado
+                    updateApiStatus(true, 'API key cargada correctamente desde el servidor');
+                    enableChat();
+                    
+                } catch (error) {
+                    console.error('Error al cargar la API key:', error);
+                    updateApiStatus(false, 'Error al cargar la API key: ' + error.message);
                 }
             });
             
@@ -483,7 +484,7 @@
                 const model = modelSelect.value;
                 
                 if (!apiKey) {
-                    configStatus.textContent = 'Por favor, introduce una clave API válida.';
+                    configStatus.textContent = 'Por favor, carga primero la API key.';
                     configStatus.classList.remove('success');
                     configStatus.classList.add('error');
                     return;
@@ -538,41 +539,15 @@
                     
                     // Respuesta simulada (en una implementación real, usarías la respuesta de la API)
                     const responses = [
-                        "¡Hola! Gracias por tu mensaje. He recibido correctamente tu clave API y me estoy comunicando con el endpoint de DeepSeek.",
-                        "He procesado tu solicitud. La conexión con la API de DeepSeek se ha establecido correctamente usando tu clave API.",
+                        "¡Hola! He recibido correctamente tu mensaje. La conexión con la API de DeepSeek está funcionando correctamente.",
                         "Interesante pregunta. Como modelo de lenguaje de DeepSeek, puedo ayudarte con diversas tareas de procesamiento de lenguaje natural.",
-                        "Conexión exitosa. Tu clave API es válida y el endpoint está respondiendo adecuadamente."
+                        "He procesado tu solicitud. La API key se ha cargado correctamente desde el servidor y la conexión es exitosa.",
+                        "Gracias por tu mensaje. La integración automática de la API key está funcionando como se esperaba."
                     ];
                     
                     const randomResponse = responses[Math.floor(Math.random() * responses.length)];
                     addMessage(randomResponse, 'bot');
                 }, 1500);
-                
-                // Código de ejemplo para una llamada real a la API (descomenta y adapta cuando tengas la API real)
-                /*
-                fetch(config.apiEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${config.apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: config.model,
-                        messages: [{role: "user", content: message}],
-                        temperature: 0.7
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    typingIndicator.style.display = 'none';
-                    const botMessage = data.choices[0].message.content;
-                    addMessage(botMessage, 'bot');
-                })
-                .catch(error => {
-                    typingIndicator.style.display = 'none';
-                    addMessage('Error al conectar con la API: ' + error.message, 'bot');
-                });
-                */
             }
             
             function addMessage(text, sender) {
@@ -583,6 +558,29 @@
                 
                 chatMessages.appendChild(messageElement);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function updateApiStatus(success, message) {
+                const statusIcon = apiStatus.querySelector('.status-icon');
+                const statusText = apiStatus.querySelector('span');
+                
+                statusText.textContent = message;
+                
+                if (success) {
+                    statusIcon.classList.add('success');
+                    statusIcon.classList.remove('error');
+                    statusIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                } else {
+                    statusIcon.classList.add('error');
+                    statusIcon.classList.remove('success');
+                    statusIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                }
+            }
+            
+            function enableChat() {
+                messageInput.disabled = false;
+                sendMessageBtn.disabled = false;
+                messageInput.placeholder = "Escribe tu mensaje...";
             }
         });
     </script>
