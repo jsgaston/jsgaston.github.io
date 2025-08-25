@@ -639,6 +639,34 @@
 }
 
 
+        /* Oculta cualquier iframe dentro de secciones ocultas */
+.main-tab-content.hidden iframe {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none;
+  z-index: -1000 !important;
+}
+
+/* Oculta cualquier iframe dentro de secciones ocultas */
+.main-tab-content.hidden iframe2 {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none;
+  z-index: -1000 !important;
+}
+
+/* Oculta cualquier iframe dentro de secciones ocultas */
+.main-tab-content.hidden iframe3 {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none;
+  z-index: -1000 !important;
+}
+
+
     </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -1733,26 +1761,26 @@ let graphIframe2 = null;
         
         
         function showMainTab(tabName) {
-            // Ocultar todas las secciones
-            mainHomeSection.classList.add('hidden');
-            mainDiarySection.classList.add('hidden');
-            mainMapsSection.classList.add('hidden');
-            mainTripsSection.classList.add('hidden');
-            mainMenusSection.classList.add('hidden');
-            mainProjectsSection.classList.add('hidden');
-            document.getElementById('mainProfileSection').classList.add('hidden');
-            document.getElementById('mainRadioSection').classList.add('hidden');
-            document.getElementById('mainEnsayosSection').classList.add('hidden');
-            document.getElementById('mainTimeConverterSection').classList.add('hidden');
-            document.getElementById('mainTimeElapsedSection').classList.add('hidden');
-            document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
-            document.getElementById('mainGraphSection').classList.add('hidden');
-            document.getElementById('maintontoSection').class.add('hidden');
-            document.getElementById('mainCuentosSection').classList.add('hidden');
-            mainDiario_Section.getElementById('mainDiario_Section').classList.add('hidden'); // Añadido
-            document.getElementById('mainnoticiasSection').classList.add('hidden');
-            document.getElementById('mainwindSection').classList.add('hidden');
-            document.getElementById('maintrafficSection').classList.add('hidden');
+    // Ocultar todas las secciones
+    mainHomeSection.classList.add('hidden');
+    mainDiarySection.classList.add('hidden');
+    mainMapsSection.classList.add('hidden');
+    mainTripsSection.classList.add('hidden');
+    mainMenusSection.classList.add('hidden');
+    mainProjectsSection.classList.add('hidden');
+    document.getElementById('mainProfileSection').classList.add('hidden');
+    document.getElementById('mainRadioSection').classList.add('hidden');
+    document.getElementById('mainEnsayosSection').classList.add('hidden');
+    document.getElementById('mainTimeConverterSection').classList.add('hidden');
+    document.getElementById('mainTimeElapsedSection').classList.add('hidden');
+    document.getElementById('mainNumberSymbolsSection').classList.add('hidden');
+    document.getElementById('mainGraphSection').classList.add('hidden');
+    document.getElementById('maintontoSection').classList.add('hidden'); // Corregido: classList en lugar de class
+    document.getElementById('mainCuentosSection').classList.add('hidden');
+    mainDiario_Section.classList.add('hidden'); // Corregido: eliminado getElementById
+    document.getElementById('mainnoticiasSection').classList.add('hidden');
+    document.getElementById('mainwindSection').classList.add('hidden');
+    document.getElementById('maintrafficSection').classList.add('hidden');
             
             // Eliminar el div extra si existe
             const extraTimeUnits = document.getElementById('extraTimeUnits');
@@ -3460,6 +3488,7 @@ const DIARIO_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ7YbUFsOofA
 
 </body>
 </html>
+
 
 
 
