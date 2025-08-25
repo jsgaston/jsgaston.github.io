@@ -3369,14 +3369,16 @@ function translateNumber() {
 
 <script>
     // Agrega esta constante con la URL de tu Google Apps Script
-const STORY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7F5Tc9CoUZP51-A5dcxbQjCFnsOxg0E12gdVhmMbtgqYNo8WldtHMRf8Dm-IKEetW/exec';
+// Cambia esta URL por la correcta de tu Google Apps Script para el diario
+const DIARIO_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxODHOeZZKOsIiVHEaVn0kNH4Ekbzk-PVBW2lWrzvGdy6tCZD866Rtc5ul72tIcKMrs/exec';
 
-// Función para cargar el último cuento
+// Y en la función loadLatestDiary_():
 async function loadLatestDiary_() {
   const container = document.getElementById('diario_Container');
   
   try {
-    const response = await fetch(`${STORY_SCRIPT_URL}?action=getLatestDiary_`);
+    // Usa la URL correcta y el action correcto
+    const response = await fetch(`${DIARIO_SCRIPT_URL}?action=getLatestDiary`);
     const result = await response.json();
     
     if (result.status === 'success') {
@@ -3468,6 +3470,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
 
