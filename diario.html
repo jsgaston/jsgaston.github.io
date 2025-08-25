@@ -74,12 +74,17 @@
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
         .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
         
-        /* Nuevos estilos para búsqueda */
+        /* Estilos para búsqueda avanzada */
         .search-container { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
         .search-input { flex: 1; min-width: 200px; }
+        .search-date-group { display: flex; gap: 10px; align-items: center; }
+        .search-date-group label { white-space: nowrap; }
         .search-btn { background-color: #3b82f6; width: auto; }
         .reset-search-btn { background-color: #6b7280; width: auto; }
         .no-results { text-align: center; padding: 20px; color: #6b7280; }
+        .search-advanced-toggle { color: #3b82f6; cursor: pointer; text-decoration: underline; margin-top: 10px; }
+        .search-advanced-filters { display: none; margin-top: 15px; padding: 15px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .search-advanced-filters.active { display: block; }
     </style>
 </head>
 <body>
@@ -112,9 +117,24 @@
             <!-- Contenedor de búsqueda -->
             <div class="search-container">
                 <input type="text" id="searchText" class="form-input search-input" placeholder="Buscar por palabra...">
-                <input type="date" id="searchDate" class="form-input" style="width: auto;">
                 <button id="searchBtn" class="btn search-btn">Buscar</button>
                 <button id="resetSearchBtn" class="btn reset-search-btn">Restablecer</button>
+            </div>
+            
+            <div class="search-advanced-toggle" id="toggleAdvancedSearch">
+                Búsqueda avanzada ▼
+            </div>
+            
+            <div class="search-advanced-filters" id="advancedSearchFilters">
+                <div style="margin-bottom: 15px;">
+                    <label class="form-label">Rango de fechas:</label>
+                    <div class="search-date-group">
+                        <input type="date" id="searchDateStart" class="form-input">
+                        <span>a</span>
+                        <input type="date" id="searchDateEnd" class="form-input">
+                    </div>
+                </div>
+                <button id="searchAdvancedBtn" class="btn search-btn">Buscar con filtros</button>
             </div>
             
             <div id="cuentos-list" class="story-list">
@@ -125,7 +145,7 @@
     <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
     <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVwfagVylCAfc5ze5WcZr0U4MbivIRW7hdh9QFTfh89_vmmEINe3SY6T6SElpNBG4rPg/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxe3Xr8C1z4F3zEnN5psk-w1QEYQ3eOaNHJGzK_Sg6sMOKx3In55Oi2ISVmpo0zMdyRgg/exec'; 
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
@@ -377,354 +397,196 @@
                 if (node.nodeType === Node.TEXT_NODE) {
                     text += node.textContent.trim();
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
-                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR' || node.tagName === 'BLOCKQUOTE' || node.tagName.startsWith('H')) {
-                        text += '\n\n' + node.textContent.trim();
-                    } else if (node.tagName === 'UL' || node.tagName === 'OL') {
-                        node.querySelectorAll('li').forEach(li => {
-                            text += '\n* ' + li.textContent.trim();
-                        });
+                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR') {
                         text += '\n';
-                    } else if (node.tagName === 'TABLE') {
-                        text += '\n\n[Tabla]\n';
-                        const rows = node.querySelectorAll('tr');
-                        rows.forEach(row => {
-                            const cells = row.querySelectorAll('td, th');
-                            cells.forEach(cell => {
-                                text += cell.textContent.trim() + '\t';
-                            });
-                            text += '\n';
-                        });
-                        text += '[/Tabla]\n';
-                    } else if (node.tagName === 'IMG') {
-                        const imgUrl = node.getAttribute('src');
-                        const extension = imgUrl.split('.').pop().split('?')[0];
-                        text += `\n[Imagen: imagen_${imageCounter}.${extension}]`;
+                    } else if (node.tagName === 'LI') {
+                        text += '• ';
+                    }
+                    
+                    if (node.tagName === 'IMG') {
+                        text += ` [Imagen ${imageCounter}] `;
                         imageCounter++;
                     } else if (node.tagName === 'A') {
-                        // Mantener los enlaces en el texto
-                        text += `\n[Enlace: ${node.href}]`;
+                        if (node.href) {
+                            text += ` [Enlace: ${node.href}] `;
+                        }
                     } else {
-                        text += node.textContent.trim();
+                        text += htmlToFormattedText(node.innerHTML);
                     }
                 }
             });
             
-            return text.replace(/\n\s*\n/g, '\n\n').trim();
+            return text;
         }
 
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
-            cuentosList.innerHTML = '<p>Cargando cuentos...</p>';
-            const url = `${APP_SCRIPT_URL}?action=listarCuentos`;
-            fetch(url)
+            cuentosList.innerHTML = '<p>Cargando entradas...</p>';
+            
+            fetch(`${APP_SCRIPT_URL}?action=listarCuentos`)
                 .then(response => response.json())
                 .then(result => {
                     if (result.estado === 'éxito') {
-                        allCuentos = result.cuentos || [];
+                        allCuentos = result.cuentos;
                         filteredCuentos = [...allCuentos];
-                        mostrarCuentos();
+                        mostrarCuentos(filteredCuentos);
                     } else {
-                        cuentosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
+                        cuentosList.innerHTML = `<p>Error: ${result.mensaje}</p>`;
                     }
                 })
                 .catch(error => {
-                    cuentosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                    cuentosList.innerHTML = `<p>Error al cargar: ${error.message}</p>`;
                 });
         }
-        
-        function mostrarCuentos() {
+
+        function mostrarCuentos(cuentos) {
             const cuentosList = document.getElementById('cuentos-list');
-            cuentosList.innerHTML = '';
             
-            if (filteredCuentos && filteredCuentos.length > 0) {
-                filteredCuentos.forEach((cuento, index) => {
-                    const storyId = `story-${index}`;
-                    const storyDiv = document.createElement('div');
-                    storyDiv.id = storyId;
-                    storyDiv.className = 'story-item';
-                    
-                    const contenidoConVideos = processVideos(cuento.contenido, false);
-                    
-                    storyDiv.innerHTML = `
-                        <div class="header">
-                            <h3>${cuento.titulo}</h3>
-                            <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(cuento.fecha).toLocaleString()} <span class="arrow">►</span></p>
-                        </div>
-                        <div class="story-content" data-original-content="${encodeURIComponent(cuento.contenido)}" data-title="${encodeURIComponent(cuento.titulo)}">
-                            ${contenidoConVideos}
-                            <div class="download-buttons-container">
-                                <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
-                                <button class="btn download-btn" data-format="odt" style="background-color: #f7931e; width: auto; padding: 10px 20px;">Descargar en ODT</button>
-                                <button class="btn download-btn" data-format="docx" style="background-color: #2b579a; width: auto; padding: 10px 20px;">Descargar en Word</button>
-                                <button class="btn download-btn" data-format="xlsx" style="background-color: #21a366; width: auto; padding: 10px 20px;">Descargar en Excel</button>
-                                <button class="btn download-btn" data-format="txt" style="background-color: #607d8b; width: auto; padding: 10px 20px;">Descargar en TXT</button>
-                                <button class="btn download-btn" data-format="zip" style="background-color: #8c2a9d; width: auto; padding: 10px 20px;">Descargar Imágenes (ZIP)</button>
-                            </div>
-                        </div>
-                    `;
-                    cuentosList.appendChild(storyDiv);
-                });
-
-                document.querySelectorAll('.story-item .header').forEach(header => {
-                    header.addEventListener('click', function() {
-                        const content = this.nextElementSibling;
-                        const arrow = this.querySelector('.arrow');
-                        content.classList.toggle('expanded');
-                        arrow.classList.toggle('expanded');
-                    });
-                });
-            } else {
-                cuentosList.innerHTML = '<p class="no-results">No se encontraron entradas que coincidan con tu búsqueda.</p>';
-            }
-        }
-        
-        // Función para buscar entradas
-        function buscarEntradas() {
-            const searchText = document.getElementById('searchText').value.toLowerCase();
-            const searchDate = document.getElementById('searchDate').value;
-            
-            filteredCuentos = allCuentos.filter(cuento => {
-                let matchesText = true;
-                let matchesDate = true;
-                
-                // Filtrar por texto (título o contenido)
-                if (searchText) {
-                    matchesText = cuento.titulo.toLowerCase().includes(searchText) || 
-                                 cuento.contenido.toLowerCase().includes(searchText);
-                }
-                
-                // Filtrar por fecha
-                if (searchDate) {
-                    const cuentoDate = new Date(cuento.fecha).toISOString().split('T')[0];
-                    matchesDate = cuentoDate === searchDate;
-                }
-                
-                return matchesText && matchesDate;
-            });
-            
-            mostrarCuentos();
-        }
-        
-        // Función para restablecer la búsqueda
-        function restablecerBusqueda() {
-            document.getElementById('searchText').value = '';
-            document.getElementById('searchDate').value = '';
-            filteredCuentos = [...allCuentos];
-            mostrarCuentos();
-        }
-        
-        async function descargarCuento(storyId, format) {
-            const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
-            const originalContent = decodeURIComponent(storyContentDiv.dataset.originalContent);
-            const titulo = decodeURIComponent(storyContentDiv.dataset.title);
-            
-            if (format === 'pdf') {
-                generarPDF(storyId, titulo);
-            } else if (format === 'odt') {
-                generarODT(originalContent, titulo);
-            } else if (format === 'docx') {
-                generarWord(originalContent, titulo);
-            } else if (format === 'xlsx') {
-                generarExcel(titulo, originalContent);
-            } else if (format === 'txt') {
-                generarTXT(originalContent, titulo);
-            } else if (format === 'zip') {
-                descargarImagenesZIP(originalContent, titulo);
-            }
-        }
-        
-        function generarPDF(storyId, filename) {
-            const element = document.getElementById(storyId);
-            if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
-            
-            const originalContentHTML = element.querySelector('.story-content').innerHTML;
-            const contentForPDF = processVideos(originalContentHTML, true);
-            
-            element.querySelector('.story-content').innerHTML = contentForPDF;
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-
-            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgProps = doc.getImageProperties(imgData);
-                const pdfWidth = doc.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                let y = 0;
-                while (y < pdfHeight) {
-                    if (y > 0) { doc.addPage(); }
-                    const heightLeft = pdfHeight - y;
-                    const newHeight = Math.min(doc.internal.pageSize.getHeight(), heightLeft);
-                    doc.addImage(imgData, 'PNG', 0, -y, pdfWidth, pdfHeight);
-                    y += newHeight;
-                }
-                doc.save(`${filename}.pdf`);
-            }).catch(error => {
-                alert("Hubo un error al generar el PDF: " + error.message);
-                console.error("Error generando PDF:", error);
-            }).finally(() => {
-                element.querySelector('.story-content').innerHTML = originalContentHTML;
-            });
-        }
-        
-        async function generarODT(htmlContent, filename) {
-            try {
-                const formattedText = htmlToFormattedText(htmlContent);
-                const blob = new Blob([formattedText], { type: 'application/vnd.oasis.opendocument.text' });
-                saveAs(blob, `${filename}.odt`);
-                
-            } catch (error) {
-                alert("Hubo un error al generar el archivo ODT: " + error.message);
-                console.error("Error generando ODT:", error);
-            }
-        }
-        
-        async function generarWord(htmlContent, filename) {
-            try {
-                const formattedText = htmlToFormattedText(htmlContent);
-                const blob = new Blob([formattedText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-                saveAs(blob, `${filename}.docx`);
-                
-            } catch (error) {
-                alert("Hubo un error al generar el archivo de Word: " + error.message);
-                console.error("Error generando DOCX:", error);
-            }
-        }
-        
-        function generarExcel(titulo, contenido) {
-            try {
-                const wb = XLSX.utils.book_new();
-                const ws_data = [
-                    ["Título", "Contenido"],
-                    [titulo, htmlToFormattedText(contenido)]
-                ];
-                const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                XLSX.utils.book_append_sheet(wb, ws, "Historia");
-                XLSX.writeFile(wb, `${titulo}.xlsx`);
-            } catch (error) {
-                alert("Hubo un error al generar el archivo Excel: " + error.message);
-                console.error("Error generando Excel:", error);
-            }
-        }
-
-        function generarTXT(htmlContent, filename) {
-            try {
-                const formattedText = htmlToFormattedText(htmlContent);
-                const blob = new Blob([formattedText], { type: 'text/plain' });
-                saveAs(blob, `${filename}.txt`);
-            } catch (error) {
-                alert("Hubo un error al generar el archivo TXT: " + error.message);
-                console.error("Error generando TXT:", error);
-            }
-        }
-        
-        async function descargarImagenesZIP(htmlContent, filename) {
-            const imageUrls = extractImageUrls(htmlContent);
-            if (imageUrls.length === 0) {
-                alert("No hay imágenes en este cuento para descargar.");
+            if (cuentos.length === 0) {
+                cuentosList.innerHTML = '<p class="no-results">No se encontraron entradas.</p>';
                 return;
             }
-
-            const formData = new FormData();
-            formData.append('action', 'zipImagenes');
-            formData.append('imageUrls', JSON.stringify(imageUrls));
-
-            try {
-                const response = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
+            
+            cuentosList.innerHTML = '';
+            
+            cuentos.forEach(cuento => {
+                const storyItem = document.createElement('div');
+                storyItem.className = 'story-item';
+                
+                const formattedDate = new Date(cuento.fecha).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
-                const result = await response.json();
-                if (result.estado === 'éxito') {
-                    const downloadUrl = `${APP_SCRIPT_URL}?action=descargarZip&fileId=${result.fileId}`;
-                    
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.download = `${filename}_imagenes.zip`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
-                    alert('Error al crear el archivo ZIP: ' + result.mensaje);
-                }
-            } catch (error) {
-                alert('Fallo al comunicarse con el servidor: ' + error.message);
+                
+                const processedContent = processVideos(cuento.contenido, false);
+                
+                storyItem.innerHTML = `
+                    <div class="header" onclick="toggleStoryContent(this)">
+                        <h3>${cuento.titulo}</h3>
+                        <div>
+                            <span style="color: #6b7280; font-size: 0.9rem;">${formattedDate}</span>
+                            <span class="arrow">▶</span>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <div>${processedContent}</div>
+                        <div class="download-buttons-container">
+                            <button class="btn download-btn" onclick="descargarPDF(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
+                                Descargar PDF
+                            </button>
+                            <button class="btn download-btn" onclick="descargarWord(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
+                                Descargar Word
+                            </button>
+                            <button class="btn download-btn" onclick="descargarExcel(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
+                                Descargar Excel
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                cuentosList.appendChild(storyItem);
+            });
+        }
+
+        function toggleStoryContent(element) {
+            const content = element.nextElementSibling;
+            const arrow = element.querySelector('.arrow');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                arrow.classList.remove('expanded');
+            } else {
+                content.style.display = 'block';
+                arrow.classList.add('expanded');
             }
         }
 
-        // Event listeners
-        document.getElementById('cuentos-list').addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('download-btn')) {
-                const storyId = e.target.closest('.story-item').id;
-                const format = e.target.dataset.format;
-                descargarCuento(storyId, format);
+        // Funciones para búsqueda y filtrado
+        function buscarCuentos() {
+            const searchText = document.getElementById('searchText').value.toLowerCase();
+            const fechaInicio = document.getElementById('searchDateStart').value;
+            const fechaFin = document.getElementById('searchDateEnd').value;
+            
+            // Construir parámetros de búsqueda
+            let params = new URLSearchParams();
+            params.append('action', 'buscarCuentos');
+            
+            if (searchText) {
+                params.append('texto', searchText);
             }
+            
+            if (fechaInicio) {
+                params.append('fechaInicio', fechaInicio);
+            }
+            
+            if (fechaFin) {
+                params.append('fechaFin', fechaFin);
+            }
+            
+            const cuentosList = document.getElementById('cuentos-list');
+            cuentosList.innerHTML = '<p>Buscando...</p>';
+            
+            fetch(`${APP_SCRIPT_URL}?${params.toString()}`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.estado === 'éxito') {
+                        filteredCuentos = result.cuentos;
+                        mostrarCuentos(filteredCuentos);
+                    } else {
+                        cuentosList.innerHTML = `<p>Error: ${result.mensaje}</p>`;
+                    }
+                })
+                .catch(error => {
+                    cuentosList.innerHTML = `<p>Error al buscar: ${error.message}</p>`;
+                });
+        }
+
+        function resetSearch() {
+            document.getElementById('searchText').value = '';
+            document.getElementById('searchDateStart').value = '';
+            document.getElementById('searchDateEnd').value = '';
+            filteredCuentos = [...allCuentos];
+            mostrarCuentos(filteredCuentos);
+        }
+
+        // Event listeners para búsqueda
+        document.getElementById('searchBtn').addEventListener('click', buscarCuentos);
+        document.getElementById('resetSearchBtn').addEventListener('click', resetSearch);
+        document.getElementById('searchAdvancedBtn').addEventListener('click', buscarCuentos);
+        
+        // Event listener para búsqueda avanzada
+        document.getElementById('toggleAdvancedSearch').addEventListener('click', function() {
+            const filters = document.getElementById('advancedSearchFilters');
+            const isActive = filters.classList.toggle('active');
+            this.innerHTML = isActive ? 'Búsqueda avanzada ▲' : 'Búsqueda avanzada ▼';
         });
 
-        document.querySelectorAll('.btn-tab').forEach(button => {
-            button.addEventListener('click', function() {
-                document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        // Event listeners para pestañas
+        document.querySelectorAll('.btn-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Actualizar pestañas activas
+                document.querySelectorAll('.btn-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
                 this.classList.add('active');
-                const tabId = this.dataset.tab;
                 document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                // Si es la pestaña de vista, cargar los cuentos
                 if (tabId === 'view') {
                     cargarCuentos();
                 }
             });
         });
 
-        // Event listeners para búsqueda
-        document.getElementById('searchBtn').addEventListener('click', buscarEntradas);
-        document.getElementById('resetSearchBtn').addEventListener('click', restablecerBusqueda);
-        
-        // Permitir búsqueda con Enter
-        document.getElementById('searchText').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                buscarEntradas();
-            }
-        });
-
-        // Inicializar
-        document.querySelector('.btn-tab').click();
-
-        quill.root.addEventListener('paste', (event) => {
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                if (item.type.indexOf('image') === 0) {
-                    const blob = item.getAsFile();
-                    if (blob) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const base64data = e.target.result;
-                            const formData = new FormData();
-                            formData.append('action', 'subirImagenBase64');
-                            formData.append('imagen', base64data);
-                            const range = quill.getSelection();
-                            quill.insertText(range.index, 'Cargando imagen...');
-                            fetch(APP_SCRIPT_URL, {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(result => {
-                                if (result.estado === 'éxito') {
-                                    quill.insertEmbed(range.index, 'image', result.url);
-                                } else {
-                                    alert('Error al subir la imagen: ' + result.mensaje);
-                                }
-                            })
-                            .catch(error => {
-                                alert('Fallo en la comunicación con el servidor: ' + error.message);
-                            });
-                        };
-                        reader.readAsDataURL(blob);
-                    }
-                }
-            }
-        });
+        // Cargar cuentos al iniciar si estamos en la pestaña de vista
+        if (document.getElementById('view-tab').classList.contains('active')) {
+            cargarCuentos();
+        }
     </script>
 </body>
 </html>
