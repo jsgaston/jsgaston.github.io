@@ -148,6 +148,7 @@
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxe3Xr8C1z4F3zEnN5psk-w1QEYQ3eOaNHJGzK_Sg6sMOKx3In55Oi2ISVmpo0zMdyRgg/exec'; 
 
         // Inicializar Quill
+        // Inicializar Quill
         const quill = new Quill('#editor-container', {
             theme: 'snow',
             placeholder: 'Escribe tu historia aquí...',
@@ -171,6 +172,47 @@
                         ['table']
                     ],
                     handlers: {
+                        'image': async function() {
+                            const input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/*');
+                            input.click();
+
+                            input.onchange = async () => {
+                                const file = input.files[0];
+                                if (!file) {
+                                    return;
+                                }
+
+                                const reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                reader.onload = async () => {
+                                    const base64Data = reader.result;
+                                    try {
+                                        const formData = new FormData();
+                                        formData.append('action', 'subirImagenBase64');
+                                        formData.append('imagen', base64Data);
+
+                                        const response = await fetch(APP_SCRIPT_URL, {
+                                            method: 'POST',
+                                            body: formData
+                                        });
+
+                                        const result = await response.json();
+
+                                        if (result.estado === 'éxito' && result.url) {
+                                            const range = quill.getSelection(true);
+                                            quill.insertEmbed(range.index, 'image', result.url);
+                                            quill.setSelection(range.index + 1);
+                                        } else {
+                                            alert('Error al subir la imagen: ' + result.mensaje);
+                                        }
+                                    } catch (error) {
+                                        alert('Fallo al subir la imagen: ' + error.message);
+                                    }
+                                };
+                            };
+                        },
                         'link': function(value) {
                             if (value) {
                                 let url = prompt('Introduce la URL del enlace:');
@@ -216,7 +258,6 @@
                 'table': true
             }
         });
-
         // Variables globales para almacenar los cuentos y búsqueda
         let allCuentos = [];
         let filteredCuentos = [];
