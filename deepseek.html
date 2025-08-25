@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conexión Automática con DeepSeek</title>
+    <title>Conexión Real con DeepSeek API</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -314,13 +314,22 @@
             gap: 10px;
             margin-top: 20px;
         }
+        
+        .debug-info {
+            background: #f8f9fa;
+            border-left: 4px solid #4361ee;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Conexión Automática con DeepSeek</h1>
-            <p class="subtitle">Obtención automática de la API key desde el servidor</p>
+            <h1>Conexión Real con DeepSeek API</h1>
+            <p class="subtitle">Integración real con la API de DeepSeek</p>
         </header>
         
         <div class="api-config">
@@ -381,13 +390,13 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 01-2-2v8a2 2 0 012 2h5l-5 5v-5z" />
                     </svg>
-                    Prueba de Conexión
+                    Chat con DeepSeek
                 </h2>
                 
                 <div class="chat-container">
                     <div class="chat-messages" id="chat-messages">
                         <div class="message bot-message">
-                            ¡Hola! Una vez que cargues la API key desde el servidor, podremos comenzar a chatear.
+                            ¡Hola! Soy DeepSeek. Haz clic en "Obtener API Key del Servidor" para cargar tu clave API y comenzar a chatear.
                         </div>
                     </div>
                     
@@ -408,15 +417,25 @@
             </div>
         </div>
         
-        <div class="instructions">
-            <h3>Instrucciones para la integración automática</h3>
+        <div class="debug-info">
+            <h3>Información de Depuración</h3>
+            <p>Si estás recibiendo respuestas genéricas, es porque:</p>
             <ol>
-                <li>Asegúrate de que el archivo <code>deepseekapi.txt</code> esté en tu servidor web</li>
+                <li>La API key no es válida o no se está cargando correctamente</li>
+                <li>El endpoint de la API podría ser diferente al proporcionado</li>
+                <li>La API de DeepSeek podría requerir parámetros adicionales</li>
+            </ol>
+            <p>Revisa la consola del navegador (F12) para ver mensajes de error detallados.</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instrucciones para la integración real</h3>
+            <ol>
+                <li>Asegúrate de que el archivo <code>deepseekapi.txt</code> esté en tu servidor web y contenga solo la clave API</li>
                 <li>Haz clic en "Obtener API Key del Servidor" para cargarla automáticamente</li>
-                <li>La API key se mostrará en el campo correspondiente (enmascarada por seguridad)</li>
-                <li>Guarda la configuración para almacenarla en el navegador (localStorage)</li>
-                <li>¡Ya puedes comenzar a chatear con DeepSeek!</li>
-                <li><strong>Nota:</strong> Necesitarás implementar un endpoint en tu servidor que sirva el archivo de forma segura</li>
+                <li>Guarda la configuración para almacenarla en el navegador</li>
+                <li>¡Ya puedes comenzar a chatear con la API real de DeepSeek!</li>
+                <li>Si tienes problemas, verifica que la clave API y el endpoint sean correctos</li>
             </ol>
         </div>
     </div>
@@ -451,17 +470,16 @@
             loadApiKeyBtn.addEventListener('click', async function() {
                 try {
                     // En una implementación real, esta sería la URL a tu endpoint que sirve el archivo
-                    // Por ejemplo: '/api/deepseek-key' o 'https://tudominio.com/deepseekapi.txt'
                     const response = await fetch('deepseekapi.txt');
                     
                     if (!response.ok) {
-                        throw new Error('No se pudo cargar el archivo');
+                        throw new Error('No se pudo cargar el archivo. Asegúrate de que deepseekapi.txt existe en el servidor.');
                     }
                     
                     const apiKey = await response.text();
                     
                     if (apiKey.trim() === '') {
-                        throw new Error('El archivo está vacío');
+                        throw new Error('El archivo está vacío. Asegúrate de que contiene la clave API.');
                     }
                     
                     // Guardar la API key en el campo
@@ -473,7 +491,7 @@
                     
                 } catch (error) {
                     console.error('Error al cargar la API key:', error);
-                    updateApiStatus(false, 'Error al cargar la API key: ' + error.message);
+                    updateApiStatus(false, 'Error: ' + error.message);
                 }
             });
             
@@ -511,7 +529,7 @@
                 }
             });
             
-            function sendMessage() {
+            async function sendMessage() {
                 const message = messageInput.value.trim();
                 if (!message) return;
                 
@@ -532,22 +550,52 @@
                 typingIndicator.style.display = 'block';
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                // En una implementación real, aquí harías la llamada a la API de DeepSeek
-                // Esta es una simulación de la respuesta
-                setTimeout(() => {
+                try {
+                    // Llamada REAL a la API de DeepSeek
+                    const response = await fetch(config.apiEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${config.apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: config.model,
+                            messages: [{role: "user", content: message}],
+                            temperature: 0.7,
+                            max_tokens: 1000
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => null);
+                        throw new Error(errorData?.error?.message || `Error HTTP: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
                     typingIndicator.style.display = 'none';
                     
-                    // Respuesta simulada (en una implementación real, usarías la respuesta de la API)
-                    const responses = [
-                        "¡Hola! He recibido correctamente tu mensaje. La conexión con la API de DeepSeek está funcionando correctamente.",
-                        "Interesante pregunta. Como modelo de lenguaje de DeepSeek, puedo ayudarte con diversas tareas de procesamiento de lenguaje natural.",
-                        "He procesado tu solicitud. La API key se ha cargado correctamente desde el servidor y la conexión es exitosa.",
-                        "Gracias por tu mensaje. La integración automática de la API key está funcionando como se esperaba."
-                    ];
+                    if (data.choices && data.choices.length > 0) {
+                        const botMessage = data.choices[0].message.content;
+                        addMessage(botMessage, 'bot');
+                    } else {
+                        throw new Error('Formato de respuesta inesperado de la API');
+                    }
                     
-                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                    addMessage(randomResponse, 'bot');
-                }, 1500);
+                } catch (error) {
+                    console.error('Error al conectar con la API:', error);
+                    typingIndicator.style.display = 'none';
+                    
+                    // Mensajes de error específicos
+                    if (error.message.includes('401')) {
+                        addMessage('Error de autenticación: La API key no es válida.', 'bot');
+                    } else if (error.message.includes('404')) {
+                        addMessage('Endpoint no encontrado. Verifica la URL de la API.', 'bot');
+                    } else if (error.message.includes('429')) {
+                        addMessage('Límite de tasa excedido. Por favor, espera un momento.', 'bot');
+                    } else {
+                        addMessage('Error al conectar con la API: ' + error.message, 'bot');
+                    }
+                }
             }
             
             function addMessage(text, sender) {
@@ -581,6 +629,7 @@
                 messageInput.disabled = false;
                 sendMessageBtn.disabled = false;
                 messageInput.placeholder = "Escribe tu mensaje...";
+                addMessage('¡Conexión establecida! Ya puedes chatear con DeepSeek.', 'bot');
             }
         });
     </script>
