@@ -22,7 +22,7 @@
         h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
         .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
         .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
-        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
+        .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform: 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
         .btn:hover { transform: scale(1.02); }
         .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
         .message-box.success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
@@ -85,6 +85,29 @@
         .search-advanced-toggle { color: #3b82f6; cursor: pointer; text-decoration: underline; margin-top: 10px; }
         .search-advanced-filters { display: none; margin-top: 15px; padding: 15px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
         .search-advanced-filters.active { display: block; }
+        
+        /* Estilos para la carga de imágenes */
+        .image-upload-progress {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f9ff;
+            border-radius: 8px;
+            border: 1px solid #bae6fd;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-bar-inner {
+            height: 100%;
+            background-color: #3b82f6;
+            width: 0%;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +126,12 @@
                 <div style="margin-bottom: 1rem;">
                     <label class="form-label">Contenido:</label>
                     <div id="editor-container"></div>
+                </div>
+                <div id="imageUploadProgress" class="image-upload-progress">
+                    <p>Subiendo imágenes: <span id="uploadStatus">0/0</span></p>
+                    <div class="progress-bar">
+                        <div class="progress-bar-inner" id="progressBar"></div>
+                    </div>
                 </div>
                 <button type="submit" class="btn">
                     <span id="buttonText">Guardar Entrada</span>
@@ -145,9 +174,8 @@
     <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
     <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx40Ybiyz2Un2jYeNT2KdpSHxaH2HQOL871ZHCKWxNVy8gdCTQWFQdpimvQymkY5L6ZmQ/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEjeYq7R3AvW81OjD4Y4ZI3UW8Z-dvuUl5ZnGg-XKFvaYBRvhrLgyvDm5EPUFmeWlVUQ/exec'; 
 
-        // Inicializar Quill
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
             theme: 'snow',
@@ -172,45 +200,23 @@
                         ['table']
                     ],
                     handlers: {
-                        'image': async function() {
+                        'image': function() {
                             const input = document.createElement('input');
                             input.setAttribute('type', 'file');
                             input.setAttribute('accept', 'image/*');
                             input.click();
-
-                            input.onchange = async () => {
+                            
+                            input.onchange = async function() {
                                 const file = input.files[0];
-                                if (!file) {
-                                    return;
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        const range = quill.getSelection(true);
+                                        quill.insertEmbed(range.index, 'image', e.target.result);
+                                        quill.setSelection(range.index + 1);
+                                    };
+                                    reader.readAsDataURL(file);
                                 }
-
-                                const reader = new FileReader();
-                                reader.readAsDataURL(file);
-                                reader.onload = async () => {
-                                    const base64Data = reader.result;
-                                    try {
-                                        const formData = new FormData();
-                                        formData.append('action', 'subirImagenBase64');
-                                        formData.append('imagen', base64Data);
-
-                                        const response = await fetch(APP_SCRIPT_URL, {
-                                            method: 'POST',
-                                            body: formData
-                                        });
-
-                                        const result = await response.json();
-
-                                        if (result.estado === 'éxito' && result.url) {
-                                            const range = quill.getSelection(true);
-                                            quill.insertEmbed(range.index, 'image', result.url);
-                                            quill.setSelection(range.index + 1);
-                                        } else {
-                                            alert('Error al subir la imagen: ' + result.mensaje);
-                                        }
-                                    } catch (error) {
-                                        alert('Fallo al subir la imagen: ' + error.message);
-                                    }
-                                };
                             };
                         },
                         'link': function(value) {
@@ -258,30 +264,116 @@
                 'table': true
             }
         });
+
         // Variables globales para almacenar los cuentos y búsqueda
         let allCuentos = [];
         let filteredCuentos = [];
 
-        document.getElementById('cuentoForm').addEventListener('submit', function(e) {
+        // Función para subir una imagen a Google Drive
+        async function subirImagenABase64(base64Data) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'subirImagenBase64');
+                formData.append('imagen', base64Data);
+                
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.estado === 'éxito') {
+                    return result.url;
+                } else {
+                    console.error('Error al subir imagen:', result.mensaje);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error al subir imagen:', error);
+                return null;
+            }
+        }
+
+        // Función para procesar y subir todas las imágenes en el contenido
+        async function procesarImagenesEnContenido(contenido) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contenido;
+            
+            const imagenes = tempDiv.querySelectorAll('img');
+            const totalImagenes = imagenes.length;
+            
+            if (totalImagenes === 0) {
+                return contenido;
+            }
+            
+            // Mostrar barra de progreso
+            const progressContainer = document.getElementById('imageUploadProgress');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const progressBar = document.getElementById('progressBar');
+            
+            progressContainer.style.display = 'block';
+            uploadStatus.textContent = `0/${totalImagenes}`;
+            progressBar.style.width = '0%';
+            
+            let imagenesProcesadas = 0;
+            
+            for (let img of imagenes) {
+                const src = img.src;
+                
+                // Solo procesar imágenes en base64
+                if (src.startsWith('data:image')) {
+                    try {
+                        const driveUrl = await subirImagenABase64(src);
+                        if (driveUrl) {
+                            img.src = driveUrl;
+                        }
+                    } catch (error) {
+                        console.error('Error procesando imagen:', error);
+                    }
+                }
+                
+                imagenesProcesadas++;
+                uploadStatus.textContent = `${imagenesProcesadas}/${totalImagenes}`;
+                progressBar.style.width = `${(imagenesProcesadas / totalImagenes) * 100}%`;
+            }
+            
+            // Ocultar barra de progreso
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+            }, 1000);
+            
+            return tempDiv.innerHTML;
+        }
+
+        document.getElementById('cuentoForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
-            const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
+            let contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
             const buttonText = document.getElementById('buttonText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const messageBox = document.getElementById('messageBox');
+            
             buttonText.textContent = 'Guardando...';
             loadingSpinner.style.display = 'inline-block';
             messageBox.style.display = 'none';
-            const formData = new FormData();
-            formData.append('action', 'guardarCuento');
-            formData.append('titulo', titulo);
-            formData.append('contenido', contenido);
-            fetch(APP_SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(result => {
+            
+            try {
+                // Procesar imágenes antes de guardar
+                contenido = await procesarImagenesEnContenido(contenido);
+                
+                const formData = new FormData();
+                formData.append('action', 'guardarCuento');
+                formData.append('titulo', titulo);
+                formData.append('contenido', contenido);
+                
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
                 if (result.estado === 'éxito') {
                     showMessage('success', result.mensaje);
                     document.getElementById('cuentoForm').reset();
@@ -293,14 +385,12 @@
                 } else {
                     showMessage('error', result.mensaje);
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 showMessage('error', 'Fallo al guardar: ' + error.message);
-            })
-            .finally(() => {
-                buttonText.textContent = 'Guardar Cuento';
+            } finally {
+                buttonText.textContent = 'Guardar Entrada';
                 loadingSpinner.style.display = 'none';
-            });
+            }
         });
 
         function showMessage(type, message) {
