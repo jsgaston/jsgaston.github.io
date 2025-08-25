@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Diario Personal</title>
+    <title>Editor de diarios e Historias</title>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
     
@@ -21,7 +21,7 @@
         .container { background-color: #ffffff; padding: 2.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-width: 100%; border: 1px solid #e5e7eb; }
         h1 { color: #1a202c; font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center; }
         .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #374151; }
-        .form-input, .form-select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background-color: #f9fafb; }
         .btn { background-color: #4f46e5; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 1.5rem; }
         .btn:hover { transform: scale(1.02); }
         .message-box { padding: 12px 20px; border-radius: 8px; margin-top: 20px; font-weight: 500; display: none; }
@@ -29,16 +29,16 @@
         .message-box.error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
         .loading-spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid #ffffff; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .entry-list { list-style: none; padding: 0; }
-        .entry-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .entry-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
-        .entry-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .entry-item .header:hover { background-color: #f0f4f8; }
-        .entry-item .arrow { transition: transform 0.3s; }
-        .entry-item .arrow.expanded { transform: rotate(90deg); }
-        .entry-content { display: none; margin-top: 15px; }
-        .entry-content.expanded { display: block; }
-        .entry-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
+        .story-list { list-style: none; padding: 0; }
+        .story-item { background-color: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .story-item h3 { font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 10px; }
+        .story-item .header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .story-item .header:hover { background-color: #f0f4f8; }
+        .story-item .arrow { transition: transform 0.3s; }
+        .story-item .arrow.expanded { transform: rotate(90deg); }
+        .story-content { display: none; margin-top: 15px; }
+        .story-content.expanded { display: block; }
+        .story-content img { max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; }
         
         .video-wrapper {
             position: relative;
@@ -73,22 +73,17 @@
         .download-btn { background-color: #10b981; margin-right: 10px; }
         #editor-container { height: 300px; margin-bottom: 20px; border: 1px solid #d1d5db; }
         .download-buttons-container { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
-        .search-form { background-color: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 200px; }
-        .search-btn { background-color: #3b82f6; margin-top: 0; width: auto; }
-        .reset-btn { background-color: #6b7280; margin-top: 0; width: auto; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Mi Diario Personal</h1>
+        <h1>Editor de diarios e Historias</h1>
         <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn-tab active" data-tab="create">Nueva Entrada</button>
-            <button class="btn-tab" data-tab="view">Ver Entradas</button>
+            <button class="btn-tab active" data-tab="create">Crear Nuevo diario</button>
+            <button class="btn-tab" data-tab="view">Ver Todos los diarios</button>
         </nav>
         <div id="create-tab" class="tab-content active">
-            <form id="entradaForm">
+            <form id="diarioForm">
                 <div style="margin-bottom: 1rem;">
                     <label for="titulo" class="form-label">Título:</label>
                     <input type="text" id="titulo" name="titulo" class="form-input" required>
@@ -98,53 +93,28 @@
                     <div id="editor-container"></div>
                 </div>
                 <button type="submit" class="btn">
-                    <span id="buttonText">Guardar Entrada</span>
+                    <span id="buttonText">Guardar diario</span>
                     <div id="loadingSpinner" class="loading-spinner"></div>
                 </button>
                 <div id="messageBox" class="message-box"></div>
             </form>
         </div>
         <div id="view-tab" class="tab-content">
-            <h2>Mis Entradas de Diario</h2>
-            
-            <div class="search-form">
-                <h3>Buscar en el diario</h3>
-                <form id="searchForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="searchTerm" class="form-label">Palabra clave:</label>
-                            <input type="text" id="searchTerm" name="searchTerm" class="form-input" placeholder="Escribe palabras para buscar...">
-                        </div>
-                        <div class="form-group">
-                            <label for="startDate" class="form-label">Fecha desde:</label>
-                            <input type="date" id="startDate" name="startDate" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="endDate" class="form-label">Fecha hasta:</label>
-                            <input type="date" id="endDate" name="endDate" class="form-input">
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn search-btn">Buscar</button>
-                        <button type="button" id="resetSearch" class="btn reset-btn">Limpiar</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div id="entradas-list" class="entry-list">
-                <p>Cargando entradas...</p>
+            <h2>diarios Publicados</h2>
+            <div id="diarios-list" class="story-list">
+                <p>Cargando diarios...</p>
             </div>
         </div>
     </div>
     <script src="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.min.js"></script>
     <link href="https://unpkg.com/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
     <script>
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfiDEJ17e1ay9WuGotIG1_9HcvPbiX2o_whDbEhCa55i3H6VyX92dQ44psH2dGyXBDIA/exec'; 
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxrQnAuE5NgTSocO9Kp93AEQOxzAbfPeZHOIN95NlcKX-_91SrrOuCk98b-_x4i2U/exec'; 
 
         // Inicializar Quill
         const quill = new Quill('#editor-container', {
             theme: 'snow',
-            placeholder: 'Escribe tu entrada de diario aquí...',
+            placeholder: 'Escribe tu historia aquí...',
             modules: {
                 toolbar: {
                     container: [
@@ -211,7 +181,7 @@
             }
         });
 
-        document.getElementById('entradaForm').addEventListener('submit', function(e) {
+        document.getElementById('diarioForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const titulo = document.getElementById('titulo').value;
             const contenido = document.querySelector('#editor-container .ql-editor').innerHTML;
@@ -222,7 +192,7 @@
             loadingSpinner.style.display = 'inline-block';
             messageBox.style.display = 'none';
             const formData = new FormData();
-            formData.append('action', 'guardarEntrada');
+            formData.append('action', 'guardardiario');
             formData.append('titulo', titulo);
             formData.append('contenido', contenido);
             fetch(APP_SCRIPT_URL, {
@@ -233,7 +203,7 @@
             .then(result => {
                 if (result.estado === 'éxito') {
                     showMessage('success', result.mensaje);
-                    document.getElementById('entradaForm').reset();
+                    document.getElementById('diarioForm').reset();
                     quill.setContents([]);
                 } else {
                     showMessage('error', result.mensaje);
@@ -243,7 +213,7 @@
                 showMessage('error', 'Fallo al guardar: ' + error.message);
             })
             .finally(() => {
-                buttonText.textContent = 'Guardar Entrada';
+                buttonText.textContent = 'Guardar diario';
                 loadingSpinner.style.display = 'none';
             });
         });
@@ -418,43 +388,30 @@
             return text.replace(/\n\s*\n/g, '\n\n').trim();
         }
 
-        function cargarEntradas(filtros = {}) {
-            const entradasList = document.getElementById('entradas-list');
-            entradasList.innerHTML = '<p>Cargando entradas...</p>';
-            
-            let url = `${APP_SCRIPT_URL}?action=listarEntradas`;
-            
-            // Añadir filtros a la URL si existen
-            if (filtros.searchTerm) {
-                url += `&searchTerm=${encodeURIComponent(filtros.searchTerm)}`;
-            }
-            if (filtros.startDate) {
-                url += `&startDate=${encodeURIComponent(filtros.startDate)}`;
-            }
-            if (filtros.endDate) {
-                url += `&endDate=${encodeURIComponent(filtros.endDate)}`;
-            }
-            
+        function cargardiarios() {
+            const diariosList = document.getElementById('diarios-list');
+            diariosList.innerHTML = '<p>Cargando diarios...</p>';
+            const url = `${APP_SCRIPT_URL}?action=listardiarios`;
             fetch(url)
                 .then(response => response.json())
                 .then(result => {
                     if (result.estado === 'éxito') {
-                        entradasList.innerHTML = '';
-                        if (result.entradas && result.entradas.length > 0) {
-                            result.entradas.forEach((entrada, index) => {
-                                const entryId = `entry-${index}`;
-                                const entryDiv = document.createElement('div');
-                                entryDiv.id = entryId;
-                                entryDiv.className = 'entry-item';
+                        diariosList.innerHTML = '';
+                        if (result.diarios && result.diarios.length > 0) {
+                            result.diarios.forEach((diario, index) => {
+                                const storyId = `story-${index}`;
+                                const storyDiv = document.createElement('div');
+                                storyDiv.id = storyId;
+                                storyDiv.className = 'story-item';
                                 
-                                const contenidoConVideos = processVideos(entrada.contenido, false);
+                                const contenidoConVideos = processVideos(diario.contenido, false);
                                 
-                                entryDiv.innerHTML = `
+                                storyDiv.innerHTML = `
                                     <div class="header">
-                                        <h3>${entrada.titulo}</h3>
-                                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(entrada.fecha).toLocaleString()} <span class="arrow">►</span></p>
+                                        <h3>${diario.titulo}</h3>
+                                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Publicado el: ${new Date(diario.fecha).toLocaleString()} <span class="arrow">►</span></p>
                                     </div>
-                                    <div class="entry-content" data-original-content="${encodeURIComponent(entrada.contenido)}" data-title="${encodeURIComponent(entrada.titulo)}">
+                                    <div class="story-content" data-original-content="${encodeURIComponent(diario.contenido)}" data-title="${encodeURIComponent(diario.titulo)}">
                                         ${contenidoConVideos}
                                         <div class="download-buttons-container">
                                             <button class="btn download-btn" data-format="pdf" style="width: auto; padding: 10px 20px;">Descargar en PDF</button>
@@ -466,10 +423,10 @@
                                         </div>
                                     </div>
                                 `;
-                                entradasList.appendChild(entryDiv);
+                                diariosList.appendChild(storyDiv);
                             });
 
-                            document.querySelectorAll('.entry-item .header').forEach(header => {
+                            document.querySelectorAll('.story-item .header').forEach(header => {
                                 header.addEventListener('click', function() {
                                     const content = this.nextElementSibling;
                                     const arrow = this.querySelector('.arrow');
@@ -478,24 +435,24 @@
                                 });
                             });
                         } else {
-                            entradasList.innerHTML = '<p>No hay entradas en tu diario aún.</p>';
+                            diariosList.innerHTML = '<p>No hay diarios publicados aún.</p>';
                         }
                     } else {
-                        entradasList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
+                        diariosList.innerHTML = `<p style="color: red;">Error al cargar: ${result.mensaje}</p>`;
                     }
                 })
                 .catch(error => {
-                    entradasList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
+                    diariosList.innerHTML = `<p style="color: red;">Fallo en la comunicación con el servidor: ${error.message}</p>`;
                 });
         }
         
-        async function descargarEntrada(entryId, format) {
-            const entryContentDiv = document.getElementById(entryId).querySelector('.entry-content');
-            const originalContent = decodeURIComponent(entryContentDiv.dataset.originalContent);
-            const titulo = decodeURIComponent(entryContentDiv.dataset.title);
+        async function descargardiario(storyId, format) {
+            const storyContentDiv = document.getElementById(storyId).querySelector('.story-content');
+            const originalContent = decodeURIComponent(storyContentDiv.dataset.originalContent);
+            const titulo = decodeURIComponent(storyContentDiv.dataset.title);
             
             if (format === 'pdf') {
-                generarPDF(entryId, titulo);
+                generarPDF(storyId, titulo);
             } else if (format === 'odt') {
                 generarODT(originalContent, titulo);
             } else if (format === 'docx') {
@@ -509,14 +466,14 @@
             }
         }
         
-        function generarPDF(entryId, filename) {
-            const element = document.getElementById(entryId);
+        function generarPDF(storyId, filename) {
+            const element = document.getElementById(storyId);
             if (!element) { alert("No se encontró el contenido para generar el PDF."); return; }
             
-            const originalContentHTML = element.querySelector('.entry-content').innerHTML;
+            const originalContentHTML = element.querySelector('.story-content').innerHTML;
             const contentForPDF = processVideos(originalContentHTML, true);
             
-            element.querySelector('.entry-content').innerHTML = contentForPDF;
+            element.querySelector('.story-content').innerHTML = contentForPDF;
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -539,7 +496,7 @@
                 alert("Hubo un error al generar el PDF: " + error.message);
                 console.error("Error generando PDF:", error);
             }).finally(() => {
-                element.querySelector('.entry-content').innerHTML = originalContentHTML;
+                element.querySelector('.story-content').innerHTML = originalContentHTML;
             });
         }
         
@@ -575,7 +532,7 @@
                     [titulo, htmlToFormattedText(contenido)]
                 ];
                 const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                XLSX.utils.book_append_sheet(wb, ws, "Entrada de Diario");
+                XLSX.utils.book_append_sheet(wb, ws, "Historia");
                 XLSX.writeFile(wb, `${titulo}.xlsx`);
             } catch (error) {
                 alert("Hubo un error al generar el archivo Excel: " + error.message);
@@ -597,7 +554,7 @@
         async function descargarImagenesZIP(htmlContent, filename) {
             const imageUrls = extractImageUrls(htmlContent);
             if (imageUrls.length === 0) {
-                alert("No hay imágenes en esta entrada para descargar.");
+                alert("No hay imágenes en este diario para descargar.");
                 return;
             }
 
@@ -628,11 +585,11 @@
             }
         }
 
-        document.getElementById('entradas-list').addEventListener('click', function(e) {
+        document.getElementById('diarios-list').addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('download-btn')) {
-                const entryId = e.target.closest('.entry-item').id;
+                const storyId = e.target.closest('.story-item').id;
                 const format = e.target.dataset.format;
-                descargarEntrada(entryId, format);
+                descargardiario(storyId, format);
             }
         });
 
@@ -644,35 +601,12 @@
                 const tabId = this.dataset.tab;
                 document.getElementById(`${tabId}-tab`).classList.add('active');
                 if (tabId === 'view') {
-                    cargarEntradas();
+                    cargardiarios();
                 }
             });
         });
 
-        // Manejar búsqueda
-        document.getElementById('searchForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const searchTerm = document.getElementById('searchTerm').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            
-            cargarEntradas({
-                searchTerm: searchTerm,
-                startDate: startDate,
-                endDate: endDate
-            });
-        });
-
-        // Limpiar búsqueda
-        document.getElementById('resetSearch').addEventListener('click', function() {
-            document.getElementById('searchTerm').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            cargarEntradas();
-        });
-
-        // Activar la pestaña por defecto
-        document.querySelector('.btn-tab.active').click();
+        document.querySelector('.btn-tab').click();
 
         quill.root.addEventListener('paste', (event) => {
             const items = (event.clipboardData || event.originalEvent.clipboardData).items;
