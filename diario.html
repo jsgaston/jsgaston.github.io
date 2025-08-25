@@ -418,59 +418,57 @@
 
         // Función para procesar imágenes al mostrar contenido
         function procesarImagenesParaVisualizacion(contenido) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = contenido;
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = contenido;
+    
+    const imagenes = tempDiv.querySelectorAll('img');
+    
+    imagenes.forEach(img => {
+        const src = img.src;
+        
+        // Si la imagen es de Google Drive, asegurarnos de que use la URL directa
+        if (src.includes('drive.google.com')) {
+            const nuevaUrl = crearUrlDirectaDeImagen(src);
+            if (nuevaUrl !== src) {
+                img.src = nuevaUrl;
+            }
             
-            const imagenes = tempDiv.querySelectorAll('img');
+            // Añadir atributos para mejor visualización
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.margin = '15px auto';
+            img.style.borderRadius = '8px';
             
-            imagenes.forEach(img => {
-                const src = img.src;
+            // Añadir manejadores de eventos para errores de carga
+            img.onerror = function() {
+                console.error('Error al cargar la imagen:', this.src);
+                this.style.display = 'none';
                 
-                // Si la imagen es de Google Drive, asegurarnos de que use la URL directa
-                if (src.includes('drive.google.com')) {
-                    const nuevaUrl = crearUrlDirectaDeImagen(src);
-                    if (nuevaUrl !== src) {
-                        img.src = nuevaUrl;
-                    }
-                    
-                    // Añadir atributos para mejor visualización
-                    img.loading = 'lazy';
-                    img.decoding = 'async';
-                    
-                    // Añadir manejadores de eventos para errores de carga
-                    img.onerror = function() {
-                        console.error('Error al cargar la imagen:', this.src);
-                        this.style.display = 'none';
-                        
-                        // Crear un mensaje de error
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'image-error';
-                        errorDiv.innerHTML = `
-                            <strong>Error al cargar la imagen</strong><br>
-                            <small>Si el problema persiste, verifica que la imagen todavía exista en Google Drive.</small>
-                        `;
-                        
-                        this.parentNode.insertBefore(errorDiv, this.nextSibling);
-                    };
-                    
-                    // Mostrar un indicador de carga
-                    img.style.display = 'none';
-                    const loadingDiv = document.createElement('div');
-                    loadingDiv.className = 'image-loading';
-                    loadingDiv.textContent = 'Cargando imagen...';
-                    img.parentNode.insertBefore(loadingDiv, img);
-                    
-                    img.onload = function() {
-                        this.style.display = 'block';
-                        if (loadingDiv.parentNode) {
-                            loadingDiv.parentNode.removeChild(loadingDiv);
-                        }
-                    };
-                }
-            });
+                // Crear un mensaje de error
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'image-error';
+                errorDiv.innerHTML = `
+                    <strong>Error al cargar la imagen</strong><br>
+                    <small>Si el problema persiste, verifica que la imagen todavía exista en Google Drive.</small>
+                `;
+                
+                this.parentNode.insertBefore(errorDiv, this.nextSibling);
+            };
             
-            return tempDiv.innerHTML;
+            // Forzar recarga con parámetro único para evitar caché
+            setTimeout(() => {
+                const url = new URL(img.src);
+                url.searchParams.set('t', Date.now());
+                img.src = url.toString();
+            }, 100);
         }
+    });
+    
+    return tempDiv.innerHTML;
+}
 
         // Función para forzar la recarga de imágenes con parámetros únicos
         function forzarRecargaImagenes(contenido) {
@@ -639,72 +637,58 @@
         }
 
         function mostrarCuentos(cuentos) {
-            const cuentosList = document.getElementById('cuentos-list');
-            
-            if (cuentos.length === 0) {
-                cuentosList.innerHTML = '<p class="no-results">No se encontraron entradas.</p>';
-                return;
-            }
-            
-            cuentosList.innerHTML = '';
-            
-            cuentos.forEach(cuento => {
-                const storyItem = document.createElement('div');
-                storyItem.className = 'story-item';
-                
-                const formattedDate = new Date(cuento.fecha).toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                // Procesar contenido para mostrar correctamente las imágenes
-                let processedContent = procesarImagenesParaVisualizacion(cuento.contenido);
-                processedContent = forzarRecargaImagenes(processedContent); // Forzar recarga
-                processedContent = processVideos(processedContent, false);
-                
-                storyItem.innerHTML = `
-                    <div class="header" onclick="toggleStoryContent(this)">
-                        <h3>${cuento.titulo}</h3>
-                        <div>
-                            <span style="color: #6b7280; font-size: 0.9rem;">${formattedDate}</span>
-                            <span class="arrow">▶</span>
-                        </div>
-                    </div>
-                    <div class="story-content">
-                        <div>${processedContent}</div>
-                        <div class="download-buttons-container">
-                            <button class="btn download-btn" onclick="descargarPDF(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
-                                Descargar PDF
-                            </button>
-                            <button class="btn download-btn" onclick="descargarWord(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
-                                Descargar Word
-                            </button>
-                            <button class="btn download-btn" onclick="descargarExcel(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
-                                Descargar Excel
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                cuentosList.appendChild(storyItem);
-                
-                // Forzar la carga de imágenes después de insertar en el DOM
-                setTimeout(() => {
-                    const images = storyItem.querySelectorAll('img');
-                    images.forEach(img => {
-                        if (img.src.includes('drive.google.com')) {
-                            // Añadir un parámetro único para evitar caché
-                            const url = new URL(img.src);
-                            url.searchParams.set('t', Date.now());
-                            img.src = url.toString();
-                        }
-                    });
-                }, 100);
-            });
-        }
+    const cuentosList = document.getElementById('cuentos-list');
+    
+    if (cuentos.length === 0) {
+        cuentosList.innerHTML = '<p class="no-results">No se encontraron entradas.</p>';
+        return;
+    }
+    
+    cuentosList.innerHTML = '';
+    
+    cuentos.forEach(cuento => {
+        const storyItem = document.createElement('div');
+        storyItem.className = 'story-item';
+        
+        const formattedDate = new Date(cuento.fecha).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // Procesar contenido para mostrar correctamente las imágenes
+        let processedContent = procesarImagenesParaVisualizacion(cuento.contenido);
+        processedContent = processVideos(processedContent, false);
+        
+        storyItem.innerHTML = `
+            <div class="header" onclick="toggleStoryContent(this)">
+                <h3>${cuento.titulo}</h3>
+                <div>
+                    <span style="color: #6b7280; font-size: 0.9rem;">${formattedDate}</span>
+                    <span class="arrow">▶</span>
+                </div>
+            </div>
+            <div class="story-content">
+                <div>${processedContent}</div>
+                <div class="download-buttons-container">
+                    <button class="btn download-btn" onclick="descargarPDF(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
+                        Descargar PDF
+                    </button>
+                    <button class="btn download-btn" onclick="descargarWord(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
+                        Descargar Word
+                    </button>
+                    <button class="btn download-btn" onclick="descargarExcel(${cuento.id}, '${cuento.titulo}', '${formattedDate}')">
+                        Descargar Excel
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        cuentosList.appendChild(storyItem);
+    });
+}
 
         function toggleStoryContent(element) {
             const content = element.nextElementSibling;
