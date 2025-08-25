@@ -108,6 +108,12 @@
             width: 0%;
             transition: width 0.3s;
         }
+        
+        /* Estilos para imágenes en el editor */
+        .ql-editor img {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -326,7 +332,12 @@
                     try {
                         const driveUrl = await subirImagenABase64(src);
                         if (driveUrl) {
+                            // Reemplazar la imagen base64 con la URL de Drive
                             img.src = driveUrl;
+                            // También actualizar el atributo srcset si existe
+                            if (img.srcset) {
+                                img.srcset = driveUrl;
+                            }
                         }
                     } catch (error) {
                         console.error('Error procesando imagen:', error);
@@ -338,10 +349,48 @@
                 progressBar.style.width = `${(imagenesProcesadas / totalImagenes) * 100}%`;
             }
             
-            // Ocultar barra de progreso
+            // Ocultar barra de progreso después de un segundo
             setTimeout(() => {
                 progressContainer.style.display = 'none';
             }, 1000);
+            
+            return tempDiv.innerHTML;
+        }
+
+        // Función para procesar imágenes al mostrar contenido (reemplazar URLs problemáticas)
+        function procesarImagenesParaVisualizacion(contenido) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = contenido;
+            
+            const imagenes = tempDiv.querySelectorAll('img');
+            
+            imagenes.forEach(img => {
+                const src = img.src;
+                
+                // Si la imagen es de Google Drive pero no se muestra correctamente
+                if (src.includes('drive.google.com')) {
+                    // Convertir URL de visualización a URL de descarga directa
+                    if (src.includes('/uc?export=view&id=')) {
+                        // Ya está en formato correcto
+                    } else if (src.includes('/file/d/')) {
+                        // Formato: https://drive.google.com/file/d/FILE_ID/view
+                        const match = src.match(/\/file\/d\/([^/]+)/);
+                        if (match && match[1]) {
+                            img.src = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                        }
+                    } else if (src.includes('id=')) {
+                        // Formato: https://drive.google.com/open?id=FILE_ID
+                        const match = src.match(/[?&]id=([^&]+)/);
+                        if (match && match[1]) {
+                            img.src = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                        }
+                    }
+                    
+                    // Añadir atributos para mejor visualización
+                    img.loading = 'lazy';
+                    img.decoding = 'async';
+                }
+            });
             
             return tempDiv.innerHTML;
         }
@@ -359,7 +408,7 @@
             messageBox.style.display = 'none';
             
             try {
-                // Procesar imágenes antes de guardar
+                // Procesar imágenes antes de guardar (convertir base64 a URLs de Drive)
                 contenido = await procesarImagenesEnContenido(contenido);
                 
                 const formData = new FormData();
@@ -475,81 +524,6 @@
             return tempDiv.innerHTML;
         }
 
-        // Función para extraer URLs de imágenes del HTML
-        function extractImageUrls(html) {
-            const doc = new DOMParser().parseFromString(html, 'text/html');
-            const images = doc.querySelectorAll('img');
-            const imageUrls = [];
-            images.forEach(img => {
-                imageUrls.push(img.src);
-            });
-            return imageUrls;
-        }
-
-        // Función para convertir HTML a texto con marcadores de imagen
-        function htmlToFormattedText(html) {
-            let doc = new DOMParser().parseFromString(html, 'text/html');
-            let text = '';
-            let imageCounter = 1;
-            
-            // Procesar videos primero
-            const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-            const wistiaRegex = /(?:https?:\/\/)?(?:[a-zA-Z0-9-]+\.)?wistia\.(?:com|net)\/medias\/([a-zA-Z0-9]+)/;
-            
-            // Reemplazar iframes de video con enlaces
-            const iframes = doc.querySelectorAll('iframe');
-            iframes.forEach(iframe => {
-                const src = iframe.getAttribute('src');
-                let videoUrl = '';
-                
-                if (src) {
-                    let match = src.match(youtubeRegex);
-                    if (match) {
-                        videoUrl = `https://www.youtube.com/watch?v=${match[1]}`;
-                    } else {
-                        match = src.match(wistiaRegex);
-                        if (match) {
-                            // Para Wistia, intentamos reconstruir la URL original
-                            videoUrl = `https://${match.input.split('/')[2]}/medias/${match[1]}`;
-                        } else {
-                            videoUrl = src;
-                        }
-                    }
-                    
-                    const link = document.createElement('a');
-                    link.href = videoUrl;
-                    link.textContent = `Ver video: ${videoUrl}`;
-                    iframe.parentNode.replaceChild(link, iframe);
-                }
-            });
-            
-            // Procesar el resto del contenido
-            doc.body.childNodes.forEach(node => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    text += node.textContent.trim();
-                } else if (node.nodeType === Node.ELEMENT_NODE) {
-                    if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR') {
-                        text += '\n';
-                    } else if (node.tagName === 'LI') {
-                        text += '• ';
-                    }
-                    
-                    if (node.tagName === 'IMG') {
-                        text += ` [Imagen ${imageCounter}] `;
-                        imageCounter++;
-                    } else if (node.tagName === 'A') {
-                        if (node.href) {
-                            text += ` [Enlace: ${node.href}] `;
-                        }
-                    } else {
-                        text += htmlToFormattedText(node.innerHTML);
-                    }
-                }
-            });
-            
-            return text;
-        }
-
         function cargarCuentos() {
             const cuentosList = document.getElementById('cuentos-list');
             cuentosList.innerHTML = '<p>Cargando entradas...</p>';
@@ -592,7 +566,9 @@
                     minute: '2-digit'
                 });
                 
-                const processedContent = processVideos(cuento.contenido, false);
+                // Procesar contenido para mostrar correctamente las imágenes
+                let processedContent = procesarImagenesParaVisualizacion(cuento.contenido);
+                processedContent = processVideos(processedContent, false);
                 
                 storyItem.innerHTML = `
                     <div class="header" onclick="toggleStoryContent(this)">
