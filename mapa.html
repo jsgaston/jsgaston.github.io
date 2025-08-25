@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapas con OpenStreetMap y Google Drive</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        header {
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #map {
+            flex: 1;
+            width: 100%;
+        }
+        
+        .controls {
+            padding: 10px;
+            background-color: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        #status {
+            margin-left: auto;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mapas con OpenStreetMap y Google Drive</h1>
+    </header>
+    
+    <div id="map"></div>
+    
+    <div class="controls">
+        <button id="startDrawing">Iniciar dibujo</button>
+        <button id="saveToDrive">Guardar en Drive</button>
+        <button id="loadFromDrive">Cargar desde Drive</button>
+        <span id="status"></span>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Variables globales
+        let map;
+        let drawnItems = new L.FeatureGroup();
+        let drawControl;
+        
+        // Inicializar el mapa
+        function initMap() {
+            // Crear mapa centrado en una ubicación por defecto
+            map = L.map('map').setView([40.4168, -3.7038], 13); // Madrid por defecto
+            
+            // Añadir capa de OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Añadir capa para los elementos dibujados
+            map.addLayer(drawnItems);
+        }
+        
+        // Iniciar el modo de dibujo
+        function startDrawing() {
+            // Si ya existe un control de dibujo, lo eliminamos
+            if (drawControl) {
+                map.removeControl(drawControl);
+            }
+            
+            // Importar el plugin de dibujo de Leaflet dinámicamente
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js';
+            script.onload = function() {
+                // Configurar opciones de dibujo
+                const drawControl = new L.Control.Draw({
+                    edit: {
+                        featureGroup: drawnItems
+                    },
+                    draw: {
+                        polygon: true,
+                        polyline: true,
+                        rectangle: true,
+                        circle: true,
+                        marker: true
+                    }
+                });
+                
+                // Añadir control de dibujo al mapa
+                map.addControl(drawControl);
+                
+                // Eventos para capturar lo dibujado
+                map.on(L.Draw.Event.CREATED, function (e) {
+                    const type = e.layerType;
+                    const layer = e.layer;
+                    
+                    // Añadir la capa al grupo
+                    drawnItems.addLayer(layer);
+                });
+                
+                updateStatus('Modo dibujo activado. Dibuja tu trayectoria.');
+            };
+            document.head.appendChild(script);
+            
+            // Añadir también el CSS para el dibujo
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css';
+            document.head.appendChild(link);
+        }
+        
+        // Guardar datos en Google Drive
+        async function saveToDrive() {
+            // Convertir los elementos dibujados a GeoJSON
+            const data = drawnItems.toGeoJSON();
+            
+            if (Object.keys(data.features).length === 0) {
+                updateStatus('No hay datos para guardar.');
+                return;
+            }
+            
+            updateStatus('Guardando en Google Drive...');
+            
+            try {
+                // URL de tu Google Apps Script desplegado como aplicación web
+                const scriptUrl = 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec';
+                
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save',
+                        data: data
+                    })
+                });
+                
+                updateStatus('Datos guardados correctamente en Google Drive.');
+            } catch (error) {
+                console.error('Error:', error);
+                updateStatus('Error al guardar los datos.');
+            }
+        }
+        
+        // Cargar datos desde Google Drive
+        async function loadFromDrive() {
+            updateStatus('Cargando desde Google Drive...');
+            
+            try {
+                // URL de tu Google Apps Script desplegado como aplicación web
+                const scriptUrl = 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec?action=load';
+                
+                const response = await fetch(scriptUrl);
+                const data = await response.json();
+                
+                // Limpiar elementos existentes
+                drawnItems.clearLayers();
+                
+                // Añadir los elementos cargados al mapa
+                L.geoJSON(data).addTo(drawnItems);
+                
+                // Ajustar la vista del mapa a los elementos cargados
+                map.fitBounds(drawnItems.getBounds());
+                
+                updateStatus('Datos cargados correctamente desde Google Drive.');
+            } catch (error) {
+                console.error('Error:', error);
+                updateStatus('Error al cargar los datos.');
+            }
+        }
+        
+        // Actualizar el mensaje de estado
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+        
+        // Inicializar cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            
+            // Event listeners para los botones
+            document.getElementById('startDrawing').addEventListener('click', startDrawing);
+            document.getElementById('saveToDrive').addEventListener('click', saveToDrive);
+            document.getElementById('loadFromDrive').addEventListener('click', loadFromDrive);
+        });
+    </script>
+</body>
+</html>
