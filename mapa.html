@@ -7,89 +7,328 @@
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
     
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         
         header {
-            background-color: #f8f9fa;
-            padding: 10px 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(90deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
         }
         
         #map {
-            flex: 1;
+            height: 450px;
             width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            z-index: 1;
         }
         
         .controls {
-            padding: 10px;
-            background-color: #f8f9fa;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #5f6368;
+        }
+        
+        input, button {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            font-size: 1rem;
         }
         
         button {
-            padding: 8px 16px;
-            background-color: #4285f4;
+            background: #4285f4;
             color: white;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         button:hover {
-            background-color: #3367d6;
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #saveToDrive {
+            background: #34a853;
+        }
+        
+        #saveToDrive:hover {
+            background: #2d8d47;
+        }
+        
+        #loadFromDrive {
+            background: #fbbc05;
+        }
+        
+        #loadFromDrive:hover {
+            background: #e6a800;
+        }
+        
+        #clearMap {
+            background: #ea4335;
+        }
+        
+        #clearMap:hover {
+            background: #d33426;
+        }
+        
+        .status-panel {
+            padding: 15px;
+            background: #e8f0fe;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #4285f4;
         }
         
         #status {
-            margin-left: auto;
-            color: #666;
+            font-weight: 500;
+            color: #5f6368;
+        }
+        
+        .instructions {
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #fbbc05;
+        }
+        
+        .instructions h3 {
+            color: #f57c00;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #5f6368;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        .legend {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Mapas con OpenStreetMap y Google Drive</h1>
-    </header>
-    
-    <div id="map"></div>
-    
-    <div class="controls">
-        <button id="startDrawing">Iniciar dibujo</button>
-        <button id="saveToDrive">Guardar en Drive</button>
-        <button id="loadFromDrive">Cargar desde Drive</button>
-        <span id="status"></span>
+    <div class="container">
+        <header>
+            <h1>Mapas con OpenStreetMap y Google Drive</h1>
+            <p class="description">Dibuja trayectorias en el mapa y guárdalas en tu Google Drive</p>
+        </header>
+        
+        <div class="content">
+            <div id="map"></div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="fileName">Nombre del archivo:</label>
+                    <input type="text" id="fileName" placeholder="mi_trayectoria.json" value="trayectoria.json">
+                </div>
+                
+                <div class="control-group">
+                    <label>Acciones:</label>
+                    <button id="startDrawing">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12 12 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A20 20 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a20 20 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
+                        </svg>
+                        Iniciar dibujo
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <label>Guardar/Cargar:</label>
+                    <button id="saveToDrive">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                        </svg>
+                        Guardar en Drive
+                    </button>
+                    <button id="loadFromDrive">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                        </svg>
+                        Cargar desde Drive
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <label>Gestión del mapa:</label>
+                    <button id="clearMap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                        Limpiar mapa
+                    </button>
+                </div>
+            </div>
+            
+            <div class="status-panel">
+                <h3>Estado del sistema:</h3>
+                <p id="status">Listo para usar. Haz clic en "Iniciar dibujo" para comenzar.</p>
+            </div>
+            
+            <div class="instructions">
+                <h3>Instrucciones de uso:</h3>
+                <ol>
+                    <li>Haz clic en "Iniciar dibujo" para activar las herramientas de dibujo</li>
+                    <li>Dibuja tus trayectorias, marcadores o áreas en el mapa</li>
+                    <li>Asigna un nombre al archivo (opcional)</li>
+                    <li>Haz clic en "Guardar en Drive" para guardar en Google Drive</li>
+                    <li>Usa "Cargar desde Drive" para recuperar tus trayectorias guardadas</li>
+                    <li>Usa "Limpiar mapa" para eliminar todos los elementos dibujados</li>
+                </ol>
+                <p><strong>Nota:</strong> Asegúrate de desplegar el Google Apps Script y reemplazar la URL en el código.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Mapa con OpenStreetMap y Google Drive | Leaflet | OpenStreetMap contributors</p>
+        </footer>
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Leaflet Draw JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    
     <script>
         // Variables globales
         let map;
-        let drawnItems = new L.FeatureGroup();
+        let drawnItems;
         let drawControl;
         
         // Inicializar el mapa
         function initMap() {
             // Crear mapa centrado en una ubicación por defecto
-            map = L.map('map').setView([40.4168, -3.7038], 13); // Madrid por defecto
+            map = L.map('map').setView([36.8, 5.75], 10); // Centro en Argelia
             
             // Añadir capa de OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
             
-            // Añadir capa para los elementos dibujados
+            // Inicializar la capa para elementos dibujados
+            drawnItems = new L.FeatureGroup();
             map.addLayer(drawnItems);
+            
+            // Añadir leyenda
+            const legend = L.control({position: 'bottomright'});
+            legend.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'legend');
+                div.innerHTML = '<h4>Leyenda</h4>';
+                div.innerHTML += '<i style="background: #3388ff"></i> Línea<br>';
+                div.innerHTML += '<i style="background: #fa5e4a"></i> Polígono<br>';
+                div.innerHTML += '<i style="background: #4af55c"></i> Marcador';
+                return div;
+            };
+            legend.addTo(map);
         }
         
         // Iniciar el modo de dibujo
@@ -99,45 +338,51 @@
                 map.removeControl(drawControl);
             }
             
-            // Importar el plugin de dibujo de Leaflet dinámicamente
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js';
-            script.onload = function() {
-                // Configurar opciones de dibujo
-                const drawControl = new L.Control.Draw({
-                    edit: {
-                        featureGroup: drawnItems
+            // Configurar opciones de dibujo
+            drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: drawnItems
+                },
+                draw: {
+                    polygon: {
+                        shapeOptions: {
+                            color: '#fa5e4a'
+                        }
                     },
-                    draw: {
-                        polygon: true,
-                        polyline: true,
-                        rectangle: true,
-                        circle: true,
-                        marker: true
-                    }
-                });
-                
-                // Añadir control de dibujo al mapa
-                map.addControl(drawControl);
-                
-                // Eventos para capturar lo dibujado
-                map.on(L.Draw.Event.CREATED, function (e) {
-                    const type = e.layerType;
-                    const layer = e.layer;
-                    
-                    // Añadir la capa al grupo
-                    drawnItems.addLayer(layer);
-                });
-                
-                updateStatus('Modo dibujo activado. Dibuja tu trayectoria.');
-            };
-            document.head.appendChild(script);
+                    polyline: {
+                        shapeOptions: {
+                            color: '#3388ff'
+                        }
+                    },
+                    rectangle: false,
+                    circle: false,
+                    marker: {
+                        icon: new L.Icon({
+                            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41]
+                        })
+                    },
+                    circlemarker: false
+                }
+            });
             
-            // Añadir también el CSS para el dibujo
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css';
-            document.head.appendChild(link);
+            // Añadir control de dibujo al mapa
+            map.addControl(drawControl);
+            
+            // Eventos para capturar lo dibujado
+            map.on(L.Draw.Event.CREATED, function (e) {
+                const type = e.layerType;
+                const layer = e.layer;
+                
+                // Añadir la capa al grupo
+                drawnItems.addLayer(layer);
+                
+                updateStatus('Elemento dibujado correctamente. Continúa dibujando o guarda tu trabajo.');
+            });
+            
+            updateStatus('Modo dibujo activado. Usa las herramientas en la esquina superior derecha.');
         }
         
         // Guardar datos en Google Drive
@@ -146,60 +391,82 @@
             const data = drawnItems.toGeoJSON();
             
             if (Object.keys(data.features).length === 0) {
-                updateStatus('No hay datos para guardar.');
+                updateStatus('Error: No hay datos para guardar. Dibuja algo en el mapa primero.');
                 return;
             }
+            
+            const fileName = document.getElementById('fileName').value || 'trayectoria.json';
             
             updateStatus('Guardando en Google Drive...');
             
             try {
                 // URL de tu Google Apps Script desplegado como aplicación web
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyB8vJsPU1bZkXXDy-WoWMp13xnJA768DlD8q9lTkf8EaLMIOfg_IU-IoWKRLaAby5Z4w/exec';
+                // REEMPLAZA ESTA URL CON LA DE TU PROPIO SCRIPT
+                const scriptUrl = 'https://script.google.com/macros/s/ABCD1234/exec';
                 
                 const response = await fetch(scriptUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         action: 'save',
+                        filename: fileName,
                         data: data
                     })
                 });
                 
-                updateStatus('Datos guardados correctamente en Google Drive.');
+                if (response.ok) {
+                    const result = await response.json();
+                    updateStatus('Datos guardados correctamente en Google Drive. ID: ' + result.id);
+                } else {
+                    updateStatus('Error al guardar. ¿Has desplegado el Google Apps Script correctamente?');
+                }
             } catch (error) {
                 console.error('Error:', error);
-                updateStatus('Error al guardar los datos.');
+                updateStatus('Error al guardar los datos. Revisa la consola para más detalles.');
             }
         }
         
         // Cargar datos desde Google Drive
         async function loadFromDrive() {
+            const fileName = document.getElementById('fileName').value || 'trayectoria.json';
+            
             updateStatus('Cargando desde Google Drive...');
             
             try {
                 // URL de tu Google Apps Script desplegado como aplicación web
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbyB8vJsPU1bZkXXDy-WoWMp13xnJA768DlD8q9lTkf8EaLMIOfg_IU-IoWKRLaAby5Z4w/exec';
+                // REEMPLAZA ESTA URL CON LA DE TU PROPIO SCRIPT
+                const scriptUrl = `https://script.google.com/macros/s/ABCD1234/exec?action=load&filename=${encodeURIComponent(fileName)}`;
                 
                 const response = await fetch(scriptUrl);
-                const data = await response.json();
                 
-                // Limpiar elementos existentes
-                drawnItems.clearLayers();
-                
-                // Añadir los elementos cargados al mapa
-                L.geoJSON(data).addTo(drawnItems);
-                
-                // Ajustar la vista del mapa a los elementos cargados
-                map.fitBounds(drawnItems.getBounds());
-                
-                updateStatus('Datos cargados correctamente desde Google Drive.');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Limpiar elementos existentes
+                    drawnItems.clearLayers();
+                    
+                    // Añadir los elementos cargados al mapa
+                    L.geoJSON(data).addTo(drawnItems);
+                    
+                    // Ajustar la vista del mapa a los elementos cargados
+                    map.fitBounds(drawnItems.getBounds());
+                    
+                    updateStatus('Datos cargados correctamente desde Google Drive.');
+                } else {
+                    updateStatus('Error al cargar. ¿El archivo existe en Drive?');
+                }
             } catch (error) {
                 console.error('Error:', error);
-                updateStatus('Error al cargar los datos.');
+                updateStatus('Error al cargar los datos. Revisa la consola para más detalles.');
             }
+        }
+        
+        // Limpiar el mapa
+        function clearMap() {
+            drawnItems.clearLayers();
+            updateStatus('Mapa limpiado. Todos los elementos han sido eliminados.');
         }
         
         // Actualizar el mensaje de estado
@@ -215,6 +482,7 @@
             document.getElementById('startDrawing').addEventListener('click', startDrawing);
             document.getElementById('saveToDrive').addEventListener('click', saveToDrive);
             document.getElementById('loadFromDrive').addEventListener('click', loadFromDrive);
+            document.getElementById('clearMap').addEventListener('click', clearMap);
         });
     </script>
 </body>
