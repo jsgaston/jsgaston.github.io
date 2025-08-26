@@ -182,8 +182,11 @@
                     },
                     body: JSON.stringify({ prompt: userMessage })
                 });
-                
-                const botResponse = await response.text(); 
+            
+                // Lee la respuesta como JSON
+                const responseData = await response.json(); 
+                const botResponse = responseData.response; // Accede a la propiedad 'response' del JSON
+            
                 appendMessage('bot', botResponse);
             } catch (error) {
                 console.error('Error al llamar a la API de DeepSeek:', error);
