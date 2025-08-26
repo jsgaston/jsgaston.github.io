@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensajería P2P</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .chat-container { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; margin-bottom: 10px; }
+        .message { margin-bottom: 10px; }
+        .message-text { background: #f0f0f0; padding: 8px; border-radius: 5px; }
+        .sender { font-weight: bold; }
+        .controls { display: flex; gap: 10px; }
+        .controls input, .controls button { padding: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>Mensajería P2P</h1>
+    
+    <div class="chat-container" id="chat-container"></div>
+
+    <div class="controls">
+        <input type="text" id="sender-name" placeholder="Tu nombre" required>
+        <input type="text" id="message-input" placeholder="Escribe tu mensaje..." style="flex-grow: 1;">
+        <input type="file" id="photo-file" accept="image/*">
+        <button onclick="sendMessage()">Enviar Mensaje</button>
+        <button onclick="uploadPhoto()">Subir Foto</button>
+    </div>
+
+    <script>
+        // Reemplaza 'TU_URL_DE_APLICACION_WEB' con la URL que copiaste en el paso 3.
+        const WEB_APP_URL = 'TU_URL_DE_APLICACION_WEB';
+
+        const chatContainer = document.getElementById('chat-container');
+        const senderInput = document.getElementById('sender-name');
+        const messageInput = document.getElementById('message-input');
+        const photoFileInput = document.getElementById('photo-file');
+
+        async function fetchMessages() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getMessages`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    chatContainer.innerHTML = '';
+                    result.messages.forEach(msg => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = 'message';
+                        
+                        let contentHtml = `<span class="sender">${msg.sender}</span>: `;
+                        
+                        if (msg.message) {
+                            contentHtml += `<span class="message-text">${msg.message}</span>`;
+                        } else if (msg.photoUrl) {
+                            contentHtml += `<img src="${msg.photoUrl}" alt="Foto" style="max-width: 100%;">`;
+                        }
+                        
+                        messageDiv.innerHTML = contentHtml;
+                        chatContainer.appendChild(messageDiv);
+                    });
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            } catch (error) {
+                console.error("Error al obtener mensajes:", error);
+            }
+        }
+
+        async function sendMessage() {
+            const sender = senderInput.value.trim();
+            const message = messageInput.value.trim();
+
+            if (!sender || !message) {
+                alert("Por favor, introduce tu nombre y un mensaje.");
+                return;
+            }
+
+            const data = {
+                action: 'sendMessage',
+                sender: sender,
+                message: message
+            };
+
+            await fetch(WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            messageInput.value = '';
+            fetchMessages();
+        }
+
+        async function uploadPhoto() {
+            const sender = senderInput.value.trim();
+            const photoFile = photoFileInput.files[0];
+
+            if (!sender || !photoFile) {
+                alert("Por favor, introduce tu nombre y selecciona una foto.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const base64Data = btoa(reader.result);
+                const data = {
+                    action: 'uploadPhoto',
+                    sender: sender,
+                    fileName: photoFile.name,
+                    mimeType: photoFile.type,
+                    photoData: base64Data
+                };
+
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                photoFileInput.value = null;
+                fetchMessages();
+            };
+            reader.readAsBinaryString(photoFile);
+        }
+
+        // Obtener los mensajes cada 5 segundos para que el chat se actualice.
+        setInterval(fetchMessages, 5000);
+        fetchMessages();
+
+    </script>
+</body>
+</html>
