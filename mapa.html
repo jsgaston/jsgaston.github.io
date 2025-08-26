@@ -90,7 +90,7 @@
             color: #5f6368;
         }
         
-        input, button {
+        input, button, select {
             padding: 12px 15px;
             border-radius: 8px;
             border: 1px solid #dadce0;
@@ -225,7 +225,16 @@
             opacity: 0.7;
         }
         
-        .simulation-notice {
+        .success-message {
+            background: #e6f4ea;
+            color: #1e8e3e;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .script-info {
             background: #fef7e0;
             border: 1px solid #fbbc05;
             border-radius: 8px;
@@ -290,31 +299,13 @@
                 </div>
             </div>
             
-            <div class="config-panel">
-                <h3>Configuración de Google Apps Script</h3>
-                <div class="control-group">
-                    <label for="scriptUrl">URL de tu Google Apps Script:</label>
-                    <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/..." value="">
-                    <small>Pega aquí la URL de tu script desplegado</small>
+            <div class="script-info">
+                <h3>Google Apps Script Configurado</h3>
+                <p>Tu Google Apps Script está correctamente configurado y guardará los archivos en la carpeta "Mapas" de tu Google Drive.</p>
+                <p><strong>URL del script:</strong> <span id="scriptUrlDisplay">https://script.google.com/macros/s/AKfycbw_Xokyi39Hgci6yZQKY7omBFKTxqw2atGC5vSbppNeW3fwkcaQsGG7UEzgWlZX0isLg/exec</span></p>
+                <div id="connectionSuccess" class="success-message">
+                    ✅ Conexión exitosa con Google Apps Script
                 </div>
-                <button id="testScript">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25.286 25.286 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135Z"/>
-                        <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2V1.866ZM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5Z"/>
-                    </svg>
-                    Probar conexión con el Script
-                </button>
-            </div>
-            
-            <div class="simulation-notice">
-                <h3>Modo Simulación Activado</h3>
-                <p>Actualmente estás en modo simulación. Para usar Google Drive real:</p>
-                <ol>
-                    <li>Crea un Google Apps Script con el código proporcionado</li>
-                    <li>Desplégalo como aplicación web</li>
-                    <li>Copia la URL y pégala en el campo de arriba</li>
-                    <li>Haz clic en "Probar conexión con el Script"</li>
-                </ol>
             </div>
             
             <div class="status-panel">
@@ -328,11 +319,10 @@
                     <li>Haz clic en "Iniciar dibujo" para activar las herramientas de dibujo</li>
                     <li>Dibuja tus trayectorias, marcadores o áreas en el mapa</li>
                     <li>Asigna un nombre al archivo (opcional)</li>
-                    <li>Haz clic en "Guardar en Drive" para guardar en Google Drive</li>
+                    <li>Haz clic en "Guardar en Drive" para guardar en la carpeta "Mapas"</li>
                     <li>Usa "Cargar desde Drive" para recuperar tus trayectorias guardadas</li>
                     <li>Usa "Limpiar mapa" para eliminar todos los elementos dibujados</li>
                 </ol>
-                <p><strong>Nota:</strong> Asegúrate de desplegar el Google Apps Script y reemplazar la URL en el código.</p>
             </div>
         </div>
         
@@ -351,7 +341,9 @@
         let map;
         let drawnItems;
         let drawControl;
-        let scriptUrl = "https://script.google.com/macros/s/AKfycbw_XoKyi39Hgcl6yZQKY7omBFk7lxqw2afGC5vSbppNeW3fwkcaOsGG7UEzgWiZXDisLg/exec";
+        
+        // URL de tu Google Apps Script (ya integrada)
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbw_Xokyi39Hgci6yZQKY7omBFKTxqw2atGC5vSbppNeW3fwkcaQsGG7UEzgWlZX0isLg/exec";
         
         // Inicializar el mapa
         function initMap() {
@@ -378,6 +370,9 @@
                 return div;
             };
             legend.addTo(map);
+            
+            // Probar la conexión con el script al cargar la página
+            testScriptConnection();
         }
         
         // Iniciar el modo de dibujo
@@ -445,19 +440,6 @@
             }
             
             const fileName = document.getElementById('fileName').value || 'trayectoria.json';
-            scriptUrl = document.getElementById('scriptUrl').value;
-            
-            if (!scriptUrl) {
-                updateStatus('Usando modo simulación. Para guardar en Drive real, configura la URL del Script.');
-                // Simular guardado exitoso
-                setTimeout(() => {
-                    updateStatus('Simulación: Datos guardados correctamente en Google Drive. Nombre: ' + fileName);
-                    // Guardar en localStorage para simular persistencia
-                    localStorage.setItem('simulated_drive_data', JSON.stringify(data));
-                    localStorage.setItem('simulated_drive_filename', fileName);
-                }, 1000);
-                return;
-            }
             
             updateStatus('Guardando en Google Drive...');
             
@@ -466,6 +448,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                     },
                     body: JSON.stringify({
                         action: 'save',
@@ -476,9 +459,13 @@
                 
                 if (response.ok) {
                     const result = await response.json();
-                    updateStatus('Datos guardados correctamente en Google Drive. ID: ' + result.id);
+                    if (result.result === 'success') {
+                        updateStatus('✅ Datos guardados correctamente en la carpeta "Mapas" de Google Drive. Archivo: ' + fileName);
+                    } else {
+                        updateStatus('Error: ' + result.error);
+                    }
                 } else {
-                    updateStatus('Error al guardar. ¿Has desplegado el Google Apps Script correctamente?');
+                    updateStatus('Error al guardar. Código de estado: ' + response.status);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -489,35 +476,6 @@
         // Cargar datos desde Google Drive
         async function loadFromDrive() {
             const fileName = document.getElementById('fileName').value || 'trayectoria.json';
-            scriptUrl = document.getElementById('scriptUrl').value;
-            
-            if (!scriptUrl) {
-                updateStatus('Usando modo simulación. Para cargar desde Drive real, configura la URL del Script.');
-                // Simular carga
-                const simulatedData = localStorage.getItem('simulated_drive_data');
-                const simulatedFilename = localStorage.getItem('simulated_drive_filename');
-                
-                if (simulatedData && simulatedFilename === fileName) {
-                    try {
-                        const data = JSON.parse(simulatedData);
-                        // Limpiar elementos existentes
-                        drawnItems.clearLayers();
-                        
-                        // Añadir los elementos cargados al mapa
-                        L.geoJSON(data).addTo(drawnItems);
-                        
-                        // Ajustar la vista del mapa a los elementos cargados
-                        map.fitBounds(drawnItems.getBounds());
-                        
-                        updateStatus('Simulación: Datos cargados correctamente desde Google Drive.');
-                    } catch (e) {
-                        updateStatus('Error en simulación: No hay datos guardados con el nombre: ' + fileName);
-                    }
-                } else {
-                    updateStatus('Error en simulación: No hay datos guardados con el nombre: ' + fileName);
-                }
-                return;
-            }
             
             updateStatus('Cargando desde Google Drive...');
             
@@ -537,9 +495,9 @@
                     // Ajustar la vista del mapa a los elementos cargados
                     map.fitBounds(drawnItems.getBounds());
                     
-                    updateStatus('Datos cargados correctamente desde Google Drive.');
+                    updateStatus('✅ Datos cargados correctamente desde Google Drive. Archivo: ' + fileName);
                 } else {
-                    updateStatus('Error al cargar. ¿El archivo existe en Drive?');
+                    updateStatus('Error al cargar. ¿El archivo existe en Drive? Código: ' + response.status);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -549,26 +507,25 @@
         
         // Probar la conexión con el script
         async function testScriptConnection() {
-            scriptUrl = document.getElementById('scriptUrl').value;
-            
-            if (!scriptUrl) {
-                updateStatus('Por favor, introduce la URL de tu Google Apps Script.');
-                return;
-            }
-            
-            updateStatus('Probando conexión con el script...');
+            updateStatus('Probando conexión con Google Apps Script...');
             
             try {
                 const response = await fetch(scriptUrl + '?action=test');
                 
                 if (response.ok) {
-                    updateStatus('Conexión exitosa con el Google Apps Script.');
+                    const result = await response.json();
+                    if (result.result === 'success') {
+                        updateStatus('✅ Conexión exitosa con Google Apps Script. Puedes guardar y cargar mapas.');
+                        document.getElementById('connectionSuccess').style.display = 'block';
+                    } else {
+                        updateStatus('Error en la conexión: ' + result.error);
+                    }
                 } else {
-                    updateStatus('Error en la conexión. Verifica que el script esté desplegado correctamente.');
+                    updateStatus('Error en la conexión. Código: ' + response.status);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                updateStatus('Error de conexión. Verifica la URL y que el script esté desplegado como aplicación web.');
+                updateStatus('Error de conexión. Verifica que el script esté desplegado correctamente.');
             }
         }
         
@@ -592,7 +549,6 @@
             document.getElementById('saveToDrive').addEventListener('click', saveToDrive);
             document.getElementById('loadFromDrive').addEventListener('click', loadFromDrive);
             document.getElementById('clearMap').addEventListener('click', clearMap);
-            document.getElementById('testScript').addEventListener('click', testScriptConnection);
         });
     </script>
 </body>
