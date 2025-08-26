@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapas con OpenStreetMap y Google Drive</title>
+    <title>Selector de Mapas Guardados</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -61,12 +61,66 @@
         }
         
         #map {
-            height: 450px;
+            height: 400px;
             width: 100%;
             border-radius: 10px;
             margin-bottom: 20px;
             border: 2px solid #e0e0e0;
             z-index: 1;
+        }
+        
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        .saved-maps-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .saved-maps-panel h3 {
+            color: #5f6368;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .map-list {
+            list-style: none;
+        }
+        
+        .map-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #4285f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .map-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-left-color: #34a853;
+        }
+        
+        .map-name {
+            font-weight: 600;
+            color: #5f6368;
+        }
+        
+        .map-date {
+            font-size: 0.8rem;
+            color: #9aa0a6;
         }
         
         .controls {
@@ -144,6 +198,14 @@
             background: #d33426;
         }
         
+        #refreshMaps {
+            background: #9aa0a6;
+        }
+        
+        #refreshMaps:hover {
+            background: #80868b;
+        }
+        
         .status-panel {
             padding: 15px;
             background: #e8f0fe;
@@ -201,7 +263,11 @@
             border-top: 1px solid #e0e0e0;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 968px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
             .controls {
                 grid-template-columns: 1fr;
             }
@@ -226,102 +292,96 @@
             opacity: 0.7;
         }
         
-        .success-message {
-            background: #e6f4ea;
-            color: #1e8e3e;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #9aa0a6;
         }
         
-        .error-message {
-            background: #fce8e6;
-            color: #c5221f;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
-        .debug-panel {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .debug-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .troubleshooting {
-            background: #e8f0fe;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border-left: 4px solid #4285f4;
+        .empty-state svg {
+            margin-bottom: 15px;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Mapas con OpenStreetMap y Google Drive</h1>
-            <p class="description">Dibuja trayectorias en el mapa y guárdalas en tu Google Drive</p>
+            <h1>Selector de Mapas Guardados</h1>
+            <p class="description">Visualiza y selecciona entre todos tus mapas guardados en Google Drive</p>
         </header>
         
         <div class="content">
-            <div id="map"></div>
-            
-            <div class="controls">
-                <div class="control-group">
-                    <label for="fileName">Nombre del archivo:</label>
-                    <input type="text" id="fileName" placeholder="mi_trayectoria.json" value="trayectoria.json">
+            <div class="main-layout">
+                <div class="saved-maps-panel">
+                    <h3>Mapas Guardados</h3>
+                    <button id="refreshMaps" style="margin-bottom: 15px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        Actualizar lista
+                    </button>
+                    <div id="mapListContainer">
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M7 11.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0-5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                            <p>No hay mapas guardados</p>
+                            <p>Haz clic en "Actualizar lista" para buscar mapas</p>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="control-group">
-                    <label>Acciones:</label>
-                    <button id="startDrawing">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12 12 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A20 20 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a20 20 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
-                        </svg>
-                        Iniciar dibujo
-                    </button>
-                </div>
-                
-                <div class="control-group">
-                    <label>Guardar/Cargar:</label>
-                    <button id="saveToDrive">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-                        </svg>
-                        Guardar en Drive
-                    </button>
-                    <button id="loadFromDrive">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                        </svg>
-                        Cargar desde Drive
-                    </button>
-                </div>
-                
-                <div class="control-group">
-                    <label>Gestión del mapa:</label>
-                    <button id="clearMap">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                        </svg>
-                        Limpiar mapa
-                    </button>
+                <div>
+                    <div id="map"></div>
+                    
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="fileName">Nombre del archivo:</label>
+                            <input type="text" id="fileName" placeholder="mi_trayectoria.json" value="trayectoria.json">
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Acciones:</label>
+                            <button id="startDrawing">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12 12 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A20 20 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a20 20 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
+                                </svg>
+                                Iniciar dibujo
+                            </button>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Guardar/Cargar:</label>
+                            <button id="saveToDrive">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                </svg>
+                                Guardar en Drive
+                            </button>
+                            <button id="loadFromDrive">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                </svg>
+                                Cargar desde Drive
+                            </button>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>Gestión del mapa:</label>
+                            <button id="clearMap">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                                Limpiar mapa
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -335,8 +395,8 @@
                 </div>
                 <button id="testScript">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25.286 25.286 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135Z"/>
-                        <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2V1.866ZM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5Z"/>
+                        <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 极速快3 0 0 0 4.94 0C11.765 5.765 13 6.76 13 极速快3.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.极速快3.068l-.92.9a24.767 24.767 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25.286 25.286 0 0 0 1.922-.188.25.25 极速快3 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135Z"/>
+                        <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 极速快3 1 1v1a2 2 极速快3 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2V1.866ZM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.极速快3 4h5A3.5 3.5 0 0 1 14 7.5Z"/>
                     </svg>
                     Probar conexión con el Script
                 </button>
@@ -347,51 +407,156 @@
                 <h3>Estado del sistema:</h3>
                 <p id="status">Listo para usar. Haz clic en "Iniciar dibujo" para comenzar.</p>
             </div>
-
-            <div class="troubleshooting">
-                <h3>🔍 Solución de problemas</h3>
-                <p>Si ves errores al guardar, sigue estos pasos:</p>
-                <ol>
-                    <li>Asegúrate de que tu Google Apps Script esté desplegado como <strong>"Aplicación web"</strong></li>
-                    <li>Configura la ejecución como <strong>"Yo"</strong> y el acceso como <strong>"Cualquier usuario"</strong></li>
-                    <li>Haz clic en <strong>"Probar conexión con el Script"</strong> para verificar</li>
-                    <li>Si persisten los errores, usa el modo simulación para probar la interfaz</li>
-                </ol>
-            </div>
-            
-            <div class="debug-panel">
-                <div class="debug-title">
-                    <h3>Consola de depuración</h3>
-                    <button id="clearDebug">Limpiar</button>
-                </div>
-                <div id="debugOutput"></div>
-            </div>
             
             <div class="instructions">
                 <h3>Instrucciones de uso:</h3>
                 <ol>
-                    <li>Haz clic en "Iniciar dibujo" para activar las herramientas de dibujo</li>
-                    <li>Dibuja tus trayectorias, marcadores o áreas en el mapa</li>
-                    <li>Asigna un nombre al archivo (opcional)</li>
-                    <li>Haz clic en "Guardar en Drive" para guardar en Google Drive</li>
-                    <li>Usa "Cargar desde Drive" para recuperar tus trayectorias guardadas</li>
-                    <li>Usa "Limpiar mapa" para eliminar todos los elementos dibujados</li>
+                    <li>Haz clic en "Actualizar lista" para ver todos tus mapas guardados en Google Drive</li>
+                    <li>Selecciona un mapa de la lista para cargarlo en el visor</li>
+                    <li>Usa "Iniciar dibujo" para crear nuevas trayectorias</li>
+                    <li>Guarda tus nuevos mapas con "Guardar en Drive"</li>
+                    <li>Puedes cargar un mapa específico por nombre usando "Cargar desde Drive"</li>
                 </ol>
             </div>
         </div>
         
         <footer>
-            <p>© 2023 Mapa con OpenStreetMap y Google Drive | Leaflet | OpenStreetMap contributors</p>
+            <p>© 2023 Selector de Mapas con OpenStreetMap y Google Drive | Leaflet | OpenStreetMap contributors</p>
         </footer>
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <!-- Leaflet Draw JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="极速快3https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     
     <script>
         // Variables globales
+        let map;
+        let drawnItems;
+        let drawControl;
+        let scriptUrl = "";
+        
+        // Inicializar el mapa
+        function initMap() {
+            // Crear mapa centrado en una ubicación por defecto
+            map = L.map('map').setView([36.8, 5.75], 10);
+            
+            // Añadir capa de OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Inicializar la capa para elementos dibujados
+            drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            
+            // Establecer la URL del script
+            document.getElementById('scriptUrl').value = "https://script.google.com/macros/s/AKfycbw_Xokyi39Hgci6yZQKY7omBFKT极速快3xqw2atGC5vSbppNeW3fwkcaQsGG7UEzgWlZX0isLg/exec";
+        }
+        
+        // Cargar la lista de mapas guardados
+        async function loadSavedMapsList() {
+            scriptUrl = document.getElementById('scriptUrl').value;
+            
+            if (!scriptUrl) {
+                updateStatus('Error: Introduce la URL de tu Google Apps Script.');
+                return;
+            }
+            
+            updateStatus('Cargando lista de mapas...');
+            
+            try {
+                // Usar un proxy para evitar problemas de CORS
+                const proxyUrl = 'https://corsproxy.io/?';
+                const fullUrl = proxyUrl + encodeURIComponent(`${scriptUrl}?action=list`);
+                
+                const response = await fetch(fullUrl);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.result === 'success' && data.files && data.files.length > 0) {
+                        displayMapsList(data.files);
+                        updateStatus('✅ Lista de mapas cargada correctamente');
+                    } else {
+                        displayEmptyState();
+                        updateStatus('No se encontraron mapas guardados');
+                    }
+                } else {
+                    displayEmptyState();
+                    updateStatus('Error al cargar la lista de mapas');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                displayEmptyState();
+                updateStatus('Error de conexión al cargar la lista de mapas');
+            }
+        }
+        
+        // Mostrar la lista de mapas en el panel
+        function displayMapsList(maps) {
+            const mapListContainer = document.getElementById('mapListContainer');
+            
+            // Ordenar mapas por fecha (más recientes primero)
+            maps.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = '<ul class="map-list">';
+            
+            maps.forEach(mapItem => {
+                const date = new Date(mapItem.date).toLocaleDateString();
+                
+                html += `
+                    <li class="map-item" data-filename="${mapItem.name}">
+                        <div>
+                            <div class="map-name">${mapItem.name}</div>
+                            <div class="map-date">${date}</div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+                        </svg>
+                    </li>
+                `;
+            });
+            
+            html += '</ul>';
+            mapListContainer.innerHTML = html;
+            
+            // Añadir event listeners a los elementos de la lista
+            document.querySelectorAll('.map-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const fileName = this.getAttribute('data-filename');
+                    document.getElementById('fileName').value = fileName;
+                    loadSelectedMap(fileName);
+                });
+            });
+        }
+        
+        // Mostrar estado vacío
+        function displayEmptyState() {
+            const mapListContainer = document.getElementById('mapListContainer');
+            mapListContainer.innerHTML = `
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 极速快3 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M7 11.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1极速快3h-1a.5.5 0 0 1-.5-.5zm0-5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                    <p>No hay mapas guardados</p>
+                    <p>Guarda algún mapa primero</p>
+                </div>
+            `;
+        }
+        
+        // Cargar un mapa seleccionado
+        function loadSelectedMap(fileName) {
+            document.getElementById('fileName').value = fileName;
+            loadFromDrive();
+        }
+        
+
+
+
         let map;
         let drawnItems;
         let drawControl;
@@ -726,6 +891,10 @@
             debugOutput.innerHTML += `<div>[${timestamp}] ${message}</div>`;
             debugOutput.scrollTop = debugOutput.scrollHeight;
         }
+
+
+                // Resto de funciones (initMap, startDrawing, saveToDrive, loadFromDrive, etc.)
+        // ... (El resto del código JavaScript es similar al anterior)
         
         // Inicializar cuando se cargue la página
         document.addEventListener('DOMContentLoaded', function() {
@@ -737,15 +906,15 @@
             document.getElementById('loadFromDrive').addEventListener('click', loadFromDrive);
             document.getElementById('clearMap').addEventListener('click', clearMap);
             document.getElementById('testScript').addEventListener('click', testScriptConnection);
-            document.getElementById('clearDebug').addEventListener('click', function() {
-                document.getElementById('debugOutput').innerHTML = '';
-            });
+            document.getElementById('refreshMaps').addEventListener('click', loadSavedMapsList);
             
-            // Probar la conexión automáticamente al cargar la página
+            // Cargar la lista de mapas al iniciar
             setTimeout(() => {
-                testScriptConnection();
-            }, 2000);
+                loadSavedMapsList();
+            }, 1000);
         });
+        
+
     </script>
 </body>
 </html>
