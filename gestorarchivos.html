@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Archivos - Google Drive</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #7209b7;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--secondary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-title {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 968px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        input, textarea, select, button {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        button.secondary {
+            background: var(--light-color);
+            color: var(--dark-color);
+            border: 2px solid #e2e8f0;
+        }
+        
+        button.secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .file-preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .file-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .instructions {
+            background: #f1f8ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .instructions code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .status {
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+        }
+        
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status.error {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        .file-list {
+            margin-top: 20px;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .file-actions button {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
+        .tab-container {
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .script-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        
+        .config-section {
+            margin-bottom: 30px;
+        }
+        
+        .script-url-container {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestor de Archivos para Google Drive</h1>
+            <p class="subtitle">Carpeta: "claves y contraseñas y más papeles a guardar"</p>
+        </header>
+        
+        <div class="script-url-container">
+            <h3>URL de Google Apps Script configurada:</h3>
+            <p id="current-script-url">https://script.google.com/macros/s/AKfycbxXgL5fJrVjN2Q3Q2Z4Q5Z4Q5Z4Q5Z4Q5Z4Q5Z4Q5Z4Q5Z4Q5Z4/exec</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="app">Aplicación</div>
+            <div class="tab" data-tab="info">Información</div>
+        </div>
+        
+        <div class="tab-content active" id="app-tab">
+            <div class="app-container">
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        Subir Archivos
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="file-type">Tipo de Archivo</label>
+                        <select id="file-type">
+                            <option value="text">Texto (.txt)</option>
+                            <option value="image">Imagen (.jpg, .png, .gif)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="text-input-group">
+                        <label for="text-content">Contenido de Texto</label>
+                        <textarea id="text-content" placeholder="Escribe tu texto aquí..."></textarea>
+                    </div>
+                    
+                    <div class="form-group" id="image-input-group" style="display: none;">
+                        <label for="image-upload">Seleccionar Imagen</label>
+                        <input type="file" id="image-upload" accept="image/*">
+                        <div class="file-preview" id="image-preview"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="file-name">Nombre del Archivo</label>
+                        <input type="text" id="file-name" placeholder="nombre-del-archivo">
+                    </div>
+                    
+                    <button id="upload-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                        </svg>
+                        Subir a Google Drive
+                    </button>
+                    
+                    <div id="upload-status" class="status"></div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                        </svg>
+                        Archivos en Drive
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="file-filter">Filtrar por tipo</label>
+                        <select id="file-filter">
+                            <option value="all">Todos los archivos</option>
+                            <option value="text">Solo textos</option>
+                            <option value="image">Solo imágenes</option>
+                        </select>
+                    </div>
+                    
+                    <button id="load-files-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                        </svg>
+                        Cargar Archivos
+                    </button>
+                    
+                    <div class="file-list" id="file-list">
+                        <p>Haz clic en "Cargar Archivos" para ver los archivos en tu carpeta de Drive.</p>
+                    </div>
+                    
+                    <div id="load-status" class="status"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="info-tab">
+            <div class="card">
+                <h2 class="card-title">Información de Uso</h2>
+                
+                <div class="config-section">
+                    <h3>Función de la Aplicación</h3>
+                    <p>Esta aplicación te permite gestionar archivos en tu carpeta de Google Drive llamada "claves y contraseñas y más papeles a guardar".</p>
+                    <p>Puedes subir archivos de texto e imágenes, y luego visualizarlos o descargarlos directamente desde la interfaz.</p>
+                </div>
+                
+                <div class="config-section">
+                    <h3>Cómo usar la aplicación</h3>
+                    <ol>
+                        <li>Selecciona el tipo de archivo que quieres subir (texto o imagen)</li>
+                        <li>Si es texto, escribe el contenido en el área de texto</li>
+                        <li>Si es una imagen, selecciona un archivo de tu dispositivo</li>
+                        <li>Proporciona un nombre para el archivo</li>
+                        <li>Haz clic en "Subir a Google Drive" para guardar el archivo en tu carpeta</li>
+                        <li>Usa el botón "Cargar Archivos" para ver y gestionar los archivos en tu Drive</li>
+                    </ol>
+                </div>
+                
+                <div class="config-section">
+                    <h3>Notas importantes</h3>
+                    <ul>
+                        <li>Los archivos de texto se guardan con extensión .txt</li>
+                        <li>Las imágenes se guardan con extensión .png</li>
+                        <li>La aplicación creará automáticamente la carpeta si no existe</li>
+                        <li>No se pueden subir dos archivos con el mismo nombre</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instrucciones de Uso</h3>
+            <ol>
+                <li>Selecciona el tipo de archivo que quieres subir (texto o imagen)</li>
+                <li>Proporciona el contenido y un nombre para el archivo</li>
+                <li>Haz clic en "Subir a Google Drive" para guardar el archivo en tu carpeta</li>
+                <li>Usa el botón "Cargar Archivos" para ver y gestionar los archivos en tu Drive</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // URL de Google Apps Script (reemplaza con tu URL real)
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjB-fKzN-jkxbsReMFPUwou2R4PllXFJ6C6f6eDYdgTe6b0t3juCJ4dP2PEaL4gVnQ/exec";
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos de la interfaz
+            const fileTypeSelect = document.getElementById('file-type');
+            const textInputGroup = document.getElementById('text-input-group');
+            const imageInputGroup = document.getElementById('image-input-group');
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreview = document.getElementById('image-preview');
+            const fileNameInput = document.getElementById('file-name');
+            const uploadBtn = document.getElementById('upload-btn');
+            const uploadStatus = document.getElementById('upload-status');
+            const fileFilter = document.getElementById('file-filter');
+            const loadFilesBtn = document.getElementById('load-files-btn');
+            const fileList = document.getElementById('file-list');
+            const loadStatus = document.getElementById('load-status');
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const currentScriptUrl = document.getElementById('current-script-url');
+            
+            // Mostrar la URL actual del script
+            currentScriptUrl.textContent = SCRIPT_URL;
+            
+            // Configurar pestañas
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Desactivar todas las pestañas
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    // Activar la pestaña seleccionada
+                    tab.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Cambiar entre texto e imagen
+            fileTypeSelect.addEventListener('change', function() {
+                if (this.value === 'text') {
+                    textInputGroup.style.display = 'block';
+                    imageInputGroup.style.display = 'none';
+                } else {
+                    textInputGroup.style.display = 'none';
+                    imageInputGroup.style.display = 'block';
+                }
+            });
+            
+            // Vista previa de imagen
+            imageUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        imagePreview.innerHTML = `<img src="${event.target.result}" alt="Vista previa">`;
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Sugerir nombre de archivo
+                    if (!fileNameInput.value) {
+                        fileNameInput.value = file.name.split('.')[0];
+                    }
+                }
+            });
+            
+            // Subir archivo
+            uploadBtn.addEventListener('click', async function() {
+                const fileType = fileTypeSelect.value;
+                const fileName = fileNameInput.value.trim();
+                
+                if (!fileName) {
+                    uploadStatus.textContent = 'Error: Debes proporcionar un nombre de archivo';
+                    uploadStatus.className = 'status error';
+                    return;
+                }
+                
+                let content = '';
+                
+                if (fileType === 'text') {
+                    content = document.getElementById('text-content').value;
+                    if (!content) {
+                        uploadStatus.textContent = 'Error: El contenido de texto está vacío';
+                        uploadStatus.className = 'status error';
+                        return;
+                    }
+                } else {
+                    if (!imageUpload.files[0]) {
+                        uploadStatus.textContent = 'Error: Debes seleccionar una imagen';
+                        uploadStatus.className = 'status error';
+                        return;
+                    }
+                    
+                    // Convertir imagen a base64
+                    const file = imageUpload.files[0];
+                    content = await readFileAsDataURL(file);
+                }
+                
+                uploadStatus.textContent = 'Subiendo archivo...';
+                uploadStatus.className = 'status';
+                
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'upload',
+                            fileType: fileType,
+                            fileName: fileName,
+                            content: content
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        uploadStatus.textContent = 'Archivo subido correctamente: ' + result.fileName;
+                        uploadStatus.className = 'status success';
+                        
+                        // Limpiar formulario
+                        if (fileType === 'text') {
+                            document.getElementById('text-content').value = '';
+                        } else {
+                            imageUpload.value = '';
+                            imagePreview.innerHTML = '';
+                        }
+                        fileNameInput.value = '';
+                    } else {
+                        uploadStatus.textContent = 'Error: ' + result.message;
+                        uploadStatus.className = 'status error';
+                    }
+                } catch (error) {
+                    uploadStatus.textContent = 'Error al conectar con el servidor: ' + error.message;
+                    uploadStatus.className = 'status error';
+                }
+            });
+            
+            // Cargar lista de archivos
+            loadFilesBtn.addEventListener('click', async function() {
+                loadStatus.textContent = 'Cargando archivos...';
+                loadStatus.className = 'status';
+                fileList.innerHTML = '<p>Cargando...</p>';
+                
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'list',
+                            fileType: fileFilter.value
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        if (result.files.length === 0) {
+                            fileList.innerHTML = '<p>No hay archivos en tu carpeta de Drive.</p>';
+                        } else {
+                            fileList.innerHTML = '';
+                            result.files.forEach(file => {
+                                const fileItem = document.createElement('div');
+                                fileItem.className = 'file-item';
+                                
+                                const fileDate = new Date(file.dateCreated).toLocaleDateString();
+                                const fileSize = file.type === 'text' ? 
+                                    (file.size + ' bytes') : 
+                                    (Math.round(file.size / 1024) + ' KB');
+                                
+                                fileItem.innerHTML = `
+                                    <div>
+                                        <strong>${file.name}</strong>
+                                        <div><small>Tipo: ${file.type} | Fecha: ${fileDate} | Tamaño: ${fileSize}</small></div>
+                                    </div>
+                                    <div class="file-actions">
+                                        <button class="secondary download-btn" data-file-id="${file.id}">Descargar</button>
+                                        <button class="view-btn" data-file-url="${file.url}">Ver</button>
+                                    </div>
+                                `;
+                                
+                                fileList.appendChild(fileItem);
+                            });
+                            
+                            // Añadir event listeners a los botones
+                            document.querySelectorAll('.download-btn').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    downloadFile(this.getAttribute('data-file-id'));
+                                });
+                            });
+                            
+                            document.querySelectorAll('.view-btn').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    window.open(this.getAttribute('data-file-url'), '_blank');
+                                });
+                            });
+                        }
+                        
+                        loadStatus.textContent = `Se encontraron ${result.files.length} archivos`;
+                        loadStatus.className = 'status success';
+                    } else {
+                        loadStatus.textContent = 'Error: ' + result.message;
+                        loadStatus.className = 'status error';
+                        fileList.innerHTML = '<p>Error al cargar los archivos.</p>';
+                    }
+                } catch (error) {
+                    loadStatus.textContent = 'Error al conectar con el servidor: ' + error.message;
+                    loadStatus.className = 'status error';
+                    fileList.innerHTML = '<p>Error de conexión.</p>';
+                }
+            });
+            
+            // Función para descargar archivo
+            async function downloadFile(fileId) {
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'download',
+                            fileId: fileId
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        if (result.type === 'text') {
+                            // Descargar como archivo de texto
+                            const element = document.createElement('a');
+                            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(result.content));
+                            element.setAttribute('download', result.fileName);
+                            element.style.display = 'none';
+                            document.body.appendChild(element);
+                            element.click();
+                            document.body.removeChild(element);
+                        } else {
+                            // Mostrar imagen
+                            const win = window.open();
+                            win.document.write(`
+                                <html>
+                                    <head><title>${result.fileName}</title></head>
+                                    <body style="margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f0f0;">
+                                        <img src="${result.content}" alt="${result.fileName}" style="max-width: 100%; max-height: 100vh;">
+                                    </body>
+                                </html>
+                            `);
+                        }
+                    } else {
+                        alert('Error al descargar el archivo: ' + result.message);
+                    }
+                } catch (error) {
+                    alert('Error al conectar con el servidor: ' + error.message);
+                }
+            }
+            
+            // Función auxiliar para leer archivo como Data URL
+            function readFileAsDataURL(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
