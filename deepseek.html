@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Archivos con Google Drive</title>
+    <title>Conexión Real con DeepSeek API</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -33,7 +33,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
@@ -77,14 +77,14 @@
             height: 24px;
         }
         
-        .app-container {
+        .api-config {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
         
-        @media (max-width: 968px) {
-            .app-container {
+        @media (max-width: 768px) {
+            .api-config {
                 grid-template-columns: 1fr;
             }
         }
@@ -100,7 +100,7 @@
             color: var(--secondary-color);
         }
         
-        input, textarea, select, button {
+        input, textarea, select {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e2e8f0;
@@ -115,7 +115,7 @@
         }
         
         textarea {
-            min-height: 150px;
+            min-height: 120px;
             resize: vertical;
         }
         
@@ -123,14 +123,15 @@
             background: var(--primary-color);
             color: white;
             border: none;
+            padding: 14px 25px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            margin-top: 10px;
         }
         
         button:hover {
@@ -148,16 +149,95 @@
             background: #e2e8f0;
         }
         
-        .file-preview {
-            margin-top: 20px;
-            text-align: center;
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            overflow: hidden;
         }
         
-        .file-preview img {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fafbff;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            border-radius: 18px;
+            line-height: 1.5;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            background: #e2e8f0;
+            color: var(--dark-color);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 2px solid #e2e8f0;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            margin: 0;
+        }
+        
+        .chat-input button {
+            padding: 12px 20px;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 12px 18px;
+            background: #e2e8f0;
+            border-radius: 18px;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            width: fit-content;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .typing-indicator span {
+            animation: typing 1.4s infinite;
+            display: inline-block;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
         
         .instructions {
@@ -206,593 +286,350 @@
             display: block;
         }
         
-        .file-list {
-            margin-top: 20px;
-        }
-        
-        .file-item {
+        .api-status {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            background: #f8f9fa;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px 15px;
             border-radius: var(--border-radius);
-            margin-bottom: 10px;
+            background: #f1f8ff;
         }
         
-        .file-actions {
+        .status-icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .status-icon.success {
+            color: #10b981;
+        }
+        
+        .status-icon.error {
+            color: #ef4444;
+        }
+        
+        .btn-group {
             display: flex;
             gap: 10px;
-        }
-        
-        .file-actions button {
-            width: auto;
-            padding: 5px 10px;
-            font-size: 14px;
-        }
-        
-        .tab-container {
             margin-top: 20px;
         }
         
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #e2e8f0;
-            margin-bottom: 20px;
-        }
-        
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab.active {
-            border-bottom: 3px solid var(--primary-color);
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .script-code {
-            background: #2d3748;
-            color: #e2e8f0;
+        .debug-info {
+            background: #f8f9fa;
+            border-left: 4px solid #4361ee;
             padding: 15px;
-            border-radius: var(--border-radius);
-            overflow-x: auto;
-            font-family: monospace;
+            margin-top: 20px;
+            border-radius: 4px;
             font-size: 14px;
-            margin: 15px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Gestor de Archivos con Google Drive</h1>
-            <p class="subtitle">Sube, guarda y gestiona tus archivos con Google Apps Script</p>
+            <h1>Conexión Real con DeepSeek API</h1>
+            <p class="subtitle">Integración real con la API de DeepSeek</p>
         </header>
         
-        <div class="tabs">
-            <div class="tab active" data-tab="app">Aplicación</div>
-            <div class="tab" data-tab="setup">Configuración</div>
-        </div>
-        
-        <div class="tab-content active" id="app-tab">
-            <div class="app-container">
-                <div class="card">
-                    <h2 class="card-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                        Subir Archivos
-                    </h2>
-                    
-                    <div class="form-group">
-                        <label for="file-type">Tipo de Archivo</label>
-                        <select id="file-type">
-                            <option value="text">Texto (.txt)</option>
-                            <option value="image">Imagen (.jpg, .png)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group" id="text-input-group">
-                        <label for="text-content">Contenido de Texto</label>
-                        <textarea id="text-content" placeholder="Escribe tu texto aquí..."></textarea>
-                    </div>
-                    
-                    <div class="form-group" id="image-input-group" style="display: none;">
-                        <label for="image-upload">Seleccionar Imagen</label>
-                        <input type="file" id="image-upload" accept="image/*">
-                        <div class="file-preview" id="image-preview"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="file-name">Nombre del Archivo</label>
-                        <input type="text" id="file-name" placeholder="nombre-del-archivo">
-                    </div>
-                    
-                    <button id="upload-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                        </svg>
-                        Subir a Google Drive
-                    </button>
-                    
-                    <div id="upload-status" class="status"></div>
-                </div>
-                
-                <div class="card">
-                    <h2 class="card-title">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                        </svg>
-                        Archivos en Drive
-                    </h2>
-                    
-                    <div class="form-group">
-                        <label for="file-filter">Filtrar por tipo</label>
-                        <select id="file-filter">
-                            <option value="all">Todos los archivos</option>
-                            <option value="text">Solo textos</option>
-                            <option value="image">Solo imágenes</option>
-                        </select>
-                    </div>
-                    
-                    <button id="load-files-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                        </svg>
-                        Cargar Archivos
-                    </button>
-                    
-                    <div class="file-list" id="file-list"></div>
-                    
-                    <div id="load-status" class="status"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="setup-tab">
+        <div class="api-config">
             <div class="card">
-                <h2 class="card-title">Configuración de Google Apps Script</h2>
+                <h2 class="card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    Configuración de API Key
+                </h2>
                 
-                <p>Para usar esta aplicación, necesitas configurar un script de Google Apps que actuará como intermediario con Google Drive.</p>
-                
-                <h3>Paso 1: Crear un nuevo proyecto en Google Apps Script</h3>
-                <ol>
-                    <li>Ve a <a href="https://script.google.com/" target="_blank">script.google.com</a></li>
-                    <li>Crea un nuevo proyecto</li>
-                    <li>Pega el siguiente código:</li>
-                </ol>
-                
-                <div class="script-code">
-// Código para Google Apps Script
-function doPost(e) {
-  try {
-    var data = JSON.parse(e.postData.contents);
-    var action = data.action;
-    
-    if (action === "upload") {
-      return uploadFile(data);
-    } else if (action === "list") {
-      return listFiles(data);
-    } else if (action === "download") {
-      return downloadFile(data);
-    } else {
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "error",
-        message: "Acción no válida"
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "error",
-      message: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function doGet(e) {
-  return ContentService.createTextOutput(JSON.stringify({
-    status: "error",
-    message: "Solo se permiten solicitudes POST"
-  })).setMimeType(ContentService.MimeType.JSON);
-}
-
-function uploadFile(data) {
-  var folderId = "TU_FOLDER_ID"; // Reemplaza con el ID de tu carpeta en Drive
-  var folder = DriveApp.getFolderById(folderId);
-  var fileName = data.fileName;
-  var fileType = data.fileType;
-  var content = data.content;
-  
-  var file;
-  
-  if (fileType === "text") {
-    file = folder.createFile(fileName + ".txt", content, "text/plain");
-  } else if (fileType === "image") {
-    // Eliminar el prefijo de datos de la imagen (data:image/png;base64,)
-    var base64Data = content.replace(/^data:image\/\w+;base64,/, "");
-    var blob = Utilities.newBlob(Utilities.base64Decode(base64Data), "image/png", fileName + ".png");
-    file = folder.createFile(blob);
-  } else {
-    throw new Error("Tipo de archivo no válido");
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({
-    status: "success",
-    message: "Archivo subido correctamente",
-    fileId: file.getId(),
-    fileUrl: file.getUrl()
-  })).setMimeType(ContentService.MimeType.JSON);
-}
-
-function listFiles(data) {
-  var folderId = "TU_FOLDER_ID"; // Reemplaza con el ID de tu carpeta en Drive
-  var folder = DriveApp.getFolderById(folderId);
-  var files = folder.getFiles();
-  var fileType = data.fileType || "all";
-  var result = [];
-  
-  while (files.hasNext()) {
-    var file = files.next();
-    var name = file.getName();
-    var id = file.getId();
-    var url = file.getUrl();
-    var type = name.endsWith(".txt") ? "text" : "image";
-    
-    if (fileType === "all" || fileType === type) {
-      result.push({
-        id: id,
-        name: name,
-        url: url,
-        type: type
-      });
-    }
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({
-    status: "success",
-    files: result
-  })).setMimeType(ContentService.MimeType.JSON);
-}
-
-function downloadFile(data) {
-  var fileId = data.fileId;
-  var file = DriveApp.getFileById(fileId);
-  
-  if (file.getMimeType() === "text/plain") {
-    var content = file.getBlob().getDataAsString();
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "success",
-      content: content,
-      type: "text"
-    })).setMimeType(ContentService.MimeType.JSON);
-  } else {
-    var blob = file.getBlob();
-    var base64Data = Utilities.base64Encode(blob.getBytes());
-    var mimeType = blob.getContentType();
-    var dataUrl = "data:" + mimeType + ";base64," + base64Data;
-    
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "success",
-      content: dataUrl,
-      type: "image"
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-                </div>
-                
-                <h3>Paso 2: Configurar el script</h3>
-                <ol>
-                    <li>Reemplaza "TU_FOLDER_ID" con el ID de la carpeta de Google Drive donde quieres guardar los archivos</li>
-                    <li>Guarda el proyecto</li>
-                    <li>Despliega el script como una aplicación web</li>
-                    <li>Configura el acceso para "Anyone, even anonymous" (si quieres acceso público)</li>
-                    <li>Copia la URL de despliegue</li>
-                </ol>
-                
-                <h3>Paso 3: Configurar la aplicación</h3>
                 <div class="form-group">
-                    <label for="script-url">URL de tu Google Apps Script</label>
-                    <input type="text" id="script-url" placeholder="https://script.google.com/macros/s/...">
+                    <label for="api-key">Clave API de DeepSeek</label>
+                    <input type="password" id="api-key" placeholder="La API key se cargará automáticamente" readonly>
                 </div>
-                <button id="save-script-url">Guardar URL</button>
+                
+                <div class="form-group">
+                    <label for="api-endpoint">Endpoint de la API</label>
+                    <input type="text" id="api-endpoint" value="https://api.deepseek.com/v1/chat/completions">
+                </div>
+                
+                <div class="form-group">
+                    <label for="model">Modelo</label>
+                    <select id="model">
+                        <option value="deepseek-chat">DeepSeek Chat</option>
+                        <option value="deepseek-coder">DeepSeek Coder</option>
+                    </select>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="load-api-key">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        Obtener API Key del Servidor
+                    </button>
+                    
+                    <button id="save-config" class="secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
+                        </svg>
+                        Guardar Configuración
+                    </button>
+                </div>
+                
+                <div id="api-status" class="api-status">
+                    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>API key no cargada aún</span>
+                </div>
+                
+                <div id="config-status" class="status"></div>
             </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 01-2-2v8a2 2 0 012 2h5l-5 5v-5z" />
+                    </svg>
+                    Chat con DeepSeek
+                </h2>
+                
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message bot-message">
+                            ¡Hola! Soy DeepSeek. Haz clic en "Obtener API Key del Servidor" para cargar tu clave API y comenzar a chatear.
+                        </div>
+                    </div>
+                    
+                    <div class="typing-indicator" id="typing-indicator">
+                        DeepSeek está escribiendo<span>.</span><span>.</span><span>.</span>
+                    </div>
+                    
+                    <div class="chat-input">
+                        <input type="text" id="message-input" placeholder="Escribe tu mensaje..." disabled>
+                        <button id="send-message" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.5.5 0 0 1-.928.086L7.5 12.5l-3.5 4.5L1 11.5l-1-1 4.5-3.5L.146 6.854a.5.5 0 0 1 .086-.928L14.714.036a.5.5 0 0 1 .54.11ZM4.5 10.5l5-5-5 5Z"/>
+                            </svg>
+                            Enviar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <h3>Información de Depuración</h3>
+            <p>Si estás recibiendo respuestas genéricas, es porque:</p>
+            <ol>
+                <li>La API key no es válida o no se está cargando correctamente</li>
+                <li>El endpoint de la API podría ser diferente al proporcionado</li>
+                <li>La API de DeepSeek podría requerir parámetros adicionales</li>
+            </ol>
+            <p>Revisa la consola del navegador (F12) para ver mensajes de error detallados.</p>
         </div>
         
         <div class="instructions">
-            <h3>Instrucciones de Uso</h3>
+            <h3>Instrucciones para la integración real</h3>
             <ol>
-                <li>Configura el script de Google Apps Script siguiendo las instrucciones en la pestaña "Configuración"</li>
-                <li>En la pestaña "Aplicación", selecciona el tipo de archivo que quieres subir (texto o imagen)</li>
-                <li>Proporciona un nombre para el archivo</li>
-                <li>Haz clic en "Subir a Google Drive" para guardar el archivo</li>
-                <li>Usa el botón "Cargar Archivos" para ver y gestionar los archivos en tu Drive</li>
+                <li>Asegúrate de que el archivo <code>deepseekapi.txt</code> esté en tu servidor web y contenga solo la clave API</li>
+                <li>Haz clic en "Obtener API Key del Servidor" para cargarla automáticamente</li>
+                <li>Guarda la configuración para almacenarla en el navegador</li>
+                <li>¡Ya puedes comenzar a chatear con la API real de DeepSeek!</li>
+                <li>Si tienes problemas, verifica que la clave API y el endpoint sean correctos</li>
             </ol>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Elementos de la interfaz
-            const fileTypeSelect = document.getElementById('file-type');
-            const textInputGroup = document.getElementById('text-input-group');
-            const imageInputGroup = document.getElementById('image-input-group');
-            const imageUpload = document.getElementById('image-upload');
-            const imagePreview = document.getElementById('image-preview');
-            const fileNameInput = document.getElementById('file-name');
-            const uploadBtn = document.getElementById('upload-btn');
-            const uploadStatus = document.getElementById('upload-status');
-            const fileFilter = document.getElementById('file-filter');
-            const loadFilesBtn = document.getElementById('load-files-btn');
-            const fileList = document.getElementById('file-list');
-            const loadStatus = document.getElementById('load-status');
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            const scriptUrlInput = document.getElementById('script-url');
-            const saveScriptUrlBtn = document.getElementById('save-script-url');
+            const apiKeyInput = document.getElementById('api-key');
+            const apiEndpointInput = document.getElementById('api-endpoint');
+            const modelSelect = document.getElementById('model');
+            const loadApiKeyBtn = document.getElementById('load-api-key');
+            const saveConfigBtn = document.getElementById('save-config');
+            const configStatus = document.getElementById('config-status');
+            const apiStatus = document.getElementById('api-status');
+            const chatMessages = document.getElementById('chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendMessageBtn = document.getElementById('send-message');
+            const typingIndicator = document.getElementById('typing-indicator');
             
-            // URL del script (se guardará en localStorage)
-            let scriptUrl = localStorage.getItem('googleAppsScriptUrl') || '';
-            if (scriptUrl) {
-                scriptUrlInput.value = scriptUrl;
+            // Cargar configuración guardada
+            const savedConfig = localStorage.getItem('deepseekConfig');
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                apiKeyInput.value = config.apiKey;
+                apiEndpointInput.value = config.apiEndpoint;
+                modelSelect.value = config.model;
+                
+                updateApiStatus(true, 'API key cargada desde almacenamiento local');
+                enableChat();
             }
             
-            // Configurar pestañas
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.getAttribute('data-tab');
+            // Función para obtener la API key del servidor
+            loadApiKeyBtn.addEventListener('click', async function() {
+                try {
+                    // En una implementación real, esta sería la URL a tu endpoint que sirve el archivo
+                    const response = await fetch('deepseekapi.txt');
                     
-                    // Desactivar todas las pestañas
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(tc => tc.classList.remove('active'));
-                    
-                    // Activar la pestaña seleccionada
-                    tab.classList.add('active');
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                });
-            });
-            
-            // Cambiar entre texto e imagen
-            fileTypeSelect.addEventListener('change', function() {
-                if (this.value === 'text') {
-                    textInputGroup.style.display = 'block';
-                    imageInputGroup.style.display = 'none';
-                } else {
-                    textInputGroup.style.display = 'none';
-                    imageInputGroup.style.display = 'block';
-                }
-            });
-            
-            // Vista previa de imagen
-            imageUpload.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        imagePreview.innerHTML = `<img src="${event.target.result}" alt="Vista previa">`;
-                    };
-                    reader.readAsDataURL(file);
-                    
-                    // Sugerir nombre de archivo
-                    if (!fileNameInput.value) {
-                        fileNameInput.value = file.name.split('.')[0];
+                    if (!response.ok) {
+                        throw new Error('No se pudo cargar el archivo. Asegúrate de que deepseekapi.txt existe en el servidor.');
                     }
+                    
+                    const apiKey = await response.text();
+                    
+                    if (apiKey.trim() === '') {
+                        throw new Error('El archivo está vacío. Asegúrate de que contiene la clave API.');
+                    }
+                    
+                    // Guardar la API key en el campo
+                    apiKeyInput.value = apiKey.trim();
+                    
+                    // Actualizar estado
+                    updateApiStatus(true, 'API key cargada correctamente desde el servidor');
+                    enableChat();
+                    
+                } catch (error) {
+                    console.error('Error al cargar la API key:', error);
+                    updateApiStatus(false, 'Error: ' + error.message);
                 }
             });
             
-            // Guardar URL del script
-            saveScriptUrlBtn.addEventListener('click', function() {
-                const url = scriptUrlInput.value.trim();
-                if (url) {
-                    localStorage.setItem('googleAppsScriptUrl', url);
-                    scriptUrl = url;
-                    alert('URL guardada correctamente');
-                } else {
-                    alert('Por favor, introduce una URL válida');
-                }
-            });
-            
-            // Subir archivo
-            uploadBtn.addEventListener('click', async function() {
-                if (!scriptUrl) {
-                    uploadStatus.textContent = 'Error: Primero configura la URL del script en la pestaña de Configuración';
-                    uploadStatus.classList.add('error');
+            // Guardar configuración
+            saveConfigBtn.addEventListener('click', function() {
+                const apiKey = apiKeyInput.value.trim();
+                const apiEndpoint = apiEndpointInput.value.trim();
+                const model = modelSelect.value;
+                
+                if (!apiKey) {
+                    configStatus.textContent = 'Por favor, carga primero la API key.';
+                    configStatus.classList.remove('success');
+                    configStatus.classList.add('error');
                     return;
                 }
                 
-                const fileType = fileTypeSelect.value;
-                const fileName = fileNameInput.value.trim();
+                const config = {
+                    apiKey,
+                    apiEndpoint,
+                    model
+                };
                 
-                if (!fileName) {
-                    uploadStatus.textContent = 'Error: Debes proporcionar un nombre de archivo';
-                    uploadStatus.classList.add('error');
-                    return;
-                }
+                localStorage.setItem('deepseekConfig', JSON.stringify(config));
                 
-                let content = '';
-                
-                if (fileType === 'text') {
-                    content = document.getElementById('text-content').value;
-                    if (!content) {
-                        uploadStatus.textContent = 'Error: El contenido de texto está vacío';
-                        uploadStatus.classList.add('error');
-                        return;
-                    }
-                } else {
-                    if (!imageUpload.files[0]) {
-                        uploadStatus.textContent = 'Error: Debes seleccionar una imagen';
-                        uploadStatus.classList.add('error');
-                        return;
-                    }
-                    
-                    // Convertir imagen a base64
-                    const file = imageUpload.files[0];
-                    content = await readFileAsDataURL(file);
-                }
-                
-                uploadStatus.textContent = 'Subiendo archivo...';
-                uploadStatus.classList.remove('error', 'success');
-                
-                try {
-                    const response = await fetch(scriptUrl, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            action: 'upload',
-                            fileType: fileType,
-                            fileName: fileName,
-                            content: content
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        uploadStatus.textContent = 'Archivo subido correctamente: ' + result.fileUrl;
-                        uploadStatus.classList.add('success');
-                        
-                        // Limpiar formulario
-                        if (fileType === 'text') {
-                            document.getElementById('text-content').value = '';
-                        } else {
-                            imageUpload.value = '';
-                            imagePreview.innerHTML = '';
-                        }
-                        fileNameInput.value = '';
-                    } else {
-                        uploadStatus.textContent = 'Error: ' + result.message;
-                        uploadStatus.classList.add('error');
-                    }
-                } catch (error) {
-                    uploadStatus.textContent = 'Error al conectar con el servidor: ' + error.message;
-                    uploadStatus.classList.add('error');
+                configStatus.textContent = 'Configuración guardada correctamente.';
+                configStatus.classList.remove('error');
+                configStatus.classList.add('success');
+            });
+            
+            // Enviar mensaje
+            sendMessageBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
                 }
             });
             
-            // Cargar lista de archivos
-            loadFilesBtn.addEventListener('click', async function() {
-                if (!scriptUrl) {
-                    loadStatus.textContent = 'Error: Primero configura la URL del script en la pestaña de Configuración';
-                    loadStatus.classList.add('error');
+            async function sendMessage() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+                
+                // Agregar mensaje del usuario al chat
+                addMessage(message, 'user');
+                messageInput.value = '';
+                
+                // Obtener configuración
+                const savedConfig = localStorage.getItem('deepseekConfig');
+                if (!savedConfig) {
+                    addMessage('Por favor, configura tu API key primero.', 'bot');
                     return;
                 }
                 
-                loadStatus.textContent = 'Cargando archivos...';
-                loadStatus.classList.remove('error', 'success');
-                fileList.innerHTML = '';
+                const config = JSON.parse(savedConfig);
+                
+                // Mostrar indicador de escritura
+                typingIndicator.style.display = 'block';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
                 
                 try {
-                    const response = await fetch(scriptUrl, {
+                    // Llamada REAL a la API de DeepSeek
+                    const response = await fetch(config.apiEndpoint, {
                         method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${config.apiKey}`
+                        },
                         body: JSON.stringify({
-                            action: 'list',
-                            fileType: fileFilter.value
+                            model: config.model,
+                            messages: [{role: "user", content: message}],
+                            temperature: 0.7,
+                            max_tokens: 1000
                         })
                     });
                     
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        if (result.files.length === 0) {
-                            fileList.innerHTML = '<p>No hay archivos en tu Drive.</p>';
-                        } else {
-                            result.files.forEach(file => {
-                                const fileItem = document.createElement('div');
-                                fileItem.className = 'file-item';
-                                
-                                fileItem.innerHTML = `
-                                    <div>
-                                        <strong>${file.name}</strong>
-                                        <div><small>${file.type}</small></div>
-                                    </div>
-                                    <div class="file-actions">
-                                        <button class="secondary download-btn" data-file-id="${file.id}">Descargar</button>
-                                        <button class="view-btn" data-file-url="${file.url}">Ver en Drive</button>
-                                    </div>
-                                `;
-                                
-                                fileList.appendChild(fileItem);
-                            });
-                            
-                            // Añadir event listeners a los botones
-                            document.querySelectorAll('.download-btn').forEach(btn => {
-                                btn.addEventListener('click', function() {
-                                    downloadFile(this.getAttribute('data-file-id'));
-                                });
-                            });
-                            
-                            document.querySelectorAll('.view-btn').forEach(btn => {
-                                btn.addEventListener('click', function() {
-                                    window.open(this.getAttribute('data-file-url'), '_blank');
-                                });
-                            });
-                        }
-                        
-                        loadStatus.textContent = `Se encontraron ${result.files.length} archivos`;
-                        loadStatus.classList.add('success');
-                    } else {
-                        loadStatus.textContent = 'Error: ' + result.message;
-                        loadStatus.classList.add('error');
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => null);
+                        throw new Error(errorData?.error?.message || `Error HTTP: ${response.status}`);
                     }
-                } catch (error) {
-                    loadStatus.textContent = 'Error al conectar con el servidor: ' + error.message;
-                    loadStatus.classList.add('error');
-                }
-            });
-            
-            // Función para descargar archivo
-            async function downloadFile(fileId) {
-                try {
-                    const response = await fetch(scriptUrl, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            action: 'download',
-                            fileId: fileId
-                        })
-                    });
                     
-                    const result = await response.json();
+                    const data = await response.json();
+                    typingIndicator.style.display = 'none';
                     
-                    if (result.status === 'success') {
-                        if (result.type === 'text') {
-                            // Descargar como archivo de texto
-                            const element = document.createElement('a');
-                            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(result.content));
-                            element.setAttribute('download', 'archivo.txt');
-                            element.style.display = 'none';
-                            document.body.appendChild(element);
-                            element.click();
-                            document.body.removeChild(element);
-                        } else {
-                            // Mostrar imagen
-                            const win = window.open();
-                            win.document.write(`<img src="${result.content}" alt="Imagen descargada" style="max-width: 100%;">`);
-                        }
+                    if (data.choices && data.choices.length > 0) {
+                        const botMessage = data.choices[0].message.content;
+                        addMessage(botMessage, 'bot');
                     } else {
-                        alert('Error al descargar el archivo: ' + result.message);
+                        throw new Error('Formato de respuesta inesperado de la API');
                     }
+                    
                 } catch (error) {
-                    alert('Error al conectar con el servidor: ' + error.message);
+                    console.error('Error al conectar con la API:', error);
+                    typingIndicator.style.display = 'none';
+                    
+                    // Mensajes de error específicos
+                    if (error.message.includes('401')) {
+                        addMessage('Error de autenticación: La API key no es válida.', 'bot');
+                    } else if (error.message.includes('404')) {
+                        addMessage('Endpoint no encontrado. Verifica la URL de la API.', 'bot');
+                    } else if (error.message.includes('429')) {
+                        addMessage('Límite de tasa excedido. Por favor, espera un momento.', 'bot');
+                    } else {
+                        addMessage('Error al conectar con la API: ' + error.message, 'bot');
+                    }
                 }
             }
             
-            // Función auxiliar para leer archivo como Data URL
-            function readFileAsDataURL(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
+            function addMessage(text, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+                messageElement.textContent = text;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function updateApiStatus(success, message) {
+                const statusIcon = apiStatus.querySelector('.status-icon');
+                const statusText = apiStatus.querySelector('span');
+                
+                statusText.textContent = message;
+                
+                if (success) {
+                    statusIcon.classList.add('success');
+                    statusIcon.classList.remove('error');
+                    statusIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                } else {
+                    statusIcon.classList.add('error');
+                    statusIcon.classList.remove('success');
+                    statusIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                }
+            }
+            
+            function enableChat() {
+                messageInput.disabled = false;
+                sendMessageBtn.disabled = false;
+                messageInput.placeholder = "Escribe tu mensaje...";
+                addMessage('¡Conexión establecida! Ya puedes chatear con DeepSeek.', 'bot');
             }
         });
     </script>
