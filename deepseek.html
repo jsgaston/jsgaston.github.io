@@ -176,14 +176,18 @@
 
             
             try {
-                const response = await fetch(APPS_SCRIPT_URL, {
+                   const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Agrega esto para evitar errores CORS en el navegador
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ prompt: userMessage })
                 });
+                
+                const jsonResponse = await response.json();
+                const botResponse = jsonResponse.response;
+                appendMessage('bot', botResponse);
+
             
                 // Lee la respuesta como texto y luego extrae el JSON
                 const responseData = await response.text();
