@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conexión con DeepSeek - Solución Alternativa</title>
+    <title>Conexión DeepSeek con Python Simulado</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -33,7 +33,7 @@
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         
@@ -100,20 +100,6 @@
             display: block;
         }
         
-        .iframe-container {
-            width: 100%;
-            height: 600px;
-            border: 2px solid #e2e8f0;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-        
-        .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
         .form-group {
             margin-bottom: 20px;
         }
@@ -157,26 +143,6 @@
         button:hover {
             background: var(--secondary-color);
             transform: translateY(-2px);
-        }
-        
-        .instructions {
-            background: #f1f8ff;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            margin-top: 30px;
-        }
-        
-        .instructions h3 {
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-        }
-        
-        .instructions ol {
-            padding-left: 20px;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
         }
         
         .status {
@@ -223,8 +189,57 @@
             margin-bottom: 15px;
         }
         
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .code-editor {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            min-height: 300px;
+            overflow: auto;
+        }
+        
+        .code-output {
+            background: #f8f8f8;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            min-height: 300px;
+            overflow: auto;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .python-keyword {
+            color: #ff79c6;
+        }
+        
+        .python-string {
+            color: #f1fa8c;
+        }
+        
+        .python-comment {
+            color: #6272a4;
+        }
+        
+        .python-function {
+            color: #50fa7b;
+        }
+        
+        .api-management {
+            background: #f1f8ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 768px) {
-            .solution-options {
+            .solution-options, .editor-container {
                 grid-template-columns: 1fr;
             }
         }
@@ -233,140 +248,114 @@
 <body>
     <div class="container">
         <header>
-            <h1>Solución: Error "Insufficient Balance"</h1>
-            <p class="subtitle">Alternativas para usar DeepSeek sin créditos en la API</p>
+            <h1>Conexión con DeepSeek usando Python</h1>
+            <p class="subtitle">Simulación de código Python en el navegador</p>
         </header>
         
         <div class="card">
-            <h2 class="card-title">¿Por qué aparece el error "Insufficient Balance"?</h2>
-            <p>Este error significa que tu cuenta de DeepSeek API no tiene suficientes créditos para procesar solicitudes. La API de DeepSeek funciona con un sistema de créditos que se consumen con cada solicitud.</p>
+            <h2 class="card-title">Gestión de API Key</h2>
             
-            <div class="solution-options">
-                <div class="solution-card">
-                    <h3>Opción 1: Recargar Créditos</h3>
-                    <p>Accede a tu cuenta de DeepSeek y añade créditos a tu API key.</p>
-                    <button onclick="window.open('https://platform.deepseek.com/', '_blank')">
-                        Ir a DeepSeek
-                    </button>
-                </div>
-                
-                <div class="solution-card">
-                    <h3>Opción 2: Usar mediante iframe</h3>
-                    <p>Accede a DeepSeek Chat a través de un iframe (puede tener limitaciones).</p>
-                    <button onclick="showTab('iframe-tab')">
-                        Usar iframe
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('api-tab')">Conexión API</div>
-            <div class="tab" onclick="showTab('iframe-tab')">Conexión por iframe</div>
-        </div>
-        
-        <div id="api-tab" class="tab-content active">
-            <div class="card">
-                <h2 class="card-title">Conexión mediante API</h2>
-                <p>Si decides recargar créditos en tu cuenta de DeepSeek, puedes usar esta opción.</p>
-                
+            <div class="api-management">
                 <div class="form-group">
                     <label for="api-key">Clave API de DeepSeek</label>
                     <input type="password" id="api-key" placeholder="Ingresa tu API key">
                 </div>
                 
                 <div class="form-group">
-                    <label for="api-endpoint">Endpoint de la API</label>
-                    <select id="api-endpoint">
-                        <option value="https://api.deepseek.com/v1/chat/completions">Endpoint Oficial</option>
-                    </select>
+                    <label for="api-file">O selecciona un archivo con tu API key</label>
+                    <input type="file" id="api-file" accept=".txt">
                 </div>
                 
-                <button id="test-api">
-                    Probar Conexión
+                <button id="save-api">
+                    Guardar API Key
                 </button>
                 
                 <div id="api-status" class="status"></div>
             </div>
         </div>
         
-        <div id="iframe-tab" class="tab-content">
-            <div class="card">
-                <h2 class="card-title">Conexión mediante iframe</h2>
-                <p>Esta opción te permite usar DeepSeek Chat directamente a través de su interfaz web.</p>
+        <div class="card">
+            <h2 class="card-title">Editor de Python Simulado</h2>
+            <p>Escribe o pega tu código Python para interactuar con DeepSeek API. Esta es una simulación que se ejecuta en JavaScript.</p>
+            
+            <div class="editor-container">
+                <div class="code-editor" id="python-editor" contenteditable="true"># Simulador de Python para DeepSeek
+# Escribe tu código aquí
+
+# Leer API key del almacenamiento local
+api_key = localStorage.get('deepseek_api_key')
+
+if api_key:
+    print("API Key encontrada:", api_key[:10] + "...")
+else:
+    print("No se encontró API Key. Guarda una primero.")
+
+# Ejemplo de solicitud a la API
+def consultar_deepseek(pregunta):
+    # Simulación de una solicitud a la API
+    print(f"Enviando pregunta: {pregunta}")
+    
+    # En un entorno real, aquí usarías requests.post()
+    respuesta_simulada = f"DeepSeek responde: Has preguntado sobre '{pregunta}'. Esto es una simulación."
+    
+    return respuesta_simulada
+
+# Ejemplo de uso
+if api_key:
+    respuesta = consultar_deepseek("¿Cómo funciona la API de DeepSeek?")
+    print(respuesta)
+</div>
                 
-                <div class="form-group">
-                    <label for="iframe-url">URL de DeepSeek Chat</label>
-                    <input type="text" id="iframe-url" value="https://chat.deepseek.com/" placeholder="URL de DeepSeek Chat">
+                <div class="code-output" id="output">
+                    <p>> El resultado de tu código aparecerá aquí</p>
                 </div>
-                
-                <button onclick="loadIframe()">
-                    Cargar DeepSeek Chat
-                </button>
             </div>
             
-            <div class="iframe-container">
-                <iframe id="deepseek-iframe" src="about:blank"></iframe>
-            </div>
+            <button id="run-code">
+                Ejecutar Código
+            </button>
+            <button id="reset-code">
+                Restablecer Código
+            </button>
         </div>
         
-        <div class="instructions">
-            <h3>Ventajas y desventajas de cada método</h3>
+        <div class="card">
+            <h2 class="card-title">Ejemplos de Código</h2>
             
             <div class="solution-options">
-                <div>
-                    <h4>Conexión API</h4>
-                    <ul>
-                        <li><strong>Ventajas:</strong> Mayor control, integración personalizada, respuesta en JSON</li>
-                        <li><strong>Desventajas:</strong> Requiere créditos, necesita configuración</li>
-                    </ul>
+                <div class="solution-card">
+                    <h3>Conexión Básica</h3>
+                    <p>Ejemplo simple de conexión con la API</p>
+                    <button onclick="loadExample('basic')">
+                        Cargar Ejemplo
+                    </button>
                 </div>
                 
-                <div>
-                    <h4>Conexión iframe</h4>
-                    <ul>
-                        <li><strong>Ventajas:</strong> No requiere créditos, interfaz completa</li>
-                        <li><strong>Desventajas:</strong> Menor control, puede haber restricciones de embedding</li>
-                    </ul>
+                <div class="solution-card">
+                    <h3>Chat Completo</h3>
+                    <p>Ejemplo de conversación con DeepSeek</p>
+                    <button onclick="loadExample('chat')">
+                        Cargar Ejemplo
+                    </button>
                 </div>
             </div>
-            
-            <p>Si necesitas una integración personalizada en tu aplicación, la opción de API es la mejor pero requiere créditos. Si solo necesitas acceso al chat, el iframe puede ser una solución temporal.</p>
         </div>
     </div>
 
     <script>
-        function showTab(tabId) {
-            // Ocultar todos los tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Mostrar el tab seleccionado
-            document.getElementById(tabId).classList.add('active');
-            
-            // Activar el botón del tab
-            document.querySelectorAll('.tab').forEach(tab => {
-                if (tab.onclick.toString().includes(tabId)) {
-                    tab.classList.add('active');
-                }
-            });
-        }
-        
-        function loadIframe() {
-            const url = document.getElementById('iframe-url').value;
-            if (url) {
-                document.getElementById('deepseek-iframe').src = url;
-            } else {
-                alert('Por favor, ingresa una URL válida');
+        // Mostrar la API key guardada si existe
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedApiKey = localStorage.getItem('deepseek_api_key');
+            if (savedApiKey) {
+                document.getElementById('api-key').value = savedApiKey;
             }
-        }
+            
+            // Configurar el editor de código
+            highlightCode();
+        });
         
-        document.getElementById('test-api').addEventListener('click', async function() {
+        // Guardar API key
+        document.getElementById('save-api').addEventListener('click', function() {
             const apiKey = document.getElementById('api-key').value;
             const apiStatus = document.getElementById('api-status');
             
@@ -378,37 +367,243 @@
                 return;
             }
             
-            apiStatus.textContent = 'Probando conexión...';
-            apiStatus.classList.remove('error', 'success');
+            localStorage.setItem('deepseek_api_key', apiKey);
+            apiStatus.textContent = 'API Key guardada correctamente';
+            apiStatus.classList.remove('error');
+            apiStatus.classList.add('success');
             apiStatus.style.display = 'block';
-            
-            try {
-                // Simulamos una prueba de conexión
-                const response = await fetch('https://api.deepseek.com/v1/models', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`
-                    }
-                });
-                
-                if (response.ok) {
-                    apiStatus.textContent = '¡Conexión exitosa! Tu API key es válida.';
-                    apiStatus.classList.remove('error');
-                    apiStatus.classList.add('success');
-                } else {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-            } catch (error) {
-                apiStatus.textContent = 'Error: ' + error.message;
-                apiStatus.classList.remove('success');
-                apiStatus.classList.add('error');
-            }
         });
         
-        // Cargar el iframe por defecto
-        window.onload = function() {
-            document.getElementById('iframe-url').value = 'https://chat.deepseek.com/';
-        };
+        // Cargar API key desde archivo
+        document.getElementById('api-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const apiKey = e.target.result.trim();
+                document.getElementById('api-key').value = apiKey;
+                
+                // Guardar automáticamente
+                localStorage.setItem('deepseek_api_key', apiKey);
+                document.getElementById('api-status').textContent = 'API Key cargada desde archivo y guardada';
+                document.getElementById('api-status').classList.remove('error');
+                document.getElementById('api-status').classList.add('success');
+                document.getElementById('api-status').style.display = 'block';
+            };
+            reader.readAsText(file);
+        });
+        
+        // Ejecutar código Python simulado
+        document.getElementById('run-code').addEventListener('click', function() {
+            const code = document.getElementById('python-editor').textContent;
+            const outputElement = document.getElementById('output');
+            
+            outputElement.innerHTML = '<p>> Ejecutando código...</p>';
+            
+            // Simular ejecución con un pequeño retraso
+            setTimeout(function() {
+                try {
+                    const result = executePythonCode(code);
+                    outputElement.innerHTML = '<p>> Resultado:</p>' + result;
+                } catch (error) {
+                    outputElement.innerHTML = '<p style="color: red;">> Error: ' + error.message + '</p>';
+                }
+            }, 500);
+        });
+        
+        // Restablecer código
+        document.getElementById('reset-code').addEventListener('click', function() {
+            document.getElementById('python-editor').textContent = `# Simulador de Python para DeepSeek
+# Escribe tu código aquí
+
+# Leer API key del almacenamiento local
+api_key = localStorage.get('deepseek_api_key')
+
+if api_key:
+    print("API Key encontrada:", api_key[:10] + "...")
+else:
+    print("No se encontró API Key. Guarda una primero.")
+
+# Ejemplo de solicitud a la API
+def consultar_deepseek(pregunta):
+    # Simulación de una solicitud a la API
+    print(f"Enviando pregunta: {pregunta}")
+    
+    # En un entorno real, aquí usarías requests.post()
+    respuesta_simulada = f"DeepSeek responde: Has preguntado sobre '{pregunta}'. Esto es una simulación."
+    
+    return respuesta_simulada
+
+# Ejemplo de uso
+if api_key:
+    respuesta = consultar_deepseek("¿Cómo funciona la API de DeepSeek?")
+    print(respuesta)`;
+            
+            highlightCode();
+            document.getElementById('output').innerHTML = '<p>> El resultado de tu código aparecerá aquí</p>';
+        });
+        
+        // Función para "ejecutar" el código Python (simulado)
+        function executePythonCode(code) {
+            const apiKey = localStorage.getItem('deepseek_api_key') || '';
+            
+            // Simular algunas funciones de Python
+            const print = (...args) => {
+                return args.map(arg => {
+                    if (typeof arg === 'object') return JSON.stringify(arg);
+                    return String(arg);
+                }).join(' ') + '<br>';
+            };
+            
+            // Simular localStorage para el código "Python"
+            const localStorageSim = {
+                get: (key) => {
+                    if (key === 'deepseek_api_key') return apiKey;
+                    return null;
+                }
+            };
+            
+            // Capturar console.log
+            let output = '';
+            const console = {
+                log: (...args) => {
+                    output += print(...args);
+                }
+            };
+            
+            // Ejecutar las funciones simuladas
+            try {
+                // Reemplazar funciones de Python con versiones JavaScript
+                const jsCode = code
+                    .replace(/print\((.*)\)/g, 'console.log($1)')
+                    .replace(/localStorage\.get\(/g, 'localStorageSim.get(');
+                
+                // Ejecutar el código modificado
+                eval(jsCode);
+                
+                return output || '<p>> El código se ejecutó pero no produjo output</p>';
+            } catch (error) {
+                throw new Error(error.message);
+            }
+        }
+        
+        // Resaltar sintaxis para el código Python
+        function highlightCode() {
+            const editor = document.getElementById('python-editor');
+            let code = editor.textContent;
+            
+            // Resaltar palabras clave
+            code = code.replace(/(#.*)/g, '<span class="python-comment">$1</span>');
+            code = code.replace(/\b(def|if|else|return|print|for|while|in|import|from|as|True|False|None)\b/g, '<span class="python-keyword">$1</span>');
+            code = code.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\(/g, '<span class="python-function">$1</span>(');
+            code = code.replace(/(".*?"|'.*?')/g, '<span class="python-string">$1</span>');
+            
+            editor.innerHTML = code;
+        }
+        
+        // Cargar ejemplos de código
+        function loadExample(type) {
+            const editor = document.getElementById('python-editor');
+            
+            if (type === 'basic') {
+                editor.textContent = `# Conexión básica con DeepSeek API
+api_key = localStorage.get('deepseek_api_key')
+
+if not api_key:
+    print("Error: No se encontró API Key")
+else:
+    print("Conectando con DeepSeek API...")
+    print("API Key:", api_key[:8] + "..." + api_key.slice(-4))
+    
+    # Simular una solicitud HTTP
+    import requests
+    
+    url = "https://api.deepseek.com/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "user", "content": "Hola, ¿puedes ayudarme?"}
+        ]
+    }
+    
+    # response = requests.post(url, json=data, headers=headers)
+    # print("Respuesta recibida:", response.json())
+    
+    # Simulación de respuesta
+    respuesta_simulada = {
+        "choices": [
+            {
+                "message": {
+                    "content": "¡Hola! Claro que puedo ayudarte. ¿En qué necesitas asistencia?"
+                }
+            }
+        ]
+    }
+    
+    print("Respuesta simulada:", respuesta_simulada["choices"][0]["message"]["content"])`;
+            } else if (type === 'chat') {
+                editor.textContent = `# Chat completo con DeepSeek
+api_key = localStorage.get('deepseek_api_key')
+
+def chat_con_deepseek(mensaje, historial=[]):
+    if not api_key:
+        return "Error: No hay API Key configurada", historial
+    
+    # Agregar el nuevo mensaje al historial
+    historial.append({"role": "user", "content": mensaje})
+    
+    # Preparar la solicitud
+    url = "https://api.deepseek.com/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "model": "deepseek-chat",
+        "messages": historial,
+        "temperature": 0.7
+    }
+    
+    # Simular envío de solicitud (en realidad sería: response = requests.post(...))
+    # response = requests.post(url, json=data, headers=headers)
+    # respuesta = response.json()
+    
+    # Simulación de respuesta
+    respuesta_simulada = {
+        "choices": [
+            {
+                "message": {
+                    "content": f"Entendí tu mensaje: '{mensaje}'. Esto es una simulación de respuesta."
+                }
+            }
+        ]
+    }
+    
+    contenido_respuesta = respuesta_simulada["choices"][0]["message"]["content"]
+    
+    # Agregar la respuesta al historial
+    historial.append({"role": "assistant", "content": contenido_respuesta})
+    
+    return contenido_respuesta, historial
+
+# Ejemplo de conversación
+historial_conversacion = []
+respuesta, historial_conversacion = chat_con_deepseek("Hola, ¿cómo estás?", historial_conversacion)
+print("DeepSeek:", respuesta)
+
+respuesta, historial_conversacion = chat_con_deepseek("¿Puedes explicarme cómo funciona tu API?", historial_conversacion)
+print("DeepSeek:", respuesta)`;
+            }
+            
+            highlightCode();
+        }
     </script>
 </body>
 </html>
