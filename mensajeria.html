@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Bonito 😎</title>
+    <title>Mensajería con Destinatarios</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* (El mismo CSS de la versión anterior) */
         body {
             font-family: 'Roboto', Arial, sans-serif;
             margin: 0;
@@ -73,12 +74,13 @@
         }
         .controls {
             display: flex;
+            flex-wrap: wrap; /* Permite que los elementos se envuelvan si no caben */
             padding: 15px;
             gap: 10px;
             border-top: 1px solid #eee;
             background-color: #fff;
         }
-        .controls input[type="text"] {
+        .controls input[type="text"], .controls select {
             flex-grow: 1;
             border: 1px solid #ccc;
             border-radius: 20px;
@@ -127,12 +129,13 @@
 <body>
 
     <div class="container">
-        <h1>Mensajería Bonita ✨</h1>
+        <h1>Mensajería con Destinatarios</h1>
         
         <div class="chat-container" id="chat-container"></div>
 
         <div class="controls">
             <input type="text" id="sender-name" placeholder="Tu nombre..." required>
+            <select id="recipient-select"></select>
             <input type="text" id="message-input" placeholder="Escribe tu mensaje..." style="flex-grow: 1;">
             <label for="photo-file">📸</label>
             <input type="file" id="photo-file" accept="image/*">
@@ -142,31 +145,59 @@
 
     <script>
         // Reemplaza 'TU_URL_DE_APLICACION_WEB' con la URL de tu Apps Script.
-        const WEB_APP_URL = 'TU_URL_DE_APLICACION_WEB';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyunB8rjKss10LSJUh3ml9x6FrDtert_BtxdvhA-LHPl_OU31qAe12twlRYaFnio7urDw/exec';
 
         const chatContainer = document.getElementById('chat-container');
         const senderInput = document.getElementById('sender-name');
+        const recipientSelect = document.getElementById('recipient-select');
         const messageInput = document.getElementById('message-input');
         const photoFileInput = document.getElementById('photo-file');
 
-        // Guarda el nombre del usuario en el navegador
+        // Guarda el nombre del usuario y el destinatario seleccionado
         senderInput.value = localStorage.getItem('chatUsername') || '';
         senderInput.addEventListener('change', () => {
             localStorage.setItem('chatUsername', senderInput.value);
         });
 
-        async function fetchMessages() {
+        async function fetchRecipients() {
             try {
-                const response = await fetch(`${WEB_APP_URL}?action=getMessages`);
+                const response = await fetch(`${WEB_APP_URL}?action=getRecipients`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    // Limpia y añade la opción "Todos"
+                    recipientSelect.innerHTML = `<option value="todos">Todos</option>`;
+                    result.recipients.forEach(recipient => {
+                        const option = document.createElement('option');
+                        option.value = recipient.id;
+                        option.textContent = recipient.name;
+                        recipientSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error("Error al obtener destinatarios:", error);
+            }
+        }
+
+        async function fetchMessages() {
+            const currentSenderId = senderInput.value.trim().toLowerCase().replace(/\s/g, '_');
+            if (!currentSenderId) {
+                // No hay remitente, no se pueden filtrar los mensajes.
+                return;
+            }
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=getMessages&forRecipient=${currentSenderId}`);
                 const result = await response.json();
                 
                 if (result.status === 'success') {
                     chatContainer.innerHTML = '';
                     result.messages.forEach(msg => {
                         const messageDiv = document.createElement('div');
-                        messageDiv.className = `message received`; // Puedes cambiar esto para que los mensajes del usuario sean diferentes
+                        const isSent = msg.sender.toLowerCase().replace(/\s/g, '_') === currentSenderId;
+                        const isPublic = msg.recipient === 'todos';
                         
-                        let contentHtml = `<div class="sender">${msg.sender}</div>`;
+                        messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                        
+                        let contentHtml = `<div class="sender">${msg.sender} ${isPublic ? '' : ' ➡️ ' + msg.recipient}</div>`;
                         
                         if (msg.message) {
                             contentHtml += `<div class="message-text">${parseMessage(msg.message)}</div>`;
@@ -187,16 +218,15 @@
         }
 
         function parseMessage(text) {
-            // Convierte URLs de YouTube, Spotify y otras en elementos HTML incrustados o enlaces
             const youtubeRegex = /(https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})|https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{11}))/;
-            const spotifyRegex = /(https?:\/\/(?:open\.)?spotify\.com\/(track|album|artist)\/[a-zA-Z0-9]{22})/;
+            const spotifyRegex = /(https?:\/\/(?:open\.)?spotify\.com\/(track|album|artist|playlist)\/[a-zA-Z0-9]{22})/;
             const urlRegex = /(https?:\/\/[^\s]+)/;
 
             let result = text.replace(youtubeRegex, (match, url, id1, id2) => {
                 const videoId = id1 || id2;
                 return `<div class="media-link"><iframe src="https://www.youtube.com/embed/${videoId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-            }).replace(spotifyRegex, (match, url, type, id) => {
-                return `<div class="media-link"><iframe src="${url.replace('spotify.com/', 'spotify.com/embed/')}" allow="encrypted-media" allowfullscreen></iframe></div>`;
+            }).replace(spotifyRegex, (match, url) => {
+                return `<div class="media-link"><iframe src="https://open.spotify.com/embed?uri=${encodeURIComponent(url)}" allow="encrypted-media" allowfullscreen></iframe></div>`;
             }).replace(urlRegex, (match, url) => {
                 return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
             });
@@ -206,6 +236,7 @@
 
         async function sendMessage() {
             const sender = senderInput.value.trim();
+            const recipient = recipientSelect.value;
             const message = messageInput.value.trim();
 
             if (!sender || !message) {
@@ -216,6 +247,7 @@
             const data = {
                 action: 'sendMessage',
                 sender: sender,
+                recipient: recipient, // Nuevo
                 message: message
             };
 
@@ -231,6 +263,7 @@
 
         async function uploadPhoto() {
             const sender = senderInput.value.trim();
+            const recipient = recipientSelect.value; // Nuevo
             const photoFile = photoFileInput.files[0];
 
             if (!sender || !photoFile) {
@@ -244,6 +277,7 @@
                 const data = {
                     action: 'uploadPhoto',
                     sender: sender,
+                    recipient: recipient, // Nuevo
                     fileName: photoFile.name,
                     mimeType: photoFile.type,
                     photoData: base64Data
@@ -261,13 +295,16 @@
             reader.readAsBinaryString(photoFile);
         }
 
-        // Detecta el cambio en el archivo y sube la foto automáticamente
         photoFileInput.addEventListener('change', uploadPhoto);
-
+        
+        // Actualiza los mensajes cuando cambias de destinatario
+        recipientSelect.addEventListener('change', fetchMessages);
+        
+        // Carga la lista de destinatarios al iniciar
+        fetchRecipients();
+        
         // Actualiza los mensajes cada 5 segundos
         setInterval(fetchMessages, 5000);
-        fetchMessages();
-
     </script>
 </body>
 </html>
