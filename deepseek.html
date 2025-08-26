@@ -174,18 +174,21 @@
             loadingIndicator.style.display = 'block';
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
+            
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors', // Agrega esto para evitar errores CORS en el navegador
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ prompt: userMessage })
                 });
             
-                // Lee la respuesta como JSON
-                const responseData = await response.json(); 
-                const botResponse = responseData.response; // Accede a la propiedad 'response' del JSON
+                // Lee la respuesta como texto y luego extrae el JSON
+                const responseData = await response.text();
+                const jsonResponse = JSON.parse(responseData);
+                const botResponse = jsonResponse.response;
             
                 appendMessage('bot', botResponse);
             } catch (error) {
