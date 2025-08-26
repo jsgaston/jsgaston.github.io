@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conexión Real con DeepSeek API</title>
+    <title>Conexión con DeepSeek API</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -323,13 +323,17 @@
             border-radius: 4px;
             font-size: 14px;
         }
+
+        .manual-key-input {
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Conexión Real con DeepSeek API</h1>
-            <p class="subtitle">Integración real con la API de DeepSeek</p>
+            <h1>Conexión con DeepSeek API</h1>
+            <p class="subtitle">Solución de problemas de conexión</p>
         </header>
         
         <div class="api-config">
@@ -343,12 +347,26 @@
                 
                 <div class="form-group">
                     <label for="api-key">Clave API de DeepSeek</label>
-                    <input type="password" id="api-key" placeholder="La API key se cargará automáticamente" readonly>
+                    <input type="password" id="api-key" placeholder="Ingresa manualmente o carga desde el servidor">
+                </div>
+
+                <div class="manual-key-input">
+                    <button id="toggle-key-visibility">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                        </svg>
+                        Mostrar/Ocultar
+                    </button>
                 </div>
                 
                 <div class="form-group">
                     <label for="api-endpoint">Endpoint de la API</label>
-                    <input type="text" id="api-endpoint" value="https://api.deepseek.com/v1/chat/completions">
+                    <select id="api-endpoint">
+                        <option value="https://api.deepseek.com/v1/chat/completions">Endpoint Oficial (api.deepseek.com)</option>
+                        <option value="https://api.deepseek.com/chat/completions">Endpoint Alternativo 1</option>
+                        <option value="https://api.deepseek.com/beta/chat/completions">Endpoint Alternativo 2</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -379,7 +397,7 @@
                     <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>API key no cargada aún</span>
+                    <span>API key no configurada aún</span>
                 </div>
                 
                 <div id="config-status" class="status"></div>
@@ -396,7 +414,7 @@
                 <div class="chat-container">
                     <div class="chat-messages" id="chat-messages">
                         <div class="message bot-message">
-                            ¡Hola! Soy DeepSeek. Haz clic en "Obtener API Key del Servidor" para cargar tu clave API y comenzar a chatear.
+                            ¡Hola! Configura tu API key para comenzar a chatear. Si tienes problemas, prueba a ingresar la clave manualmente.
                         </div>
                     </div>
                     
@@ -418,24 +436,25 @@
         </div>
         
         <div class="debug-info">
-            <h3>Información de Depuración</h3>
-            <p>Si estás recibiendo respuestas genéricas, es porque:</p>
+            <h3>Solución de Problemas</h3>
+            <p>Si no puedes conectarte, prueba lo siguiente:</p>
             <ol>
-                <li>La API key no es válida o no se está cargando correctamente</li>
-                <li>El endpoint de la API podría ser diferente al proporcionado</li>
-                <li>La API de DeepSeek podría requerir parámetros adicionales</li>
+                <li>Verifica que tu API key sea válida y esté activa</li>
+                <li>Prueba con diferentes endpoints en el selector</li>
+                <li>Si usas un archivo TXT, asegúrate de que esté en el mismo directorio y solo contenga la clave API</li>
+                <li>Revisa la consola del navegador (F12) para ver errores detallados</li>
+                <li>Si persisten los problemas, contacta con el soporte de DeepSeek</li>
             </ol>
-            <p>Revisa la consola del navegador (F12) para ver mensajes de error detallados.</p>
         </div>
         
         <div class="instructions">
-            <h3>Instrucciones para la integración real</h3>
+            <h3>Instrucciones de Uso</h3>
             <ol>
-                <li>Asegúrate de que el archivo <code>deepseekapi.txt</code> esté en tu servidor web y contenga solo la clave API</li>
-                <li>Haz clic en "Obtener API Key del Servidor" para cargarla automáticamente</li>
-                <li>Guarda la configuración para almacenarla en el navegador</li>
-                <li>¡Ya puedes comenzar a chatear con la API real de DeepSeek!</li>
-                <li>Si tienes problemas, verifica que la clave API y el endpoint sean correctos</li>
+                <li>Ingresa tu API key manualmente o haz clic en "Obtener API Key del Servidor"</li>
+                <li>Selecciona un endpoint de la lista (prueba diferentes opciones)</li>
+                <li>Selecciona el modelo que deseas utilizar</li>
+                <li>Guarda la configuración</li>
+                <li>¡Comienza a chatear!</li>
             </ol>
         </div>
     </div>
@@ -447,6 +466,7 @@
             const modelSelect = document.getElementById('model');
             const loadApiKeyBtn = document.getElementById('load-api-key');
             const saveConfigBtn = document.getElementById('save-config');
+            const toggleKeyBtn = document.getElementById('toggle-key-visibility');
             const configStatus = document.getElementById('config-status');
             const apiStatus = document.getElementById('api-status');
             const chatMessages = document.getElementById('chat-messages');
@@ -462,14 +482,24 @@
                 apiEndpointInput.value = config.apiEndpoint;
                 modelSelect.value = config.model;
                 
-                updateApiStatus(true, 'API key cargada desde almacenamiento local');
+                updateApiStatus(true, 'Configuración cargada desde almacenamiento local');
                 enableChat();
             }
+            
+            // Alternar visibilidad de la API key
+            toggleKeyBtn.addEventListener('click', function() {
+                if (apiKeyInput.type === 'password') {
+                    apiKeyInput.type = 'text';
+                    toggleKeyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/></svg> Ocultar';
+                } else {
+                    apiKeyInput.type = 'password';
+                    toggleKeyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/></svg> Mostrar';
+                }
+            });
             
             // Función para obtener la API key del servidor
             loadApiKeyBtn.addEventListener('click', async function() {
                 try {
-                    // En una implementación real, esta sería la URL a tu endpoint que sirve el archivo
                     const response = await fetch('deepseekapi.txt');
                     
                     if (!response.ok) {
@@ -492,19 +522,21 @@
                 } catch (error) {
                     console.error('Error al cargar la API key:', error);
                     updateApiStatus(false, 'Error: ' + error.message);
+                    addMessage('No se pudo cargar la API key automáticamente. Por favor, ingrésala manualmente.', 'bot');
                 }
             });
             
             // Guardar configuración
             saveConfigBtn.addEventListener('click', function() {
                 const apiKey = apiKeyInput.value.trim();
-                const apiEndpoint = apiEndpointInput.value.trim();
+                const apiEndpoint = apiEndpointInput.value;
                 const model = modelSelect.value;
                 
                 if (!apiKey) {
-                    configStatus.textContent = 'Por favor, carga primero la API key.';
+                    configStatus.textContent = 'Por favor, ingresa una API key válida.';
                     configStatus.classList.remove('success');
                     configStatus.classList.add('error');
+                    configStatus.style.display = 'block';
                     return;
                 }
                 
@@ -519,6 +551,9 @@
                 configStatus.textContent = 'Configuración guardada correctamente.';
                 configStatus.classList.remove('error');
                 configStatus.classList.add('success');
+                configStatus.style.display = 'block';
+                
+                enableChat();
             });
             
             // Enviar mensaje
@@ -551,7 +586,7 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
                 try {
-                    // Llamada REAL a la API de DeepSeek
+                    // Llamada a la API de DeepSeek
                     const response = await fetch(config.apiEndpoint, {
                         method: 'POST',
                         headers: {
@@ -599,9 +634,11 @@
                     if (error.message.includes('401')) {
                         addMessage('Error de autenticación: La API key no es válida.', 'bot');
                     } else if (error.message.includes('404')) {
-                        addMessage('Endpoint no encontrado. Verifica la URL de la API.', 'bot');
+                        addMessage('Endpoint no encontrado. Prueba con un endpoint diferente.', 'bot');
                     } else if (error.message.includes('429')) {
                         addMessage('Límite de tasa excedido. Por favor, espera un momento.', 'bot');
+                    } else if (error.message.includes('Failed to fetch')) {
+                        addMessage('Error de conexión. Verifica tu conexión a internet o prueba con un endpoint diferente.', 'bot');
                     } else {
                         addMessage('Error al conectar con la API: ' + error.message, 'bot');
                     }
@@ -628,10 +665,12 @@
                     statusIcon.classList.add('success');
                     statusIcon.classList.remove('error');
                     statusIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                    apiStatus.style.background = '#d1fae5';
                 } else {
                     statusIcon.classList.add('error');
                     statusIcon.classList.remove('success');
                     statusIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+                    apiStatus.style.background = '#fee2e2';
                 }
             }
             
@@ -639,7 +678,7 @@
                 messageInput.disabled = false;
                 sendMessageBtn.disabled = false;
                 messageInput.placeholder = "Escribe tu mensaje...";
-                addMessage('¡Conexión establecida! Ya puedes chatear con DeepSeek.', 'bot');
+                addMessage('¡Configuración guardada! Ya puedes chatear con DeepSeek.', 'bot');
             }
         });
     </script>
