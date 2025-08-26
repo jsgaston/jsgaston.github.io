@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargar API Key de DeepSeek desde Archivo</title>
+    <title>Chat con DeepSeek</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -30,431 +30,181 @@
             line-height: 1.6;
             padding: 20px;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-        }
-        
-        h1 {
-            color: var(--secondary-color);
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: var(--accent-color);
-            font-size: 1.2rem;
-            font-weight: 400;
-        }
-        
-        .card {
-            background: white;
+            max-width: 800px;
+            width: 100%;
+            background-color: #ffffff;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .card-title {
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-            font-size: 1.4rem;
+            padding: 30px;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            gap: 20px;
         }
-        
-        .form-group {
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
             margin-bottom: 20px;
+            font-size: 2.5em;
         }
         
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--secondary-color);
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e2e8f0;
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
             border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: border-color 0.3s;
+            background-color: #f9f9f9;
+            height: 400px;
+            overflow-y: auto;
+            word-wrap: break-word;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            line-height: 1.5;
         }
         
-        input:focus, textarea:focus, select:focus {
+        .user-message {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            background-color: var(--secondary-color);
+            color: var(--light-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        #userInput {
+            flex-grow: 1;
+            padding: 15px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        #userInput:focus {
             outline: none;
             border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(67, 97, 238, 0.5);
         }
         
         button {
-            background: var(--primary-color);
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 14px 25px;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-weight: 600;
+            padding: 15px 25px;
+            border-radius: 25px;
             cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         
         button:hover {
-            background: var(--secondary-color);
+            background-color: var(--secondary-color);
             transform: translateY(-2px);
         }
-        
-        .status {
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .status.success {
-            background: #d1fae5;
-            color: #065f46;
-            display: block;
-        }
-        
-        .status.error {
-            background: #fee2e2;
-            color: #b91c1c;
-            display: block;
-        }
-        
-        .api-display {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-top: 20px;
-            word-break: break-all;
-            font-family: monospace;
-            display: none;
-        }
-        
-        .api-test {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #e2e8f0;
-        }
-        
-        .instructions {
-            background: #f1f8ff;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            margin-top: 30px;
-        }
-        
-        .instructions h3 {
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-        }
-        
-        .instructions ol {
-            padding-left: 20px;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-        }
-        
-        .file-input-container {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .file-input-button {
-            background: var(--accent-color);
-            padding: 14px 20px;
-            border-radius: var(--border-radius);
-            color: white;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            margin-bottom: 15px;
-        }
-        
-        .file-input {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        
-        .file-name {
-            text-align: center;
+
+        #loadingIndicator {
+            color: #555;
             font-style: italic;
+            text-align: center;
             margin-top: 10px;
-        }
-        
-        .connection-test {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            margin-top: 20px;
-        }
-        
-        .test-result {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            display: none;
-        }
-        
-        .test-result.success {
-            background: #d1fae5;
-            color: #065f46;
-            display: block;
-        }
-        
-        .test-result.error {
-            background: #fee2e2;
-            color: #b91c1c;
-            display: block;
-        }
-        
-        .hidden {
             display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Cargar API Key desde Archivo</h1>
-            <p class="subtitle">Conecta con DeepSeek usando tu archivo deepseekapi.txt</p>
-        </header>
-        
-        <div class="card">
-            <h2 class="card-title">Cargar API Key desde Archivo</h2>
-            <p>Selecciona tu archivo <strong>deepseekapi.txt</strong> que está en el servidor para cargar la API key automáticamente.</p>
-            
-            <div class="file-input-container">
-                <div class="file-input-button">
-                    Seleccionar archivo deepseekapi.txt
-                </div>
-                <input type="file" id="file-input" class="file-input" accept=".txt">
-                <div id="file-name" class="file-name">No se ha seleccionado ningún archivo</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="api-key">API Key (cargada desde archivo)</label>
-                <input type="password" id="api-key" placeholder="La API key aparecerá aquí después de cargar el archivo" readonly>
-            </div>
-            
-            <button id="load-from-server">
-                Cargar desde Ruta del Servidor
-            </button>
-            
-            <div id="api-status" class="status"></div>
-            
-            <div id="api-display" class="api-display">
-                <strong>API Key cargada:</strong> <span id="api-key-display"></span>
-            </div>
+        <h1>DeepSeek Chat</h1>
+        <div class="chat-container" id="chatContainer">
+            <div class="bot-message message">¡Hola! ¿En qué puedo ayudarte hoy?</div>
         </div>
-        
-        <div class="card">
-            <h2 class="card-title">Probar Conexión con DeepSeek</h2>
-            <p>Una vez cargada tu API key, puedes probar la conexión con los servidores de DeepSeek.</p>
-            
-            <div class="connection-test">
-                <button id="test-connection">
-                    Probar Conexión con DeepSeek
-                </button>
-                
-                <div id="test-result" class="test-result"></div>
-                
-                <div id="connection-details" class="hidden">
-                    <div class="form-group">
-                        <label for="api-query">Consulta de prueba</label>
-                        <textarea id="api-query" rows="3" placeholder="Escribe tu consulta para DeepSeek">¿Puedes explicarme cómo funciona la API de DeepSeek?</textarea>
-                    </div>
-                    
-                    <button id="send-query">
-                        Enviar Consulta
-                    </button>
-                    
-                    <div class="form-group">
-                        <label for="api-response">Respuesta</label>
-                        <textarea id="api-response" rows="5" placeholder="La respuesta de DeepSeek aparecerá aquí" readonly></textarea>
-                    </div>
-                </div>
-            </div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje aquí...">
+            <button id="sendBtn">Enviar</button>
         </div>
-        
-        <div class="instructions">
-            <h3>Instrucciones para usar la API Key desde archivo</h3>
-            <ol>
-                <li>Asegúrate de que el archivo <strong>deepseekapi.txt</strong> esté en tu servidor</li>
-                <li>Haz clic en "Seleccionar archivo" para cargarlo desde tu dispositivo</li>
-                <li>O haz clic en "Cargar desde Ruta del Servidor" para intentar cargarlo automáticamente</li>
-                <li>Una vez cargada la API key, podrás probar la conexión con DeepSeek</li>
-                <li>Si la conexión es exitosa, puedes enviar consultas a la API</li>
-            </ol>
-            
-            <p><strong>Nota:</strong> Esta implementación simula la carga desde el servidor. En un entorno real, necesitarías implementar un endpoint en tu servidor que sirva el contenido del archivo.</p>
-        </div>
+        <div id="loadingIndicator">Cargando respuesta...</div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('file-input');
-            const fileName = document.getElementById('file-name');
-            const apiKeyInput = document.getElementById('api-key');
-            const apiStatus = document.getElementById('api-status');
-            const apiDisplay = document.getElementById('api-display');
-            const apiKeyDisplay = document.getElementById('api-key-display');
-            const loadFromServerBtn = document.getElementById('load-from-server');
-            const testConnectionBtn = document.getElementById('test-connection');
-            const testResult = document.getElementById('test-result');
-            const connectionDetails = document.getElementById('connection-details');
-            const sendQueryBtn = document.getElementById('send-query');
-            const apiQuery = document.getElementById('api-query');
-            const apiResponse = document.getElementById('api-response');
-            
-            // Manejar la selección de archivo
-            fileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                fileName.textContent = file.name;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result.trim();
-                    if (content) {
-                        apiKeyInput.value = content;
-                        apiKeyDisplay.textContent = content;
-                        apiDisplay.style.display = 'block';
-                        
-                        apiStatus.textContent = 'API Key cargada correctamente desde archivo';
-                        apiStatus.classList.remove('error');
-                        apiStatus.classList.add('success');
-                        apiStatus.style.display = 'block';
-                        
-                        // Guardar en localStorage para futuros usos
-                        localStorage.setItem('deepseek_api_key', content);
-                    } else {
-                        showError('El archivo está vacío o no contiene una API key válida');
-                    }
-                };
-                reader.readAsText(file);
-            });
-            
-            // Cargar desde el servidor (simulado)
-            loadFromServerBtn.addEventListener('click', function() {
-                // En un caso real, aquí harías una petición a tu servidor
-                // para obtener el contenido de deepseekapi.txt
-                
-                // Simulamos una demora de red
-                apiStatus.textContent = 'Buscando archivo deepseekapi.txt en el servidor...';
-                apiStatus.classList.remove('error', 'success');
-                apiStatus.style.display = 'block';
-                
-                setTimeout(function() {
-                    // Simulamos una respuesta del servidor
-                    // En la práctica, necesitarías un endpoint que devuelva el contenido del archivo
-                    const simulatedApiKey = localStorage.getItem('deepseek_api_key') || 'sk-simulatedExampleKey1234567890';
-                    
-                    apiKeyInput.value = simulatedApiKey;
-                    apiKeyDisplay.textContent = simulatedApiKey;
-                    apiDisplay.style.display = 'block';
-                    
-                    apiStatus.textContent = 'API Key cargada desde servidor (simulación)';
-                    apiStatus.classList.remove('error');
-                    apiStatus.classList.add('success');
-                    
-                    // Guardar en localStorage
-                    localStorage.setItem('deepseek_api_key', simulatedApiKey);
-                }, 1500);
-            });
-            
-            // Probar conexión
-            testConnectionBtn.addEventListener('click', function() {
-                const apiKey = apiKeyInput.value;
-                if (!apiKey) {
-                    showError('Primero debes cargar una API key');
-                    return;
-                }
-                
-                testResult.textContent = 'Probando conexión con DeepSeek...';
-                testResult.classList.remove('success', 'error');
-                testResult.style.display = 'block';
-                
-                // Simulamos una prueba de conexión
-                setTimeout(function() {
-                    // En un caso real, aquí harías una petición a la API de DeepSeek
-                    // para verificar que la key es válida
-                    
-                    if (apiKey.includes('simulated') || apiKey.length > 10) {
-                        testResult.textContent = '✅ Conexión exitosa con DeepSeek API';
-                        testResult.classList.add('success');
-                        connectionDetails.classList.remove('hidden');
-                    } else {
-                        testResult.textContent = '❌ Error de conexión. Verifica tu API key.';
-                        testResult.classList.add('error');
-                    }
-                }, 2000);
-            });
-            
-            // Enviar consulta
-            sendQueryBtn.addEventListener('click', function() {
-                const apiKey = apiKeyInput.value;
-                const query = apiQuery.value;
-                
-                if (!query) {
-                    alert('Por favor, escribe una consulta');
-                    return;
-                }
-                
-                apiResponse.value = 'Enviando consulta a DeepSeek...';
-                
-                // Simulamos el envío de la consulta
-                setTimeout(function() {
-                    // En un caso real, aquí harías una petición POST a la API de DeepSeek
-                    apiResponse.value = `DeepSeek Response (simulación):\n\nHe recibido tu pregunta: "${query}".\n\nEn una implementación real, esta sería la respuesta genuina de DeepSeek. Para conectar realmente, necesitarías hacer una solicitud a su endpoint API con tu clave válida.`;
-                }, 1500);
-            });
-            
-            // Comprobar si hay una API key guardada
-            const savedApiKey = localStorage.getItem('deepseek_api_key');
-            if (savedApiKey) {
-                apiKeyInput.value = savedApiKey;
-                apiKeyDisplay.textContent = savedApiKey;
-                apiDisplay.style.display = 'block';
-                
-                apiStatus.textContent = 'API Key cargada desde almacenamiento local';
-                apiStatus.classList.remove('error');
-                apiStatus.classList.add('success');
-                apiStatus.style.display = 'block';
-            }
-            
-            function showError(message) {
-                apiStatus.textContent = message;
-                apiStatus.classList.remove('success');
-                apiStatus.classList.add('error');
-                apiStatus.style.display = 'block';
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        // Reemplaza esta URL con la URL de tu aplicación web de Google Apps Script
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhM3pNrGfmiInu7UJiVE584ErmcOfGGAckDIRZji83EzX59nP6R8vc6znzteCU2dMs/exec'; 
+
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
         });
+
+        async function sendMessage() {
+            const userMessage = userInput.value.trim();
+            if (userMessage === '') {
+                return;
+            }
+
+            appendMessage('user', userMessage);
+            userInput.value = '';
+            loadingIndicator.style.display = 'block';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: userMessage })
+                });
+
+                // Apps Script con POST y no-cors devolverá un JSON vacío,
+                // así que debemos manejar la respuesta de forma diferente
+                const responseData = await response.text(); 
+                const botResponse = responseData; // El texto crudo es la respuesta
+                
+                appendMessage('bot', botResponse);
+            } catch (error) {
+                console.error('Error al llamar a la API de DeepSeek:', error);
+                appendMessage('bot', 'Hubo un error al conectar con DeepSeek. Por favor, inténtalo de nuevo más tarde.');
+            } finally {
+                loadingIndicator.style.display = 'none';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            messageDiv.textContent = text;
+            chatContainer.appendChild(messageDiv);
+        }
     </script>
 </body>
 </html>
