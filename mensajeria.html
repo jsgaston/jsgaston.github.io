@@ -3,39 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mensajería P2P</title>
+    <title>Chat Bonito 😎</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .chat-container { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; margin-bottom: 10px; }
-        .message { margin-bottom: 10px; }
-        .message-text { background: #f0f0f0; padding: 8px; border-radius: 5px; }
-        .sender { font-weight: bold; }
-        .controls { display: flex; gap: 10px; }
-        .controls input, .controls button { padding: 8px; }
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        h1 {
+            color: #4a4a4a;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .chat-container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            word-wrap: break-word;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .message.sent {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+        }
+        .message.received {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+        }
+        .sender {
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .timestamp {
+            font-size: 0.7em;
+            color: #999;
+            align-self: flex-end;
+            margin-top: 5px;
+        }
+        .controls {
+            display: flex;
+            padding: 15px;
+            gap: 10px;
+            border-top: 1px solid #eee;
+            background-color: #fff;
+        }
+        .controls input[type="text"] {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+        }
+        .controls input[type="file"] {
+            display: none;
+        }
+        .controls button, .controls label {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        .controls button:hover, .controls label:hover {
+            background-color: #45a049;
+        }
+        .media-link {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .media-link iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+        }
+        img.chat-image {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
-    <h1>Mensajería P2P</h1>
-    
-    <div class="chat-container" id="chat-container"></div>
+    <div class="container">
+        <h1>Mensajería Bonita ✨</h1>
+        
+        <div class="chat-container" id="chat-container"></div>
 
-    <div class="controls">
-        <input type="text" id="sender-name" placeholder="Tu nombre" required>
-        <input type="text" id="message-input" placeholder="Escribe tu mensaje..." style="flex-grow: 1;">
-        <input type="file" id="photo-file" accept="image/*">
-        <button onclick="sendMessage()">Enviar Mensaje</button>
-        <button onclick="uploadPhoto()">Subir Foto</button>
+        <div class="controls">
+            <input type="text" id="sender-name" placeholder="Tu nombre..." required>
+            <input type="text" id="message-input" placeholder="Escribe tu mensaje..." style="flex-grow: 1;">
+            <label for="photo-file">📸</label>
+            <input type="file" id="photo-file" accept="image/*">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
     </div>
 
     <script>
-        // Reemplaza 'TU_URL_DE_APLICACION_WEB' con la URL que copiaste en el paso 3.
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzHXNst4HLa0kPkbHrFuwERkdnFZPpe18vUttLYpnW_lsTTNSYBIKzMenVORetksw8qOw/exec';
+        // Reemplaza 'TU_URL_DE_APLICACION_WEB' con la URL de tu Apps Script.
+        const WEB_APP_URL = 'TU_URL_DE_APLICACION_WEB';
 
         const chatContainer = document.getElementById('chat-container');
         const senderInput = document.getElementById('sender-name');
         const messageInput = document.getElementById('message-input');
         const photoFileInput = document.getElementById('photo-file');
+
+        // Guarda el nombre del usuario en el navegador
+        senderInput.value = localStorage.getItem('chatUsername') || '';
+        senderInput.addEventListener('change', () => {
+            localStorage.setItem('chatUsername', senderInput.value);
+        });
 
         async function fetchMessages() {
             try {
@@ -46,15 +164,17 @@
                     chatContainer.innerHTML = '';
                     result.messages.forEach(msg => {
                         const messageDiv = document.createElement('div');
-                        messageDiv.className = 'message';
+                        messageDiv.className = `message received`; // Puedes cambiar esto para que los mensajes del usuario sean diferentes
                         
-                        let contentHtml = `<span class="sender">${msg.sender}</span>: `;
+                        let contentHtml = `<div class="sender">${msg.sender}</div>`;
                         
                         if (msg.message) {
-                            contentHtml += `<span class="message-text">${msg.message}</span>`;
+                            contentHtml += `<div class="message-text">${parseMessage(msg.message)}</div>`;
                         } else if (msg.photoUrl) {
-                            contentHtml += `<img src="${msg.photoUrl}" alt="Foto" style="max-width: 100%;">`;
+                            contentHtml += `<img src="${msg.photoUrl}" alt="Foto" class="chat-image">`;
                         }
+                        
+                        contentHtml += `<div class="timestamp">${msg.timestamp}</div>`;
                         
                         messageDiv.innerHTML = contentHtml;
                         chatContainer.appendChild(messageDiv);
@@ -64,6 +184,24 @@
             } catch (error) {
                 console.error("Error al obtener mensajes:", error);
             }
+        }
+
+        function parseMessage(text) {
+            // Convierte URLs de YouTube, Spotify y otras en elementos HTML incrustados o enlaces
+            const youtubeRegex = /(https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})|https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{11}))/;
+            const spotifyRegex = /(https?:\/\/(?:open\.)?spotify\.com\/(track|album|artist)\/[a-zA-Z0-9]{22})/;
+            const urlRegex = /(https?:\/\/[^\s]+)/;
+
+            let result = text.replace(youtubeRegex, (match, url, id1, id2) => {
+                const videoId = id1 || id2;
+                return `<div class="media-link"><iframe src="https://www.youtube.com/embed/${videoId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+            }).replace(spotifyRegex, (match, url, type, id) => {
+                return `<div class="media-link"><iframe src="${url.replace('spotify.com/', 'spotify.com/embed/')}" allow="encrypted-media" allowfullscreen></iframe></div>`;
+            }).replace(urlRegex, (match, url) => {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            });
+            
+            return result;
         }
 
         async function sendMessage() {
@@ -102,7 +240,7 @@
 
             const reader = new FileReader();
             reader.onload = async function() {
-                const base64Data = btoa(reader.result);
+                const base64Data = Utilities.base64Encode(reader.result);
                 const data = {
                     action: 'uploadPhoto',
                     sender: sender,
@@ -123,7 +261,10 @@
             reader.readAsBinaryString(photoFile);
         }
 
-        // Obtener los mensajes cada 5 segundos para que el chat se actualice.
+        // Detecta el cambio en el archivo y sube la foto automáticamente
+        photoFileInput.addEventListener('change', uploadPhoto);
+
+        // Actualiza los mensajes cada 5 segundos
         setInterval(fetchMessages, 5000);
         fetchMessages();
 
