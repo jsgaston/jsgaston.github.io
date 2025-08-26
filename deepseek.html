@@ -177,18 +177,13 @@
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ prompt: userMessage })
                 });
-
-                // Apps Script con POST y no-cors devolverá un JSON vacío,
-                // así que debemos manejar la respuesta de forma diferente
-                const responseData = await response.text(); 
-                const botResponse = responseData; // El texto crudo es la respuesta
                 
+                const botResponse = await response.text(); 
                 appendMessage('bot', botResponse);
             } catch (error) {
                 console.error('Error al llamar a la API de DeepSeek:', error);
