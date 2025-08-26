@@ -6,7 +6,7 @@
     <title>Mensajería con Destinatarios</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* (El mismo CSS de la versión anterior) */
+        /* El CSS es el mismo de la versión anterior */
         body {
             font-family: 'Roboto', Arial, sans-serif;
             margin: 0;
@@ -141,17 +141,23 @@
             <input type="file" id="photo-file" accept="image/*">
             <button onclick="sendMessage()">Enviar</button>
         </div>
+
+        <div class="controls" style="border-top: none; padding-top: 0;">
+            <input type="text" id="new-recipient-input" placeholder="Añadir nuevo destinatario..." style="flex-grow: 1;">
+            <button onclick="addRecipient()">Añadir</button>
+        </div>
     </div>
 
     <script>
         // Reemplaza 'TU_URL_DE_APLICACION_WEB' con la URL de tu Apps Script.
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyunB8rjKss10LSJUh3ml9x6FrDtert_BtxdvhA-LHPl_OU31qAe12twlRYaFnio7urDw/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxmf9Giw6QE4ndtJIsc7LJc9F8DpVbjImY7FB0r8YbCs6rgN7SAmViPRjLwt5gsePH25Q/exec';
 
         const chatContainer = document.getElementById('chat-container');
         const senderInput = document.getElementById('sender-name');
         const recipientSelect = document.getElementById('recipient-select');
         const messageInput = document.getElementById('message-input');
         const photoFileInput = document.getElementById('photo-file');
+        const newRecipientInput = document.getElementById('new-recipient-input');
 
         // Guarda el nombre del usuario y el destinatario seleccionado
         senderInput.value = localStorage.getItem('chatUsername') || '';
@@ -178,10 +184,39 @@
             }
         }
 
+        async function addRecipient() {
+            const newRecipientName = newRecipientInput.value.trim();
+            if (!newRecipientName) {
+                alert("Por favor, introduce un nombre para el nuevo destinatario.");
+                return;
+            }
+
+            const data = {
+                action: 'addRecipient',
+                name: newRecipientName
+            };
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (result.status === 'success') {
+                    newRecipientInput.value = '';
+                    await fetchRecipients(); // Recarga la lista para mostrar el nuevo destinatario
+                }
+            } catch (error) {
+                alert("Error al añadir destinatario.");
+                console.error("Error:", error);
+            }
+        }
+
         async function fetchMessages() {
             const currentSenderId = senderInput.value.trim().toLowerCase().replace(/\s/g, '_');
             if (!currentSenderId) {
-                // No hay remitente, no se pueden filtrar los mensajes.
                 return;
             }
             try {
@@ -296,14 +331,9 @@
         }
 
         photoFileInput.addEventListener('change', uploadPhoto);
-        
-        // Actualiza los mensajes cuando cambias de destinatario
         recipientSelect.addEventListener('change', fetchMessages);
         
-        // Carga la lista de destinatarios al iniciar
         fetchRecipients();
-        
-        // Actualiza los mensajes cada 5 segundos
         setInterval(fetchMessages, 5000);
     </script>
 </body>
