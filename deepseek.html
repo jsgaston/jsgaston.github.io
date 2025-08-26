@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conexión DeepSeek con Python Simulado</title>
+    <title>Cargar API Key de DeepSeek desde Archivo</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -33,7 +33,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
@@ -70,34 +70,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        .tab {
-            padding: 12px 20px;
-            cursor: pointer;
-            background: #f1f8ff;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
-            transition: all 0.3s;
-        }
-        
-        .tab.active {
-            background: var(--primary-color);
-            color: white;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
         }
         
         .form-group {
@@ -164,446 +136,325 @@
             display: block;
         }
         
-        .solution-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .solution-card {
-            background: white;
+        .api-display {
+            background: #f8f9fa;
+            padding: 15px;
             border-radius: var(--border-radius);
+            margin-top: 20px;
+            word-break: break-all;
+            font-family: monospace;
+            display: none;
+        }
+        
+        .api-test {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .instructions {
+            background: #f1f8ff;
             padding: 20px;
-            text-align: center;
-            box-shadow: var(--box-shadow);
-            transition: transform 0.3s;
+            border-radius: var(--border-radius);
+            margin-top: 30px;
         }
         
-        .solution-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .solution-card h3 {
+        .instructions h3 {
             color: var(--secondary-color);
             margin-bottom: 15px;
         }
         
-        .editor-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+        .instructions ol {
+            padding-left: 20px;
         }
         
-        .code-editor {
-            background: #2d2d2d;
-            color: #f8f8f2;
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-button {
+            background: var(--accent-color);
+            padding: 14px 20px;
             border-radius: var(--border-radius);
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            min-height: 300px;
-            overflow: auto;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin-bottom: 15px;
         }
         
-        .code-output {
-            background: #f8f8f8;
-            border-radius: var(--border-radius);
-            padding: 15px;
-            min-height: 300px;
-            overflow: auto;
-            border: 1px solid #e2e8f0;
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
         }
         
-        .python-keyword {
-            color: #ff79c6;
+        .file-name {
+            text-align: center;
+            font-style: italic;
+            margin-top: 10px;
         }
         
-        .python-string {
-            color: #f1fa8c;
-        }
-        
-        .python-comment {
-            color: #6272a4;
-        }
-        
-        .python-function {
-            color: #50fa7b;
-        }
-        
-        .api-management {
-            background: #f1f8ff;
+        .connection-test {
+            background: #f8f9fa;
             padding: 20px;
             border-radius: var(--border-radius);
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
         
-        @media (max-width: 768px) {
-            .solution-options, .editor-container {
-                grid-template-columns: 1fr;
-            }
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+        
+        .test-result.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+        
+        .test-result.error {
+            background: #fee2e2;
+            color: #b91c1c;
+            display: block;
+        }
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Conexión con DeepSeek usando Python</h1>
-            <p class="subtitle">Simulación de código Python en el navegador</p>
+            <h1>Cargar API Key desde Archivo</h1>
+            <p class="subtitle">Conecta con DeepSeek usando tu archivo deepseekapi.txt</p>
         </header>
         
         <div class="card">
-            <h2 class="card-title">Gestión de API Key</h2>
+            <h2 class="card-title">Cargar API Key desde Archivo</h2>
+            <p>Selecciona tu archivo <strong>deepseekapi.txt</strong> que está en el servidor para cargar la API key automáticamente.</p>
             
-            <div class="api-management">
-                <div class="form-group">
-                    <label for="api-key">Clave API de DeepSeek</label>
-                    <input type="password" id="api-key" placeholder="Ingresa tu API key">
+            <div class="file-input-container">
+                <div class="file-input-button">
+                    Seleccionar archivo deepseekapi.txt
                 </div>
-                
-                <div class="form-group">
-                    <label for="api-file">O selecciona un archivo con tu API key</label>
-                    <input type="file" id="api-file" accept=".txt">
-                </div>
-                
-                <button id="save-api">
-                    Guardar API Key
+                <input type="file" id="file-input" class="file-input" accept=".txt">
+                <div id="file-name" class="file-name">No se ha seleccionado ningún archivo</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="api-key">API Key (cargada desde archivo)</label>
+                <input type="password" id="api-key" placeholder="La API key aparecerá aquí después de cargar el archivo" readonly>
+            </div>
+            
+            <button id="load-from-server">
+                Cargar desde Ruta del Servidor
+            </button>
+            
+            <div id="api-status" class="status"></div>
+            
+            <div id="api-display" class="api-display">
+                <strong>API Key cargada:</strong> <span id="api-key-display"></span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">Probar Conexión con DeepSeek</h2>
+            <p>Una vez cargada tu API key, puedes probar la conexión con los servidores de DeepSeek.</p>
+            
+            <div class="connection-test">
+                <button id="test-connection">
+                    Probar Conexión con DeepSeek
                 </button>
                 
-                <div id="api-status" class="status"></div>
+                <div id="test-result" class="test-result"></div>
+                
+                <div id="connection-details" class="hidden">
+                    <div class="form-group">
+                        <label for="api-query">Consulta de prueba</label>
+                        <textarea id="api-query" rows="3" placeholder="Escribe tu consulta para DeepSeek">¿Puedes explicarme cómo funciona la API de DeepSeek?</textarea>
+                    </div>
+                    
+                    <button id="send-query">
+                        Enviar Consulta
+                    </button>
+                    
+                    <div class="form-group">
+                        <label for="api-response">Respuesta</label>
+                        <textarea id="api-response" rows="5" placeholder="La respuesta de DeepSeek aparecerá aquí" readonly></textarea>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="card">
-            <h2 class="card-title">Editor de Python Simulado</h2>
-            <p>Escribe o pega tu código Python para interactuar con DeepSeek API. Esta es una simulación que se ejecuta en JavaScript.</p>
+        <div class="instructions">
+            <h3>Instrucciones para usar la API Key desde archivo</h3>
+            <ol>
+                <li>Asegúrate de que el archivo <strong>deepseekapi.txt</strong> esté en tu servidor</li>
+                <li>Haz clic en "Seleccionar archivo" para cargarlo desde tu dispositivo</li>
+                <li>O haz clic en "Cargar desde Ruta del Servidor" para intentar cargarlo automáticamente</li>
+                <li>Una vez cargada la API key, podrás probar la conexión con DeepSeek</li>
+                <li>Si la conexión es exitosa, puedes enviar consultas a la API</li>
+            </ol>
             
-            <div class="editor-container">
-                <div class="code-editor" id="python-editor" contenteditable="true"># Simulador de Python para DeepSeek
-# Escribe tu código aquí
-
-# Leer API key del almacenamiento local
-api_key = localStorage.get('deepseek_api_key')
-
-if api_key:
-    print("API Key encontrada:", api_key[:10] + "...")
-else:
-    print("No se encontró API Key. Guarda una primero.")
-
-# Ejemplo de solicitud a la API
-def consultar_deepseek(pregunta):
-    # Simulación de una solicitud a la API
-    print(f"Enviando pregunta: {pregunta}")
-    
-    # En un entorno real, aquí usarías requests.post()
-    respuesta_simulada = f"DeepSeek responde: Has preguntado sobre '{pregunta}'. Esto es una simulación."
-    
-    return respuesta_simulada
-
-# Ejemplo de uso
-if api_key:
-    respuesta = consultar_deepseek("¿Cómo funciona la API de DeepSeek?")
-    print(respuesta)
-</div>
-                
-                <div class="code-output" id="output">
-                    <p>> El resultado de tu código aparecerá aquí</p>
-                </div>
-            </div>
-            
-            <button id="run-code">
-                Ejecutar Código
-            </button>
-            <button id="reset-code">
-                Restablecer Código
-            </button>
-        </div>
-        
-        <div class="card">
-            <h2 class="card-title">Ejemplos de Código</h2>
-            
-            <div class="solution-options">
-                <div class="solution-card">
-                    <h3>Conexión Básica</h3>
-                    <p>Ejemplo simple de conexión con la API</p>
-                    <button onclick="loadExample('basic')">
-                        Cargar Ejemplo
-                    </button>
-                </div>
-                
-                <div class="solution-card">
-                    <h3>Chat Completo</h3>
-                    <p>Ejemplo de conversación con DeepSeek</p>
-                    <button onclick="loadExample('chat')">
-                        Cargar Ejemplo
-                    </button>
-                </div>
-            </div>
+            <p><strong>Nota:</strong> Esta implementación simula la carga desde el servidor. En un entorno real, necesitarías implementar un endpoint en tu servidor que sirva el contenido del archivo.</p>
         </div>
     </div>
 
     <script>
-        // Mostrar la API key guardada si existe
-        window.addEventListener('DOMContentLoaded', function() {
-            const savedApiKey = localStorage.getItem('deepseekapi.txt');
-            if (savedApiKey) {
-                document.getElementById('api-key').value = savedApiKey;
-            }
-            
-            // Configurar el editor de código
-            highlightCode();
-        });
-        
-        // Guardar API key
-        document.getElementById('save-api').addEventListener('click', function() {
-            const apiKey = document.getElementById('api-key').value;
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            const fileName = document.getElementById('file-name');
+            const apiKeyInput = document.getElementById('api-key');
             const apiStatus = document.getElementById('api-status');
+            const apiDisplay = document.getElementById('api-display');
+            const apiKeyDisplay = document.getElementById('api-key-display');
+            const loadFromServerBtn = document.getElementById('load-from-server');
+            const testConnectionBtn = document.getElementById('test-connection');
+            const testResult = document.getElementById('test-result');
+            const connectionDetails = document.getElementById('connection-details');
+            const sendQueryBtn = document.getElementById('send-query');
+            const apiQuery = document.getElementById('api-query');
+            const apiResponse = document.getElementById('api-response');
             
-            if (!apiKey) {
-                apiStatus.textContent = 'Por favor, ingresa una API key';
-                apiStatus.classList.add('error');
-                apiStatus.classList.remove('success');
+            // Manejar la selección de archivo
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                fileName.textContent = file.name;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result.trim();
+                    if (content) {
+                        apiKeyInput.value = content;
+                        apiKeyDisplay.textContent = content;
+                        apiDisplay.style.display = 'block';
+                        
+                        apiStatus.textContent = 'API Key cargada correctamente desde archivo';
+                        apiStatus.classList.remove('error');
+                        apiStatus.classList.add('success');
+                        apiStatus.style.display = 'block';
+                        
+                        // Guardar en localStorage para futuros usos
+                        localStorage.setItem('deepseek_api_key', content);
+                    } else {
+                        showError('El archivo está vacío o no contiene una API key válida');
+                    }
+                };
+                reader.readAsText(file);
+            });
+            
+            // Cargar desde el servidor (simulado)
+            loadFromServerBtn.addEventListener('click', function() {
+                // En un caso real, aquí harías una petición a tu servidor
+                // para obtener el contenido de deepseekapi.txt
+                
+                // Simulamos una demora de red
+                apiStatus.textContent = 'Buscando archivo deepseekapi.txt en el servidor...';
+                apiStatus.classList.remove('error', 'success');
                 apiStatus.style.display = 'block';
-                return;
-            }
-            
-            localStorage.setItem('deepseek_api_key', apiKey);
-            apiStatus.textContent = 'API Key guardada correctamente';
-            apiStatus.classList.remove('error');
-            apiStatus.classList.add('success');
-            apiStatus.style.display = 'block';
-        });
-        
-        // Cargar API key desde archivo
-        document.getElementById('api-file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const apiKey = e.target.result.trim();
-                document.getElementById('api-key').value = apiKey;
                 
-                // Guardar automáticamente
-                localStorage.setItem('deepseek_api_key', apiKey);
-                document.getElementById('api-status').textContent = 'API Key cargada desde archivo y guardada';
-                document.getElementById('api-status').classList.remove('error');
-                document.getElementById('api-status').classList.add('success');
-                document.getElementById('api-status').style.display = 'block';
-            };
-            reader.readAsText(file);
-        });
-        
-        // Ejecutar código Python simulado
-        document.getElementById('run-code').addEventListener('click', function() {
-            const code = document.getElementById('python-editor').textContent;
-            const outputElement = document.getElementById('output');
+                setTimeout(function() {
+                    // Simulamos una respuesta del servidor
+                    // En la práctica, necesitarías un endpoint que devuelva el contenido del archivo
+                    const simulatedApiKey = localStorage.getItem('deepseek_api_key') || 'sk-simulatedExampleKey1234567890';
+                    
+                    apiKeyInput.value = simulatedApiKey;
+                    apiKeyDisplay.textContent = simulatedApiKey;
+                    apiDisplay.style.display = 'block';
+                    
+                    apiStatus.textContent = 'API Key cargada desde servidor (simulación)';
+                    apiStatus.classList.remove('error');
+                    apiStatus.classList.add('success');
+                    
+                    // Guardar en localStorage
+                    localStorage.setItem('deepseek_api_key', simulatedApiKey);
+                }, 1500);
+            });
             
-            outputElement.innerHTML = '<p>> Ejecutando código...</p>';
-            
-            // Simular ejecución con un pequeño retraso
-            setTimeout(function() {
-                try {
-                    const result = executePythonCode(code);
-                    outputElement.innerHTML = '<p>> Resultado:</p>' + result;
-                } catch (error) {
-                    outputElement.innerHTML = '<p style="color: red;">> Error: ' + error.message + '</p>';
+            // Probar conexión
+            testConnectionBtn.addEventListener('click', function() {
+                const apiKey = apiKeyInput.value;
+                if (!apiKey) {
+                    showError('Primero debes cargar una API key');
+                    return;
                 }
-            }, 500);
-        });
-        
-        // Restablecer código
-        document.getElementById('reset-code').addEventListener('click', function() {
-            document.getElementById('python-editor').textContent = `# Simulador de Python para DeepSeek
-# Escribe tu código aquí
-
-# Leer API key del almacenamiento local
-api_key = localStorage.get('deepseek_api_key')
-
-if api_key:
-    print("API Key encontrada:", api_key[:10] + "...")
-else:
-    print("No se encontró API Key. Guarda una primero.")
-
-# Ejemplo de solicitud a la API
-def consultar_deepseek(pregunta):
-    # Simulación de una solicitud a la API
-    print(f"Enviando pregunta: {pregunta}")
-    
-    # En un entorno real, aquí usarías requests.post()
-    respuesta_simulada = f"DeepSeek responde: Has preguntado sobre '{pregunta}'. Esto es una simulación."
-    
-    return respuesta_simulada
-
-# Ejemplo de uso
-if api_key:
-    respuesta = consultar_deepseek("¿Cómo funciona la API de DeepSeek?")
-    print(respuesta)`;
-            
-            highlightCode();
-            document.getElementById('output').innerHTML = '<p>> El resultado de tu código aparecerá aquí</p>';
-        });
-        
-        // Función para "ejecutar" el código Python (simulado)
-        function executePythonCode(code) {
-            const apiKey = localStorage.getItem('deepseek_api_key') || '';
-            
-            // Simular algunas funciones de Python
-            const print = (...args) => {
-                return args.map(arg => {
-                    if (typeof arg === 'object') return JSON.stringify(arg);
-                    return String(arg);
-                }).join(' ') + '<br>';
-            };
-            
-            // Simular localStorage para el código "Python"
-            const localStorageSim = {
-                get: (key) => {
-                    if (key === 'deepseek_api_key') return apiKey;
-                    return null;
-                }
-            };
-            
-            // Capturar console.log
-            let output = '';
-            const console = {
-                log: (...args) => {
-                    output += print(...args);
-                }
-            };
-            
-            // Ejecutar las funciones simuladas
-            try {
-                // Reemplazar funciones de Python con versiones JavaScript
-                const jsCode = code
-                    .replace(/print\((.*)\)/g, 'console.log($1)')
-                    .replace(/localStorage\.get\(/g, 'localStorageSim.get(');
                 
-                // Ejecutar el código modificado
-                eval(jsCode);
+                testResult.textContent = 'Probando conexión con DeepSeek...';
+                testResult.classList.remove('success', 'error');
+                testResult.style.display = 'block';
                 
-                return output || '<p>> El código se ejecutó pero no produjo output</p>';
-            } catch (error) {
-                throw new Error(error.message);
-            }
-        }
-        
-        // Resaltar sintaxis para el código Python
-        function highlightCode() {
-            const editor = document.getElementById('python-editor');
-            let code = editor.textContent;
+                // Simulamos una prueba de conexión
+                setTimeout(function() {
+                    // En un caso real, aquí harías una petición a la API de DeepSeek
+                    // para verificar que la key es válida
+                    
+                    if (apiKey.includes('simulated') || apiKey.length > 10) {
+                        testResult.textContent = '✅ Conexión exitosa con DeepSeek API';
+                        testResult.classList.add('success');
+                        connectionDetails.classList.remove('hidden');
+                    } else {
+                        testResult.textContent = '❌ Error de conexión. Verifica tu API key.';
+                        testResult.classList.add('error');
+                    }
+                }, 2000);
+            });
             
-            // Resaltar palabras clave
-            code = code.replace(/(#.*)/g, '<span class="python-comment">$1</span>');
-            code = code.replace(/\b(def|if|else|return|print|for|while|in|import|from|as|True|False|None)\b/g, '<span class="python-keyword">$1</span>');
-            code = code.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\(/g, '<span class="python-function">$1</span>(');
-            code = code.replace(/(".*?"|'.*?')/g, '<span class="python-string">$1</span>');
-            
-            editor.innerHTML = code;
-        }
-        
-        // Cargar ejemplos de código
-        function loadExample(type) {
-            const editor = document.getElementById('python-editor');
-            
-            if (type === 'basic') {
-                editor.textContent = `# Conexión básica con DeepSeek API
-api_key = localStorage.get('deepseek_api_key')
-
-if not api_key:
-    print("Error: No se encontró API Key")
-else:
-    print("Conectando con DeepSeek API...")
-    print("API Key:", api_key[:8] + "..." + api_key.slice(-4))
-    
-    # Simular una solicitud HTTP
-    import requests
-    
-    url = "https://api.deepseek.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    data = {
-        "model": "deepseek-chat",
-        "messages": [
-            {"role": "user", "content": "Hola, ¿puedes ayudarme?"}
-        ]
-    }
-    
-    # response = requests.post(url, json=data, headers=headers)
-    # print("Respuesta recibida:", response.json())
-    
-    # Simulación de respuesta
-    respuesta_simulada = {
-        "choices": [
-            {
-                "message": {
-                    "content": "¡Hola! Claro que puedo ayudarte. ¿En qué necesitas asistencia?"
+            // Enviar consulta
+            sendQueryBtn.addEventListener('click', function() {
+                const apiKey = apiKeyInput.value;
+                const query = apiQuery.value;
+                
+                if (!query) {
+                    alert('Por favor, escribe una consulta');
+                    return;
                 }
-            }
-        ]
-    }
-    
-    print("Respuesta simulada:", respuesta_simulada["choices"][0]["message"]["content"])`;
-            } else if (type === 'chat') {
-                editor.textContent = `# Chat completo con DeepSeek
-api_key = localStorage.get('deepseek_api_key')
-
-def chat_con_deepseek(mensaje, historial=[]):
-    if not api_key:
-        return "Error: No hay API Key configurada", historial
-    
-    # Agregar el nuevo mensaje al historial
-    historial.append({"role": "user", "content": mensaje})
-    
-    # Preparar la solicitud
-    url = "https://api.deepseek.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    data = {
-        "model": "deepseek-chat",
-        "messages": historial,
-        "temperature": 0.7
-    }
-    
-    # Simular envío de solicitud (en realidad sería: response = requests.post(...))
-    # response = requests.post(url, json=data, headers=headers)
-    # respuesta = response.json()
-    
-    # Simulación de respuesta
-    respuesta_simulada = {
-        "choices": [
-            {
-                "message": {
-                    "content": f"Entendí tu mensaje: '{mensaje}'. Esto es una simulación de respuesta."
-                }
-            }
-        ]
-    }
-    
-    contenido_respuesta = respuesta_simulada["choices"][0]["message"]["content"]
-    
-    # Agregar la respuesta al historial
-    historial.append({"role": "assistant", "content": contenido_respuesta})
-    
-    return contenido_respuesta, historial
-
-# Ejemplo de conversación
-historial_conversacion = []
-respuesta, historial_conversacion = chat_con_deepseek("Hola, ¿cómo estás?", historial_conversacion)
-print("DeepSeek:", respuesta)
-
-respuesta, historial_conversacion = chat_con_deepseek("¿Puedes explicarme cómo funciona tu API?", historial_conversacion)
-print("DeepSeek:", respuesta)`;
+                
+                apiResponse.value = 'Enviando consulta a DeepSeek...';
+                
+                // Simulamos el envío de la consulta
+                setTimeout(function() {
+                    // En un caso real, aquí harías una petición POST a la API de DeepSeek
+                    apiResponse.value = `DeepSeek Response (simulación):\n\nHe recibido tu pregunta: "${query}".\n\nEn una implementación real, esta sería la respuesta genuina de DeepSeek. Para conectar realmente, necesitarías hacer una solicitud a su endpoint API con tu clave válida.`;
+                }, 1500);
+            });
+            
+            // Comprobar si hay una API key guardada
+            const savedApiKey = localStorage.getItem('deepseek_api_key');
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+                apiKeyDisplay.textContent = savedApiKey;
+                apiDisplay.style.display = 'block';
+                
+                apiStatus.textContent = 'API Key cargada desde almacenamiento local';
+                apiStatus.classList.remove('error');
+                apiStatus.classList.add('success');
+                apiStatus.style.display = 'block';
             }
             
-            highlightCode();
-        }
+            function showError(message) {
+                apiStatus.textContent = message;
+                apiStatus.classList.remove('success');
+                apiStatus.classList.add('error');
+                apiStatus.style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>
