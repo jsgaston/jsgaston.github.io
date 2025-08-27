@@ -388,7 +388,7 @@
     <script>
         // Configuración de la aplicación
         const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec', // Dejar vacío inicialmente para configurar
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwz4s9v2OmIWaXDmGGC8oSrMEoC3AeTFe3Y_jr9Y-eXFUinbId_ib2lqrmcKYWULCiX/exec', // Dejar vacío inicialmente para configurar
             FACE_API_KEY: 'lOqB68CyoDooXg1h-H-z6uJaEIR_uFs4', // Para detección de caras
         };
 
@@ -401,33 +401,141 @@
             }
         }
 
-        // Función para probar la conexión
+        // Función para probar la conexión con múltiples métodos
         async function testConnection() {
             if (!CONFIG.APPS_SCRIPT_URL) {
                 showStatus('Por favor configura primero la URL del Apps Script', 'error');
+                setupAppsScript();
                 return;
             }
 
             try {
-                showStatus('Probando conexión con Google Apps Script...', 'info');
+                showStatus('🔄 Probando conexión con Google Apps Script...', 'info');
                 
-                const response = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=test', {
+                // Método 1: Probar con GET primero (más simple)
+                console.log('Intentando conexión GET...');
+                let response = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=test', {
                     method: 'GET',
-                    mode: 'cors'
+                    cache: 'no-cache'
                 });
                 
                 if (response.ok) {
                     const result = await response.json();
-                    showStatus('✅ Conexión exitosa con Apps Script', 'success');
+                    showStatus('✅ Conexión exitosa con Apps Script (método GET)', 'success');
                     console.log('Respuesta del servidor:', result);
-                } else {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    return true;
                 }
+                
+                // Método 2: Si GET falla, probar con POST
+                console.log('GET falló, intentando POST...');
+                response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'test',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showStatus('✅ Conexión exitosa con Apps Script (método POST)', 'success');
+                    console.log('Respuesta del servidor:', result);
+                    return true;
+                }
+                
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                
             } catch (error) {
-                console.error('Error de conexión:', error);
-                showStatus(`❌ Error de conexión: ${error.message}`, 'error');
-                showConnectionHelp();
+                console.error('Error de conexión completo:', error);
+                
+                let errorMessage = '';
+                let solutions = [];
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMessage = '🚫 Error de red o CORS';
+                    solutions = [
+                        '1. Verifica que la URL del Apps Script sea correcta',
+                        '2. Asegúrate de que el Apps Script esté IMPLEMENTADO (no solo guardado)',
+                        '3. Configura el acceso como "Cualquier persona"',
+                        '4. Reautoriza los permisos del Apps Script',
+                        '5. Intenta desde una página HTTPS'
+                    ];
+                } else if (error.message.includes('403')) {
+                    errorMessage = '🔒 Acceso denegado';
+                    solutions = [
+                        '1. Reautoriza los permisos del Apps Script',
+                        '2. Verifica que el acceso esté configurado como "Cualquier persona"',
+                        '3. Comprueba que tengas acceso a las carpetas de Google Drive'
+                    ];
+                } else if (error.message.includes('404')) {
+                    errorMessage = '❌ Apps Script no encontrado';
+                    solutions = [
+                        '1. Verifica la URL del Apps Script',
+                        '2. Asegúrate de que esté implementado como "Aplicación web"',
+                        '3. Comprueba que no hayas copiado la URL de edición'
+                    ];
+                }
+                
+                showDetailedError(errorMessage, error.message, solutions);
+                return false;
             }
+        }
+
+        // Mostrar error detallado con soluciones
+        function showDetailedError(title, details, solutions) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'status-message status-error';
+            errorDiv.innerHTML = `
+                <h4>${title}</h4>
+                <p><strong>Detalles:</strong> ${details}</p>
+                <h5>💡 Soluciones:</h5>
+                <ul style="text-align: left; margin: 10px 0;">
+                    ${solutions.map(solution => `<li>${solution}</li>`).join('')}
+                </ul>
+                <div style="margin-top: 15px;">
+                    <button class="btn" onclick="openAppsScriptGuide()">📖 Ver Guía Completa</button>
+                    <button class="btn" onclick="setupAppsScript()">🔗 Cambiar URL</button>
+                </div>
+            `;
+            document.getElementById('status').appendChild(errorDiv);
+        }
+
+        // Abrir guía de configuración
+        function openAppsScriptGuide() {
+            const guide = `
+            🔧 GUÍA DE CONFIGURACIÓN GOOGLE APPS SCRIPT:
+
+            1. Ve a https://script.google.com
+            2. Crea un nuevo proyecto
+            3. Pega el código del Apps Script
+            4. Guarda el proyecto (Ctrl+S)
+            5. Ve a "Implementar" > "Nueva implementación"
+            6. Selecciona "Aplicación web"
+            7. Configura:
+               - Ejecutar como: Yo (${getCurrentUserEmail() || 'tu-email'})
+               - Quién tiene acceso: Cualquier persona
+            8. Haz clic en "Implementar"
+            9. AUTORIZA TODOS LOS PERMISOS cuando te lo pida
+            10. Copia la URL que termina en "/exec"
+
+            ⚠️ IMPORTANTE: 
+            - Usa la URL que termina en "/exec" 
+            - NO uses la URL de edición del script
+            - Debes autorizar permisos de Google Drive
+
+            ✅ URL CORRECTA: https://script.google.com/macros/s/ABC123.../exec
+            ❌ URL INCORRECTA: https://script.google.com/home/projects/.../edit
+            `;
+            
+            alert(guide);
+        }
+
+        function getCurrentUserEmail() {
+            // Intenta obtener el email del usuario si está disponible
+            return localStorage.getItem('userEmail') || null;
         }
 
         // Mostrar ayuda de conexión
