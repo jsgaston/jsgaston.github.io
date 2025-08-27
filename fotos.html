@@ -25,6 +25,7 @@
         .tabs {
             display: flex;
             margin-bottom: 20px;
+            justify-content: center;
         }
         .tab {
             padding: 10px 20px;
@@ -107,11 +108,46 @@
         .morph-image.active {
             opacity: 1;
         }
+        .config-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .success-message {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Morfing de Fotos Diarias</h1>
+        
+        <div class="config-section">
+            <h3>Configuración de Google Apps Script</h3>
+            <p>Para usar esta aplicación, necesitas configurar un script de Google Apps.</p>
+            <label for="scriptUrl">URL de tu Google Apps Script:</label>
+            <input type="text" id="scriptUrl" style="width: 100%; padding: 8px; margin: 10px 0;" 
+                   placeholder="https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec">
+            <button onclick="saveScriptUrl()">Guardar URL</button>
+        </div>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
         
         <div class="tabs">
             <button class="tab active" onclick="switchTab('cara')">Cara</button>
@@ -160,12 +196,62 @@
         let morphingInterval = null;
         let currentMorphIndex = 0;
         let currentPhotos = [];
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSdseZIZ6Z5WYUeNZh8kGEtMyrBwMbDrBYGSrak4HOcLWoMrVX_RVnxLafIrmuQrIQ/exec'; // Reemplazar con tu URL
+        let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec';
 
-        // Inicializar la cámara cuando se carga la página
+        // Inicializar la aplicación cuando se carga la página
         window.onload = function() {
+            // Cargar la URL guardada si existe
+            const savedUrl = localStorage.getItem('googleScriptUrl');
+            if (savedUrl) {
+                document.getElementById('scriptUrl').value = savedUrl;
+                SCRIPT_URL = savedUrl;
+                showSuccess('URL cargada desde almacenamiento local');
+            }
+            
             initCamera();
         };
+
+        // Guardar la URL del script
+        function saveScriptUrl() {
+            const url = document.getElementById('scriptUrl').value;
+            if (url) {
+                // Validar que sea una URL válida
+                try {
+                    new URL(url);
+                    SCRIPT_URL = url;
+                    localStorage.setItem('googleScriptUrl', url);
+                    showSuccess('URL guardada correctamente');
+                } catch (e) {
+                    showError('Por favor, introduce una URL válida');
+                }
+            } else {
+                showError('Por favor, introduce la URL de tu Google Apps Script');
+            }
+        }
+
+        // Mostrar mensaje de error
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Mostrar mensaje de éxito
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
 
         // Cambiar entre pestañas
         function switchTab(tab) {
@@ -202,7 +288,7 @@
                 loadPhotos();
             } catch (error) {
                 console.error('Error al acceder a la cámara:', error);
-                alert('No se pudo acceder a la cámara. Asegúrate de permitir el acceso.');
+                showError('No se pudo acceder a la cámara. Asegúrate de permitir el acceso.');
             }
         }
 
@@ -261,7 +347,12 @@
         // Guardar foto en Google Drive
         async function savePhoto() {
             if (!capturedPhotoData) {
-                alert('No hay foto para guardar');
+                showError('No hay foto para guardar');
+                return;
+            }
+            
+            if (!SCRIPT_URL) {
+                showError('Primero debes configurar la URL de Google Apps Script');
                 return;
             }
             
@@ -282,26 +373,41 @@
                     })
                 });
                 
+                // Verificar si la respuesta es OK
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success) {
-                    alert('Foto guardada correctamente en Google Drive');
+                    showSuccess('Foto guardada correctamente en Google Drive');
                     retakePhoto(); // Volver a la cámara
                 } else {
                     throw new Error(result.error || 'Error desconocido');
                 }
             } catch (error) {
                 console.error('Error al guardar la foto:', error);
-                alert('Error al guardar la foto: ' + error.message);
+                showError('Error al guardar la foto: ' + error.message);
             }
         }
 
         // Cargar fotos desde Google Drive
         async function loadPhotos() {
+            if (!SCRIPT_URL) {
+                return; // No intentar cargar sin URL
+            }
+            
             const dateFilter = document.getElementById('dateFilter').value;
             
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=list&type=${currentTab}&date=${dateFilter}`);
+                
+                // Verificar si la respuesta es OK
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success) {
@@ -312,7 +418,7 @@
                 }
             } catch (error) {
                 console.error('Error al cargar fotos:', error);
-                alert('Error al cargar fotos: ' + error.message);
+                showError('Error al cargar fotos: ' + error.message);
             }
         }
 
@@ -336,13 +442,6 @@
             });
         }
 
-        // Mostrar galería
-        function showGallery() {
-            document.getElementById('cameraSection').style.display = 'none';
-            document.getElementById('gallerySection').style.display = 'block';
-            loadPhotos();
-        }
-
         // Mostrar foto en el visor de morfing
         function showPhotoInMorph(url) {
             const morphImage1 = document.getElementById('morphImage1');
@@ -358,7 +457,7 @@
         // Iniciar efecto de morfing
         function startMorphing() {
             if (currentPhotos.length < 2) {
-                alert('Se necesitan al menos 2 fotos para el morfing');
+                showError('Se necesitan al menos 2 fotos para el morfing');
                 return;
             }
             
