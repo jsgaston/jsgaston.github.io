@@ -251,6 +251,29 @@
             font-size: 1rem;
             margin: 10px 0;
         }
+        .drive-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .drive-link {
+            background: #f1f3f4;
+            padding: 10px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #1a73e8;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        .drive-link:hover {
+            background: #e8f0fe;
+            transform: translateY(-2px);
+        }
         @media (max-width: 768px) {
             .tabs {
                 flex-direction: column;
@@ -264,6 +287,10 @@
                 max-width: 300px;
                 justify-content: center;
             }
+            .drive-links {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -271,15 +298,27 @@
     <div class="container">
         <header>
             <h1>Morfing de Fotos Diarias</h1>
-            <p class="subtitle">Captura, guarda y visualiza tus fotos con efecto morfing</p>
+            <p class="subtitle">Captura y visualiza tus fotos con efecto morfing</p>
         </header>
         
         <div class="config-section">
             <h3>Configuración de Google Apps Script</h3>
-            <p>Para usar esta aplicación, necesitas configurar un script de Google Apps.</p>
+            <p>Inserta la URL de tu Google Apps Script para conectar con Google Drive</p>
             <label for="scriptUrl">URL de tu Google Apps Script:</label>
             <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
             <button class="btn btn-primary" onclick="saveScriptUrl()">Guardar URL</button>
+            
+            <div class="drive-links">
+                <a href="https://drive.google.com/drive/folders/1HHp2nbPRqfjtyZXyTsQeoLkO-N9FkN4J" target="_blank" class="drive-link">
+                    <span class="icon">📁</span> Cara
+                </a>
+                <a href="https://drive.google.com/drive/folders/1-4TqDmmxZhz337eeaf8CEP1xIdDHWFAW" target="_blank" class="drive-link">
+                    <span class="icon">📁</span> Cuerpo
+                </a>
+                <a href="https://drive.google.com/drive/folders/1W1qA0qCcZjvKZwOQvk3ZWGVE1F3251MP" target="_blank" class="drive-link">
+                    <span class="icon">📁</span> Otros
+                </a>
+            </div>
         </div>
         
         <div class="tabs">
@@ -310,15 +349,15 @@
             <div class="filter-section">
                 <label for="dateFilter">Filtrar por fecha:</label>
                 <input type="date" id="dateFilter" onchange="filterPhotosByDate()">
-                <button class="btn btn-primary" onclick="showGallery()">
-                    <span class="icon">🔄</span> Actualizar
+                <button class="btn btn-primary" onclick="loadPhotosFromDrive()">
+                    <span class="icon">🔄</span> Cargar Fotos
                 </button>
             </div>
             
             <h2>Galería de Fotos</h2>
             <div class="gallery" id="photoGallery">
                 <div class="empty-state">
-                    <p>No hay fotos disponibles. Captura algunas fotos primero.</p>
+                    <p>No hay fotos disponibles. Haz clic en "Cargar Fotos" para ver tus imágenes.</p>
                 </div>
             </div>
             
@@ -360,6 +399,13 @@
         };
         let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec';
 
+        // IDs de las carpetas de Google Drive
+        const DRIVE_FOLDER_IDS = {
+            'cara': '1HHp2nbPRqfjtyZXyTsQeoLkO-N9FkN4J',
+            'cuerpo': '1-4TqDmmxZhz337eeaf8CEP1xIdDHWFAW',
+            'otros': '1W1qA0qCcZjvKZwOQvk3ZWGVE1F3251MP'
+        };
+
         // Inicializar la aplicación cuando se carga la página
         window.onload = function() {
             // Cargar la URL guardada si existe
@@ -371,7 +417,6 @@
             }
             
             initCamera();
-            loadPhotosFromStorage();
         };
 
         // Guardar la URL del script
@@ -409,9 +454,6 @@
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
-            
-            // Actualizar la galería para la pestaña seleccionada
-            filterPhotosByDate();
         }
 
         // Inicializar la cámara
@@ -489,7 +531,7 @@
             initCamera();
         }
 
-        // Guardar foto en Google Drive
+        // Guardar foto en Google Drive a través de Google Apps Script
         async function savePhoto() {
             if (!capturedPhotoData) {
                 showNotification('No hay foto para guardar', false);
@@ -502,6 +544,8 @@
             }
             
             try {
+                showNotification('Guardando foto en Google Drive...', true);
+                
                 // Extraer los datos base64
                 const base64Data = capturedPhotoData.split(',')[1];
                 
@@ -526,7 +570,7 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showNotification('Foto guardada correctamente en Google Drive');
+                    showNotification(`Foto guardada en la carpeta de ${currentTab} en Google Drive`);
                     
                     // También guardar localmente para previsualización
                     const photo = {
@@ -559,16 +603,43 @@
             }
         }
 
-        // Cargar fotos desde el almacenamiento local
-        function loadPhotosFromStorage() {
+        // Cargar fotos desde Google Drive a través de Google Apps Script
+        async function loadPhotosFromDrive() {
+            if (!SCRIPT_URL) {
+                showNotification('Primero debes configurar la URL de Google Apps Script', false);
+                return;
+            }
+            
+            showNotification('Cargando fotos desde Google Drive...', true);
+            
             try {
-                const savedPhotos = localStorage.getItem('morphingPhotos');
-                if (savedPhotos) {
-                    allPhotos = JSON.parse(savedPhotos);
+                const dateFilter = document.getElementById('dateFilter').value;
+                const response = await fetch(`${SCRIPT_URL}?action=list&type=${currentTab}&date=${dateFilter}`);
+                
+                // Verificar si la respuesta es OK
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Procesar las fotos desde Drive
+                    allPhotos[currentTab] = result.photos || [];
+                    savePhotosToStorage();
+                    
+                    showNotification('Fotos cargadas desde Google Drive');
+                    
+                    // Mostrar la galería
+                    document.querySelector('.camera-container').style.display = 'none';
+                    document.getElementById('gallerySection').style.display = 'block';
                     filterPhotosByDate();
+                } else {
+                    throw new Error(result.error || 'Error al cargar fotos');
                 }
             } catch (error) {
-                console.error('Error al cargar desde localStorage:', error);
+                console.error('Error al cargar fotos:', error);
+                showNotification('Error al cargar fotos: ' + error.message, false);
             }
         }
 
@@ -608,7 +679,7 @@
                 const photoCard = document.createElement('div');
                 photoCard.className = 'photo-card';
                 photoCard.innerHTML = `
-                    <img src="${photo.data}" alt="${photo.name}">
+                    <img src="${photo.url || photo.data}" alt="${photo.name}">
                     <div class="photo-info">
                         <div>${photo.name}</div>
                         <div class="photo-date">${new Date(photo.date).toLocaleDateString()}</div>
@@ -623,15 +694,8 @@
         function selectPhotoForMorphing(photo) {
             // Alternar selección (podrías expandir esto para seleccionar múltiples fotos)
             const morphImage1 = document.getElementById('morphImage1');
-            morphImage1.src = photo.data;
+            morphImage1.src = photo.url || photo.data;
             document.getElementById('morphPlaceholder').style.display = 'none';
-        }
-
-        // Mostrar galería
-        function showGallery() {
-            document.querySelector('.camera-container').style.display = 'none';
-            document.getElementById('gallerySection').style.display = 'block';
-            filterPhotosByDate();
         }
 
         // Iniciar efecto de morfing
@@ -655,12 +719,12 @@
                 // Alternar entre imágenes
                 if (morphImage1.classList.contains('active')) {
                     morphImage1.classList.remove('active');
-                    morphImage2.src = photos[(currentMorphIndex + 1) % photos.length].data;
+                    morphImage2.src = photos[(currentMorphIndex + 1) % photos.length].url || photos[(currentMorphIndex + 1) % photos.length].data;
                     morphImage2.classList.add('active');
                 } else {
                     morphImage2.classList.remove('active');
                     currentMorphIndex = (currentMorphIndex + 1) % photos.length;
-                    morphImage1.src = photos[currentMorphIndex].data;
+                    morphImage1.src = photos[currentMorphIndex].url || photos[currentMorphIndex].data;
                     morphImage1.classList.add('active');
                 }
             }, 2000); // Cambiar cada 2 segundos
@@ -678,8 +742,17 @@
         }
 
         // También permitir mostrar la galería desde la cámara
-        document.getElementById('video').ondblclick = showGallery;
-        document.getElementById('capturedImage').ondblclick = showGallery;
+        document.getElementById('video').ondblclick = function() {
+            document.querySelector('.camera-container').style.display = 'none';
+            document.getElementById('gallerySection').style.display = 'block';
+            filterPhotosByDate();
+        };
+        
+        document.getElementById('capturedImage').ondblclick = function() {
+            document.querySelector('.camera-container').style.display = 'none';
+            document.getElementById('gallerySection').style.display = 'block';
+            filterPhotosByDate();
+        };
     </script>
 </body>
 </html>
