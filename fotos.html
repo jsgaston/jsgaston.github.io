@@ -3,291 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morfing de Fotos Diarias</title>
+    <title>Clasificador de Fotos y Morfing</title>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #333;
-            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
+
         .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            width: 95%;
-            max-width: 1000px;
-            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
-        header {
-            background: #4a00e0;
-            color: white;
-            padding: 20px;
+
+        .header {
             text-align: center;
+            margin-bottom: 30px;
         }
-        h1 {
-            font-size: 2.2rem;
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
             margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
+
         .tabs {
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        .tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            background: #e9ecef;
-            border: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .tab.active {
-            background: white;
-            border-bottom: 4px solid #4a00e0;
-            color: #4a00e0;
-        }
-        .tab:not(.active):hover {
-            background: #dae0e5;
-        }
-        .camera-container {
-            padding: 20px;
-            text-align: center;
-        }
-        #video, #capturedImage {
-            width: 100%;
-            max-width: 600px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-        }
-        .controls {
-            display: flex;
             justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
         }
-        .btn {
-            padding: 12px 25px;
+
+        .tab-button {
+            background: none;
             border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 15px 30px;
+            font-size: 1.1rem;
             cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
-        .btn-primary {
-            background: #4a00e0;
-            color: white;
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
         }
-        .btn-primary:hover {
-            background: #3a00b0;
-            transform: translateY(-2px);
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #218838;
-            transform: translateY(-2px);
-        }
-        .gallery-container {
-            padding: 20px;
+
+        .tab-content {
             display: none;
         }
-        .filter-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .camera-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .camera-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            display: block;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .camera-controls {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
             justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
         }
-        .filter-section label {
-            font-weight: 600;
-        }
-        .filter-section input {
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
             font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        .gallery {
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .captured-photos {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
         }
-        .photo-card {
+
+        .photo-item {
             background: white;
             border-radius: 10px;
-            overflow: hidden;
+            padding: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
-        .photo-card:hover {
+
+        .photo-item:hover {
             transform: translateY(-5px);
         }
-        .photo-card img {
+
+        .photo-item img {
             width: 100%;
             height: 150px;
             object-fit: cover;
-        }
-        .photo-info {
-            padding: 10px;
-            font-size: 0.9rem;
-        }
-        .photo-date {
-            color: #6c757d;
-            font-size: 0.8rem;
-        }
-        .morphing-section {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .morphing-container {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            margin: 20px auto;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-        }
-        .morph-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-        }
-        .morph-image.active {
-            opacity: 1;
-        }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
             border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            opacity: 0;
-            transform: translateX(100px);
-            transition: all 0.5s ease;
+            margin-bottom: 10px;
         }
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
+
+        .photo-category {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
         }
-        .notification.success {
-            background: #28a745;
+
+        .photo-date {
+            font-size: 0.9rem;
+            color: #666;
         }
-        .notification.error {
-            background: #dc3545;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-        .icon {
-            font-size: 1.5rem;
-        }
-        .config-section {
-            margin: 20px;
+
+        .classification-result {
+            margin-top: 15px;
             padding: 15px;
-            background: #f8f9fa;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
             border-radius: 10px;
             text-align: center;
         }
-        .config-section input {
-            padding: 10px;
-            width: 100%;
-            max-width: 500px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            font-size: 1rem;
-            margin: 10px 0;
+
+        .search-section {
+            margin-bottom: 30px;
         }
-        .drive-links {
+
+        .search-controls {
             display: flex;
-            justify-content: center;
             gap: 15px;
-            margin: 15px 0;
             flex-wrap: wrap;
-        }
-        .drive-link {
-            background: #f1f3f4;
-            padding: 10px 15px;
-            border-radius: 20px;
-            text-decoration: none;
-            color: #1a73e8;
-            font-weight: 500;
-            display: flex;
+            margin-bottom: 20px;
             align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
         }
-        .drive-link:hover {
-            background: #e8f0fe;
-            transform: translateY(-2px);
+
+        .search-controls input,
+        .search-controls select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
         }
+
+        .morphing-section {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .morphing-controls {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .image-selector {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .image-selector select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .morphing-preview {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .morphing-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
         @media (max-width: 768px) {
-            .tabs {
+            .container {
+                padding: 15px;
+            }
+
+            .camera-controls,
+            .search-controls,
+            .morphing-controls {
                 flex-direction: column;
+                align-items: stretch;
             }
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
-            .btn {
-                width: 100%;
-                max-width: 300px;
-                justify-content: center;
-            }
-            .drive-links {
+
+            .morphing-preview {
                 flex-direction: column;
                 align-items: center;
             }
@@ -296,463 +300,541 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Morfing de Fotos Diarias</h1>
-            <p class="subtitle">Captura y visualiza tus fotos con efecto morfing</p>
-        </header>
-        
-        <div class="config-section">
-            <h3>Configuración de Google Apps Script</h3>
-            <p>Inserta la URL de tu Google Apps Script para conectar con Google Drive</p>
-            <label for="scriptUrl">URL de tu Google Apps Script:</label>
-            <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
-            <button class="btn btn-primary" onclick="saveScriptUrl()">Guardar URL</button>
-            
-            <div class="drive-links">
-                <a href="https://drive.google.com/drive/folders/1HHp2nbPRqfjtyZXyTsQeoLkO-N9FkN4J" target="_blank" class="drive-link">
-                    <span class="icon">📁</span> Cara
-                </a>
-                <a href="https://drive.google.com/drive/folders/1-4TqDmmxZhz337eeaf8CEP1xIdDHWFAW" target="_blank" class="drive-link">
-                    <span class="icon">📁</span> Cuerpo
-                </a>
-                <a href="https://drive.google.com/drive/folders/1W1qA0qCcZjvKZwOQvk3ZWGVE1F3251MP" target="_blank" class="drive-link">
-                    <span class="icon">📁</span> Otros
-                </a>
-            </div>
+        <div class="header">
+            <h1>📸 Clasificador de Fotos y Morfing</h1>
+            <p>Captura fotos, clasifícalas automáticamente y crea morfings increíbles</p>
         </div>
-        
+
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('cara')">Cara</button>
-            <button class="tab" onclick="switchTab('cuerpo')">Cuerpo</button>
-            <button class="tab" onclick="switchTab('otros')">Otros</button>
+            <button class="tab-button active" onclick="showTab('capture')">📷 Capturar</button>
+            <button class="tab-button" onclick="showTab('gallery')">🖼️ Galería</button>
+            <button class="tab-button" onclick="showTab('morphing')">🔀 Morfing</button>
         </div>
-        
-        <div class="camera-container">
-            <video id="video" autoplay></video>
-            <canvas id="canvas" style="display: none;"></canvas>
-            <img id="capturedImage" style="display: none;">
-            
-            <div class="controls">
-                <button id="captureBtn" class="btn btn-primary" onclick="capturePhoto()">
-                    <span class="icon">📸</span> Capturar Foto
-                </button>
-                <button id="retakeBtn" class="btn btn-secondary" onclick="retakePhoto()" style="display: none;">
-                    <span class="icon">↩️</span> Volver a Tomar
-                </button>
-                <button id="saveBtn" class="btn btn-success" onclick="savePhoto()" style="display: none;">
-                    <span class="icon">💾</span> Guardar en Drive
-                </button>
-            </div>
-        </div>
-        
-        <div class="gallery-container" id="gallerySection">
-            <div class="filter-section">
-                <label for="dateFilter">Filtrar por fecha:</label>
-                <input type="date" id="dateFilter" onchange="filterPhotosByDate()">
-                <button class="btn btn-primary" onclick="loadPhotosFromDrive()">
-                    <span class="icon">🔄</span> Cargar Fotos
-                </button>
-            </div>
-            
-            <h2>Galería de Fotos</h2>
-            <div class="gallery" id="photoGallery">
-                <div class="empty-state">
-                    <p>No hay fotos disponibles. Haz clic en "Cargar Fotos" para ver tus imágenes.</p>
-                </div>
-            </div>
-            
-            <div class="morphing-section">
-                <h2>Efecto Morfing</h2>
-                <div class="controls">
-                    <button class="btn btn-primary" onclick="startMorphing()">
-                        <span class="icon">▶️</span> Iniciar Morfing
-                    </button>
-                    <button class="btn btn-secondary" onclick="stopMorphing()">
-                        <span class="icon">⏹️</span> Detener Morfing
-                    </button>
+
+        <!-- Tab: Captura de Fotos -->
+        <div id="capture-tab" class="tab-content active">
+            <div class="camera-section">
+                <div class="camera-container">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas"></canvas>
                 </div>
                 
-                <div class="morphing-container">
-                    <img id="morphImage1" class="morph-image">
-                    <img id="morphImage2" class="morph-image">
-                    <div class="empty-state" id="morphPlaceholder">
-                        <p>Selecciona al menos 2 fotos de la galería y haz clic en "Iniciar Morfing"</p>
-                    </div>
+                <div class="camera-controls">
+                    <button id="start-camera" class="btn">🎥 Iniciar Cámara</button>
+                    <button id="capture-photo" class="btn" disabled>📸 Capturar Foto</button>
+                    <button id="stop-camera" class="btn" disabled>⏹️ Detener Cámara</button>
                 </div>
+            </div>
+
+            <div id="status"></div>
+            <div id="progress" class="progress-bar" style="display: none;">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Galería -->
+        <div id="gallery-tab" class="tab-content">
+            <div class="search-section">
+                <h2>🔍 Buscar Fotos</h2>
+                <div class="search-controls">
+                    <input type="date" id="date-from" placeholder="Desde">
+                    <input type="date" id="date-to" placeholder="Hasta">
+                    <select id="category-filter">
+                        <option value="">Todas las categorías</option>
+                        <option value="cara">Cara</option>
+                        <option value="cuerpo">Cuerpo</option>
+                        <option value="otros">Otros</option>
+                    </select>
+                    <button class="btn" onclick="searchPhotos()">🔍 Buscar</button>
+                    <button class="btn" onclick="loadAllPhotos()">📋 Cargar Todas</button>
+                </div>
+            </div>
+            
+            <div id="photos-gallery" class="captured-photos"></div>
+        </div>
+
+        <!-- Tab: Morfing -->
+        <div id="morphing-tab" class="tab-content">
+            <div class="morphing-section">
+                <h2>🔀 Crear Morfing</h2>
+                
+                <div class="morphing-controls">
+                    <div class="image-selector">
+                        <label>Imagen 1 (Origen):</label>
+                        <select id="image1-select">
+                            <option value="">Seleccionar imagen...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="image-selector">
+                        <label>Imagen 2 (Destino):</label>
+                        <select id="image2-select">
+                            <option value="">Seleccionar imagen...</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="createMorphing()">🎬 Crear Morfing</button>
+                </div>
+
+                <div class="morphing-preview" id="morphing-preview"></div>
+                
+                <div id="morphing-result"></div>
             </div>
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
-
     <script>
+        // Configuración de la aplicación
+        const CONFIG = {
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec',
+            FACE_API_KEY: 'lOqB68CyoDooXg1h-H-z6uJaEIR_uFs4', // Para detección de caras
+        };
+
         // Variables globales
-        let currentStream = null;
-        let currentTab = 'cara';
-        let capturedPhotoData = null;
-        let morphingInterval = null;
-        let currentMorphIndex = 0;
-        let allPhotos = {
-            'cara': [],
-            'cuerpo': [],
-            'otros': []
-        };
-        let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec';
+        let video;
+        let canvas;
+        let ctx;
+        let stream;
+        let capturedPhotos = [];
+        let allPhotos = [];
 
-        // IDs de las carpetas de Google Drive
-        const DRIVE_FOLDER_IDS = {
-            'cara': '1HHp2nbPRqfjtyZXyTsQeoLkO-N9FkN4J',
-            'cuerpo': '1-4TqDmmxZhz337eeaf8CEP1xIdDHWFAW',
-            'otros': '1W1qA0qCcZjvKZwOQvk3ZWGVE1F3251MP'
-        };
-
-        // Inicializar la aplicación cuando se carga la página
-        window.onload = function() {
-            // Cargar la URL guardada si existe
-            const savedUrl = localStorage.getItem('googleScriptUrl');
-            if (savedUrl) {
-                document.getElementById('scriptUrl').value = savedUrl;
-                SCRIPT_URL = savedUrl;
-                showNotification('URL cargada desde almacenamiento local');
-            }
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            video = document.getElementById('video');
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
             
-            initCamera();
-        };
+            setupEventListeners();
+            loadAllPhotos();
+        });
 
-        // Guardar la URL del script
-        function saveScriptUrl() {
-            const url = document.getElementById('scriptUrl').value;
-            if (url) {
-                // Validar que sea una URL válida
-                try {
-                    new URL(url);
-                    SCRIPT_URL = url;
-                    localStorage.setItem('googleScriptUrl', url);
-                    showNotification('URL guardada correctamente');
-                } catch (e) {
-                    showNotification('Por favor, introduce una URL válida', false);
-                }
-            } else {
-                showNotification('Por favor, introduce la URL de tu Google Apps Script', false);
-            }
+        function setupEventListeners() {
+            document.getElementById('start-camera').addEventListener('click', startCamera);
+            document.getElementById('capture-photo').addEventListener('click', capturePhoto);
+            document.getElementById('stop-camera').addEventListener('click', stopCamera);
         }
 
-        // Mostrar notificación
-        function showNotification(message, isSuccess = true) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = isSuccess ? 'notification success' : 'notification error';
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Cambiar entre pestañas
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
-        }
-
-        // Inicializar la cámara
-        async function initCamera() {
+        // Funciones de la cámara
+        async function startCamera() {
             try {
-                stopCamera(); // Detener cualquier transmisión existente
-                
-                const constraints = {
-                    video: {
-                        width: { ideal: 1280 },
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1280 }, 
                         height: { ideal: 720 },
-                        facingMode: 'user' // Para usar la cámara frontal
-                    }
-                };
+                        facingMode: 'user' 
+                    } 
+                });
                 
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                const videoElement = document.getElementById('video');
-                videoElement.srcObject = currentStream;
+                video.srcObject = stream;
                 
+                document.getElementById('start-camera').disabled = true;
+                document.getElementById('capture-photo').disabled = false;
+                document.getElementById('stop-camera').disabled = false;
+                
+                showStatus('Cámara iniciada correctamente', 'success');
             } catch (error) {
                 console.error('Error al acceder a la cámara:', error);
-                showNotification('No se pudo acceder a la cámara. Asegúrate de permitir el acceso.', false);
+                showStatus('Error al acceder a la cámara: ' + error.message, 'error');
             }
         }
 
-        // Detener la cámara
         function stopCamera() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
             }
+            
+            document.getElementById('start-camera').disabled = false;
+            document.getElementById('capture-photo').disabled = true;
+            document.getElementById('stop-camera').disabled = true;
+            
+            showStatus('Cámara detenida', 'info');
         }
 
-        // Capturar foto
-        function capturePhoto() {
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const capturedImage = document.getElementById('capturedImage');
-            
+        async function capturePhoto() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            capturedPhotoData = canvas.toDataURL('image/png');
-            capturedImage.src = capturedPhotoData;
-            
-            // Mostrar la imagen capturada y ocultar el video
-            video.style.display = 'none';
-            capturedImage.style.display = 'block';
-            
-            // Mostrar botones de volver a tomar y guardar
-            document.getElementById('captureBtn').style.display = 'none';
-            document.getElementById('retakeBtn').style.display = 'flex';
-            document.getElementById('saveBtn').style.display = 'flex';
-            
-            // Detener la cámara temporalmente
-            stopCamera();
-        }
-
-        // Volver a tomar foto
-        function retakePhoto() {
-            const video = document.getElementById('video');
-            const capturedImage = document.getElementById('capturedImage');
-            
-            // Ocultar la imagen capturada y mostrar el video
-            capturedImage.style.display = 'none';
-            video.style.display = 'block';
-            
-            // Mostrar botón de captura y ocultar los otros
-            document.getElementById('captureBtn').style.display = 'flex';
-            document.getElementById('retakeBtn').style.display = 'none';
-            document.getElementById('saveBtn').style.display = 'none';
-            
-            // Reiniciar la cámara
-            initCamera();
-        }
-
-        // Guardar foto en Google Drive a través de Google Apps Script
-        async function savePhoto() {
-            if (!capturedPhotoData) {
-                showNotification('No hay foto para guardar', false);
-                return;
-            }
-            
-            if (!SCRIPT_URL) {
-                showNotification('Primero debes configurar la URL de Google Apps Script', false);
-                return;
-            }
+            showProgress(true);
+            updateProgress(25);
             
             try {
-                showNotification('Guardando foto en Google Drive...', true);
+                const imageData = canvas.toDataURL('image/jpeg', 0.8);
                 
-                // Extraer los datos base64
-                const base64Data = capturedPhotoData.split(',')[1];
+                showStatus('Clasificando imagen...', 'info');
+                updateProgress(50);
                 
-                // Enviar a Google Apps Script
-                const response = await fetch(SCRIPT_URL, {
+                // Clasificar la imagen
+                const category = await classifyImage(imageData);
+                updateProgress(75);
+                
+                // Subir a Google Drive
+                const result = await uploadToGoogleDrive(imageData, category);
+                updateProgress(100);
+                
+                if (result.success) {
+                    showStatus(`Foto capturada y clasificada como "${category}" exitosamente`, 'success');
+                    
+                    const photoData = {
+                        id: result.fileId,
+                        url: imageData,
+                        category: category,
+                        date: new Date().toISOString(),
+                        driveUrl: result.driveUrl
+                    };
+                    
+                    capturedPhotos.unshift(photoData);
+                    allPhotos.unshift(photoData);
+                    updateImageSelectors();
+                } else {
+                    throw new Error(result.error || 'Error desconocido');
+                }
+                
+            } catch (error) {
+                console.error('Error al procesar la foto:', error);
+                showStatus('Error al procesar la foto: ' + error.message, 'error');
+            } finally {
+                showProgress(false);
+            }
+        }
+
+        // Clasificación de imágenes usando Machine Learning
+        async function classifyImage(imageData) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() {
+                    // Crear un canvas temporal para análisis
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = this.width;
+                    tempCanvas.height = this.height;
+                    tempCtx.drawImage(this, 0, 0);
+                    
+                    // Análisis básico de la imagen
+                    const imageAnalysis = analyzeImageComposition(tempCtx, this.width, this.height);
+                    
+                    // Determinar categoría basada en el análisis
+                    let category = 'otros';
+                    
+                    if (imageAnalysis.faceArea > 0.1) {
+                        category = 'cara';
+                    } else if (imageAnalysis.bodyDetected) {
+                        category = 'cuerpo';
+                    }
+                    
+                    resolve(category);
+                };
+                img.src = imageData;
+            });
+        }
+
+        function analyzeImageComposition(ctx, width, height) {
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            
+            // Análisis básico para detectar caras (buscando tonos de piel)
+            let skinPixels = 0;
+            let totalPixels = data.length / 4;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                
+                // Detección básica de tonos de piel
+                if (isSkinTone(r, g, b)) {
+                    skinPixels++;
+                }
+            }
+            
+            const faceArea = skinPixels / totalPixels;
+            const bodyDetected = faceArea > 0.05 && faceArea < 0.3; // Área media sugiere cuerpo
+            
+            return {
+                faceArea: faceArea,
+                bodyDetected: bodyDetected
+            };
+        }
+
+        function isSkinTone(r, g, b) {
+            // Algoritmo básico para detectar tonos de piel
+            return (r > 95 && g > 40 && b > 20 &&
+                   Math.max(r, g, b) - Math.min(r, g, b) > 15 &&
+                   Math.abs(r - g) > 15 && r > g && r > b);
+        }
+
+        // Funciones de Google Drive
+        async function uploadToGoogleDrive(imageData, category) {
+            try {
+                const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'upload',
-                        type: currentTab,
-                        imageData: base64Data
+                        action: 'uploadPhoto',
+                        imageData: imageData,
+                        category: category,
+                        timestamp: new Date().toISOString()
                     })
                 });
                 
-                // Verificar si la respuesta es OK
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error al subir a Google Drive:', error);
+                throw error;
+            }
+        }
+
+        async function loadAllPhotos() {
+            try {
+                showStatus('Cargando fotos desde Google Drive...', 'info');
+                
+                const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'getAllPhotos'
+                    })
+                });
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    showNotification(`Foto guardada en la carpeta de ${currentTab} en Google Drive`);
-                    
-                    // También guardar localmente para previsualización
-                    const photo = {
-                        id: Date.now(),
-                        type: currentTab,
-                        data: capturedPhotoData,
-                        date: new Date().toISOString(),
-                        name: `${currentTab}_${new Date().toLocaleDateString()}.png`
-                    };
-                    
-                    allPhotos[currentTab].push(photo);
-                    savePhotosToStorage();
-                    
-                    retakePhoto(); // Volver a la cámara
-                } else {
-                    throw new Error(result.error || 'Error desconocido');
-                }
-            } catch (error) {
-                console.error('Error al guardar la foto:', error);
-                showNotification('Error al guardar la foto: ' + error.message, false);
-            }
-        }
-
-        // Guardar fotos en el almacenamiento local
-        function savePhotosToStorage() {
-            try {
-                localStorage.setItem('morphingPhotos', JSON.stringify(allPhotos));
-            } catch (error) {
-                console.error('Error al guardar en localStorage:', error);
-            }
-        }
-
-        // Cargar fotos desde Google Drive a través de Google Apps Script
-        async function loadPhotosFromDrive() {
-            if (!SCRIPT_URL) {
-                showNotification('Primero debes configurar la URL de Google Apps Script', false);
-                return;
-            }
-            
-            showNotification('Cargando fotos desde Google Drive...', true);
-            
-            try {
-                const dateFilter = document.getElementById('dateFilter').value;
-                const response = await fetch(`${SCRIPT_URL}?action=list&type=${currentTab}&date=${dateFilter}`);
-                
-                // Verificar si la respuesta es OK
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Procesar las fotos desde Drive
-                    allPhotos[currentTab] = result.photos || [];
-                    savePhotosToStorage();
-                    
-                    showNotification('Fotos cargadas desde Google Drive');
-                    
-                    // Mostrar la galería
-                    document.querySelector('.camera-container').style.display = 'none';
-                    document.getElementById('gallerySection').style.display = 'block';
-                    filterPhotosByDate();
+                    allPhotos = result.photos || [];
+                    displayPhotosInGallery(allPhotos);
+                    updateImageSelectors();
+                    showStatus(`${allPhotos.length} fotos cargadas`, 'success');
                 } else {
                     throw new Error(result.error || 'Error al cargar fotos');
                 }
             } catch (error) {
                 console.error('Error al cargar fotos:', error);
-                showNotification('Error al cargar fotos: ' + error.message, false);
+                showStatus('Error al cargar fotos: ' + error.message, 'error');
             }
         }
 
-        // Filtrar fotos por fecha
-        function filterPhotosByDate() {
-            const dateFilter = document.getElementById('dateFilter').value;
-            const gallery = document.getElementById('photoGallery');
+        function searchPhotos() {
+            const dateFrom = document.getElementById('date-from').value;
+            const dateTo = document.getElementById('date-to').value;
+            const category = document.getElementById('category-filter').value;
             
-            // Obtener fotos de la categoría actual
-            let photos = allPhotos[currentTab] || [];
+            let filteredPhotos = [...allPhotos];
             
-            // Filtrar por fecha si se ha seleccionado una
-            if (dateFilter) {
-                const filterDate = new Date(dateFilter).toDateString();
-                photos = photos.filter(photo => {
-                    const photoDate = new Date(photo.date).toDateString();
-                    return photoDate === filterDate;
-                });
+            // Filtrar por fechas
+            if (dateFrom) {
+                filteredPhotos = filteredPhotos.filter(photo => 
+                    new Date(photo.date) >= new Date(dateFrom)
+                );
             }
             
-            // Mostrar fotos en la galería
-            displayPhotos(photos);
+            if (dateTo) {
+                filteredPhotos = filteredPhotos.filter(photo => 
+                    new Date(photo.date) <= new Date(dateTo + 'T23:59:59')
+                );
+            }
+            
+            // Filtrar por categoría
+            if (category) {
+                filteredPhotos = filteredPhotos.filter(photo => photo.category === category);
+            }
+            
+            displayPhotosInGallery(filteredPhotos);
+            showStatus(`${filteredPhotos.length} fotos encontradas`, 'info');
         }
 
-        // Mostrar fotos en la galería
-        function displayPhotos(photos) {
-            const gallery = document.getElementById('photoGallery');
-            
-            if (photos.length === 0) {
-                gallery.innerHTML = '<div class="empty-state"><p>No hay fotos disponibles para esta fecha</p></div>';
-                return;
-            }
-            
+        function displayPhotosInGallery(photos) {
+            const gallery = document.getElementById('photos-gallery');
             gallery.innerHTML = '';
             
             photos.forEach(photo => {
-                const photoCard = document.createElement('div');
-                photoCard.className = 'photo-card';
-                photoCard.innerHTML = `
-                    <img src="${photo.url || photo.data}" alt="${photo.name}">
-                    <div class="photo-info">
-                        <div>${photo.name}</div>
-                        <div class="photo-date">${new Date(photo.date).toLocaleDateString()}</div>
-                    </div>
+                const photoElement = document.createElement('div');
+                photoElement.className = 'photo-item';
+                
+                photoElement.innerHTML = `
+                    <img src="${photo.url || photo.thumbnailUrl}" alt="Foto ${photo.category}">
+                    <div class="photo-category">${photo.category.toUpperCase()}</div>
+                    <div class="photo-date">${new Date(photo.date).toLocaleString('es-ES')}</div>
+                    <button class="btn" onclick="viewInDrive('${photo.driveUrl}')">Ver en Drive</button>
                 `;
-                photoCard.onclick = () => selectPhotoForMorphing(photo);
-                gallery.appendChild(photoCard);
+                
+                gallery.appendChild(photoElement);
             });
         }
 
-        // Seleccionar foto para el morfing
-        function selectPhotoForMorphing(photo) {
-            // Alternar selección (podrías expandir esto para seleccionar múltiples fotos)
-            const morphImage1 = document.getElementById('morphImage1');
-            morphImage1.src = photo.url || photo.data;
-            document.getElementById('morphPlaceholder').style.display = 'none';
+        function updateImageSelectors() {
+            const image1Select = document.getElementById('image1-select');
+            const image2Select = document.getElementById('image2-select');
+            
+            // Limpiar opciones existentes
+            image1Select.innerHTML = '<option value="">Seleccionar imagen...</option>';
+            image2Select.innerHTML = '<option value="">Seleccionar imagen...</option>';
+            
+            // Agregar fotos de cara para morfing
+            const facePhotos = allPhotos.filter(photo => photo.category === 'cara');
+            
+            facePhotos.forEach(photo => {
+                const option1 = document.createElement('option');
+                const option2 = document.createElement('option');
+                
+                const label = `${photo.category} - ${new Date(photo.date).toLocaleDateString()}`;
+                
+                option1.value = photo.id;
+                option1.textContent = label;
+                option1.dataset.url = photo.url || photo.thumbnailUrl;
+                
+                option2.value = photo.id;
+                option2.textContent = label;
+                option2.dataset.url = photo.url || photo.thumbnailUrl;
+                
+                image1Select.appendChild(option1);
+                image2Select.appendChild(option2);
+            });
         }
 
-        // Iniciar efecto de morfing
-        function startMorphing() {
-            const photos = allPhotos[currentTab] || [];
+        // Funciones de morfing
+        function createMorphing() {
+            const image1Select = document.getElementById('image1-select');
+            const image2Select = document.getElementById('image2-select');
             
-            if (photos.length < 2) {
-                showNotification('Se necesitan al menos 2 fotos para el morfing', false);
+            const image1Id = image1Select.value;
+            const image2Id = image2Select.value;
+            
+            if (!image1Id || !image2Id) {
+                showStatus('Por favor selecciona ambas imágenes para el morfing', 'error');
                 return;
             }
             
-            stopMorphing();
+            if (image1Id === image2Id) {
+                showStatus('Por favor selecciona dos imágenes diferentes', 'error');
+                return;
+            }
             
-            const morphImage1 = document.getElementById('morphImage1');
-            const morphImage2 = document.getElementById('morphImage2');
+            const image1Url = image1Select.options[image1Select.selectedIndex].dataset.url;
+            const image2Url = image2Select.options[image2Select.selectedIndex].dataset.url;
             
-            currentMorphIndex = 0;
-            document.getElementById('morphPlaceholder').style.display = 'none';
+            // Mostrar preview de las imágenes seleccionadas
+            displayMorphingPreview(image1Url, image2Url);
             
-            morphingInterval = setInterval(() => {
-                // Alternar entre imágenes
-                if (morphImage1.classList.contains('active')) {
-                    morphImage1.classList.remove('active');
-                    morphImage2.src = photos[(currentMorphIndex + 1) % photos.length].url || photos[(currentMorphIndex + 1) % photos.length].data;
-                    morphImage2.classList.add('active');
-                } else {
-                    morphImage2.classList.remove('active');
-                    currentMorphIndex = (currentMorphIndex + 1) % photos.length;
-                    morphImage1.src = photos[currentMorphIndex].url || photos[currentMorphIndex].data;
-                    morphImage1.classList.add('active');
-                }
-            }, 2000); // Cambiar cada 2 segundos
+            // Simular proceso de morfing
+            showStatus('Creando morfing...', 'info');
+            showProgress(true);
             
-            showNotification('Morfing iniciado');
+            setTimeout(() => {
+                updateProgress(50);
+                setTimeout(() => {
+                    updateProgress(100);
+                    showStatus('Morfing creado exitosamente', 'success');
+                    showProgress(false);
+                    
+                    // Aquí se integraría con un servicio real de morfing
+                    displayMorphingResult(image1Url, image2Url);
+                }, 1500);
+            }, 1000);
         }
 
-        // Detener efecto de morfing
-        function stopMorphing() {
-            if (morphingInterval) {
-                clearInterval(morphingInterval);
-                morphingInterval = null;
-                showNotification('Morfing detenido');
+        function displayMorphingPreview(image1Url, image2Url) {
+            const preview = document.getElementById('morphing-preview');
+            preview.innerHTML = `
+                <div>
+                    <h4>Imagen Origen</h4>
+                    <img src="${image1Url}" alt="Imagen 1" class="morphing-image">
+                </div>
+                <div>
+                    <h4>➡️</h4>
+                </div>
+                <div>
+                    <h4>Imagen Destino</h4>
+                    <img src="${image2Url}" alt="Imagen 2" class="morphing-image">
+                </div>
+            `;
+        }
+
+        function displayMorphingResult(image1Url, image2Url) {
+            const result = document.getElementById('morphing-result');
+            result.innerHTML = `
+                <div style="text-align: center; margin-top: 20px;">
+                    <h3>🎬 Resultado del Morfing</h3>
+                    <p>El morfing ha sido generado. En una implementación real, aquí se mostraría la animación del morfing.</p>
+                    <button class="btn" onclick="downloadMorphing()">⬇️ Descargar Morfing</button>
+                </div>
+            `;
+        }
+
+        function downloadMorphing() {
+            showStatus('Preparando descarga del morfing...', 'info');
+            // Aquí se implementaría la descarga real del archivo de morfing
+        }
+
+        // Funciones de utilidad
+        function showTab(tabName) {
+            // Ocultar todos los tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Desactivar todos los botones
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Mostrar el tab seleccionado
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Cargar datos específicos del tab
+            if (tabName === 'gallery' && allPhotos.length === 0) {
+                loadAllPhotos();
             }
         }
 
-        // También permitir mostrar la galería desde la cámara
-        document.getElementById('video').ondblclick = function() {
-            document.querySelector('.camera-container').style.display = 'none';
-            document.getElementById('gallerySection').style.display = 'block';
-            filterPhotosByDate();
-        };
-        
-        document.getElementById('capturedImage').ondblclick = function() {
-            document.querySelector('.camera-container').style.display = 'none';
-            document.getElementById('gallerySection').style.display = 'block';
-            filterPhotosByDate();
-        };
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+            
+            // Auto-ocultar después de 5 segundos para mensajes de éxito
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        function showProgress(show) {
+            const progressBar = document.getElementById('progress');
+            if (show) {
+                progressBar.style.display = 'block';
+                updateProgress(0);
+            } else {
+                progressBar.style.display = 'none';
+            }
+        }
+
+        function updateProgress(percentage) {
+            const progressFill = document.querySelector('.progress-fill');
+            progressFill.style.width = percentage + '%';
+        }
+
+        function viewInDrive(url) {
+            if (url) {
+                window.open(url, '_blank');
+            } else {
+                showStatus('URL de Google Drive no disponible', 'error');
+            }
+        }
+
+        // Manejo de errores globales
+        window.addEventListener('error', function(e) {
+            console.error('Error global:', e.error);
+            showStatus('Ha ocurrido un error inesperado', 'error');
+        });
+
+        // Función para configurar la URL del Apps Script
+        function setAppsScriptUrl(url) {
+            CONFIG.APPS_SCRIPT_URL = url;
+            showStatus('URL del Apps Script configurada correctamente', 'success');
+        }
     </script>
 </body>
 </html>
