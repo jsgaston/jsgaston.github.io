@@ -323,6 +323,8 @@
                     <button id="start-camera" class="btn">🎥 Iniciar Cámara</button>
                     <button id="capture-photo" class="btn" disabled>📸 Capturar Foto</button>
                     <button id="stop-camera" class="btn" disabled>⏹️ Detener Cámara</button>
+                    <button class="btn" onclick="setupAppsScript()">🔗 Configurar Apps Script</button>
+                    <button class="btn" onclick="testConnection()">🔄 Probar Conexión</button>
                 </div>
             </div>
 
@@ -386,9 +388,66 @@
     <script>
         // Configuración de la aplicación
         const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec',
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxSQXWT34LCLOp1wqfGOIEe_NubsPXb0xVYmEC9w8X_x1TYydqfu3RnQlnpUfW_Ufw1/exec', // Dejar vacío inicialmente para configurar
             FACE_API_KEY: 'lOqB68CyoDooXg1h-H-z6uJaEIR_uFs4', // Para detección de caras
         };
+
+        // Función para configurar y probar la conexión
+        function setupAppsScript() {
+            const url = prompt('Ingresa la URL de tu Google Apps Script:');
+            if (url) {
+                CONFIG.APPS_SCRIPT_URL = url;
+                testConnection();
+            }
+        }
+
+        // Función para probar la conexión
+        async function testConnection() {
+            if (!CONFIG.APPS_SCRIPT_URL) {
+                showStatus('Por favor configura primero la URL del Apps Script', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Probando conexión con Google Apps Script...', 'info');
+                
+                const response = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=test', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showStatus('✅ Conexión exitosa con Apps Script', 'success');
+                    console.log('Respuesta del servidor:', result);
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                showStatus(`❌ Error de conexión: ${error.message}`, 'error');
+                showConnectionHelp();
+            }
+        }
+
+        // Mostrar ayuda de conexión
+        function showConnectionHelp() {
+            const helpDiv = document.createElement('div');
+            helpDiv.className = 'status-message status-info';
+            helpDiv.innerHTML = `
+                <h4>🔧 Pasos para solucionar el error:</h4>
+                <ol>
+                    <li>Verifica que la URL del Apps Script sea correcta</li>
+                    <li>Asegúrate de que el Apps Script esté implementado como "Aplicación Web"</li>
+                    <li>Configura el acceso como "Cualquier persona"</li>
+                    <li>Usa HTTPS (no HTTP) para la página web</li>
+                    <li>Verifica que no haya bloqueadores de anuncios activos</li>
+                </ol>
+                <button class="btn" onclick="setupAppsScript()">🔗 Configurar URL</button>
+                <button class="btn" onclick="testConnection()">🔄 Probar Conexión</button>
+            `;
+            document.getElementById('status').appendChild(helpDiv);
+        }
 
         // Variables globales
         let video;
@@ -564,11 +623,18 @@
                    Math.abs(r - g) > 15 && r > g && r > b);
         }
 
-        // Funciones de Google Drive
+        // Funciones de Google Drive con mejor manejo de errores
         async function uploadToGoogleDrive(imageData, category) {
+            if (!CONFIG.APPS_SCRIPT_URL) {
+                throw new Error('URL del Apps Script no configurada. Haz clic en "Configurar URL".');
+            }
+
             try {
+                showStatus('Conectando con Google Drive...', 'info');
+                
                 const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -580,19 +646,49 @@
                     })
                 });
                 
-                return await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Error desconocido del servidor');
+                }
+                
+                return result;
+                
             } catch (error) {
-                console.error('Error al subir a Google Drive:', error);
-                throw error;
+                console.error('Error detallado:', error);
+                
+                // Diferentes tipos de errores y sus soluciones
+                if (error.message.includes('Failed to fetch')) {
+                    throw new Error('No se puede conectar al servidor. Verifica tu conexión a internet y la configuración del Apps Script.');
+                } else if (error.message.includes('CORS')) {
+                    throw new Error('Error CORS. Asegúrate de que el Apps Script esté configurado correctamente.');
+                } else if (error.message.includes('HTTP 403')) {
+                    throw new Error('Acceso denegado. Verifica los permisos del Apps Script.');
+                } else if (error.message.includes('HTTP 404')) {
+                    throw new Error('Apps Script no encontrado. Verifica la URL.');
+                } else {
+                    throw error;
+                }
             }
         }
 
         async function loadAllPhotos() {
+            if (!CONFIG.APPS_SCRIPT_URL) {
+                showStatus('Configura primero la URL del Apps Script', 'error');
+                showConnectionHelp();
+                return;
+            }
+
             try {
                 showStatus('Cargando fotos desde Google Drive...', 'info');
                 
                 const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -601,19 +697,24 @@
                     })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const result = await response.json();
                 
                 if (result.success) {
                     allPhotos = result.photos || [];
                     displayPhotosInGallery(allPhotos);
                     updateImageSelectors();
-                    showStatus(`${allPhotos.length} fotos cargadas`, 'success');
+                    showStatus(`${allPhotos.length} fotos cargadas exitosamente`, 'success');
                 } else {
                     throw new Error(result.error || 'Error al cargar fotos');
                 }
             } catch (error) {
                 console.error('Error al cargar fotos:', error);
                 showStatus('Error al cargar fotos: ' + error.message, 'error');
+                showConnectionHelp();
             }
         }
 
