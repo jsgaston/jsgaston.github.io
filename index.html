@@ -2464,13 +2464,13 @@ function updateElapsedTime() {
 
     //------------------- nuevos calculos
 
-    let numero = totalDays_2;
+    let numero = totalSoles2;
     let numeroConCeros = numero.toString().padStart(7, '0');
     console.log(numeroConCeros); // "0012345"
     let primerosDos = numeroConCeros.toString().substring(0, 2);
     let segundosDos = numeroConCeros.toString().substring(4, 2);
-    let tercerosDos = numeroConCeros.toString().substring(6, 2);
-    let cuarto = numeroConCeros.toString().substring(7, 1);
+    let tercerosDos = numeroConCeros.toString().substring(1, 2);
+    let cuarto = numeroConCeros.toString().substring(0, 1);
     console.log(primerosDos);
     console.log(segundosDos);
     console.log(tercerosDos);
@@ -2481,8 +2481,8 @@ function updateElapsedTime() {
     console.log(numeroConCeros_); // "0012345"
     let primerosDos_ = numeroConCeros_.toString().substring(0, 2);
     let segundosDos_ = numeroConCeros_.toString().substring(4, 2);
-    let tercerosDos_ = numeroConCeros_.toString().substring(6, 2);
-    let cuarto_ = numeroConCeros_.toString().substring(7, 1);
+    let tercerosDos_ = numeroConCeros_.toString().substring(1, 2);
+    let cuarto_ = numeroConCeros_.toString().substring(0, 1);
     console.log(primerosDos_);
     console.log(segundosDos_);
     console.log(tercerosDos_);
@@ -3807,6 +3807,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
