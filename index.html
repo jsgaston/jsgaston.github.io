@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link href="'https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet");
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
     <style>
@@ -686,10 +687,64 @@
             letter-spacing: 5px;
         }
 
+        
+        .bg-gray-50 {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .flip-display {
+            display: inline-block;
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #2a2a2a;
+            padding: 8px 12px;
+            margin: 0 2px;
+            border-radius: 4px;
+            box-shadow: 
+                inset 0 2px 0 rgba(0,0,0,0.5),
+                inset 0 -2px 0 rgba(255,255,255,0.1),
+                0 2px 4px rgba(0,0,0,0.3);
+            border: 1px solid #444;
+            position: relative;
+        }
+        
+        .flip-display::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(0,0,0,0.3);
+        }
+        
+        .flip-text {
+            color: #cccccc;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        
+        .flip-container {
+            display: inline-flex;
+            gap: 3px;
+            align-items: center;
+        }
+        
+        .flip-separator {
+            color: #888;
+            font-size: 24px;
+            margin: 0 5px;
+        }
+
     </style>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"  rel="stylesheet");
-     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet");
+
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
 
@@ -732,10 +787,22 @@
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
 
+                <div class="bg-gray-50">
+        <div class="flip-text">Tiempo que debería de haber existido:</div>
+        <div id="elapsedSoles2">...</div>
+        
+        <div class="flip-text" style="margin-top: 20px;">Tiempo existido:</div>
+        <div id="elapsedDays">...</div>
+    </div>
+
                 <div class="display">
                     <div class="numero-retro"><span id="elapsedSoles">...</span></div>
 
                  </div>
+              <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
+                <div><strong>Tiempo que debería de haber existido: </strong> <span id="elapsedSoles2">...</span>   </div>
+                <div><strong>Tiempo existido: </strong> <span id="elapsedDays">...</span> <strong>  </strong> </div>
+              </div>
             
             <p class="text-center text-gray-600 mb-8"></p>
  
@@ -1385,7 +1452,7 @@
 
 
   <div class="bg-gray-50 p-4 rounded-lg text-center text-gray-800 space-y-3">
-    <div><strong>Tiempo que debería de haber existido: </strong> <span id="elapsedSoles">...</span>   </div>
+    <!-- <div><strong>Tiempo que debería de haber existido: </strong> <span id="elapsedSoles">...</span>   </div> -->
     <div><strong>Tiempo que debería de haber existido: </strong> <span id="elapsedSoles2">...</span>   </div>
     <div><strong>Tiempo existido: </strong> <span id="elapsedDays">...</span> <strong>  </strong> </div>
     <!--
@@ -2431,7 +2498,7 @@ function updateElapsedTime() {
 
   // Mostrar tiempo básico
   //  document.getElementById("elapsedSoles").textContent = `${totalSoles2} . `;
-    document.getElementById("elapsedSoles").textContent = `${numeroConCeros} years `;
+  //  document.getElementById("elapsedSoles").textContent = `${numeroConCeros} years `;
   document.getElementById("elapsedSoles2").textContent = `${primerosDos} years , ${segundosDos} months, ${tercerosDos} days,  ${cuarto} hours.`;
   document.getElementById("elapsedDays").textContent = ` ${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days,  ${cuarto_} hours.`;
   document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
@@ -3581,6 +3648,145 @@ function translateNumber() {
 }
 </script>
 
+    <script>
+
+        function formatearFlip(texto) {
+  const startInput = document.getElementById("startElapsed").value;
+  const endInput = document.getElementById("endElapsed").value;
+
+  const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
+  const endDate = endInput ? new Date(endInput) : new Date();
+
+  const personasCeldaStr = document.getElementById('personasCeldaInput').value;
+  const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
+
+  let personasCelda = parseInt(personasCeldaStr) || 16;
+  let personasAfectadas = parseInt(personasAfectadasStr) || 606;
+
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    document.getElementById("elapsedDays").textContent = "Fechas no válidas.";
+    return;
+  }
+
+  const startDate_2 = new Date("1987-12-06T00:00:00");
+
+  const msElapsed = endDate - startDate;
+  const  msElapsed_2 = endDate - startDate_2;
+  const totalSeconds2 = Math.floor(msElapsed * personasCelda * personasAfectadas / 1000); // Esto sigue siendo el total de segundos calculados con tus factores.
+
+  // Cálculos base para días, horas, minutos a partir de totalSeconds2
+  const totalDays = Math.floor(msElapsed / (60 * 60 * 24 * 1000));
+  const totalDays_2 = Math.floor(msElapsed_2 / (60 * 60 * 24 * 1000));
+  const totalSoles1 = Math.floor(totalSeconds2 / (60 * 60 * 24));
+  const totalSoles2 = Math.floor(msElapsed * personasCelda *3.703703 / (100 * 100 * 32 * 1000));
+  const secondsAfterDays = totalSeconds2 % (60 * 60 * 24);
+
+  const totalYears = Math.floor(totalSeconds2 / (60 * 60 * 24 *365.25));
+
+  const hours = Math.floor(secondsAfterDays / (60 * 60));
+  const minutes = Math.floor((secondsAfterDays % (60 * 60)) / 60);
+
+  // **NUEVAS CONSTANTES DE CONVERSIÓN BASADAS EN TU ACLARACIÓN**
+  const SECONDS_IN_STANDARD_DAY = 24 * 60 * 60; // 86400 segundos
+  const CUCHUFLUS_PEQUENOS_PER_STANDARD_DAY = 200000;
+
+  // Factor para convertir segundos estándar (totalSeconds2) a :-_
+  const conversion_factor_seconds_to_cuchuflus_pequenos = CUCHUFLUS_PEQUENOS_PER_STANDARD_DAY / SECONDS_IN_STANDARD_DAY;
+
+  // Factores internos entre tus unidades (de la imagen):
+  const CUCHUFLUS_MEDIANOS_PER_CUCHUFLUS_PEQUENO = 1 / 100; // 1 :- = 100 :-_  => 1 :-_ = 1/100 :-
+  const CUCHUFLUS_GRANDES_PER_CUCHUFLUS_MEDIANO = 1 / 100; // 1 : = 100 :- => 1 :- = 1/100 :
+  const SOLES_PER_CUCHUFLUS_GRANDE = 1 / 20; // 1 o = 20 : => 1 : = 1/20 o
+
+  // Factor para "tiradas" (1 tirada = 1.83 segundos)
+  const TIRADAS_PER_SECOND = 1 / 1.83;
+
+
+  // For demonstration, let's just display these values
+  const resultDiv = document.getElementById('resultDisplay');
+  resultDiv.innerHTML = `
+        <p>Fecha de Inicio: ${startDate.toLocaleString()}</p>
+        <p>Fecha Fin: ${endDate.toLocaleString()}</p>
+        <p> 32 x 6 : ${personasCelda}</p>
+         `;
+       // <p>Personas Afectadas : ${personasAfectadas}</p>
+        
+        // <p>1 Día son estos soles (o) : ${personasCelda}</p>
+        
+
+  console.log("Start Date: ", startDate);
+  console.log("End Date: ", endDate);
+  console.log("Personas en Celda: ", personasCelda);
+  console.log("Personas Afectadas: ", personasAfectadas);
+  console.log("Total Seconds: ", totalSeconds2);
+  // console.log("1 Día son estos soles: ", personasCelda);
+
+
+    //------------------- nuevos calculos
+
+    let numero = totalSoles2;
+    let numeroConCeros = numero.toString().padStart(7, '0');
+    console.log(numeroConCeros); // "0012345"
+    let primerosDos = numeroConCeros.toString().substring(0, 2);
+    let segundosDos = numeroConCeros.toString().substring(4, 2);
+    let tercerosDos = numeroConCeros.toString().substr(4, 2);
+    let cuarto = numeroConCeros.toString().substr(6, 1);
+    console.log(primerosDos);
+    console.log(segundosDos);
+    console.log(tercerosDos);
+    console.log(cuarto);
+
+    let numero_ = totalDays_2;
+    let numeroConCeros_ = numero_.toString().padStart(7, '0');
+    console.log(numeroConCeros_); // "0012345"
+    let primerosDos_ = numeroConCeros_.toString().substring(0, 2);
+    let segundosDos_ = numeroConCeros_.toString().substring(4, 2);
+    let tercerosDos_ = numeroConCeros_.toString().substr(4, 2);
+    let cuarto_ = numeroConCeros_.toString().substr(6, 1);
+    console.log(primerosDos_);
+    console.log(segundosDos_);
+    console.log(tercerosDos_);
+    console.log(cuarto_);
+
+
+
+
+        
+
+            // Separar el texto en palabras y números
+            let html = '';
+            let partes = texto.split(/(\d+)/); // Separa números del resto
+            
+            partes.forEach(parte => {
+                if (parte.match(/\d+/)) {
+                    // Es un número, crear flip cards para cada dígito
+                    html += '<span class="flip-container">';
+                    for (let digito of parte) {
+                        html += `<span class="flip-display">${digito}</span>`;
+                    }
+                    html += '</span>';
+                } else {
+                    // Es texto normal (comas, espacios, palabras)
+                    html += `<span class="flip-separator">${parte}</span>`;
+                }
+            });
+            
+            return html;
+        }
+
+        // Ejemplo de uso (reemplaza con tus valores reales)
+        //let primerosDos = 5, segundosDos = 8, tercerosDos = 23, cuarto = 14;
+        //let primerosDos_ = 3, segundosDos_ = 6, tercerosDos_ = 15, cuarto_ = 9;
+
+        let texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
+        let texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+
+        document.getElementById("elapsedSoles2").innerHTML = formatearFlip(texto1);
+        document.getElementById("elapsedDays").innerHTML = formatearFlip(texto2);
+</script>
+
+    
+
 <script>
 // Cambia esta URL por la correcta de tu Google Apps Script para el diario
 const DIARIO_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQXfFyrqW01o_bpR4Bny-hkL2x1VGihuk4iRwq4w61cQvx6ovNQ6t9bYmoRbIPmlAl/exec';
@@ -3748,6 +3954,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
