@@ -2402,7 +2402,7 @@ function updateElapsedTime() {
     //------------------- nuevos calculos
 
     let numero = totalSoles2;
-    let numeroConCeros = numero.toString().padStart(7, '0');
+    let numeroConCeros = numero.toString();//.padStart(7, '0');
     console.log(numeroConCeros); // "0012345"
     let primerosDos = numeroConCeros.toString().substring(0, 2);
     let segundosDos = numeroConCeros.toString().substring(4, 2);
@@ -3744,6 +3744,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
