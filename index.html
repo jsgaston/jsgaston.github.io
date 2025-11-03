@@ -3669,7 +3669,7 @@ function translateNumber() {
   // Cálculos base para días, horas, minutos a partir de totalSeconds2
 
   const totalDays_2_ = Math.floor(msElapsed_2_ / (100 * 100 * 32 * 1000));
-  const totalSoles2_ = Math.floor(msElapsed_ * personasCelda_ *3.703703 / (100 * 100 * 32 * 1000));
+  const totalSoles2_ = Math.floor(msElapsed_ * 32*6 *3.703703 / (100 * 100 * 32 * 1000));
 
   // For demonstration, let's just display these values
   const resultDiv = document.getElementById('resultDisplay');
@@ -3956,6 +3956,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
