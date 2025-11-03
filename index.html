@@ -2429,7 +2429,7 @@ function updateElapsedTime() {
 
 
   // Mostrar tiempo básico
-  document.getElementById("elapsedSoles").textContent = `${totalSoles2} `;
+  document.getElementById("elapsedSoles").textContent = `${numeroConCeros} `;
     document.getElementById("elapsedSoles2").textContent = `${primerosDos} years , ${segundosDos} months, ${tercerosDos} days,  ${cuarto} hours.`;
   document.getElementById("elapsedDays").textContent = `${totalDays_2} ,  ${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days,  ${cuarto_} hours.`;
   document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
@@ -3746,6 +3746,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
