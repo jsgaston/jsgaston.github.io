@@ -2448,16 +2448,18 @@ function updateElapsedTime() {
         <p>Fecha de Inicio: ${startDate.toLocaleString()}</p>
         <p>Fecha Fin: ${endDate.toLocaleString()}</p>
         <p>Personas en Celda : ${personasCelda}</p>
-        <p>Personas Afectadas : ${personasAfectadas}</p>
-        <p>1 Día son estos soles (o) : ${personasCelda}</p>
-        `;
+         `;
+       // <p>Personas Afectadas : ${personasAfectadas}</p>
+        
+        // <p>1 Día son estos soles (o) : ${personasCelda}</p>
+        
 
   console.log("Start Date: ", startDate);
   console.log("End Date: ", endDate);
   console.log("Personas en Celda: ", personasCelda);
   console.log("Personas Afectadas: ", personasAfectadas);
   console.log("Total Seconds: ", totalSeconds2);
-  console.log("1 Día son estos soles: ", personasCelda);
+  // console.log("1 Día son estos soles: ", personasCelda);
 
 
     //------------------- nuevos calculos
@@ -2466,9 +2468,9 @@ function updateElapsedTime() {
     let numeroConCeros = numero.toString().padStart(7, '0');
     console.log(numeroConCeros); // "0012345"
     let primerosDos = numero.toString().substring(0, 2);
-    let segundosDos = numero.toString().substring(3, 4);
-    let tercerosDos = numero.toString().substring(5, 6);
-    let cuarto = numero.toString().substring(7, 7);
+    let segundosDos = numero.toString().substring(2, 2);
+    let tercerosDos = numero.toString().substring(4, 2);
+    let cuarto = numero.toString().substring(6, 1);
     console.log(primerosDos);
     console.log(segundosDos);
     console.log(tercerosDos);
@@ -2478,9 +2480,9 @@ function updateElapsedTime() {
     let numeroConCeros_ = numero_.toString().padStart(7, '0');
     console.log(numeroConCeros_); // "0012345"
     let primerosDos_ = numero_.toString().substring(0, 2);
-    let segundosDos_ = numero_.toString().substring(3, 4);
-    let tercerosDos_ = numero_.toString().substring(5, 6);
-    let cuarto_ = numero_.toString().substring(7, 7);
+    let segundosDos_ = numero_.toString().substring(2, 2);
+    let tercerosDos_ = numero_.toString().substring(4, 2);
+    let cuarto_ = numero_.toString().substring(6, 1);
     console.log(primerosDos_);
     console.log(segundosDos_);
     console.log(tercerosDos_);
@@ -3805,6 +3807,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
