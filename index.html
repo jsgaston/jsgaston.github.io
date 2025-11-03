@@ -2418,7 +2418,7 @@ function updateElapsedTime() {
   const totalDays = Math.floor(msElapsed / (60 * 60 * 24 * 1000));
   const totalDays_2 = Math.floor(msElapsed_2 / (60 * 60 * 24 * 1000));
   const totalSoles1 = Math.floor(totalSeconds2 / (60 * 60 * 24));
-  const totalSoles2 = Math.floor(msElapsed * personasCelda *3.703703 / (100 * 100 * 32 * 1000));
+  const totalSoles2 = Math.floor(msElapsed * 32*6 *3.703703 / (100 * 100 * 32 * 1000));
   const secondsAfterDays = totalSeconds2 % (60 * 60 * 24);
 
   const totalYears = Math.floor(totalSeconds2 / (60 * 60 * 24 *365.25));
@@ -3956,6 +3956,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
