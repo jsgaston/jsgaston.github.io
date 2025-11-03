@@ -2428,8 +2428,11 @@ function updateElapsedTime() {
   const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
   const endDate = endInput ? new Date(endInput) : new Date();
 
-  const personasCeldaStr = document.getElementById('personasCeldaInput').value;
-  const personasAfectadasStr = document.getElementById('personasAfectadasInput').value;
+  const personasCeldaStr_ = document.getElementById('personasCeldaInput').value;
+  const personasAfectadasStr_ = document.getElementById('personasAfectadasInput').value;
+
+  const personasCeldaStr = personasCeldaInput ? personasCeldaStr_ : 192;
+  const personasAfectadasStr = personasAfectadasInput ? personasAfectadasStr_ : 608;
 
   let personasCelda = parseInt(personasCeldaStr) || 16;
   let personasAfectadas = parseInt(personasAfectadasStr) || 606;
@@ -3856,6 +3859,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
