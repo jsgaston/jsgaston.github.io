@@ -2409,7 +2409,10 @@ let graphIframe2 = null;
         // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', () => {
             showMainTab('home');
-            updateElapsedTime();  // ← ESTO SE AÑADIÓ
+            // Actualizar el contador de tiempo al cargar la página
+            updateElapsedTime();                        // ← Se ejecuta al cargar
+            // Actualizar el contador cada 30 segundos
+            setInterval(updateElapsedTime, 30000);     // ← Se ejecuta cada 30 seg
         });
     </script>
 
@@ -3852,6 +3855,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
