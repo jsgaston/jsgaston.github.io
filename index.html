@@ -787,7 +787,7 @@
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-white-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
 
-                <div class="bg-gray-50">
+                <div class="bg-gray-9">
                     <div class="flip-text">Tiempo que debería de haber existido:</div>
                     <div id="elapsedSoles2_">...</div>
                     
@@ -3643,7 +3643,7 @@ function translateNumber() {
 
         function formatearFlip(texto) {
 
-
+/*
   const startDate_ = new Date("1982-12-06T00:00:00");
   const endDate_ =  new Date();
 
@@ -3701,7 +3701,7 @@ function translateNumber() {
     console.log(tercerosDos__);
     console.log(cuarto__);
 
-
+*/
 
 
         
@@ -3731,8 +3731,8 @@ function translateNumber() {
         //let primerosDos = 5, segundosDos = 8, tercerosDos = 23, cuarto = 14;
         //let primerosDos_ = 3, segundosDos_ = 6, tercerosDos_ = 15, cuarto_ = 9;
 
-        let texto1 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
-        let texto2 = `${primerosDos__} years, ${segundosDos__} months, ${tercerosDos__} days, ${cuarto__} hours`;
+        let texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto_} hours`;
+        let texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
 
         document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
         document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
@@ -3907,6 +3907,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
