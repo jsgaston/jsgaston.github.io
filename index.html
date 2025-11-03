@@ -748,6 +748,30 @@
 </head>
 <body class="bg-gray-100 p-5 flex items-center justify-center min-h-screen">
 
+    <script>
+        // Función para formatear números con estilo flip/retro
+        function formatearFlip(texto) {
+            let html = '';
+            let partes = texto.split(/(\d+)/); // Separa números del resto
+            
+            partes.forEach(parte => {
+                if (parte.match(/\d+/)) {
+                    // Es un número, crear flip cards para cada dígito
+                    html += '<span class="flip-container">';
+                    for (let digito of parte) {
+                        html += `<span class="flip-display">${digito}</span>`;
+                    }
+                    html += '</span>';
+                } else {
+                    // Es texto normal (comas, espacios, palabras)
+                    html += `<span class="flip-separator">${parte}</span>`;
+                }
+            });
+            
+            return html;
+        }
+    </script>
+
     
 
     <!-- Modal para ver imágenes en grande -->
@@ -2390,89 +2414,6 @@ let graphIframe2 = null;
 
 
 
-<script>
-
-      function formatearFlip(texto) {
-
-
-  const startDate_ = new Date("1982-12-06T00:00:00");
-  const endDate_ = = new Date();
-
-  const startDate_2_ = new Date("1987-12-06T00:00:00");
-
-  const msElapsed_ = endDate_ - startDate_;
-  const  msElapsed_2_ = endDate_ - startDate_2_;
-
-
-  // Cálculos base para días, horas, minutos a partir de totalSeconds2
-
-  const totalDays_2_ = Math.floor(msElapsed_2_ / (100 * 100 * 32 * 1000));
-  const totalSoles2_ = Math.floor(msElapsed_ * 32*6 *3.703703 / (100 * 100 * 32 * 1000));
-
-  // For demonstration, let's just display these values
-  const resultDiv = document.getElementById('resultDisplay');
-  resultDiv.innerHTML = `
-        <p>Fecha de Inicio: ${startDate_.toLocaleString()}</p>
-        <p>Fecha Fin: ${endDate_.toLocaleString()}</p>
-
-         `;
-
-  console.log("Start Date: ", startDate_);
-  console.log("End Date: ", endDate_);
-
-     let numero = totalSoles2_;
-     let numeroConCeros = numero.toString().padStart(7, '0');
-    console.log(numeroConCeros); // "0012345"
-    let primerosDos = numeroConCeros.toString().substring(0, 2);
-     let segundosDos = numeroConCeros.toString().substring(4, 2);
-    let tercerosDos = numeroConCeros.toString().substr(4, 2);
-    let cuarto = numeroConCeros.toString().substr(6, 1);
-    console.log(primerosDos);
-    console.log(segundosDos);
-    console.log(tercerosDos);
-    console.log(cuarto);
-
-     let numero_ = totalDays_2_;
-     let numeroConCeros_ = numero_.toString().padStart(7, '0');
-    console.log(numeroConCeros_); // "0012345"
-     let primerosDos_ = numeroConCeros_.toString().substring(0, 2);
-     let segundosDos_ = numeroConCeros_.toString().substring(4, 2);
-     let tercerosDos_ = numeroConCeros_.toString().substr(4, 2);
-     let cuarto_ = numeroConCeros_.toString().substr(6, 1);
-    console.log(primerosDos_);
-    console.log(segundosDos_);
-    console.log(tercerosDos_);
-    console.log(cuarto_);
-      
-            // Separar el texto en palabras y números
-            let html = '';
-            let partes = texto.split(/(\d+)/); // Separa números del resto
-            
-            partes.forEach(parte => {
-                if (parte.match(/\d+/)) {
-                    // Es un número, crear flip cards para cada dígito
-                    html += '<span class="flip-container">';
-                    for (let digito of parte) {
-                        html += `<span class="flip-display">${digito}</span>`;
-                    }
-                    html += '</span>';
-                } else {
-                    // Es texto normal (comas, espacios, palabras)
-                    html += `<span class="flip-separator">${parte}</span>`;
-                }
-            });
-            
-            return html;
-        }
-
-
-        // Actualizar con el estilo flip/retro
-let texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-let texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
-//document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
-//document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
-
-</script>    
 
 
 <script>
@@ -3910,6 +3851,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
