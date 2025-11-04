@@ -2566,11 +2566,11 @@ function updateElapsedTime() {
     console.log(cuarto_);
 
     let numero_dias24h_ = totalDays;
-    let numero_dias24h = numero_dias24h_.toString()
+    const numero_dias24h = numero_dias24h_.toString()
     console.log(numero_dias24h); // "0012345"
 
     let numero_dias32h_ = numero_dias24h*0.8;
-    let numero_dias32h = numero_dias32h_.toString();
+    const numero_dias32h = numero_dias32h_.toString();
     console.log(numero_dias32h); // "0012345"
 
   const texto1_1 = `${numero_dias24h}`;
@@ -2579,11 +2579,6 @@ function updateElapsedTime() {
     document.getElementById("numero_dias32h_").textContent = `${texto2_1} en equivalente en días de 32 h en calendario Gregoriano `;
     document.getElementById("numero_dias24h_2").innerHTML = formatearFlip(texto1_1);
   document.getElementById("numero_dias32h_2").innerHTML = formatearFlip(texto2_1);
-
-  // Mostrar tiempo básico
-  //  document.getElementById("elapsedSoles").textContent = `${totalSoles2} . `;
-  //  document.getElementById("elapsedSoles").textContent = `${numeroConCeros} years `;
-
   
   // Actualizar con el estilo flip/retro
   const texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
@@ -3943,6 +3938,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
