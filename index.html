@@ -2567,12 +2567,12 @@ function updateElapsedTime() {
 
     const numero_dias24h_ = totalDays;
     const numero_dias24h = numero_dias24h_.toString()
-    console.log(numero_dias24h); // "0012345"
+    //console.log(numero_dias24h); // "0012345"
 
     const numero_dias32h_ = numero_dias24h*0.8;
     const numero_dias32h = numero_dias32h_.toString();
-    console.log(numero_dias32h); // "0012345"
-    console.log(numero_dias24h); // "0012345"
+    //console.log(numero_dias32h); // "0012345"
+    //console.log(numero_dias24h); // "0012345"
 
     const texto1_1 = `${numero_dias24h}`;
     const texto2_1 = `${numero_dias32h}`;
@@ -2586,13 +2586,16 @@ function updateElapsedTime() {
     const texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
     document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
     document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
-
+    const texto1_2 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
+    const texto2_2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
     document.getElementById("elapsedSoles2_1").innerHTML = formatearFlip(texto1);
     document.getElementById("elapsedDays_1").innerHTML = formatearFlip(texto2);
-
+    const texto1_3 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
+    const texto2_3 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
     document.getElementById("elapsedSoles2_2").innerHTML = formatearFlip(texto1);
     document.getElementById("elapsedDays_2").innerHTML = formatearFlip(texto2);
-
+    const texto1_4 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
+    const texto2_4 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
     document.getElementById("elapsedSoles2_3").innerHTML = formatearFlip(texto1);
     document.getElementById("elapsedDays_3").innerHTML = formatearFlip(texto2);
 
@@ -3939,6 +3942,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
