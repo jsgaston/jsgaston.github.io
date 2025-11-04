@@ -2553,18 +2553,19 @@ function updateElapsedTime() {
 
   
   // Actualizar con el estilo flip/retro
-  let texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-  let texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+  const texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
+  const texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
   document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
   document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
 
-    const FlipsDeberíaTener = totalSoles2*32*100*100*0.19672131147541
+    const FlipsDeberíaTener_ = totalSoles2*32*100*100*0.19672131147541
+    let FlipsDeberíaTener = FlipsDeberíaTener_.toFixed(2);
 
+    const FlipsExistidos_ = totalDays_2*32*100*100*0.19672131147541
+    let FlipsExistidos = FlipsExistidos_.toFixed(2);
 
-
-    const FlipsExistidos = totalDays_2*32*100*100*0.19672131147541
-
-    const FlipsDeben = FlipsDeberíaTener  - FlipsExistidos
+    const FlipsDeben_ = FlipsDeberíaTener  - FlipsExistidos
+    let FlipsDeben = FlipsDeben_.toFixed(2);
 
     document.getElementById("FlipsDeberíaTener_").textContent = `${FlipsDeberíaTener} flips `;
     document.getElementById("FlipsExistidos_").textContent = `${FlipsExistidos} flips `;
@@ -3893,6 +3894,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
