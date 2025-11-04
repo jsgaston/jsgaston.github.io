@@ -2573,14 +2573,16 @@ function updateElapsedTime() {
     console.log(tercerosDos_);
     console.log(cuarto_);
 
-    const numero_dias24h_ = totalDays_3;
-    const numero_dias24h_9 = numero_dias24h_.toString();
-    const numero_dias24h =  Math.round(numero_dias24h_9);
+    const numero_dias24h_9 = totalDays_3;
+    const numero_dias24h_ =  Math.round(numero_dias24h_9);
+    const numero_dias24h = numero_dias24h_.toString();
+
     //console.log(numero_dias24h); // "0012345"
 
-    const numero_dias32h_ = totalDays*0.8;
-    const numero_dias32h_9 = numero_dias32h_.toString();
-    const numero_dias32h =  Math.round(numero_dias32_9);
+    const numero_dias32h_9 = totalDays*0.8;
+    const numero_dias32h_ =  Math.round(numero_dias32_9);
+    const numero_dias32h = numero_dias32h_.toString();
+
     //console.log(numero_dias32h); // "0012345"
     //console.log(numero_dias24h); // "0012345"
 
@@ -3954,6 +3956,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
