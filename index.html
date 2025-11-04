@@ -2573,27 +2573,27 @@ function updateElapsedTime() {
     const numero_dias32h = numero_dias32h_.toString();
     console.log(numero_dias32h); // "0012345"
 
-  const texto1_1 = `${numero_dias24h}`;
-  const texto2_1 = `${numero_dias32h}`;
+    const texto1_1 = `${numero_dias24h}`;
+    const texto2_1 = `${numero_dias32h}`;
     document.getElementById("numero_dias24h_").textContent = `${texto1_1} dias existidos de 24 h en calendario Gregoriano `;
     document.getElementById("numero_dias32h_").textContent = `${texto2_1} en equivalente en días de 32 h en calendario Gregoriano `;
     document.getElementById("numero_dias24h_2").innerHTML = formatearFlip(texto1_1);
-  document.getElementById("numero_dias32h_2").innerHTML = formatearFlip(texto2_1);
+    document.getElementById("numero_dias32h_2").innerHTML = formatearFlip(texto2_1);
   
   // Actualizar con el estilo flip/retro
-  const texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-  const texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
-  document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
-  document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
+    const texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
+    const texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+    document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
+    document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
 
-      document.getElementById("elapsedSoles2_1").innerHTML = formatearFlip(texto1);
-  document.getElementById("elapsedDays_1").innerHTML = formatearFlip(texto2);
+    document.getElementById("elapsedSoles2_1").innerHTML = formatearFlip(texto1);
+    document.getElementById("elapsedDays_1").innerHTML = formatearFlip(texto2);
 
-      document.getElementById("elapsedSoles2_2").innerHTML = formatearFlip(texto1);
-  document.getElementById("elapsedDays_2").innerHTML = formatearFlip(texto2);
+    document.getElementById("elapsedSoles2_2").innerHTML = formatearFlip(texto1);
+    document.getElementById("elapsedDays_2").innerHTML = formatearFlip(texto2);
 
-      document.getElementById("elapsedSoles2_3").innerHTML = formatearFlip(texto1);
-  document.getElementById("elapsedDays_3").innerHTML = formatearFlip(texto2);
+    document.getElementById("elapsedSoles2_3").innerHTML = formatearFlip(texto1);
+    document.getElementById("elapsedDays_3").innerHTML = formatearFlip(texto2);
 
     const FlipsDeberíaTener_ = totalSoles2*32*100*100*0.19672131147541
     const FlipsDeberíaTener = FlipsDeberíaTener_.toFixed(2);
@@ -2616,12 +2616,12 @@ function updateElapsedTime() {
     document.getElementById("FlipsDeben_2").innerHTML = formatearFlip(FlipsDeben);
 
     
-  document.getElementById("elapsedSoles2").textContent = `${primerosDos} years , ${segundosDos} months, ${tercerosDos} days,  ${cuarto} hours.`;
-  document.getElementById("elapsedDays").textContent = ` ${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days,  ${cuarto_} hours.`;
-  document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
-  document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
-  document.getElementById("elapsedMinutes").textContent = (totalSeconds2 / 60).toLocaleString(undefined, {maximumFractionDigits: 2});
-   document.getElementById("elapsedSeconds").textContent = (totalSeconds2 ).toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById("elapsedSoles2").textContent = `${primerosDos} years , ${segundosDos} months, ${tercerosDos} days,  ${cuarto} hours.`;
+    document.getElementById("elapsedDays").textContent = ` ${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days,  ${cuarto_} hours.`;
+    document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById("elapsedMinutes").textContent = (totalSeconds2 / 60).toLocaleString(undefined, {maximumFractionDigits: 2});
+    document.getElementById("elapsedSeconds").textContent = (totalSeconds2 ).toLocaleString(undefined, {maximumFractionDigits: 2});
 
   // Conversiones especiales
   const extra = document.getElementById("extraTimeUnits");
@@ -3938,6 +3938,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
