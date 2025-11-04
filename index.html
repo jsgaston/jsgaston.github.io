@@ -1042,8 +1042,8 @@
             <p><strong>Contacto: </strong> <a href="mailto:javier@email.com" class="text-blue-600 underline">jsgastoniriartecabrera@gmail.com</a></p>
             <p><strong>Teléfono: </strong> +34 669 574 483</p>
             <p><strong>Nacimiento: </strong> Trillizo</p>
-            <p><strong>Tiempo real de existencia: </strong> A día de hoy 30 de Octubre de 2025 menos de <div id="elapsedDays_">...</div></p>
-            <p><strong>Tiempo que debería de haber existido: </strong> A día de hoy 30 de Octubre de 2025 más de <div id="elapsedSoles2_">...</div></p>
+            <p><strong>Tiempo real de existencia: </strong> A día de hoy 30 de Octubre de 2025 menos de <div id="elapsedDays_1">...</div></p>
+            <p><strong>Tiempo que debería de haber existido: </strong> A día de hoy 30 de Octubre de 2025 más de <div id="elapsedSoles2_1">...</div></p>
             <p><strong>Tiempo vivido: </strong> menos de 1</p>
             <p><strong>Numero de delitos, robos, fechorías, hurtos o crímenes realizados o perpetrados: </strong> NaN</p>
             <p><strong>Cuerpo: </strong> Completo</p>
@@ -1082,23 +1082,23 @@
               parte de la piel sobrante que cubre el prepucio (esto no fué estético, me dijeron que era mejor para la higiene de ellas) y me quité el frenillo también hace media existencia por necesidá.</p>
             <p><strong>Acutalidá: </strong> A día de hoy me han robado y es lo que debería de haber existio
                 
-                <div id="elapsedSoles2_">...</div>
+                <div id="elapsedSoles2_2">...</div>
               
                 , y me quieren y han querido siempre asesinar por las deudas que tienen, debería de haber existido
                    y sólo me han permitido existir  
               
-              <div id="elapsedDays_">...</div>
+              <div id="elapsedDays_2">...</div>
               
               .</p>
               
             <p><strong>De mí: </strong> Soy javi, ahora mismo tengo 42 años Gregorianos, soy trillizo (hijo de una violación), debería de ser del 2000 y la primera pantalla que ví fué plana, pero me llevaron al 1982 
                 y me despertaron en el 1987, debería tener 
               
-              <div id="elapsedSoles2_">...</div> 
+              <div id="elapsedSoles2_3">...</div> 
               
               (he ganao a Berverly Hills 90210 ) de existencia pero sólo 
               
-                tengo <div id="elapsedDays_">...</div> 
+                tengo <div id="elapsedDays_3">...</div> 
               
                 de existencia y vividos
                 ni uno (una puta mierda de existencia he vivido pues además tenía porteros y niñatos pidien pasarlo bien y gente pidiendo trabajo y gente que ordeña como si fuesen máquinas de esprimir),
@@ -2558,6 +2558,15 @@ function updateElapsedTime() {
   document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
   document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
 
+      document.getElementById("elapsedSoles2_1").innerHTML = formatearFlip(texto1);
+  document.getElementById("elapsedDays_1").innerHTML = formatearFlip(texto2);
+
+      document.getElementById("elapsedSoles2_2").innerHTML = formatearFlip(texto1);
+  document.getElementById("elapsedDays_2").innerHTML = formatearFlip(texto2);
+
+      document.getElementById("elapsedSoles2_3").innerHTML = formatearFlip(texto1);
+  document.getElementById("elapsedDays_3").innerHTML = formatearFlip(texto2);
+
     const FlipsDeberíaTener_ = totalSoles2*32*100*100*0.19672131147541
     let FlipsDeberíaTener = FlipsDeberíaTener_.toFixed(2);
 
@@ -3894,6 +3903,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
