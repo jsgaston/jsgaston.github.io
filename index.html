@@ -1062,8 +1062,8 @@
             <p><strong>Contacto: </strong> <a href="mailto:javier@email.com" class="text-blue-600 underline">jsgastoniriartecabrera@gmail.com</a></p>
             <p><strong>Teléfono: </strong> +34 669 574 483</p>
             <p><strong>Nacimiento: </strong> Trillizo</p>
-            <p><strong>Tiempo real de existencia: </strong> A día de hoy 30 de Octubre de 2025 menos de <div id="elapsedDays_1">...</div></p>
-            <p><strong>Tiempo que debería de haber existido: </strong> A día de hoy 30 de Octubre de 2025 más de <div id="elapsedSoles2_1">...</div></p>
+            <p><strong>Tiempo real de existencia: </strong> A día de hoy <div id="NowDate_">...</div> menos de <div id="elapsedDays_1">...</div></p>
+            <p><strong>Tiempo que debería de haber existido: </strong> A día <div id="NowDate_">...</div>  más de <div id="elapsedSoles2_1">...</div></p>
             <p><strong>Tiempo vivido: </strong> menos de 1</p>
             <p><strong>Numero de delitos, robos, fechorías, hurtos o crímenes realizados o perpetrados: </strong> NaN</p>
             <p><strong>Cuerpo: </strong> Completo</p>
@@ -1190,13 +1190,23 @@
                 Podría pedir que me chupasen el pito cuando quisiese ... pero no son gente legal ... así que pediré que les asesinen y así no hay más molestias, per aún no se quienes son pero voy
               a darle 4 vuelstas mas a ver si adivino cómo piensan los malos ...
 
-              He llegao a la conclusion de que para lograr todo esto han hecho lo siguiente: mataron a el hombre de la de 1,44, y así me encargaron a mi y a mi mujer … forzaron otra vez robando a 
+              He llegao a la conclusion de que para lograr todo esto han hecho lo siguiente: mataron a el hombre de la de 1,44, y así encargaron a mi y a mi mujer … forzaron otra vez robando a 
               mi mujer para que la nave me usase para rescatarla … y volvieron a forzar para que me usasen como coche con amenazas de muerte … y otra vez más … 
               forzaron usandome como coche y supongo que disparando a alguien de la familia que queria ayudar y así forzaron otra vez para  
               quitarme too el tiempo menos 1 cada 192 ... y supongo que esta gente quiere que haga algo muy mal para liberarme pero que la nave ya no me pueda dar por castigo y supongo
               que los que han hecho TODO ESTO ha sido la gente que me ha robao a la mujer y la tienen secuestrada y casaa o yo que se qué ... son todos lo mismo y parece que no han
               encontrao mejor manera de ligar y supongo hace mucho que no tiene para alimentarse ... y supongo ahora buscan o ya tienen nueva casa y quieren soltar a mi mujer y 
-              están esperand a que yo haga algo mal para soltarme y así tener a mi mujer y a mi en la nada porque mi mujer estará mal vista por la familia. FIN
+              están esperand a que yo haga algo mal para soltarme y así tener a mi mujer y a mi en la nada porque mi mujer estará mal vista por la familia. 
+
+              La otra opción es mataron a el hombre de la de 1,44, y así encargaron a mi mujer y a mi … forzaron otra vez robando a 
+              mi mujer para que la nave me usase para rescatarla … saldría detras de ellos con un arma que le daría la nave y alguien se la robó con más forzaduras 
+              y volvieron a forzar para que me usasen como coche con amenazas de muerte … y otra vez más … 
+              forzaron usandome como coche y supongo que alguién acudio a la Policia y supongo que a la nave no le gusta la Policía y por eso encamo a unos cuantos
+              y da todo miedo por que al primer problema o ayuda que pides te recomiendan ir a la Policía a poner una denuncia y así forzaron otra vez para  
+              quitarme too el tiempo menos 1 cada 192 ... y supongo que esta gente quiere que haga algo muy mal para liberarme pero que la nave ya no me pueda dar por castigo y supongo
+              que los que han hecho TODO ESTO ha sido la gente que me ha robao a la mujer y la tienen secuestrada y casaa o yo que se qué ... son todos lo mismo y parece que no han
+              encontrao mejor manera de ligar y supongo hace mucho que no tiene para alimentarse ... y supongo ahora buscan o ya tienen nueva casa y quieren soltar a mi mujer y 
+              están esperand a que yo haga algo mal para soltarme y así tener a mi mujer y a mi en la nada porque mi mujer estará mal vista por la familia. 
 
                             
             </p>
@@ -2476,6 +2486,7 @@ function updateElapsedTime() {
 
   const startDate = startInput ? new Date(startInput) : new Date("1982-12-06T00:00:00");
   const endDate = endInput ? new Date(endInput) : new Date();
+  const nowDate = new Date();
 
  //const personasCeldaStr_ = document.getElementById('personasCeldaInput').value;
   //const personasAfectadasStr_ = document.getElementById('personasAfectadasInput').value;
@@ -2483,8 +2494,8 @@ function updateElapsedTime() {
   const personasCeldaStr = 192; //personasCeldaInput ? personasCeldaStr_ : 192;
   const personasAfectadasStr = 608; //personasAfectadasInput ? personasAfectadasStr_ : 608;
 
-  let personasCelda = parseInt(personasCeldaStr) || 16;
-  let personasAfectadas = parseInt(personasAfectadasStr) || 606;
+  const personasCelda = parseInt(personasCeldaStr) || 16;
+  const personasAfectadas = parseInt(personasAfectadasStr) || 606;
 
   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
     document.getElementById("elapsedDays").textContent = "Fechas no válidas.";
@@ -2588,12 +2599,12 @@ function updateElapsedTime() {
 
     const texto1_1 = `${numero_dias24h}`;
     const texto2_1 = `${numero_dias32h}`;
-    const Alph1 = document.getElementById("numero_dias24h_5").textContent = `${numero_dias24h_} dias existidos de 24 h en calendario Gregoriano `;
-    const Alph2 = document.getElementById("numero_dias32h_5").textContent = `${numero_dias32h_} en equivalente en días de 32 h en calendario Gregoriano `;
+    //const Alph1 = document.getElementById("numero_dias24h_5").textContent = `${numero_dias24h_} dias existidos de 24 h en calendario Gregoriano `;
+    //const Alph2 = document.getElementById("numero_dias32h_5").textContent = `${numero_dias32h_} en equivalente en días de 32 h en calendario Gregoriano `;
     document.getElementById("numero_dias24h_2").innerHTML = formatearFlip(texto1_1);
     document.getElementById("numero_dias32h_2").innerHTML = formatearFlip(texto2_1);
-    document.getElementById("numero_dias24h_23").innerHTML = Alph_1;
-    document.getElementById("numero_dias32h_23").innerHTML = Alph_2;
+    //document.getElementById("numero_dias24h_23").innerHTML = Alph_1;
+    //document.getElementById("numero_dias32h_23").innerHTML = Alph_2;
   
   // Actualizar con el estilo flip/retro
     const texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
@@ -2628,6 +2639,7 @@ function updateElapsedTime() {
     document.getElementById("FlipsDeberíaTener_").textContent = `${FlipsDeberíaTener} flips `;
     document.getElementById("FlipsExistidos_").textContent = `${FlipsExistidos} flips `;
     document.getElementById("FlipsDeben:").textContent = `${FlipsDeben} flips `;
+    document.getElementById("NowDate_").textContent = `${NowDate}  `;
 
     document.getElementById("FlipsDeberíaTener_1").innerHTML = formatearFlip(FlipsDeberíaTener);
     document.getElementById("FlipsExistidos_1").innerHTML = formatearFlip(FlipsExistidos);
@@ -3956,6 +3968,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
