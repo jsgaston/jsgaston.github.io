@@ -2567,10 +2567,11 @@ function updateElapsedTime() {
 
     let numero_dias24h_ = totalDays;
     let numero_dias24h = numero_dias24h_.toString()
-    console.log(numeroConCeros_); // "0012345"
+    console.log(numero_dias24h); // "0012345"
 
-    let numero_dias32_ = numero_dias24h*0.8;
+    let numero_dias32h_ = numero_dias24h*0.8;
     let numero_dias32h = numero_dias32h_.toString();
+    console.log(numero_dias32h); // "0012345"
 
   const texto1_1 = `${numero_dias24h}`;
   const texto2_1 = `${numero_dias32h}`;
@@ -2601,12 +2602,15 @@ function updateElapsedTime() {
 
     const FlipsDeberíaTener_ = totalSoles2*32*100*100*0.19672131147541
     let FlipsDeberíaTener = FlipsDeberíaTener_.toFixed(2);
+    console.log(FlipsDeberíaTener); // "0012345"
 
     const FlipsExistidos_ = totalDays_2*32*100*100*0.19672131147541
     let FlipsExistidos = FlipsExistidos_.toFixed(2);
+    console.log(FlipsExistidos); // "0012345"
 
     const FlipsDeben_ = FlipsDeberíaTener  - FlipsExistidos
     let FlipsDeben = FlipsDeben_.toFixed(2);
+    console.log(FlipsDeben); // "0012345"
 
     document.getElementById("FlipsDeberíaTener_").textContent = `${FlipsDeberíaTener} flips `;
     document.getElementById("FlipsExistidos_").textContent = `${FlipsExistidos} flips `;
@@ -3939,6 +3943,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
