@@ -2642,13 +2642,12 @@ function updateElapsedTime() {
     document.getElementById("FlipsDeben:").textContent = `${FlipsDeben} flips `;
     document.getElementById("NowDate_").textContent = `${nowDate}  `;
     document.getElementById("NowDate_2").textContent = `${nowDate}  `;
+    document.getElementById("NowDate_3").textContent = `${nowDate}  `;
 
     document.getElementById("FlipsDeberíaTener_1").innerHTML = formatearFlip(FlipsDeberíaTener);
     document.getElementById("FlipsExistidos_1").innerHTML = formatearFlip(FlipsExistidos);
     document.getElementById("FlipsDeben_2").innerHTML = formatearFlip(FlipsDeben);
-    document.getElementById("NowDate_3").innerHTML = formatearFlip(nowDate);
-
-    
+        
     document.getElementById("elapsedSoles2").textContent = `${primerosDos} years , ${segundosDos} months, ${tercerosDos} days,  ${cuarto} hours.`;
     document.getElementById("elapsedDays").textContent = ` ${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days,  ${cuarto_} hours.`;
     document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
@@ -3971,6 +3970,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
