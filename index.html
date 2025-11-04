@@ -812,7 +812,7 @@
         </nav>
 
         <div id="mainHomeSection" class="main-tab-content">
-            <h2 class="text-2xl font-bold text-white-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
 
                 <div class="bg-gray-9">
                     <div class="flip-text">Tiempo que debería de haber existido:</div>
@@ -2499,6 +2499,7 @@ function updateElapsedTime() {
 
   // Cálculos base para días, horas, minutos a partir de totalSeconds2
   const totalDays = Math.floor(msElapsed / (60 * 60 * 24 * 1000));
+  const totalDays_3= Math.floor(msElapsed_2 / (60 * 60 * 24 * 1000));
   
   const totalSoles1 = Math.floor(totalSeconds2 / (60 * 60 * 24));
   const totalSoles2 = Math.floor(msElapsed * 32*6 *3.703703 / (100 * 100 * 32 * 1000));
@@ -2572,21 +2573,25 @@ function updateElapsedTime() {
     console.log(tercerosDos_);
     console.log(cuarto_);
 
-    const numero_dias24h_ = totalDays;
-    const numero_dias24h = numero_dias24h_.toString()
+    const numero_dias24h_ = totalDays_3;
+    const numero_dias24h_9 = numero_dias24h_.toString();
+    const numero_dias24h = numero_dias24h_9.toFixed(0);
     //console.log(numero_dias24h); // "0012345"
 
     const numero_dias32h_ = totalDays*0.8;
-    const numero_dias32h = numero_dias32h_.toString();
+    const numero_dias32h_9 = numero_dias32h_.toString();
+    const numero_dias32h = numero_dias32h_9.toFixed(0);
     //console.log(numero_dias32h); // "0012345"
     //console.log(numero_dias24h); // "0012345"
 
     const texto1_1 = `${numero_dias24h}`;
     const texto2_1 = `${numero_dias32h}`;
-    //document.getElementById("numero_dias24h_5").textContent = `${numero_dias24h_} dias existidos de 24 h en calendario Gregoriano `;
-    //document.getElementById("numero_dias32h_5").textContent = `${numero_dias32h_} en equivalente en días de 32 h en calendario Gregoriano `;
+    const Alph1 = document.getElementById("numero_dias24h_5").textContent = `${numero_dias24h_} dias existidos de 24 h en calendario Gregoriano `;
+    const Alph2 = document.getElementById("numero_dias32h_5").textContent = `${numero_dias32h_} en equivalente en días de 32 h en calendario Gregoriano `;
     document.getElementById("numero_dias24h_2").innerHTML = formatearFlip(texto1_1);
     document.getElementById("numero_dias32h_2").innerHTML = formatearFlip(texto2_1);
+    document.getElementById("numero_dias24h_23").innerHTML = Alph_1;
+    document.getElementById("numero_dias32h_23").innerHTML = Alph_2;
   
   // Actualizar con el estilo flip/retro
     const texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
@@ -2595,16 +2600,16 @@ function updateElapsedTime() {
     document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
     const texto1_2 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
     const texto2_2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
-    document.getElementById("elapsedSoles2_1").innerHTML = formatearFlip(texto1);
-    document.getElementById("elapsedDays_1").innerHTML = formatearFlip(texto2);
+    document.getElementById("elapsedSoles2_1").innerHTML = texto1_2;
+    document.getElementById("elapsedDays_1").innerHTML = texto2_2;
     const texto1_3 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
     const texto2_3 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
-    document.getElementById("elapsedSoles2_2").innerHTML = formatearFlip(texto1);
-    document.getElementById("elapsedDays_2").innerHTML = formatearFlip(texto2);
+    document.getElementById("elapsedSoles2_2").innerHTML = texto1_3;
+    document.getElementById("elapsedDays_2").innerHTML = texto2_3;
     const texto1_4 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
     const texto2_4 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
-    document.getElementById("elapsedSoles2_3").innerHTML = formatearFlip(texto1);
-    document.getElementById("elapsedDays_3").innerHTML = formatearFlip(texto2);
+    document.getElementById("elapsedSoles2_3").innerHTML = texto1_4;
+    document.getElementById("elapsedDays_3").innerHTML = texto2_4;
 
     const FlipsDeberíaTener_ = totalSoles2*32*100*100*0.19672131147541
     const FlipsDeberíaTener = FlipsDeberíaTener_.toFixed(2);
@@ -3949,6 +3954,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
