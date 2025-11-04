@@ -1063,7 +1063,7 @@
             <p><strong>Teléfono: </strong> +34 669 574 483</p>
             <p><strong>Nacimiento: </strong> Trillizo</p>
             <p><strong>Tiempo real de existencia: </strong> A día de hoy <div id="NowDate_">...</div> menos de <div id="elapsedDays_1">...</div></p>
-            <p><strong>Tiempo que debería de haber existido: </strong> A día <div id="NowDate_">...</div>  más de <div id="elapsedSoles2_1">...</div></p>
+            <p><strong>Tiempo que debería de haber existido: </strong> A día <div id="NowDate_2">...</div>  más de <div id="elapsedSoles2_1">...</div></p>
             <p><strong>Tiempo vivido: </strong> menos de 1</p>
             <p><strong>Numero de delitos, robos, fechorías, hurtos o crímenes realizados o perpetrados: </strong> NaN</p>
             <p><strong>Cuerpo: </strong> Completo</p>
@@ -2640,6 +2640,7 @@ function updateElapsedTime() {
     document.getElementById("FlipsExistidos_").textContent = `${FlipsExistidos} flips `;
     document.getElementById("FlipsDeben:").textContent = `${FlipsDeben} flips `;
     document.getElementById("NowDate_").textContent = `${nowDate}  `;
+    document.getElementById("NowDate_2").textContent = `${nowDate}  `;
 
     document.getElementById("FlipsDeberíaTener_1").innerHTML = formatearFlip(FlipsDeberíaTener);
     document.getElementById("FlipsExistidos_1").innerHTML = formatearFlip(FlipsExistidos);
@@ -3968,6 +3969,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
