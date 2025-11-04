@@ -2569,15 +2569,15 @@ function updateElapsedTime() {
     const numero_dias24h = numero_dias24h_.toString()
     //console.log(numero_dias24h); // "0012345"
 
-    const numero_dias32h_ = numero_dias24h*0.8;
+    const numero_dias32h_ = totalDays*0.8;
     const numero_dias32h = numero_dias32h_.toString();
     //console.log(numero_dias32h); // "0012345"
     //console.log(numero_dias24h); // "0012345"
 
     const texto1_1 = `${numero_dias24h}`;
     const texto2_1 = `${numero_dias32h}`;
-    document.getElementById("numero_dias24h_5").textContent = `${numero_dias24h_} dias existidos de 24 h en calendario Gregoriano `;
-    document.getElementById("numero_dias32h_5").textContent = `${numero_dias32h_} en equivalente en días de 32 h en calendario Gregoriano `;
+    //document.getElementById("numero_dias24h_5").textContent = `${numero_dias24h_} dias existidos de 24 h en calendario Gregoriano `;
+    //document.getElementById("numero_dias32h_5").textContent = `${numero_dias32h_} en equivalente en días de 32 h en calendario Gregoriano `;
     document.getElementById("numero_dias24h_2").innerHTML = formatearFlip(texto1_1);
     document.getElementById("numero_dias32h_2").innerHTML = formatearFlip(texto2_1);
   
@@ -3942,6 +3942,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
