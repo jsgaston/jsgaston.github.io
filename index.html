@@ -820,7 +820,27 @@
                     
                     <div class="flip-text" style="margin-top: 20px;">Tiempo existido:</div>
                     <div id="elapsedDays_">...</div>
+
+                    <div class="flip-text" style="margin-top: 20px;">Tiempo existido con 1 sol y noche visto o no visto en el cielo:</div>
+                    <div id="numero_dias24h_2">...</div>
+
+                    <div class="flip-text" style="margin-top: 20px;">Equivalente si el del climatizador no sacase antes el sol a la misma altura:</div>
+                    <div id="numero_dias32h_2">...</div>
+
+                    <div class="flip-text" style="margin-top: 20px;">Flips debería haber existidos:</div>
+                    <div id="FlipsDeberíaTener_1">...</div>
+
+                    <div class="flip-text" style="margin-top: 20px;">Flips existidos:</div>
+                    <div id="FlipsExistidos_1">...</div>
+
+                    <div class="flip-text" style="margin-top: 20px;">Flips me deben:</div>
+                    <div id="FlipsDeben_2">...</div>
+
+                    
                 </div>
+
+
+
             
             <p class="text-center text-gray-600 mb-8"></p>
  
@@ -2545,7 +2565,19 @@ function updateElapsedTime() {
     console.log(tercerosDos_);
     console.log(cuarto_);
 
+    let numero_dias24h_ = totalDays;
+    let numero_dias24h = numero_dias24h_.toString()
+    console.log(numeroConCeros_); // "0012345"
 
+    let numero_dias24h_ = numero_dias24h*0.8;
+    let numero_dias32h = numero_dias232h_.toString();
+
+  const texto1_1 = `${numero_dias24h}`;
+  const texto2_1 = `${numero_dias32h}`;
+    document.getElementById("numero_dias24h_").textContent = `${texto1_1} dias existidos de 24 h en calendario Gregoriano `;
+    document.getElementById("numero_dias32h_").textContent = `${texto2_1} en equivalente en días de 32 h en calendario Gregoriano `;
+    document.getElementById("numero_dias24h_2").innerHTML = formatearFlip(texto1_1);
+  document.getElementById("numero_dias32h_2").innerHTML = formatearFlip(texto2_1);
 
   // Mostrar tiempo básico
   //  document.getElementById("elapsedSoles").textContent = `${totalSoles2} . `;
@@ -2579,6 +2611,10 @@ function updateElapsedTime() {
     document.getElementById("FlipsDeberíaTener_").textContent = `${FlipsDeberíaTener} flips `;
     document.getElementById("FlipsExistidos_").textContent = `${FlipsExistidos} flips `;
     document.getElementById("FlipsDeben:").textContent = `${FlipsDeben} flips `;
+
+    document.getElementById("FlipsDeberíaTener_1").innerHTML = formatearFlip(FlipsDeberíaTener);
+    document.getElementById("FlipsExistidos_1").innerHTML = formatearFlip(FlipsExistidos);
+    document.getElementById("FlipsDeben_2").innerHTML = formatearFlip(FlipsDeben);
 
     
   document.getElementById("elapsedSoles2").textContent = `${primerosDos} years , ${segundosDos} months, ${tercerosDos} days,  ${cuarto} hours.`;
@@ -3903,6 +3939,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
