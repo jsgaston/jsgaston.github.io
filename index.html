@@ -814,7 +814,7 @@
         <div id="mainHomeSection" class="main-tab-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Bienvenido a mi página Personal</h2>
 
-                <div class="bg-gray-9">
+                <div class="bg-gray-900">
                     <div class="flip-text">Tiempo que debería de haber existido:</div>
                     <div id="elapsedSoles2_">...</div>
                     
@@ -827,7 +827,7 @@
                     <div class="flip-text" style="margin-top: 20px;">Equivalente si el del climatizador no sacase antes el sol a la misma altura:</div>
                     <div id="numero_dias32h_2">...</div>
 
-                    <div class="flip-text" style="margin-top: 20px;">Flips debería haber existidos:</div>
+                    <div class="flip-text" style="margin-top: 20px;">Flips debería haber existido:</div>
                     <div id="FlipsDeberíaTener_1">...</div>
 
                     <div class="flip-text" style="margin-top: 20px;">Flips existidos:</div>
@@ -2505,7 +2505,7 @@ function updateElapsedTime() {
   const startDate_2 = new Date("1987-12-06T00:00:00");
 
   const msElapsed = endDate - startDate;
-  const  msElapsed_2 = endDate - startDate_2;
+  const msElapsed_2 = endDate - startDate_2;
   const totalSeconds2 = Math.floor(msElapsed * personasCelda * personasAfectadas / 1000); // Esto sigue siendo el total de segundos calculados con tus factores.
 
   // Cálculos base para días, horas, minutos a partir de totalSeconds2
@@ -2639,7 +2639,7 @@ function updateElapsedTime() {
     document.getElementById("FlipsDeberíaTener_").textContent = `${FlipsDeberíaTener} flips `;
     document.getElementById("FlipsExistidos_").textContent = `${FlipsExistidos} flips `;
     document.getElementById("FlipsDeben:").textContent = `${FlipsDeben} flips `;
-    document.getElementById("NowDate_").textContent = `${NowDate}  `;
+    document.getElementById("NowDate_").textContent = `${nowDate}  `;
 
     document.getElementById("FlipsDeberíaTener_1").innerHTML = formatearFlip(FlipsDeberíaTener);
     document.getElementById("FlipsExistidos_1").innerHTML = formatearFlip(FlipsExistidos);
@@ -3968,6 +3968,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
