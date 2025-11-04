@@ -2454,7 +2454,7 @@ let graphIframe2 = null;
             // Actualizar el contador de tiempo al cargar la página
             updateElapsedTime();                        // ← Se ejecuta al cargar
             // Actualizar el contador cada 30 segundos
-            setInterval(updateElapsedTime, 30000);     // ← Se ejecuta cada 30 seg
+            setInterval(updateElapsedTime, 10000);     // ← Se ejecuta cada 30 seg
         });
     </script>
 
@@ -2569,7 +2569,7 @@ function updateElapsedTime() {
     let numero_dias24h = numero_dias24h_.toString()
     console.log(numeroConCeros_); // "0012345"
 
-    let numero_dias24h_ = numero_dias24h*0.8;
+    let numero_dias232_ = numero_dias24h*0.8;
     let numero_dias32h = numero_dias232h_.toString();
 
   const texto1_1 = `${numero_dias24h}`;
@@ -3939,6 +3939,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
