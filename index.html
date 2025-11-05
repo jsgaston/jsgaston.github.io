@@ -2619,24 +2619,24 @@ function updateElapsedTime() {
     //document.getElementById("numero_dias32h_23").innerHTML = Alph_2;
   
   // Actualizar con el estilo flip/retro
-    const texto1 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-    const texto2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+    const texto1 = `${primerosDos} dias, ${segundosDos} semanas, ${tercerosDos} months, ${cuarto} years`;
+    const texto2 = `${primerosDos_} dias, ${segundosDos_} semanas, ${tercerosDos_} months, ${cuarto_} years`;
     document.getElementById("elapsedSoles2_").innerHTML = formatearFlip(texto1);
     document.getElementById("elapsedDays_").innerHTML = formatearFlip(texto2);
-    const texto1_2 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-    const texto2_2 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+    const texto1_2 = `${primerosDos} dias, ${segundosDos} semanas, ${tercerosDos} months, ${cuarto} years`;
+    const texto2_2 = `${primerosDos_} dias, ${segundosDos_} semanas, ${tercerosDos_} months, ${cuarto_} years`;
     document.getElementById("elapsedSoles2_1").innerHTML = texto1_2;
     document.getElementById("elapsedDays_1").innerHTML = texto2_2;
-    const texto1_3 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-    const texto2_3 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+    const texto1_3 = `${primerosDos} dias, ${segundosDos} semanas, ${tercerosDos} months, ${cuarto} years`;
+    const texto2_3 = `${primerosDos_} dias, ${segundosDos_} semanas, ${tercerosDos_} months, ${cuarto_} years`;
     document.getElementById("elapsedSoles2_2").innerHTML = texto1_3;
     document.getElementById("elapsedDays_2").innerHTML = texto2_3;
-    const texto1_4 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-    const texto2_4 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+    const texto1_4 = `${primerosDos} dias, ${segundosDos} semanas, ${tercerosDos} months, ${cuarto} years`;
+    const texto2_4  = `${primerosDos_} dias, ${segundosDos_} semanas, ${tercerosDos_} months, ${cuarto_} years`;
     document.getElementById("elapsedSoles2_3").innerHTML = texto1_4;
     document.getElementById("elapsedDays_3").innerHTML = texto2_4;
-    const texto1_5 = `${primerosDos} years, ${segundosDos} months, ${tercerosDos} days, ${cuarto} hours`;
-    const texto2_5 = `${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days, ${cuarto_} hours`;
+    const texto1_5 = `${primerosDos} dias, ${segundosDos} semanas, ${tercerosDos} months, ${cuarto} years`;
+    const texto2_5 = `${primerosDos_} dias, ${segundosDos_} semanas, ${tercerosDos_} months, ${cuarto_} years`;
     document.getElementById("elapsedSoles2_4").innerHTML = texto1_5;
     document.getElementById("elapsedDays_4").innerHTML = texto2_5;
 
@@ -2663,8 +2663,8 @@ function updateElapsedTime() {
     document.getElementById("FlipsExistidos_1").innerHTML = formatearFlip(FlipsExistidos);
     document.getElementById("FlipsDeben_2").innerHTML = formatearFlip(FlipsDeben);
         
-    document.getElementById("elapsedSoles2").textContent = `${primerosDos} years , ${segundosDos} months, ${tercerosDos} days,  ${cuarto} hours.`;
-    document.getElementById("elapsedDays").textContent = ` ${primerosDos_} years, ${segundosDos_} months, ${tercerosDos_} days,  ${cuarto_} hours.`;
+    document.getElementById("elapsedSoles2").textContent = `${primerosDos} dias, ${segundosDos} semanas, ${tercerosDos} months, ${cuarto} years`;
+    document.getElementById("elapsedDays").textContent  = `${primerosDos_} dias, ${segundosDos_} semanas, ${tercerosDos_} months, ${cuarto_} years`;
     document.getElementById("elapsedYears").textContent = (totalYears).toLocaleString(undefined, {maximumFractionDigits: 2});
     document.getElementById("elapsedHours").textContent = (totalSeconds2 / (60 * 60)).toLocaleString(undefined, {maximumFractionDigits: 2});
     document.getElementById("elapsedMinutes").textContent = (totalSeconds2 / 60).toLocaleString(undefined, {maximumFractionDigits: 2});
@@ -3985,6 +3985,7 @@ if (diarioIframe) {
 
 </body>
 </html>
+
 
 
 
